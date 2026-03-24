@@ -34,6 +34,12 @@ export default function Home() {
             <Button variant="ghost" size="sm">
               Slik fungerer det
             </Button>
+            <Button variant="ghost" size="sm" render={<a href="https://play.evalion.no" />}>
+              Spill
+            </Button>
+            <Button variant="ghost" size="sm" render={<a href="https://dashboard.evalion.no" />}>
+              Lærer
+            </Button>
             <Button size="sm">Kom i gang</Button>
           </div>
         </nav>
