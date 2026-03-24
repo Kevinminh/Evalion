@@ -14,7 +14,6 @@ import {
   BarChart3,
   BookOpen,
   CheckCircle,
-  GraduationCap,
   MessageSquare,
   Sparkles,
   Vote,
@@ -27,10 +26,7 @@ export default function Home() {
       {/* Nav */}
       <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-2 text-lg font-bold tracking-tight">
-            <GraduationCap className="size-5" />
-            <span>Evalion</span>
-          </div>
+          <img src="/logo.png" alt="Evalion" className="h-8" />
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="sm">
               Funksjoner

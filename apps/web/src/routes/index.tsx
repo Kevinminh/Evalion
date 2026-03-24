@@ -11,7 +11,7 @@ function App() {
     <div className="flex min-h-svh flex-col items-center justify-center bg-background px-6">
       <div className="flex w-full max-w-sm flex-col items-center gap-8">
         <div className="flex flex-col items-center gap-2">
-          <h1 className="text-4xl font-bold tracking-tight">Evalion</h1>
+          <img src="/logo.png" alt="Evalion" className="h-12" />
           <p className="text-muted-foreground">Bli med i en FagPrat-økt</p>
         </div>
 

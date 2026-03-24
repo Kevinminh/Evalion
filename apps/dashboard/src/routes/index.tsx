@@ -19,7 +19,8 @@ function App() {
     <div className="flex min-h-svh items-center justify-center bg-background px-6">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">Evalion</CardTitle>
+          <img src="/logo.png" alt="Evalion" className="mx-auto h-10" />
+          <CardTitle className="sr-only">Evalion</CardTitle>
           <CardDescription>Logg inn for å administrere dine FagPrat-økter</CardDescription>
         </CardHeader>
         <CardContent>
