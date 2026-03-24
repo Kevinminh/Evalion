@@ -56,30 +56,22 @@ temp
 
 # Build analysis
 stats.html
+
 # Worktrees
 .worktrees/
-.worktrees
 
-
-# next
-.next/* 
-# Turbo
-.turbo
+# Next.js
+.next/
 
 # Vercel
 .vercel
 
-# Build Outputs
-dist
+# Framework outputs
 .output
 .nitro
 .tanstack
 .vinxi
 
-# Debug
-npm-debug.log*
-
-# Misc
-.DS_Store
+# Secrets
 *.pem
 
