@@ -1,0 +1,42 @@
+{
+  // Agent worktrees under .claude/ are separate Git checkouts; without this, the SCM
+  // view can jump from the workspace root (e.g. main) to a nested worktree branch.
+  "git.repositoryScanIgnoredFolders": [".claude/worktrees"],
+
+  "files.readonlyInclude": {
+    "**/routeTree.gen.ts": true,
+    "**/.tanstack/**/*": true,
+    "**/worker-configuration.d.ts": true,
+    "pnpm-lock.yaml": true,
+    "bun.lock": true
+  },
+  "files.watcherExclude": {
+    "**/routeTree.gen.ts": true,
+    "**/.tanstack/**/*": true,
+    "**/worker-configuration.d.ts": true,
+    "pnpm-lock.yaml": true,
+    "bun.lock": true
+  },
+  "search.exclude": {
+    "**/routeTree.gen.ts": true,
+    "**/.tanstack/**/*": true,
+    "**/worker-configuration.d.ts": true,
+    "pnpm-lock.yaml": true,
+    "bun.lock": true
+  },
+
+  // use LF line endings
+  "files.eol": "\n",
+
+  // disable prettier & eslint for oxc + oxfmt
+  "prettier.enable": false,
+  "eslint.enable": false,
+  "oxc.enable": true,
+
+  // type-aware linting
+  "oxc.typeAware": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+
+  // set oxfmt as default formatter
+  "editor.defaultFormatter": "oxc.oxc-vscode"
+}
