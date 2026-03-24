@@ -1,5 +1,17 @@
 # Evalion
 
+Evalion er et digitalt verktøy for lærere som ønsker å skape mer engasjement og faglig dybde i klasserommet. Kjerneaktiviteten heter FagPrat – en strukturert diskusjonsøkt hvor læreren presenterer faglige påstander som elevene skal ta stilling til.
+
+Slik fungerer det: elevene stemmer individuelt på om en påstand er sant, delvis sant eller usant, og oppgir hvor sikre de er. Deretter diskuterer de med hverandre, før de stemmer på nytt. Læreren avslører fasiten, og elevene forklarer og reflekterer over egen forståelse. Til slutt vurderer de selv hvor godt de forstår påstanden.
+
+Mens aktiviteten pågår, gir Evalion læreren tilgang til live-statistikk som viser stemmefordeling, sikkerhetsnivå og hvilke elever som endrer standpunkt. Dette gjør det mulig å tilpasse samtalen i sanntid – for eksempel ved å løfte fram elever med gode forklaringer eller undersøke mulige misoppfatninger.
+
+Etter hver økt genererer Evalion en rapport med detaljert analyse av hver påstand: hvem som endret standpunkt, gjennomsnittlig forståelse, og elevenes egne skriftlige forklaringer sortert etter riktig og feil standpunkt. Dette gir læreren et konkret grunnlag for videre undervisning og dokumentasjon av elevenes kompetanse over tid – i tråd med kravene i LK20.
+
+Evalion passer på alle trinn og fag, og er enkelt å komme i gang med. Læreren kan bruke den innebygde påstandsgeneratoren til å lage gode påstander på under ett minutt, og aktiviteten kan organiseres på fire ulike måter avhengig av klassen og situasjonen.
+
+---
+
 A TypeScript + React monorepo built with TanStack Start, shadcn/ui, and Better Auth.
 
 ## Prerequisites
