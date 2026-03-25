@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
+@import "@fontsource-variable/nunito";
 
 @custom-variant dark (&:is(.dark *));
 @source "../../../apps/**/*.{ts,tsx}";
@@ -48,7 +49,7 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
-  --font-sans: 'Inter Variable', sans-serif;
+  --font-sans: 'Nunito Variable', 'Inter Variable', sans-serif;
 }
 
 :root {
@@ -58,32 +59,32 @@
   --card-foreground: oklch(0.2 0.05 290);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.2 0.05 290);
-  --primary: oklch(0.45 0.25 285);
+  --primary: oklch(0.62 0.14 180);
   --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.94 0.04 285);
-  --secondary-foreground: oklch(0.25 0.06 285);
-  --muted: oklch(0.95 0.02 285);
-  --muted-foreground: oklch(0.52 0.04 285);
-  --accent: oklch(0.7 0.18 165);
+  --secondary: oklch(0.94 0.04 180);
+  --secondary-foreground: oklch(0.25 0.06 180);
+  --muted: oklch(0.95 0.02 180);
+  --muted-foreground: oklch(0.52 0.04 250);
+  --accent: oklch(0.75 0.16 165);
   --accent-foreground: oklch(0.18 0.05 165);
   --destructive: oklch(0.58 0.24 25);
-  --border: oklch(0.91 0.02 285);
-  --input: oklch(0.91 0.02 285);
-  --ring: oklch(0.55 0.2 285);
-  --chart-1: oklch(0.55 0.25 285);
+  --border: oklch(0.91 0.02 250);
+  --input: oklch(0.91 0.02 250);
+  --ring: oklch(0.62 0.14 180);
+  --chart-1: oklch(0.62 0.14 180);
   --chart-2: oklch(0.65 0.2 250);
   --chart-3: oklch(0.7 0.18 165);
   --chart-4: oklch(0.72 0.17 55);
   --chart-5: oklch(0.65 0.22 330);
-  --radius: 0.75rem;
-  --sidebar: oklch(0.97 0.01 285);
-  --sidebar-foreground: oklch(0.2 0.05 290);
-  --sidebar-primary: oklch(0.45 0.25 285);
+  --radius: 1rem;
+  --sidebar: oklch(0.97 0.01 180);
+  --sidebar-foreground: oklch(0.2 0.05 250);
+  --sidebar-primary: oklch(0.62 0.14 180);
   --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.93 0.04 285);
-  --sidebar-accent-foreground: oklch(0.25 0.06 285);
-  --sidebar-border: oklch(0.91 0.02 285);
-  --sidebar-ring: oklch(0.55 0.2 285);
+  --sidebar-accent: oklch(0.93 0.04 180);
+  --sidebar-accent-foreground: oklch(0.25 0.06 180);
+  --sidebar-border: oklch(0.91 0.02 250);
+  --sidebar-ring: oklch(0.62 0.14 180);
 }
 
 .dark {
@@ -93,10 +94,10 @@
   --card-foreground: oklch(0.95 0.01 285);
   --popover: oklch(0.22 0.05 285);
   --popover-foreground: oklch(0.95 0.01 285);
-  --primary: oklch(0.7 0.2 285);
-  --primary-foreground: oklch(0.15 0.04 285);
-  --secondary: oklch(0.28 0.05 285);
-  --secondary-foreground: oklch(0.95 0.01 285);
+  --primary: oklch(0.7 0.14 180);
+  --primary-foreground: oklch(0.15 0.04 180);
+  --secondary: oklch(0.28 0.05 200);
+  --secondary-foreground: oklch(0.95 0.01 200);
   --muted: oklch(0.28 0.04 285);
   --muted-foreground: oklch(0.68 0.04 285);
   --accent: oklch(0.65 0.16 165);
@@ -104,20 +105,20 @@
   --destructive: oklch(0.7 0.19 22);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.6 0.18 285);
-  --chart-1: oklch(0.7 0.2 285);
+  --ring: oklch(0.6 0.14 180);
+  --chart-1: oklch(0.7 0.14 180);
   --chart-2: oklch(0.7 0.18 250);
   --chart-3: oklch(0.72 0.16 165);
   --chart-4: oklch(0.75 0.15 55);
   --chart-5: oklch(0.7 0.2 330);
-  --sidebar: oklch(0.2 0.05 285);
-  --sidebar-foreground: oklch(0.95 0.01 285);
-  --sidebar-primary: oklch(0.7 0.2 285);
-  --sidebar-primary-foreground: oklch(0.15 0.04 285);
-  --sidebar-accent: oklch(0.28 0.05 285);
-  --sidebar-accent-foreground: oklch(0.95 0.01 285);
+  --sidebar: oklch(0.2 0.05 200);
+  --sidebar-foreground: oklch(0.95 0.01 200);
+  --sidebar-primary: oklch(0.7 0.14 180);
+  --sidebar-primary-foreground: oklch(0.15 0.04 180);
+  --sidebar-accent: oklch(0.28 0.05 200);
+  --sidebar-accent-foreground: oklch(0.95 0.01 200);
   --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: oklch(0.6 0.18 285);
+  --sidebar-ring: oklch(0.6 0.14 180);
 }
 
 @layer base {
