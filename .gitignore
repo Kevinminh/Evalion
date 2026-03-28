@@ -66,6 +66,9 @@ stats.html
 # Vercel
 .vercel
 
+# Convex generated
+**/convex/_generated/
+
 # Framework outputs
 .output
 .nitro
