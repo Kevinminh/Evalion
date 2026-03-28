@@ -1,19 +1,19 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
-import { LoginForm } from "@workspace/ui/components/login-form";
+import { RegisterForm } from "@workspace/ui/components/register-form";
 import { authClient } from "@/lib/auth-client";
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute("/register")({
   beforeLoad: ({ context }) => {
     if (context.isAuthenticated) {
       throw redirect({ to: "/" });
     }
   },
-  component: LoginPage,
+  component: RegisterPage,
 });
 
-function LoginPage() {
+function RegisterPage() {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -24,16 +24,18 @@ function LoginPage() {
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    const { error: authError } = await authClient.signIn.email({
+    const { error: authError } = await authClient.signUp.email({
+      name,
       email,
       password,
     });
 
     if (authError) {
-      setError(authError.message ?? "Innlogging feilet");
+      setError(authError.message ?? "Registrering feilet");
       setLoading(false);
     } else {
       navigate({ to: "/" });
@@ -46,18 +48,18 @@ function LoginPage() {
 
   return (
     <div className="flex min-h-svh items-center justify-center bg-background px-6">
-      <LoginForm
+      <RegisterForm
         logo={<img src="/logo.png" alt="Evalion" className="mx-auto h-10" />}
-        description="Logg inn for å administrere dine FagPrat-økter"
+        description="Opprett en konto for å komme i gang"
         onSubmit={handleSubmit}
         onGoogleSignIn={handleGoogleSignIn}
         error={error}
         loading={loading}
         footer={
           <span className="text-sm text-muted-foreground">
-            Ingen konto?{" "}
-            <Link to="/register" className="text-primary underline-offset-4 hover:underline">
-              Registrer deg
+            Har du allerede en konto?{" "}
+            <Link to="/login" className="text-primary underline-offset-4 hover:underline">
+              Logg inn
             </Link>
           </span>
         }

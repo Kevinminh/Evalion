@@ -4,9 +4,9 @@ import { Button } from "@workspace/ui/components/button"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
+  CardDescription,
   CardTitle,
 } from "@workspace/ui/components/card"
 import { FieldSeparator } from "@workspace/ui/components/field"
@@ -14,7 +14,7 @@ import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { cn } from "@workspace/ui/lib/utils"
 
-interface LoginFormProps {
+interface RegisterFormProps {
   className?: string
   logo?: React.ReactNode
   description?: string
@@ -25,38 +25,42 @@ interface LoginFormProps {
   footer?: React.ReactNode
 }
 
-function LoginForm({
+function RegisterForm({
   className,
   logo,
-  description = "Logg inn for å fortsette",
+  description = "Opprett en ny konto",
   onSubmit,
   onGoogleSignIn,
   error,
   loading,
   footer,
-}: LoginFormProps) {
+}: RegisterFormProps) {
   return (
     <Card className={cn("w-full max-w-sm", className)}>
       <CardHeader>
         {logo}
-        <CardTitle className="sr-only">Logg inn</CardTitle>
+        <CardTitle className="sr-only">Registrer</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
         <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="name">Navn</Label>
+            <Input id="name" name="name" type="text" placeholder="Ditt navn" required />
+          </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="email">E-post</Label>
             <Input id="email" name="email" type="email" placeholder="navn@skole.no" required />
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="password">Passord</Label>
-            <Input id="password" name="password" type="password" placeholder="Skriv inn passord" required />
+            <Input id="password" name="password" type="password" placeholder="Velg et passord" required />
           </div>
           {error && (
             <p className="text-sm text-destructive">{error}</p>
           )}
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Logger inn..." : "Logg inn"}
+            {loading ? "Registrerer..." : "Registrer"}
           </Button>
           <FieldSeparator>eller</FieldSeparator>
           <Button type="button" variant="outline" className="w-full" onClick={onGoogleSignIn}>
@@ -95,4 +99,4 @@ function GoogleIcon(props: React.ComponentProps<"svg">) {
   )
 }
 
-export { LoginForm }
+export { RegisterForm }
