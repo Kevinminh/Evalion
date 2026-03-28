@@ -20,6 +20,10 @@ export const authComponent = createClient<DataModel, typeof schema>(
 export const { getAuthUser } = authComponent.clientApi();
 
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
+  const trustedOrigins = process.env.TRUSTED_ORIGINS
+    ? process.env.TRUSTED_ORIGINS.split(",")
+    : [];
+
   return {
     appName: "Evalion",
     baseURL: process.env.SITE_URL,
@@ -28,6 +32,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     emailAndPassword: {
       enabled: true,
     },
+    trustedOrigins,
     plugins: [convex({ authConfig })],
   } satisfies BetterAuthOptions;
 };
