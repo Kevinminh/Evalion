@@ -5,7 +5,15 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".output/**"]
+      "outputs": [".output/**", ".vercel/output/**"],
+      "env": [
+        "VITE_CONVEX_URL",
+        "VITE_CONVEX_SITE_URL",
+        "BETTER_AUTH_SECRET",
+        "SITE_URL",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET"
+      ]
     },
     "lint": {
       "dependsOn": ["^lint"]
