@@ -39,6 +39,9 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
       },
     },
     trustedOrigins,
+    crossSubDomainCookies: process.env.COOKIE_DOMAIN
+      ? { enabled: true, domain: process.env.COOKIE_DOMAIN }
+      : undefined,
     plugins: [convex({ authConfig })],
   } satisfies BetterAuthOptions;
 };

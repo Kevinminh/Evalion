@@ -12,10 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LogoutRouteImport } from './routes/logout'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as AuthedRouteImport } from './routes/_authed'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
+import { Route as DashboardMinSamlingRouteImport } from './routes/_dashboard/min-samling'
 import { Route as AuthedPrivateRouteImport } from './routes/_authed/private'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as DashboardFagpratIdRouteImport } from './routes/_dashboard/fagprat.$id'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -32,14 +35,23 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/_dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthedRoute = AuthedRouteImport.update({
   id: '/_authed',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardMinSamlingRoute = DashboardMinSamlingRouteImport.update({
+  id: '/min-samling',
+  path: '/min-samling',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const AuthedPrivateRoute = AuthedPrivateRouteImport.update({
   id: '/private',
@@ -51,31 +63,43 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardFagpratIdRoute = DashboardFagpratIdRouteImport.update({
+  id: '/fagprat/$id',
+  path: '/fagprat/$id',
+  getParentRoute: () => DashboardRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof DashboardIndexRoute
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/register': typeof RegisterRoute
   '/private': typeof AuthedPrivateRoute
+  '/min-samling': typeof DashboardMinSamlingRoute
+  '/fagprat/$id': typeof DashboardFagpratIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/': typeof DashboardIndexRoute
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/register': typeof RegisterRoute
   '/private': typeof AuthedPrivateRoute
+  '/min-samling': typeof DashboardMinSamlingRoute
+  '/fagprat/$id': typeof DashboardFagpratIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
+  '/_dashboard': typeof DashboardRouteWithChildren
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/register': typeof RegisterRoute
   '/_authed/private': typeof AuthedPrivateRoute
+  '/_dashboard/min-samling': typeof DashboardMinSamlingRoute
+  '/_dashboard/': typeof DashboardIndexRoute
+  '/_dashboard/fagprat/$id': typeof DashboardFagpratIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -86,23 +110,36 @@ export interface FileRouteTypes {
     | '/logout'
     | '/register'
     | '/private'
+    | '/min-samling'
+    | '/fagprat/$id'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/logout' | '/register' | '/private' | '/api/auth/$'
+  to:
+    | '/'
+    | '/login'
+    | '/logout'
+    | '/register'
+    | '/private'
+    | '/min-samling'
+    | '/fagprat/$id'
+    | '/api/auth/$'
   id:
     | '__root__'
-    | '/'
     | '/_authed'
+    | '/_dashboard'
     | '/login'
     | '/logout'
     | '/register'
     | '/_authed/private'
+    | '/_dashboard/min-samling'
+    | '/_dashboard/'
+    | '/_dashboard/fagprat/$id'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   AuthedRoute: typeof AuthedRouteWithChildren
+  DashboardRoute: typeof DashboardRouteWithChildren
   LoginRoute: typeof LoginRoute
   LogoutRoute: typeof LogoutRoute
   RegisterRoute: typeof RegisterRoute
@@ -132,6 +169,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_dashboard': {
+      id: '/_dashboard'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authed': {
       id: '/_authed'
       path: ''
@@ -139,12 +183,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
+    '/_dashboard/': {
+      id: '/_dashboard/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/min-samling': {
+      id: '/_dashboard/min-samling'
+      path: '/min-samling'
+      fullPath: '/min-samling'
+      preLoaderRoute: typeof DashboardMinSamlingRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/_authed/private': {
       id: '/_authed/private'
@@ -160,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_dashboard/fagprat/$id': {
+      id: '/_dashboard/fagprat/$id'
+      path: '/fagprat/$id'
+      fullPath: '/fagprat/$id'
+      preLoaderRoute: typeof DashboardFagpratIdRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
 
@@ -174,9 +232,25 @@ const AuthedRouteChildren: AuthedRouteChildren = {
 const AuthedRouteWithChildren =
   AuthedRoute._addFileChildren(AuthedRouteChildren)
 
+interface DashboardRouteChildren {
+  DashboardMinSamlingRoute: typeof DashboardMinSamlingRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardFagpratIdRoute: typeof DashboardFagpratIdRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardMinSamlingRoute: DashboardMinSamlingRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+  DashboardFagpratIdRoute: DashboardFagpratIdRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
+  DashboardRoute: DashboardRouteWithChildren,
   LoginRoute: LoginRoute,
   LogoutRoute: LogoutRoute,
   RegisterRoute: RegisterRoute,
