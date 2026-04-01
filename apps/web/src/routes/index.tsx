@@ -1,4 +1,4 @@
-import { createFileRoute, useRouteContext, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, useRouteContext } from "@tanstack/react-router"
 import { Play, LogOut, User } from "lucide-react"
 
 import { Button } from "@workspace/ui/components/button"
@@ -10,8 +10,6 @@ export const Route = createFileRoute("/")({ component: App })
 function App() {
   const { isAuthenticated } = useRouteContext({ from: "/" })
   const { data: session } = authClient.useSession()
-  const navigate = useNavigate()
-
   const handleLogout = async () => {
     await authClient.signOut()
     window.location.reload()
