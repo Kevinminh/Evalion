@@ -1,9 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useRef, useEffect } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 
-import { getAllFagPrats } from "@/data/fagprat-data";
 import { FagPratCard } from "@/components/fagprat-card";
+import { fagpratQueries } from "@/lib/convex";
 
 export const Route = createFileRoute("/_dashboard/")({
   component: UtforskPage,
@@ -14,15 +15,18 @@ function UtforskPage() {
   const [filterOpen, setFilterOpen] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
 
-  const allFagPrats = getAllFagPrats();
-  const filtered = searchQuery
-    ? allFagPrats.filter(
-        (fp) =>
-          fp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          fp.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          fp.level.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
-    : allFagPrats;
+  const { data: allFagPrats, isPending } = useQuery(fagpratQueries.list());
+
+  const filtered = allFagPrats
+    ? searchQuery
+      ? allFagPrats.filter(
+          (fp) =>
+            fp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            fp.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            fp.level.toLowerCase().includes(searchQuery.toLowerCase()),
+        )
+      : allFagPrats
+    : [];
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -39,9 +43,7 @@ function UtforskPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="mb-1 text-3xl font-extrabold text-foreground">Utforsk</h1>
-        <p className="text-base text-muted-foreground">
-          Finn FagPrater som andre lærere har delt
-        </p>
+        <p className="text-base text-muted-foreground">Finn FagPrater som andre lærere har delt</p>
       </div>
 
       {/* Search + Filter */}
@@ -102,11 +104,7 @@ function UtforskPage() {
               </div>
               <div className="flex gap-4">
                 <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
-                  <input
-                    type="checkbox"
-                    defaultChecked
-                    className="size-4 accent-primary"
-                  />
+                  <input type="checkbox" defaultChecked className="size-4 accent-primary" />
                   Introduksjon
                 </label>
                 <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
@@ -153,14 +151,19 @@ function UtforskPage() {
       {/* Section title */}
       <h2 className="mb-6 text-2xl font-extrabold text-foreground">Populære FagPrater</h2>
 
-      {/* Card grid */}
-      <div className="grid auto-rows-fr grid-cols-3 gap-6">
-        {filtered.map((fp) => (
-          <FagPratCard key={fp.id} fagprat={fp} variant="browse" />
-        ))}
-      </div>
+      {/* Loading state */}
+      {isPending && <p className="py-12 text-center text-muted-foreground">Laster FagPrater...</p>}
 
-      {filtered.length === 0 && (
+      {/* Card grid */}
+      {!isPending && (
+        <div className="grid auto-rows-fr grid-cols-3 gap-6">
+          {filtered.map((fp) => (
+            <FagPratCard key={fp._id} fagprat={fp} variant="browse" />
+          ))}
+        </div>
+      )}
+
+      {!isPending && filtered.length === 0 && (
         <p className="py-12 text-center text-muted-foreground">
           Ingen FagPrater funnet for &quot;{searchQuery}&quot;
         </p>

@@ -1,8 +1,10 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Mic } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
-import { getFagPrat } from "@/data/fagprat-data";
+import { fagpratQueries } from "@/lib/convex";
+import type { FagPratId } from "@/lib/types";
 import { SessionTopBar } from "@/components/live/session-top-bar";
 import { StepNav } from "@/components/live/step-nav";
 import { TeacherPanel } from "@/components/live/teacher-panel";
@@ -62,7 +64,9 @@ function LiveStepPage() {
   const { id, step: stepParam } = Route.useParams();
   const navigate = useNavigate();
   const step = Number(stepParam);
-  const fagprat = getFagPrat(id);
+  const { data: fagprat, isPending } = useQuery(
+    fagpratQueries.getById(id as FagPratId),
+  );
 
   const [selectedStatement, setSelectedStatement] = useState<number | null>(null);
   const [vote, setVote] = useState<"sant" | "usant" | "delvis" | null>(null);
@@ -104,6 +108,14 @@ function LiveStepPage() {
       setCountdownDone(false);
     }
   }, [step]);
+
+  if (isPending) {
+    return (
+      <div className="flex min-h-svh items-center justify-center">
+        <p className="text-muted-foreground">Laster...</p>
+      </div>
+    );
+  }
 
   if (!fagprat) {
     return (

@@ -1,19 +1,76 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowLeft, Globe, Lock } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
-import { ConceptTags } from "@/components/concept-tags";
 import { cn } from "@workspace/ui/lib/utils";
+import { useMutation } from "convex/react";
+import { ArrowLeft, Globe, Lock } from "lucide-react";
+import { useState } from "react";
+
+import { ConceptTags } from "@/components/concept-tags";
+import { api } from "@/lib/convex";
+
+interface FagPratDraft {
+  title: string;
+  concepts: string[];
+  subject: string;
+  level: string;
+  type: "intro" | "oppsummering";
+  statements: { text: string; fasit: "sant" | "usant" | "delvis"; explanation: string }[];
+}
 
 export const Route = createFileRoute("/_dashboard/lagre-fagprat")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    draft: (search.draft as string) ?? "",
+  }),
   component: LagreFagPratPage,
 });
 
 function LagreFagPratPage() {
   const navigate = useNavigate();
-  const [title, setTitle] = useState("");
-  const [concepts, setConcepts] = useState<string[]>(["Drivhuseffekt", "CO₂", "Fossil energi"]);
+  const { draft: draftJson } = Route.useSearch();
+  const createFagPrat = useMutation(api.fagprats.create);
+
+  let draft: FagPratDraft | null = null;
+  try {
+    if (draftJson) {
+      draft = JSON.parse(draftJson) as FagPratDraft;
+    }
+  } catch {
+    // Invalid JSON, draft stays null
+  }
+
+  const [title, setTitle] = useState(draft?.title ?? "");
+  const [concepts, setConcepts] = useState<string[]>(draft?.concepts ?? []);
   const [visibility, setVisibility] = useState<"public" | "private">("public");
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!draft) return;
+    setSaving(true);
+    try {
+      const id = await createFagPrat({
+        title: title || draft.title,
+        subject: draft.subject,
+        level: draft.level,
+        type: draft.type,
+        concepts,
+        statements: draft.statements,
+        visibility,
+      });
+      navigate({ to: "/fagprat/$id", params: { id } });
+    } catch {
+      setSaving(false);
+    }
+  };
+
+  if (!draft) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <p className="text-muted-foreground">
+          Ingen FagPrat-data funnet. Gå tilbake og lag en FagPrat først.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-[700px]">
@@ -29,8 +86,8 @@ function LagreFagPratPage() {
           </button>
           <h1 className="text-2xl font-extrabold text-foreground">Fullfør FagPraten</h1>
         </div>
-        <Button onClick={() => navigate({ to: "/min-samling" })}>
-          Lagre
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? "Lagrer..." : "Lagre"}
         </Button>
       </div>
 

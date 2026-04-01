@@ -1,7 +1,9 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Users, Mic, CheckSquare, ArrowRight } from "lucide-react";
-import { getFagPrat } from "@/data/fagprat-data";
+import { fagpratQueries } from "@/lib/convex";
+import type { FagPratId } from "@/lib/types";
 import { SessionTopBar } from "@/components/live/session-top-bar";
 import { OptionCard } from "@/components/live/option-card";
 import { Stepper } from "@/components/live/stepper";
@@ -18,12 +20,22 @@ export const Route = createFileRoute("/liveokt/$id")({
 function LiveoktSetupPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const fagprat = getFagPrat(id);
+  const { data: fagprat, isPending } = useQuery(
+    fagpratQueries.getById(id as FagPratId),
+  );
 
   const [groupsEnabled, setGroupsEnabled] = useState(true);
   const [groupCount, setGroupCount] = useState(4);
   const [transcriptionEnabled, setTranscriptionEnabled] = useState(false);
   const [selfEvalEnabled, setSelfEvalEnabled] = useState(true);
+
+  if (isPending) {
+    return (
+      <div className="flex min-h-svh items-center justify-center">
+        <p className="text-muted-foreground">Laster...</p>
+      </div>
+    );
+  }
 
   if (!fagprat) {
     return (
