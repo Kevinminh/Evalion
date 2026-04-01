@@ -1,9 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import { Search, ChevronDown } from "lucide-react";
+import { useState } from "react";
 
-import { getAllFagPrats } from "@/data/fagprat-data";
 import { FagPratCard } from "@/components/fagprat-card";
+import { fagpratQueries } from "@/lib/convex";
 
 export const Route = createFileRoute("/_dashboard/min-samling")({
   component: MinSamlingPage,
@@ -14,14 +15,17 @@ function MinSamlingPage() {
   const [sortBy, setSortBy] = useState<"sist-endret" | "fag">("sist-endret");
   const [sortOpen, setSortOpen] = useState(false);
 
-  const allFagPrats = getAllFagPrats();
-  const filtered = searchQuery
-    ? allFagPrats.filter(
-        (fp) =>
-          fp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          fp.subject.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
-    : allFagPrats;
+  const { data: allFagPrats, isPending } = useQuery(fagpratQueries.listByAuthor());
+
+  const filtered = allFagPrats
+    ? searchQuery
+      ? allFagPrats.filter(
+          (fp) =>
+            fp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            fp.subject.toLowerCase().includes(searchQuery.toLowerCase()),
+        )
+      : allFagPrats
+    : [];
 
   // Group by subject for "fag" view
   const grouped = filtered.reduce(
@@ -99,31 +103,39 @@ function MinSamlingPage() {
         </div>
       </div>
 
+      {/* Loading state */}
+      {isPending && (
+        <p className="py-12 text-center text-muted-foreground">Laster samlingen din...</p>
+      )}
+
       {/* Flat view */}
-      {sortBy === "sist-endret" && (
+      {!isPending && sortBy === "sist-endret" && (
         <div className="grid auto-rows-fr grid-cols-3 gap-6">
           {filtered.map((fp) => (
-            <FagPratCard key={fp.id} fagprat={fp} variant="collection" />
+            <FagPratCard key={fp._id} fagprat={fp} variant="collection" />
           ))}
         </div>
       )}
 
       {/* Grouped view */}
-      {sortBy === "fag" &&
+      {!isPending &&
+        sortBy === "fag" &&
         Object.entries(grouped).map(([subject, items]) => (
           <div key={subject} className="mb-10">
             <h2 className="mb-6 text-2xl font-extrabold text-foreground">{subject}</h2>
             <div className="grid auto-rows-fr grid-cols-3 gap-6">
               {items.map((fp) => (
-                <FagPratCard key={fp.id} fagprat={fp} variant="collection" />
+                <FagPratCard key={fp._id} fagprat={fp} variant="collection" />
               ))}
             </div>
           </div>
         ))}
 
-      {filtered.length === 0 && (
+      {!isPending && filtered.length === 0 && (
         <p className="py-12 text-center text-muted-foreground">
-          Ingen FagPrater funnet for &quot;{searchQuery}&quot;
+          {searchQuery
+            ? `Ingen FagPrater funnet for "${searchQuery}"`
+            : "Du har ingen FagPrater i samlingen din ennå."}
         </p>
       )}
     </div>

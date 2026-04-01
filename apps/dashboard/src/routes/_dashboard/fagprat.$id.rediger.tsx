@@ -1,12 +1,16 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { Pencil, Globe, Lock } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
-import { getFagPrat } from "@/data/fagprat-data";
+import { useMutation } from "convex/react";
+import { Pencil, Globe, Lock } from "lucide-react";
+import { useState, useEffect } from "react";
+
 import { ConceptTags } from "@/components/concept-tags";
 import { ForkunnskapSelector } from "@/components/forkunnskap-selector";
 import { StatementEditor } from "@/components/statement-editor";
+import { fagpratQueries, api } from "@/lib/convex";
+import type { FagPratId } from "@/lib/types";
 
 export const Route = createFileRoute("/_dashboard/fagprat/$id/rediger")({
   component: EditFagPratPage,
@@ -15,24 +19,46 @@ export const Route = createFileRoute("/_dashboard/fagprat/$id/rediger")({
 function EditFagPratPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const fagprat = getFagPrat(id);
+  const { data: fagprat, isPending } = useQuery(fagpratQueries.getById(id as FagPratId));
+  const updateFagPrat = useMutation(api.fagprats.update);
 
   const [editing, setEditing] = useState(false);
-  const [title, setTitle] = useState(fagprat?.title ?? "");
-  const [fag, setFag] = useState(fagprat?.subject ?? "");
-  const [trinn, setTrinn] = useState(fagprat?.level ?? "");
-  const [forkunnskap, setForkunnskap] = useState<"intro" | "oppsummering" | null>(
-    fagprat?.type ?? null,
-  );
-  const [concepts, setConcepts] = useState(fagprat?.concepts ?? []);
+  const [title, setTitle] = useState("");
+  const [fag, setFag] = useState("");
+  const [trinn, setTrinn] = useState("");
+  const [forkunnskap, setForkunnskap] = useState<"intro" | "oppsummering" | null>(null);
+  const [concepts, setConcepts] = useState<string[]>([]);
   const [visibility, setVisibility] = useState<"public" | "private">("public");
-  const [statements, setStatements] = useState(
-    fagprat?.statements.map((s) => ({
-      statement: s.text,
-      fasit: s.fasit,
-      explanation: s.explanation,
-    })) ?? [],
-  );
+  const [statements, setStatements] = useState<
+    { statement: string; fasit: "sant" | "usant" | "delvis"; explanation: string }[]
+  >([]);
+
+  // Sync local state when data loads
+  useEffect(() => {
+    if (fagprat) {
+      setTitle(fagprat.title);
+      setFag(fagprat.subject);
+      setTrinn(fagprat.level);
+      setForkunnskap(fagprat.type);
+      setConcepts(fagprat.concepts);
+      setVisibility(fagprat.visibility);
+      setStatements(
+        fagprat.statements.map((s) => ({
+          statement: s.text,
+          fasit: s.fasit,
+          explanation: s.explanation,
+        })),
+      );
+    }
+  }, [fagprat]);
+
+  if (isPending) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <p className="text-muted-foreground">Laster FagPrat...</p>
+      </div>
+    );
+  }
 
   if (!fagprat) {
     return (
@@ -52,21 +78,34 @@ function EditFagPratPage() {
     setStatements(updated);
   };
 
+  const handleSave = async () => {
+    await updateFagPrat({
+      id: fagprat._id,
+      title,
+      subject: fag,
+      level: trinn,
+      type: forkunnskap ?? undefined,
+      concepts,
+      visibility,
+      statements: statements.map((s) => ({
+        text: s.statement,
+        fasit: s.fasit,
+        explanation: s.explanation,
+      })),
+    });
+    navigate({ to: "/fagprat/$id", params: { id } });
+  };
+
   return (
     <div className="max-w-[900px]">
       {/* Sticky header */}
       <div className="sticky top-0 z-20 -mx-10 mb-8 flex items-center justify-between border-b bg-background px-10 py-4">
         <h2 className="text-xl font-extrabold text-foreground">Rediger FagPrat</h2>
         <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            onClick={() => navigate({ to: "/fagprat/$id", params: { id } })}
-          >
+          <Button variant="ghost" onClick={() => navigate({ to: "/fagprat/$id", params: { id } })}>
             Avbryt
           </Button>
-          <Button onClick={() => navigate({ to: "/fagprat/$id", params: { id } })}>
-            Lagre
-          </Button>
+          <Button onClick={handleSave}>Lagre</Button>
         </div>
       </div>
 

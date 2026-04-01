@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { Sprout, Target, Users, Pencil, MoreVertical, Play } from "lucide-react";
-import type { FagPrat } from "@/data/fagprat-data";
+
+import type { FagPrat } from "@/lib/types";
 
 function TypeIcon({ type }: { type: "intro" | "oppsummering" }) {
   if (type === "intro") {
@@ -28,7 +29,7 @@ export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
   return (
     <div
       className="flex cursor-pointer flex-col rounded-2xl border-[1.5px] border-border bg-card p-6 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-[3px] hover:border-primary/30 hover:shadow-md"
-      onClick={() => navigate({ to: "/fagprat/$id", params: { id: fagprat.id } })}
+      onClick={() => navigate({ to: "/fagprat/$id", params: { id: fagprat._id } })}
     >
       {/* Tags */}
       <div className="mb-4 flex flex-wrap gap-2">
@@ -45,9 +46,7 @@ export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
       <h3 className="mb-2 text-lg font-extrabold leading-snug text-foreground">{fagprat.title}</h3>
 
       {/* Statement count */}
-      <p className="mb-5 text-sm text-muted-foreground">
-        {fagprat.statements.length} påstander
-      </p>
+      <p className="mb-5 text-sm text-muted-foreground">{fagprat.statements.length} påstander</p>
 
       {variant === "browse" ? (
         <>
@@ -59,12 +58,20 @@ export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
           {/* Author */}
           <div className="flex items-center gap-2 border-t border-border/50 pt-3">
             <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted">
-              <svg className="size-4 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                className="size-4 text-muted-foreground"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                 <circle cx="12" cy="7" r="4" />
               </svg>
             </div>
-            <span className="text-sm font-medium text-muted-foreground">{fagprat.author}</span>
+            <span className="text-sm font-medium text-muted-foreground">{fagprat.authorName}</span>
           </div>
         </>
       ) : (

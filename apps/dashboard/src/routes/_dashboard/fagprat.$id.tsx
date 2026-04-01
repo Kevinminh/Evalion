@@ -1,8 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Users, Pencil, MoreVertical, Sprout, Target, FolderPlus } from "lucide-react";
 
-import { getFagPrat } from "@/data/fagprat-data";
 import { StatementTable } from "@/components/statement-table";
+import { fagpratQueries } from "@/lib/convex";
+import type { FagPratId } from "@/lib/types";
 
 export const Route = createFileRoute("/_dashboard/fagprat/$id")({
   component: FagPratPreviewPage,
@@ -11,7 +13,15 @@ export const Route = createFileRoute("/_dashboard/fagprat/$id")({
 function FagPratPreviewPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const fagprat = getFagPrat(id);
+  const { data: fagprat, isPending } = useQuery(fagpratQueries.getById(id as FagPratId));
+
+  if (isPending) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <p className="text-muted-foreground">Laster FagPrat...</p>
+      </div>
+    );
+  }
 
   if (!fagprat) {
     return (

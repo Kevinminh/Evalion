@@ -153,7 +153,7 @@ function VelgPastanderPage() {
         </div>
         <button
           disabled={selected.size === 0}
-          onClick={() => navigate({ to: "/lagre-fagprat" })}
+          onClick={() => navigate({ to: "/lagre-fagprat", search: { draft: "" } })}
           className={cn(
             "inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition-all",
             selected.size > 0

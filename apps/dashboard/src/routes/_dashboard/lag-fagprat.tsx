@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { Plus, Sparkles } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
+import { Plus, Sparkles } from "lucide-react";
+import { useState } from "react";
+
 import { ConceptTags } from "@/components/concept-tags";
 import { ForkunnskapSelector } from "@/components/forkunnskap-selector";
 import { StatementEditor } from "@/components/statement-editor";
@@ -41,6 +42,25 @@ function LagFagPratPage() {
 
   const canProceed = title.trim() && fag && trinn && forkunnskap;
 
+  const handleNext = () => {
+    const draft = {
+      title,
+      concepts,
+      subject: fag,
+      level: trinn,
+      type: forkunnskap!,
+      statements: statements.map((s) => ({
+        text: s.statement,
+        fasit: s.fasit,
+        explanation: s.explanation,
+      })),
+    };
+    navigate({
+      to: "/lagre-fagprat",
+      search: { draft: JSON.stringify(draft) },
+    });
+  };
+
   return (
     <div className="max-w-[900px]">
       {/* Sticky header */}
@@ -50,10 +70,7 @@ function LagFagPratPage() {
           <Button variant="ghost" onClick={() => navigate({ to: "/" })}>
             Avbryt
           </Button>
-          <Button
-            disabled={!canProceed}
-            onClick={() => navigate({ to: "/lagre-fagprat" })}
-          >
+          <Button disabled={!canProceed} onClick={handleNext}>
             Neste
           </Button>
         </div>
@@ -155,9 +172,7 @@ function LagFagPratPage() {
           ))}
           {statements.length === 0 && (
             <div className="rounded-2xl border-2 border-dashed border-border py-12 text-center">
-              <p className="text-muted-foreground">
-                Bruk REDDI eller legg til påstander manuelt
-              </p>
+              <p className="text-muted-foreground">Bruk REDDI eller legg til påstander manuelt</p>
             </div>
           )}
         </div>
