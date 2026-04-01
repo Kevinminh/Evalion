@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Users, Pencil, MoreVertical, Sprout, Target } from "lucide-react";
+import { ArrowLeft, Users, Pencil, MoreVertical, Sprout, Target, FolderPlus } from "lucide-react";
 
 import { getFagPrat } from "@/data/fagprat-data";
 import { StatementTable } from "@/components/statement-table";
@@ -36,13 +36,23 @@ function FagPratPreviewPage() {
       <div className="mb-1 flex items-start justify-between">
         <h1 className="text-3xl font-extrabold text-foreground">{fagprat.title}</h1>
         <div className="flex shrink-0 items-center gap-3">
-          <button className="inline-flex items-center gap-2 rounded-xl bg-teal-400 px-6 py-3 text-sm font-bold text-white shadow-[0_3px_0_theme(colors.teal.700)] transition-all hover:-translate-y-px hover:bg-teal-300 hover:shadow-[0_4px_0_theme(colors.teal.700)] active:translate-y-0.5 active:shadow-[0_1px_0_theme(colors.teal.700)]">
+          <button
+            onClick={() => navigate({ to: "/liveokt/$id", params: { id } })}
+            className="inline-flex items-center gap-2 rounded-xl bg-teal-400 px-6 py-3 text-sm font-bold text-white shadow-[0_3px_0_theme(colors.teal.700)] transition-all hover:-translate-y-px hover:bg-teal-300 hover:shadow-[0_4px_0_theme(colors.teal.700)] active:translate-y-0.5 active:shadow-[0_1px_0_theme(colors.teal.700)]"
+          >
             <Users className="size-4" />
             Start liveøkt
           </button>
-          <button className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-5 py-3 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5">
+          <button
+            onClick={() => navigate({ to: "/fagprat/$id/rediger", params: { id } })}
+            className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-5 py-3 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5"
+          >
             <Pencil className="size-4" />
             Endre
+          </button>
+          <button className="inline-flex items-center gap-2 rounded-xl border-2 border-border bg-card px-4 py-3 text-sm font-bold text-muted-foreground transition-all hover:border-primary/30 hover:text-primary hover:bg-primary/5">
+            <FolderPlus className="size-4" />
+            Min samling
           </button>
           <button className="inline-flex items-center gap-1 rounded-xl border-2 border-border px-4 py-3 text-sm font-bold text-muted-foreground transition-all hover:border-muted-foreground/50 hover:bg-muted">
             <MoreVertical className="size-4" />
