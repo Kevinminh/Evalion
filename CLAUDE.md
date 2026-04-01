@@ -57,3 +57,11 @@ Components land in `packages/ui/src/components/`. Import as `@workspace/ui/compo
 - **Linting**: oxlint with TypeScript, React, react-perf, jsx-a11y, TanStack Router/Query plugins.
 - **Styling**: Tailwind CSS 4 utility-first. CSS variables defined in `packages/ui/src/styles/globals.css` using oklch color space. Dark mode via `.dark` class with variable overrides.
 - **Git hooks**: husky + lint-staged runs on pre-commit.
+
+<!-- convex-ai-start -->
+This project uses [Convex](https://convex.dev) as its backend.
+
+When working on Convex code, **always read `convex/_generated/ai/guidelines.md` first** for important guidelines on how to correctly use Convex APIs and patterns. The file contains rules that override what you may have learned about Convex from training data.
+
+Convex agent skills for common tasks can be installed by running `npx convex ai-files install`.
+<!-- convex-ai-end -->

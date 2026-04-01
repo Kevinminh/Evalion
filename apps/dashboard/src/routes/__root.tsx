@@ -1,5 +1,6 @@
 import {
   HeadContent,
+  Link,
   Outlet,
   Scripts,
   createRootRouteWithContext,
@@ -44,6 +45,7 @@ export const Route = createRootRouteWithContext<{
     };
   },
   component: RootComponent,
+  notFoundComponent: NotFound,
   shellComponent: RootDocument,
 });
 
@@ -57,6 +59,18 @@ function RootComponent() {
     >
       <Outlet />
     </ConvexBetterAuthProvider>
+  );
+}
+
+function NotFound() {
+  return (
+    <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background">
+      <h1 className="text-4xl font-extrabold text-foreground">404</h1>
+      <p className="text-muted-foreground">Siden ble ikke funnet</p>
+      <Link to="/" className="text-sm font-semibold text-primary hover:underline">
+        Tilbake til forsiden
+      </Link>
+    </div>
   );
 }
 
