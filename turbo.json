@@ -14,7 +14,8 @@
         "GOOGLE_CLIENT_ID",
         "GOOGLE_CLIENT_SECRET",
         "COOKIE_DOMAIN",
-        "TRUSTED_ORIGINS"
+        "TRUSTED_ORIGINS",
+        "CONVEX_DEPLOY_KEY"
       ]
     },
     "lint": {
