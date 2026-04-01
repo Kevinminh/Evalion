@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "build": "convex codegen",
     "dev": "convex dev",
     "dev:once": "convex dev --once",
     "deploy": "convex deploy",
