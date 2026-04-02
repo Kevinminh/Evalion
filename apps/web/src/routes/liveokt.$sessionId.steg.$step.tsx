@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { cn } from "@workspace/ui/lib/utils";
 import { BackButton } from "@workspace/ui/components/live/back-button";
 import { BegrunnelseCard } from "@workspace/ui/components/live/begrunnelse-card";
 import { DistributionChart } from "@workspace/ui/components/live/distribution-chart";
@@ -14,7 +13,8 @@ import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
 import { StepNav } from "@workspace/ui/components/live/step-nav";
 import { TeacherPanel } from "@workspace/ui/components/live/teacher-panel";
 import { TimerCard } from "@workspace/ui/components/live/timer-card";
-import { VoteButtons } from "@workspace/ui/components/live/vote-buttons";
+import { cn } from "@workspace/ui/lib/utils";
+// VoteButtons removed — teacher view doesn't vote
 import { useMutation } from "convex/react";
 import { ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -69,8 +69,7 @@ function LiveStepPage() {
   const endSessionMutation = useMutation(api.liveSessions.end);
 
   const [selectedStatement, setSelectedStatement] = useState<number | null>(null);
-  const [vote, setVote] = useState<"sant" | "usant" | "delvis" | null>(null);
-  const [rating, setRating] = useState<number | null>(null);
+  // vote and rating state not needed — teacher doesn't interact with student UI
   const [showCountdown, setShowCountdown] = useState(false);
   const [countdownNumber, setCountdownNumber] = useState(3);
   const [countdownDone, setCountdownDone] = useState(false);
@@ -196,9 +195,7 @@ function LiveStepPage() {
   ];
 
   // Step 4 endringer data
-  const r2CorrectCount = statement
-    ? r2Votes.filter((v) => v.vote === statement.fasit).length
-    : 0;
+  const r2CorrectCount = statement ? r2Votes.filter((v) => v.vote === statement.fasit).length : 0;
   const r2Total = r2Votes.length;
 
   const changedToCorrect = (() => {
@@ -263,8 +260,11 @@ function LiveStepPage() {
     </div>
   );
 
-  const recordButtonState: "disabled" | "ready" | "recording" =
-    recording ? "recording" : [2, 4].includes(step) ? "ready" : "disabled";
+  const recordButtonState: "disabled" | "ready" | "recording" = recording
+    ? "recording"
+    : [2, 4].includes(step)
+      ? "ready"
+      : "disabled";
 
   const nextStepButton = (
     <button
@@ -323,8 +323,10 @@ function LiveStepPage() {
               <BackButton onClick={() => goToStep(0)} />
             </div>
             {statementCard}
-            <Professor size="sm" text="Stem uten å avsløre hva du tenker..." />
-            <VoteButtons selected={vote} onVote={setVote} />
+            <Professor
+              size="sm"
+              text="Stem uten å avsløre for de andre, og skriv gjerne ned hva du tenker. Hvor sikker er du?"
+            />
           </div>
         );
 
@@ -347,7 +349,6 @@ function LiveStepPage() {
             </div>
             {statementCard}
             <Professor size="sm" text="Har du endret mening etter diskusjonen? Stem på nytt!" />
-            <VoteButtons selected={vote} onVote={setVote} />
           </div>
         );
 
@@ -365,17 +366,14 @@ function LiveStepPage() {
               </div>
             )}
             <div className="flex flex-col items-center gap-6 pt-8">
-              {countdownDone && statement && (
-                <FasitBadge answer={statement.fasit} animated />
-              )}
+              {countdownDone && statement && <FasitBadge answer={statement.fasit} animated />}
               {statementCard}
               {countdownDone && statement && (
                 <Professor
                   size="sm"
                   text={
                     <>
-                      Hvorfor er denne påstanden{" "}
-                      <strong>{FASIT_TEXT[statement.fasit]}</strong>?
+                      Hvorfor er denne påstanden <strong>{FASIT_TEXT[statement.fasit]}</strong>?
                     </>
                   }
                 />
@@ -391,9 +389,7 @@ function LiveStepPage() {
             {statement && <FasitBadge answer={statement.fasit} />}
             <div className="w-full overflow-hidden rounded-2xl border-[1.5px] border-blue-200 animate-[fadeInUp_0.5s_ease_0.2s_both]">
               <div className="bg-gradient-to-b from-blue-100 to-blue-50 p-6">
-                <p className="text-center text-lg font-bold text-foreground">
-                  {statement?.text}
-                </p>
+                <p className="text-center text-lg font-bold text-foreground">{statement?.text}</p>
               </div>
               <div className="bg-white p-6">
                 <div className="flex gap-4">
@@ -417,37 +413,7 @@ function LiveStepPage() {
           <div className="flex flex-col items-center gap-8 pt-8">
             {statement && <FasitBadge answer={statement.fasit} />}
             {statementCard}
-            <Professor
-              size="sm"
-              text="Vurder fra 1 til 5 hvor godt du forstår påstanden nå."
-            />
-            <div className="flex justify-center gap-4">
-              {[1, 2, 3, 4, 5].map((n) => {
-                const isSelected = rating === n;
-                const hasRating = rating !== null;
-                const ratingColors = [
-                  "bg-red-400",
-                  "bg-orange-400",
-                  "bg-yellow-400",
-                  "bg-lime-400",
-                  "bg-green-400",
-                ];
-                return (
-                  <button
-                    key={n}
-                    onClick={() => setRating(n)}
-                    className={cn(
-                      "rounded-xl px-6 py-4 text-lg font-bold text-white transition-all",
-                      ratingColors[n - 1],
-                      isSelected && "scale-110 shadow-[0_0_20px_rgba(0,0,0,0.25)]",
-                      hasRating && !isSelected && "opacity-40",
-                    )}
-                  >
-                    {n}
-                  </button>
-                );
-              })}
-            </div>
+            <Professor size="sm" text="Vurder fra 1 til 5 hvor godt du forstår påstanden nå." />
           </div>
         );
 
@@ -486,9 +452,7 @@ function LiveStepPage() {
             {begrunnelseTab ? (
               <div className="space-y-4">
                 <TimerCard />
-                <p className="text-xs italic text-muted-foreground">
-                  Ingen begrunnelser ennå
-                </p>
+                <p className="text-xs italic text-muted-foreground">Ingen begrunnelser ennå</p>
                 <BegrunnelseCard text="Eksempel: Fordi påstanden stemmer med det vi lærte om..." />
               </div>
             ) : (
@@ -535,9 +499,21 @@ function LiveStepPage() {
               <div className="space-y-4">
                 <DistributionChart
                   bars={[
-                    { label: "Sant", value: r2Votes.filter((v) => v.vote === "sant").length, color: "bg-sant" },
-                    { label: "Usant", value: r2Votes.filter((v) => v.vote === "usant").length, color: "bg-usant" },
-                    { label: "Delvis", value: r2Votes.filter((v) => v.vote === "delvis").length, color: "bg-delvis" },
+                    {
+                      label: "Sant",
+                      value: r2Votes.filter((v) => v.vote === "sant").length,
+                      color: "bg-sant",
+                    },
+                    {
+                      label: "Usant",
+                      value: r2Votes.filter((v) => v.vote === "usant").length,
+                      color: "bg-usant",
+                    },
+                    {
+                      label: "Delvis",
+                      value: r2Votes.filter((v) => v.vote === "delvis").length,
+                      color: "bg-delvis",
+                    },
                   ]}
                   total={r2Total}
                 />
@@ -569,9 +545,7 @@ function LiveStepPage() {
       }
 
       case 6:
-        return (
-          <RatingChart distribution={ratingDistribution} average={avgRating} />
-        );
+        return <RatingChart distribution={ratingDistribution} average={avgRating} />;
 
       default:
         return null;
@@ -617,10 +591,7 @@ function LiveStepPage() {
               elapsed={recordElapsed}
             />
           ) : [1, 3, 5, 6].includes(step) ? (
-            <RecordButton
-              state="disabled"
-              onToggle={() => {}}
-            />
+            <RecordButton state="disabled" onToggle={() => {}} />
           ) : undefined
         }
       >
@@ -634,19 +605,12 @@ function LiveStepPage() {
 
       <div className="flex pt-16 pb-14">
         <main className="flex-1 px-8 py-8">{renderStepContent()}</main>
-        <TeacherPanel
-          defaultOpen={step !== 5}
-          footer={renderPanelFooter()}
-        >
+        <TeacherPanel defaultOpen={step !== 5} footer={renderPanelFooter()}>
           {renderTeacherContent()}
         </TeacherPanel>
       </div>
 
-      <StepNav
-        currentStep={step}
-        completedSteps={completedSteps}
-        onStepClick={goToStep}
-      />
+      <StepNav currentStep={step} completedSteps={completedSteps} onStepClick={goToStep} />
     </div>
   );
 }
