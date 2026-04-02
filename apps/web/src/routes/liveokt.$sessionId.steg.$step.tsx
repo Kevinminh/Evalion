@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { cn } from "@workspace/ui/lib/utils";
 import { DistributionChart } from "@workspace/ui/components/live/distribution-chart";
 import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
@@ -16,12 +16,7 @@ import { useEffect, useRef, useState } from "react";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 
-export const Route = createFileRoute("/liveokt/$sessionId_/steg/$step")({
-  beforeLoad: ({ context }) => {
-    if (!context.isAuthenticated) {
-      throw redirect({ to: "/login" });
-    }
-  },
+export const Route = createFileRoute("/liveokt/$sessionId/steg/$step")({
   component: LiveStepPage,
 });
 
