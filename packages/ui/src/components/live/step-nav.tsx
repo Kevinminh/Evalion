@@ -18,7 +18,7 @@ interface StepNavProps {
 
 export function StepNav({ currentStep, onStepClick }: StepNavProps) {
   return (
-    <div className="fixed right-0 bottom-0 left-0 z-40 flex items-center justify-center gap-2 border-t bg-card px-6 py-3">
+    <div className="fixed right-0 bottom-0 left-0 z-40 flex items-center justify-center gap-3 border-t bg-card px-6 py-3">
       {steps.map((step, i) => {
         const isActive = i === currentStep;
         const isCompleted = i < currentStep;
@@ -43,7 +43,7 @@ export function StepNav({ currentStep, onStepClick }: StepNavProps) {
             >
               {isCompleted ? <Check className="size-3.5" /> : i}
             </span>
-            <span className="hidden lg:inline">{step.label}</span>
+            <span className="hidden sm:inline">{step.label}</span>
           </button>
         );
       })}
