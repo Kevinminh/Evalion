@@ -53,4 +53,11 @@ export default defineSchema({
     round: v.number(),
     vote: v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis")),
   }).index("by_session_statement", ["sessionId", "statementIndex"]),
+
+  sessionRatings: defineTable({
+    sessionId: v.id("liveSessions"),
+    studentId: v.id("sessionStudents"),
+    statementIndex: v.number(),
+    rating: v.number(),
+  }).index("by_session_statement", ["sessionId", "statementIndex"]),
 });

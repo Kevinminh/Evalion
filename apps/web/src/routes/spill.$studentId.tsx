@@ -85,6 +85,7 @@ function StudentGamePage() {
   });
 
   const castVoteMutation = useMutation(api.liveSessions.castVote);
+  const submitRatingMutation = useMutation(api.liveSessions.submitRating);
 
   const [voteSent, setVoteSent] = useState(false);
   const [ratingSent, setRatingSent] = useState(false);
@@ -114,29 +115,30 @@ function StudentGamePage() {
 
   // Step 4 countdown
   useEffect(() => {
-    if (currentStep === 4 && !countdownTriggered.current) {
-      countdownTriggered.current = true;
-      setShowCountdown(true);
-      setCountdownNumber(3);
-      setCountdownDone(false);
-
-      const t1 = setTimeout(() => setCountdownNumber(2), 600);
-      const t2 = setTimeout(() => setCountdownNumber(1), 1200);
-      const t3 = setTimeout(() => {
-        setShowCountdown(false);
-        setCountdownDone(true);
-      }, 1800);
-
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-        clearTimeout(t3);
-      };
-    }
     if (currentStep !== 4) {
       countdownTriggered.current = false;
       setCountdownDone(false);
+      return;
     }
+    if (countdownTriggered.current) return;
+
+    countdownTriggered.current = true;
+    setShowCountdown(true);
+    setCountdownNumber(3);
+    setCountdownDone(false);
+
+    const t1 = setTimeout(() => setCountdownNumber(2), 600);
+    const t2 = setTimeout(() => setCountdownNumber(1), 1200);
+    const t3 = setTimeout(() => {
+      setShowCountdown(false);
+      setCountdownDone(true);
+    }, 1800);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
   }, [currentStep]);
 
   if (studentLoading || sessionLoading) {
@@ -170,13 +172,17 @@ function StudentGamePage() {
   const handleVote = async (value: "sant" | "usant" | "delvis") => {
     if (hasVoted) return;
     setVoteSent(true);
-    await castVoteMutation({
-      sessionId: session._id,
-      studentId: typedStudentId,
-      statementIndex,
-      round,
-      vote: value,
-    });
+    try {
+      await castVoteMutation({
+        sessionId: session._id,
+        studentId: typedStudentId,
+        statementIndex,
+        round,
+        vote: value,
+      });
+    } catch {
+      setVoteSent(false);
+    }
   };
 
   // Statement card reusable for student
@@ -409,7 +415,19 @@ function StudentGamePage() {
                 {[1, 2, 3, 4, 5].map((n) => (
                   <button
                     key={n}
-                    onClick={() => setRatingSent(true)}
+                    onClick={async () => {
+                      setRatingSent(true);
+                      try {
+                        await submitRatingMutation({
+                          sessionId: session._id,
+                          studentId: typedStudentId,
+                          statementIndex,
+                          rating: n,
+                        });
+                      } catch {
+                        setRatingSent(false);
+                      }
+                    }}
                     className={cn(
                       "rounded-xl px-5 py-3 text-lg font-bold text-white transition-all active:scale-95",
                       RATING_COLORS[n - 1],

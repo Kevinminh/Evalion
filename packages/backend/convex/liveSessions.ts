@@ -186,6 +186,19 @@ export const addStudent = mutation({
     name: v.string(),
   },
   handler: async (ctx, args) => {
+    const trimmedName = args.name.trim();
+    if (!trimmedName || trimmedName.length > 30) {
+      throw new Error("Name must be 1-30 characters");
+    }
+
+    const session = await ctx.db.get(args.sessionId);
+    if (!session) {
+      throw new Error("Session not found");
+    }
+    if (session.status !== "lobby" && session.status !== "active") {
+      throw new Error("Session is not accepting new students");
+    }
+
     const students = await ctx.db
       .query("sessionStudents")
       .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
@@ -195,7 +208,7 @@ export const addStudent = mutation({
 
     return await ctx.db.insert("sessionStudents", {
       sessionId: args.sessionId,
-      name: args.name,
+      name: trimmedName,
       avatarColor,
     });
   },
@@ -261,6 +274,53 @@ export const castVote = mutation({
     vote: v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis")),
   },
   handler: async (ctx, args) => {
+    // Prevent duplicate votes for same student/statement/round
+    const existing = await ctx.db
+      .query("sessionVotes")
+      .withIndex("by_session_statement", (q) =>
+        q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
+      )
+      .filter((q) =>
+        q.and(q.eq(q.field("studentId"), args.studentId), q.eq(q.field("round"), args.round)),
+      )
+      .first();
+
+    if (existing) {
+      return existing._id;
+    }
+
     return await ctx.db.insert("sessionVotes", args);
+  },
+});
+
+// ── Rating mutations ──
+
+export const submitRating = mutation({
+  args: {
+    sessionId: v.id("liveSessions"),
+    studentId: v.id("sessionStudents"),
+    statementIndex: v.number(),
+    rating: v.number(),
+  },
+  handler: async (ctx, args) => {
+    if (args.rating < 1 || args.rating > 5) {
+      throw new Error("Rating must be between 1 and 5");
+    }
+
+    // Prevent duplicate ratings
+    const existing = await ctx.db
+      .query("sessionRatings")
+      .withIndex("by_session_statement", (q) =>
+        q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
+      )
+      .filter((q) => q.eq(q.field("studentId"), args.studentId))
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, { rating: args.rating });
+      return existing._id;
+    }
+
+    return await ctx.db.insert("sessionRatings", args);
   },
 });

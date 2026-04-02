@@ -10,26 +10,25 @@ export function TimerCard({ onComplete }: TimerCardProps) {
   const [totalSeconds, setTotalSeconds] = useState(60);
   const [remaining, setRemaining] = useState(60);
   const [running, setRunning] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
-    if (running && remaining > 0) {
-      intervalRef.current = setInterval(() => {
-        setRemaining((prev) => {
-          if (prev <= 1) {
-            clearInterval(intervalRef.current!);
-            setRunning(false);
-            onComplete?.();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [running, remaining, onComplete]);
+    if (!running || remaining <= 0) return;
+
+    const interval = setInterval(() => {
+      setRemaining((prev) => {
+        if (prev <= 1) {
+          setRunning(false);
+          onCompleteRef.current?.();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [running, remaining]);
 
   const setPreset = (seconds: number) => {
     setTotalSeconds(seconds);
