@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-
 import { LogoutCard } from "@workspace/ui/components/logout-card";
+
 import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/logout")({ component: LogoutPage });

@@ -1,6 +1,4 @@
-import * as React from "react"
-
-import { Button } from "@workspace/ui/components/button"
+import { Button } from "@workspace/ui/components/button";
 import {
   Card,
   CardContent,
@@ -8,21 +6,22 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@workspace/ui/components/card"
-import { FieldSeparator } from "@workspace/ui/components/field"
-import { Input } from "@workspace/ui/components/input"
-import { Label } from "@workspace/ui/components/label"
-import { cn } from "@workspace/ui/lib/utils"
+} from "@workspace/ui/components/card";
+import { FieldSeparator } from "@workspace/ui/components/field";
+import { Input } from "@workspace/ui/components/input";
+import { Label } from "@workspace/ui/components/label";
+import { cn } from "@workspace/ui/lib/utils";
+import * as React from "react";
 
 interface LoginFormProps {
-  className?: string
-  logo?: React.ReactNode
-  description?: string
-  onSubmit?: React.FormEventHandler<HTMLFormElement>
-  onGoogleSignIn?: () => void
-  error?: string | null
-  loading?: boolean
-  footer?: React.ReactNode
+  className?: string;
+  logo?: React.ReactNode;
+  description?: string;
+  onSubmit?: React.FormEventHandler<HTMLFormElement>;
+  onGoogleSignIn?: () => void;
+  error?: string | null;
+  loading?: boolean;
+  footer?: React.ReactNode;
 }
 
 function LoginForm({
@@ -50,11 +49,15 @@ function LoginForm({
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="password">Passord</Label>
-            <Input id="password" name="password" type="password" placeholder="Skriv inn passord" required />
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Skriv inn passord"
+              required
+            />
           </div>
-          {error && (
-            <p className="text-sm text-destructive">{error}</p>
-          )}
+          {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Logger inn..." : "Logg inn"}
           </Button>
@@ -65,11 +68,9 @@ function LoginForm({
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="justify-center">
-        {footer}
-      </CardFooter>
+      <CardFooter className="justify-center">{footer}</CardFooter>
     </Card>
-  )
+  );
 }
 
 function GoogleIcon(props: React.ComponentProps<"svg">) {
@@ -92,7 +93,7 @@ function GoogleIcon(props: React.ComponentProps<"svg">) {
         fill="#EA4335"
       />
     </svg>
-  )
+  );
 }
 
-export { LoginForm }
+export { LoginForm };

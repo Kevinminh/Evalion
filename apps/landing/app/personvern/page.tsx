@@ -22,9 +22,9 @@ export default function PrivacyPage() {
             <p className="mt-3 leading-relaxed">
               Evalion AS («vi», «oss», «vår») er behandlingsansvarlig for personopplysninger som
               samles inn gjennom våre tjenester på evalion.no og tilhørende applikasjoner. Vi er
-              forpliktet til å beskytte personvernet ditt og behandle personopplysninger i samsvar med
-              gjeldende personvernlovgivning, inkludert EUs personvernforordning (GDPR) og den norske
-              personopplysningsloven.
+              forpliktet til å beskytte personvernet ditt og behandle personopplysninger i samsvar
+              med gjeldende personvernlovgivning, inkludert EUs personvernforordning (GDPR) og den
+              norske personopplysningsloven.
             </p>
           </div>
 
@@ -35,8 +35,8 @@ export default function PrivacyPage() {
             <p className="mt-3 leading-relaxed">Vi samler inn følgende typer opplysninger:</p>
             <ul className="mt-3 flex flex-col gap-2 pl-6 leading-relaxed">
               <li className="list-disc">
-                <strong>Kontoinformasjon:</strong> Navn, e-postadresse og passord når du oppretter en
-                konto.
+                <strong>Kontoinformasjon:</strong> Navn, e-postadresse og passord når du oppretter
+                en konto.
               </li>
               <li className="list-disc">
                 <strong>Bruksdata:</strong> Informasjon om hvordan du bruker tjenesten, inkludert
@@ -47,8 +47,9 @@ export default function PrivacyPage() {
                 enhetsinformasjon for å sikre at tjenesten fungerer optimalt.
               </li>
               <li className="list-disc">
-                <strong>Elevdata:</strong> Kallenavn eller navn som brukes under spill. Vi samler ikke
-                inn personopplysninger direkte fra elever under 13 år uten samtykke fra foresatte.
+                <strong>Elevdata:</strong> Kallenavn eller navn som brukes under spill. Vi samler
+                ikke inn personopplysninger direkte fra elever under 13 år uten samtykke fra
+                foresatte.
               </li>
             </ul>
           </div>
@@ -70,8 +71,8 @@ export default function PrivacyPage() {
             <p className="mt-3 leading-relaxed">
               Personopplysninger lagres på sikre servere innenfor EU/EØS. Vi bruker
               bransjestandarder for kryptering og tilgangskontroll for å beskytte dine data.
-              Opplysninger lagres så lenge kontoen din er aktiv, eller så lenge det er nødvendig for å
-              oppfylle formålet med behandlingen.
+              Opplysninger lagres så lenge kontoen din er aktiv, eller så lenge det er nødvendig for
+              å oppfylle formålet med behandlingen.
             </p>
           </div>
 
@@ -79,8 +80,8 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-gray-700">5. Deling med tredjeparter</h2>
             <p className="mt-3 leading-relaxed">
               Vi selger aldri personopplysningene dine. Vi kan dele opplysninger med pålitelige
-              tredjepartsleverandører som hjelper oss å drifte tjenesten (f.eks. hosting, e-post), og
-              kun i den grad det er nødvendig. Alle tredjeparter er forpliktet til å beskytte
+              tredjepartsleverandører som hjelper oss å drifte tjenesten (f.eks. hosting, e-post),
+              og kun i den grad det er nødvendig. Alle tredjeparter er forpliktet til å beskytte
               opplysningene i henhold til gjeldende lovgivning.
             </p>
           </div>

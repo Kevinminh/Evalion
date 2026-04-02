@@ -18,8 +18,8 @@ export function getRouter() {
     scrollRestoration: true,
     defaultPreload: "intent",
     defaultPreloadStaleTime: 0,
-  })
-  return router
+  });
+  return router;
 }
 ```
 
@@ -28,7 +28,7 @@ Register the router type globally:
 ```tsx
 declare module "@tanstack/react-router" {
   interface Register {
-    router: ReturnType<typeof getRouter>
+    router: ReturnType<typeof getRouter>;
   }
 }
 ```
@@ -45,7 +45,7 @@ export const Route = createRootRoute({
     links: [{ rel: "stylesheet", href: appCss }],
   }),
   shellComponent: RootDocument,
-})
+});
 ```
 
 The `shellComponent` renders the full HTML document (`<html>`, `<head>`, `<body>`), including `<HeadContent />` and `<Scripts />` from `@tanstack/react-start`.
@@ -57,10 +57,10 @@ Use loaders for route-level data fetching:
 ```tsx
 export const Route = createFileRoute("/posts")({
   loader: async () => {
-    return { posts: await fetchPosts() }
+    return { posts: await fetchPosts() };
   },
   component: PostsPage,
-})
+});
 ```
 
 Access loader data in components via `Route.useLoaderData()`.
@@ -70,12 +70,12 @@ Access loader data in components via `Route.useLoaderData()`.
 Use `createServerFn` for server-only code that gets tree-shaken from the client bundle:
 
 ```tsx
-import { createServerFn } from "@tanstack/react-start"
+import { createServerFn } from "@tanstack/react-start";
 
 const getUser = createServerFn({ method: "GET" }).handler(async () => {
   // This code only runs on the server
-  return db.query.users.findFirst()
-})
+  return db.query.users.findFirst();
+});
 ```
 
 ## Vite Plugin Order
@@ -89,7 +89,7 @@ plugins: [
   tailwindcss(),
   tanstackStart(),
   viteReact(),
-]
+];
 ```
 
 ## Route Guards
@@ -100,8 +100,8 @@ Use `beforeLoad` to protect routes:
 export const Route = createFileRoute("/dashboard")({
   beforeLoad: async ({ context }) => {
     if (!context.auth.isAuthenticated) {
-      throw redirect({ to: "/login" })
+      throw redirect({ to: "/login" });
     }
   },
-})
+});
 ```

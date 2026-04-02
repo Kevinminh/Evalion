@@ -1,19 +1,19 @@
-import { createFileRoute, useRouteContext } from "@tanstack/react-router"
-import { Play, LogOut, User } from "lucide-react"
+import { createFileRoute, useRouteContext } from "@tanstack/react-router";
+import { Button } from "@workspace/ui/components/button";
+import { Input } from "@workspace/ui/components/input";
+import { Play, LogOut, User } from "lucide-react";
 
-import { Button } from "@workspace/ui/components/button"
-import { Input } from "@workspace/ui/components/input"
-import { authClient } from "@/lib/auth-client"
+import { authClient } from "@/lib/auth-client";
 
-export const Route = createFileRoute("/")({ component: App })
+export const Route = createFileRoute("/")({ component: App });
 
 function App() {
-  const { isAuthenticated } = useRouteContext({ from: "/" })
-  const { data: session } = authClient.useSession()
+  const { isAuthenticated } = useRouteContext({ from: "/" });
+  const { data: session } = authClient.useSession();
   const handleLogout = async () => {
-    await authClient.signOut()
-    window.location.reload()
-  }
+    await authClient.signOut();
+    window.location.reload();
+  };
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-background px-6">
@@ -22,14 +22,16 @@ function App() {
         <div className="fixed top-0 right-0 left-0 flex items-center justify-end gap-3 border-b bg-card px-6 py-3">
           <div className="flex items-center gap-2">
             <div className="flex size-8 items-center justify-center rounded-full bg-primary text-xs font-extrabold text-primary-foreground">
-              {session.user.name
-                ? session.user.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase()
-                    .slice(0, 2)
-                : <User className="size-4" />}
+              {session.user.name ? (
+                session.user.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()
+                  .slice(0, 2)
+              ) : (
+                <User className="size-4" />
+              )}
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-foreground">
@@ -64,10 +66,8 @@ function App() {
           </Button>
         </div>
 
-        <p className="text-sm text-muted-foreground">
-          Spør læreren din om spillkoden
-        </p>
+        <p className="text-sm text-muted-foreground">Spør læreren din om spillkoden</p>
       </div>
     </div>
-  )
+  );
 }

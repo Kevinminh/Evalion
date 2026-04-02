@@ -1,6 +1,7 @@
-import { handler } from "@/lib/auth-server";
 import { createFileRoute } from "@tanstack/react-router";
 import { setResponseHeader } from "@tanstack/react-start/server";
+
+import { handler } from "@/lib/auth-server";
 
 const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN;
 
@@ -14,8 +15,7 @@ async function authHandler(request: Request) {
 
   // Rewrite all cookies with the correct domain
   const rewritten = setCookieHeaders.map(
-    (cookie) =>
-      cookie.replace(/;\s*domain=[^;]*/i, "") + `; Domain=${COOKIE_DOMAIN}`,
+    (cookie) => cookie.replace(/;\s*domain=[^;]*/i, "") + `; Domain=${COOKIE_DOMAIN}`,
   );
 
   // Set rewritten cookies on the h3 response (replaces any existing)

@@ -22,17 +22,11 @@
     "jsx-a11y/no-autofocus": "off",
     "typescript/no-floating-promises": "off",
     "typescript/no-misused-spread": "off",
-    "typescript/consistent-type-assertions": [
-      "warn",
-      { "assertionStyle": "never" }
-    ],
+    "typescript/consistent-type-assertions": ["warn", { "assertionStyle": "never" }],
     "turbo/no-undeclared-env-vars": "warn",
     "react/rules-of-hooks": "error",
     "react/exhaustive-deps": "warn",
-    "typescript/consistent-type-imports": [
-      "warn",
-      { "fixStyle": "separate-type-imports" }
-    ],
+    "typescript/consistent-type-imports": ["warn", { "fixStyle": "separate-type-imports" }],
     "typescript/no-explicit-any": "warn",
 
     "eslint-tanstack-router/create-route-property-order": "warn",
