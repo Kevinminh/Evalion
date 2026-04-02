@@ -113,7 +113,11 @@ function LiveoktSetupPage() {
               {/* Launch button */}
               <button
                 onClick={() =>
-                  navigate({ to: "/liveokt/$id/steg/$step", params: { id, step: "0" } })
+                  navigate({
+                    to: "/liveokt/$id/lobby",
+                    params: { id },
+                    search: { groups: groupsEnabled, groupCount },
+                  })
                 }
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-400 px-6 py-3.5 text-sm font-bold text-white shadow-[0_3px_0_theme(colors.teal.700)] transition-all hover:-translate-y-0.5 hover:bg-teal-300 hover:shadow-[0_4px_0_theme(colors.teal.700)] active:translate-y-0.5 active:shadow-[0_1px_0_theme(colors.teal.700)]"
               >
