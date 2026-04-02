@@ -1,9 +1,9 @@
 import { cn } from "@workspace/ui/lib/utils";
 
 const FASIT_CONFIG = {
-  sant: { label: "SANT", bg: "bg-[#4CAF50]" },
-  usant: { label: "USANT", bg: "bg-[#EF5350]" },
-  delvis: { label: "DELVIS SANT", bg: "bg-[#FF9800]" },
+  sant: { label: "SANT", bg: "bg-sant" },
+  usant: { label: "USANT", bg: "bg-usant" },
+  delvis: { label: "DELVIS SANT", bg: "bg-delvis" },
 } as const;
 
 interface FasitBadgeProps {
