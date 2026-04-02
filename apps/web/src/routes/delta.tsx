@@ -7,7 +7,6 @@ import { useMutation } from "convex/react";
 import { useState } from "react";
 
 import { api, liveSessionQueries } from "@/lib/convex";
-import type { Id } from "@/lib/convex";
 
 export const Route = createFileRoute("/delta")({
   validateSearch: (search: Record<string, unknown>) => ({

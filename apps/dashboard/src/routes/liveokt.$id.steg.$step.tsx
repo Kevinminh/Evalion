@@ -83,11 +83,10 @@ function LiveStepPage() {
   const statement = fagprat?.statements[selectedIdx];
 
   // Get votes for current statement from Convex
-  const { data: votes } = useQuery(
-    sessionId && fagprat
-      ? liveSessionQueries.getVotes(sessionId as Id<"liveSessions">, selectedIdx)
-      : { queryKey: ["noop"], queryFn: () => [] },
-  );
+  const { data: votes } = useQuery({
+    ...liveSessionQueries.getVotes(sessionId as Id<"liveSessions">, selectedIdx),
+    enabled: !!sessionId && !!fagprat,
+  });
 
   const goToStep = async (n: number) => {
     if (sessionId) {
