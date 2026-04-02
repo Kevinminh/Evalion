@@ -59,6 +59,7 @@ function TeacherLobbyPage() {
   const removeStudentMutation = useMutation(api.liveSessions.removeStudent);
   const createGroupsMutation = useMutation(api.liveSessions.createGroups);
   const updateStepMutation = useMutation(api.liveSessions.updateStep);
+  const endSessionMutation = useMutation(api.liveSessions.end);
 
   const isPending = sessionLoading || fagpratLoading;
 
@@ -87,6 +88,11 @@ function TeacherLobbyPage() {
       sessionId: session._id,
       groupCount: session.groupCount,
     });
+  };
+
+  const handleEnd = async () => {
+    await endSessionMutation({ id: session._id });
+    navigate({ to: "/" });
   };
 
   const handleStart = async () => {
@@ -122,6 +128,12 @@ function TeacherLobbyPage() {
           className="inline-flex items-center gap-2 rounded-xl bg-secondary-teal px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_var(--secondary-teal-dark)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_var(--secondary-teal-dark)] active:translate-y-0.5 active:shadow-[0_1px_0_var(--secondary-teal-dark)]"
         >
           Start aktiviteten
+        </button>
+        <button
+          onClick={handleEnd}
+          className="inline-flex items-center gap-2 rounded-xl bg-destructive px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_oklch(0.45_0.15_25)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_oklch(0.45_0.15_25)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.45_0.15_25)]"
+        >
+          Avslutt
         </button>
       </SessionTopBar>
 

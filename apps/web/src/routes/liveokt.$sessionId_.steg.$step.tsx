@@ -99,6 +99,7 @@ function LiveStepPage() {
   const { data: students } = useQuery(liveSessionQueries.listStudents(typedSessionId));
 
   const updateStepMutation = useMutation(api.liveSessions.updateStep);
+  const endSessionMutation = useMutation(api.liveSessions.end);
 
   const [selectedStatement, setSelectedStatement] = useState<number | null>(null);
   const [vote, setVote] = useState<"sant" | "usant" | "delvis" | null>(null);
@@ -118,6 +119,11 @@ function LiveStepPage() {
     ...liveSessionQueries.getVotes(typedSessionId, selectedIdx),
     enabled: !!fagprat,
   });
+
+  const handleEnd = async () => {
+    await endSessionMutation({ id: typedSessionId });
+    navigate({ to: "/" });
+  };
 
   const goToStep = async (n: number) => {
     await updateStepMutation({
@@ -460,6 +466,12 @@ function LiveStepPage() {
     <div className="min-h-svh bg-background">
       <SessionTopBar title={fagprat.title}>
         {(step === 2 || step === 4) && <RecordButton />}
+        <button
+          onClick={handleEnd}
+          className="inline-flex items-center gap-2 rounded-xl bg-destructive px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_oklch(0.45_0.15_25)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_oklch(0.45_0.15_25)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.45_0.15_25)]"
+        >
+          Avslutt
+        </button>
       </SessionTopBar>
 
       <div className="flex pt-16 pb-14">
