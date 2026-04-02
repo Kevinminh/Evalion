@@ -57,11 +57,8 @@ function LiveoktSetupPage() {
         transcriptionEnabled,
         selfEvalEnabled,
       });
-      navigate({
-        to: "/liveokt/$id/lobby",
-        params: { id },
-        search: { sessionId },
-      });
+      const playUrl = import.meta.env.VITE_PLAY_URL || "http://localhost:3000";
+      window.location.href = `${playUrl}/liveokt/${sessionId}`;
     } catch {
       setLaunching(false);
     }
