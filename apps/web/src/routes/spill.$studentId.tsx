@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, skipToken } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { cn } from "@workspace/ui/lib/utils";
 import { VoteButtons } from "@workspace/ui/components/live/vote-buttons";
@@ -60,29 +60,33 @@ function StudentGamePage() {
   );
 
   // Fetch session
-  const { data: session, isPending: sessionLoading } = useQuery({
-    ...liveSessionQueries.getById(student?.sessionId!),
-    enabled: !!student?.sessionId,
-  });
+  const { data: session, isPending: sessionLoading } = useQuery(
+    student?.sessionId
+      ? liveSessionQueries.getById(student.sessionId)
+      : { queryKey: ["session", "none"], queryFn: skipToken },
+  );
 
   // Fetch fagprat for statements
-  const { data: fagprat } = useQuery({
-    ...fagpratQueries.getById(session?.fagpratId!),
-    enabled: !!session?.fagpratId,
-  });
+  const { data: fagprat } = useQuery(
+    session?.fagpratId
+      ? fagpratQueries.getById(session.fagpratId)
+      : { queryKey: ["fagprat", "none"], queryFn: skipToken },
+  );
 
   // Fetch students in session (for group display in step 2)
-  const { data: students } = useQuery({
-    ...liveSessionQueries.listStudents(student?.sessionId!),
-    enabled: !!student?.sessionId,
-  });
+  const { data: students } = useQuery(
+    student?.sessionId
+      ? liveSessionQueries.listStudents(student.sessionId)
+      : { queryKey: ["students", "none"], queryFn: skipToken },
+  );
 
   // Fetch votes (for detecting existing vote)
   const statementIndex = session?.currentStatementIndex ?? 0;
-  const { data: votes } = useQuery({
-    ...liveSessionQueries.getVotes(student?.sessionId!, statementIndex),
-    enabled: !!student?.sessionId && !!fagprat,
-  });
+  const { data: votes } = useQuery(
+    student?.sessionId && fagprat
+      ? liveSessionQueries.getVotes(student.sessionId, statementIndex)
+      : { queryKey: ["votes", "none"], queryFn: skipToken },
+  );
 
   const castVoteMutation = useMutation(api.liveSessions.castVote);
   const submitRatingMutation = useMutation(api.liveSessions.submitRating);
