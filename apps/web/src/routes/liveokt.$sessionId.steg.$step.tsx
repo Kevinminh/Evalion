@@ -105,7 +105,7 @@ function LiveStepPage() {
 
   const handleEnd = async () => {
     await endSessionMutation({ id: typedSessionId });
-    navigate({ to: "/" });
+    await navigate({ to: "/" });
   };
 
   const goToStep = async (n: number) => {
@@ -118,7 +118,7 @@ function LiveStepPage() {
       step: n,
       ...(n === 0 ? {} : { statementIndex: selectedIdx }),
     });
-    navigate({
+    await navigate({
       to: "/liveokt/$sessionId/steg/$step",
       params: { sessionId, step: String(n) },
     });
