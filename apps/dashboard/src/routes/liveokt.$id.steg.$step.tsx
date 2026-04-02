@@ -105,29 +105,30 @@ function LiveStepPage() {
 
   // Step 4 countdown effect
   useEffect(() => {
-    if (step === 4 && !countdownTriggered.current) {
-      countdownTriggered.current = true;
-      setShowCountdown(true);
-      setCountdownNumber(3);
-      setCountdownDone(false);
-
-      const t1 = setTimeout(() => setCountdownNumber(2), 600);
-      const t2 = setTimeout(() => setCountdownNumber(1), 1200);
-      const t3 = setTimeout(() => {
-        setShowCountdown(false);
-        setCountdownDone(true);
-      }, 1800);
-
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-        clearTimeout(t3);
-      };
-    }
     if (step !== 4) {
       countdownTriggered.current = false;
       setCountdownDone(false);
+      return;
     }
+    if (countdownTriggered.current) return;
+
+    countdownTriggered.current = true;
+    setShowCountdown(true);
+    setCountdownNumber(3);
+    setCountdownDone(false);
+
+    const t1 = setTimeout(() => setCountdownNumber(2), 600);
+    const t2 = setTimeout(() => setCountdownNumber(1), 1200);
+    const t3 = setTimeout(() => {
+      setShowCountdown(false);
+      setCountdownDone(true);
+    }, 1800);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
   }, [step]);
 
   if (isPending) {
