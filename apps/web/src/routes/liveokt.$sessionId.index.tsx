@@ -109,7 +109,7 @@ function TeacherLobbyPage() {
   return (
     <div className="flex min-h-svh flex-col bg-background">
       <SessionTopBar title={fagprat.title}>
-        {showGroupButton ? (
+        {showGroupButton && (
           <button
             onClick={handleCreateGroups}
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_oklch(0.4_0.15_280)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_oklch(0.4_0.15_280)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.4_0.15_280)]"
@@ -117,14 +117,13 @@ function TeacherLobbyPage() {
             <Users className="size-4" />
             Opprett grupper
           </button>
-        ) : (
-          <button
-            onClick={handleStart}
-            className="inline-flex items-center gap-2 rounded-xl bg-secondary-teal px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_var(--secondary-teal-dark)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_var(--secondary-teal-dark)] active:translate-y-0.5 active:shadow-[0_1px_0_var(--secondary-teal-dark)]"
-          >
-            Start aktiviteten
-          </button>
         )}
+        <button
+          onClick={handleStart}
+          className="inline-flex items-center gap-2 rounded-xl bg-secondary-teal px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_var(--secondary-teal-dark)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_var(--secondary-teal-dark)] active:translate-y-0.5 active:shadow-[0_1px_0_var(--secondary-teal-dark)]"
+        >
+          Start aktiviteten
+        </button>
         <button
           onClick={handleEnd}
           className="inline-flex items-center gap-2 rounded-xl bg-destructive px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_oklch(0.45_0.15_25)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_oklch(0.45_0.15_25)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.45_0.15_25)]"

@@ -1,9 +1,9 @@
 import { useQuery, skipToken } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { cn } from "@workspace/ui/lib/utils";
 import { VoteButtons } from "@workspace/ui/components/live/vote-buttons";
 import { useMutation } from "convex/react";
-import { Loader2 } from "lucide-react";
+import { Loader2, LogOut } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
@@ -55,6 +55,7 @@ function WaitingDots() {
 
 function StudentGamePage() {
   const { studentId } = Route.useParams();
+  const navigate = useNavigate();
   const typedStudentId = studentId as Id<"sessionStudents">;
 
   // Fetch student record to get sessionId
@@ -93,9 +94,11 @@ function StudentGamePage() {
 
   const castVoteMutation = useMutation(api.liveSessions.castVote);
   const submitRatingMutation = useMutation(api.liveSessions.submitRating);
+  const removeStudentMutation = useMutation(api.liveSessions.removeStudent);
 
   const [voteSent, setVoteSent] = useState(false);
   const [ratingSent, setRatingSent] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
   const [countdownNumber, setCountdownNumber] = useState(3);
   const [countdownDone, setCountdownDone] = useState(false);
@@ -210,6 +213,11 @@ function StudentGamePage() {
     } catch {
       setVoteSent(false);
     }
+  };
+
+  const handleLeave = async () => {
+    await removeStudentMutation({ id: typedStudentId });
+    navigate({ to: "/" });
   };
 
   // Statement card reusable for student
@@ -479,13 +487,45 @@ function StudentGamePage() {
           </div>
           <span className="text-sm font-bold text-foreground">{student.name}</span>
         </div>
-        <img src="/logo.png" alt="Evalion" className="h-6 object-contain" />
+        <button
+          onClick={() => setShowLeaveConfirm(true)}
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+        >
+          <LogOut className="size-3.5" />
+          Forlat spill
+        </button>
       </div>
 
       {/* Main content area */}
       <div className="flex w-full max-w-md flex-col items-center pt-8">
         {renderContent()}
       </div>
+
+      {/* Leave confirmation overlay */}
+      {showLeaveConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="mx-4 w-full max-w-sm rounded-2xl bg-card p-6 shadow-xl">
+            <h2 className="text-lg font-bold text-foreground">Forlat spill?</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Er du sikker på at du vil forlate spillet?
+            </p>
+            <div className="mt-5 flex gap-3">
+              <button
+                onClick={() => setShowLeaveConfirm(false)}
+                className="flex-1 rounded-xl border border-border px-4 py-2.5 text-sm font-bold text-foreground transition-colors hover:bg-muted"
+              >
+                Avbryt
+              </button>
+              <button
+                onClick={handleLeave}
+                className="flex-1 rounded-xl bg-destructive px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-destructive/90"
+              >
+                Ja, forlat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
