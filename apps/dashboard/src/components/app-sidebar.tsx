@@ -40,7 +40,7 @@ export function AppSidebar() {
 
   const handleLogout = async () => {
     await authClient.signOut();
-    navigate({ to: "/login" });
+    await navigate({ to: "/login" });
   };
 
   const userName = session?.user?.name ?? "Bruker";
