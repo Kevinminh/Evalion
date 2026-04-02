@@ -391,7 +391,7 @@ function StudentGamePage() {
               </div>
               <div className="bg-white p-5">
                 <div className="flex gap-3">
-                  <Professor size="sm" className="shrink-0" />
+                  <Professor size="xs" className="shrink-0" />
                   <div>
                     <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                       Forklaring

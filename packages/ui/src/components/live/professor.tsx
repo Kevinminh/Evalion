@@ -2,7 +2,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { GraduationCap } from "lucide-react";
 
 interface ProfessorProps {
-  size?: "sm" | "lg";
+  size?: "xs" | "sm" | "lg";
   text?: string;
   label?: string;
   animate?: boolean;
@@ -10,6 +10,7 @@ interface ProfessorProps {
 }
 
 const sizeConfig = {
+  xs: { container: "size-12", icon: "size-5" },
   sm: { container: "size-24", icon: "size-10" },
   lg: { container: "size-[220px]", icon: "size-20" },
 };

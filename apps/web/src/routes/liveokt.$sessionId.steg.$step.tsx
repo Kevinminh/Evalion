@@ -129,6 +129,13 @@ function LiveStepPage() {
     };
   }, [step]);
 
+  // Reset recording when leaving recording-enabled steps
+  useEffect(() => {
+    if (step !== 2 && step !== 4) {
+      setRecording(false);
+    }
+  }, [step]);
+
   // Recording timer
   useEffect(() => {
     if (!recording) {
