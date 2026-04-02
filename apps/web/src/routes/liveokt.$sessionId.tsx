@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, skipToken } from "@tanstack/react-query";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { cn } from "@workspace/ui/lib/utils";
 import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
@@ -49,10 +49,11 @@ function TeacherLobbyPage() {
   const { data: session, isPending: sessionLoading } = useQuery(
     liveSessionQueries.getById(typedSessionId),
   );
-  const { data: fagprat, isPending: fagpratLoading } = useQuery({
-    ...fagpratQueries.getById(session?.fagpratId!),
-    enabled: !!session?.fagpratId,
-  });
+  const { data: fagprat, isPending: fagpratLoading } = useQuery(
+    session?.fagpratId
+      ? fagpratQueries.getById(session.fagpratId)
+      : { queryKey: ["fagprat", "none"], queryFn: skipToken },
+  );
   const { data: students } = useQuery(liveSessionQueries.listStudents(typedSessionId));
 
   const removeStudentMutation = useMutation(api.liveSessions.removeStudent);
