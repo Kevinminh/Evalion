@@ -81,6 +81,12 @@ function App() {
               <span className="text-xs text-muted-foreground">{session.user.email}</span>
             </div>
           </div>
+          <a
+            href={import.meta.env.DEV ? "http://localhost:3001" : "https://dashboard.evalion.no"}
+            className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
+          >
+            Gå til dashboard
+          </a>
           <Button variant="ghost" size="sm" onClick={handleLogout}>
             <LogOut className="size-4" />
             Logg ut
