@@ -1,24 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { cn } from "@workspace/ui/lib/utils";
+import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
 import { useMutation } from "convex/react";
 import { Users, X } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 
-import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
-import { fagpratQueries, liveSessionQueries, api } from "@/lib/convex";
+import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
-import type { FagPratId } from "@/lib/types";
 
-export const Route = createFileRoute("/liveokt/$id/lobby")({
+export const Route = createFileRoute("/liveokt/$sessionId")({
   beforeLoad: ({ context }) => {
     if (!context.isAuthenticated) {
       throw redirect({ to: "/login" });
     }
   },
-  validateSearch: (search: Record<string, unknown>) => ({
-    sessionId: (search.sessionId as string) ?? "",
-  }),
-  component: LobbyPage,
+  component: TeacherLobbyPage,
 });
 
 function WaitingDots() {
@@ -27,7 +24,7 @@ function WaitingDots() {
       {[0, 1, 2].map((i) => (
         <span
           key={i}
-          className="size-1.5 rounded-full bg-primary/40"
+          className="size-2.5 rounded-full bg-primary/40"
           style={{
             animation: "dotPulse 1.4s ease-in-out infinite both",
             animationDelay: `${i * 0.16}s`,
@@ -44,25 +41,25 @@ function WaitingDots() {
   );
 }
 
-function LobbyPage() {
-  const { id } = Route.useParams();
-  const { sessionId } = Route.useSearch();
+function TeacherLobbyPage() {
+  const { sessionId } = Route.useParams();
   const navigate = useNavigate();
-  const { data: fagprat, isPending: fagpratLoading } = useQuery(
-    fagpratQueries.getById(id as FagPratId),
-  );
+  const typedSessionId = sessionId as Id<"liveSessions">;
+
   const { data: session, isPending: sessionLoading } = useQuery(
-    liveSessionQueries.getById(sessionId as Id<"liveSessions">),
+    liveSessionQueries.getById(typedSessionId),
   );
-  const { data: students } = useQuery(
-    liveSessionQueries.listStudents(sessionId as Id<"liveSessions">),
-  );
+  const { data: fagprat, isPending: fagpratLoading } = useQuery({
+    ...fagpratQueries.getById(session?.fagpratId!),
+    enabled: !!session?.fagpratId,
+  });
+  const { data: students } = useQuery(liveSessionQueries.listStudents(typedSessionId));
 
   const removeStudentMutation = useMutation(api.liveSessions.removeStudent);
   const createGroupsMutation = useMutation(api.liveSessions.createGroups);
   const updateStepMutation = useMutation(api.liveSessions.updateStep);
 
-  const isPending = fagpratLoading || sessionLoading;
+  const isPending = sessionLoading || fagpratLoading;
 
   if (isPending) {
     return (
@@ -72,7 +69,7 @@ function LobbyPage() {
     );
   }
 
-  if (!fagprat || !session) {
+  if (!session || !fagprat) {
     return (
       <div className="flex min-h-svh items-center justify-center">
         <p className="text-muted-foreground">Økt ikke funnet.</p>
@@ -95,13 +92,13 @@ function LobbyPage() {
   const handleStart = async () => {
     await updateStepMutation({ id: session._id, step: 0 });
     navigate({
-      to: "/liveokt/$id/steg/$step",
-      params: { id, step: "0" },
-      search: { sessionId },
+      to: "/liveokt/$sessionId/steg/$step",
+      params: { sessionId, step: "0" },
     });
   };
 
-  // Group students for display
+  const joinUrl = `${window.location.origin}/delta?code=${session.joinCode}`;
+
   const groupedStudents = hasGroups
     ? Array.from({ length: session.groupCount }, (_, gi) =>
         studentList.filter((s) => s.groupIndex === gi),
@@ -110,7 +107,7 @@ function LobbyPage() {
 
   return (
     <div className="flex min-h-svh flex-col bg-background">
-      <SessionTopBar title={fagprat.title} onExit={() => navigate({ to: "/min-samling" })}>
+      <SessionTopBar title={fagprat.title}>
         {showGroupButton && (
           <button
             onClick={handleCreateGroups}
@@ -130,43 +127,33 @@ function LobbyPage() {
         )}
       </SessionTopBar>
 
-      {/* Main content */}
       <div className="flex flex-1 pt-16">
-        {/* Left: Join panel */}
         <div className="flex w-[38%] min-w-[340px] max-w-[480px] flex-col items-center justify-center gap-4 border-r border-border bg-card p-8">
-          <img src="/logo.png" alt="Evalion" className="mb-2 h-10 object-contain" />
-
-          <p className="text-sm text-muted-foreground">www.evalion.no/delta</p>
-
+          <img src="/logo.png" alt="Evalion" className="mb-2 h-16 object-contain" />
+          <p className="text-sm text-muted-foreground">{window.location.host}</p>
           <p className="text-sm font-semibold text-muted-foreground">
             Skriv inn koden for å bli med:
           </p>
-
-          {/* Game code */}
           <div className="rounded-xl border-2 border-primary/30 bg-primary/5 px-8 py-4">
             <span className="font-mono text-4xl font-bold tracking-[0.25em] text-primary">
               {session.joinCode}
             </span>
           </div>
-
           <p className="mt-2 text-sm text-muted-foreground">Eller skann</p>
-
-          {/* QR placeholder */}
-          <div className="flex size-40 items-center justify-center rounded-xl border-2 border-dashed border-primary/30 bg-primary/5">
-            <span className="text-sm text-primary/60">QR-kode</span>
+          <div className="rounded-xl bg-white p-3">
+            <QRCodeSVG value={joinUrl} size={130} />
           </div>
         </div>
 
-        {/* Right: Students panel */}
         <div className="flex flex-1 flex-col">
           <div className="flex-1 overflow-y-auto p-6">
             {groupedStudents === null ? (
-              /* Ungrouped view */
               <div className="flex flex-wrap content-start gap-3">
                 {studentList.map((student) => (
                   <div
                     key={student._id}
                     className="flex items-center gap-2 rounded-xl border-[1.5px] border-border bg-card p-2 pr-3 shadow-xs"
+                    style={{ animation: "cardIn 0.3s ease" }}
                   >
                     <div
                       className={cn(
@@ -187,7 +174,6 @@ function LobbyPage() {
                 ))}
               </div>
             ) : (
-              /* Grouped view */
               <div className="flex flex-wrap gap-4">
                 {groupedStudents.map((group, gi) => (
                   <div
@@ -220,17 +206,10 @@ function LobbyPage() {
                     </div>
                   </div>
                 ))}
-                <style>{`
-                  @keyframes groupFadeIn {
-                    from { opacity: 0; transform: translateY(8px); }
-                    to { opacity: 1; transform: translateY(0); }
-                  }
-                `}</style>
               </div>
             )}
           </div>
 
-          {/* Footer */}
           <div className="flex shrink-0 items-center justify-between border-t border-border px-6 py-3">
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               Venter på at elever kobler til
@@ -243,6 +222,17 @@ function LobbyPage() {
           </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes cardIn {
+          from { opacity: 0; transform: scale(0.9) translateY(4px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes groupFadeIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }

@@ -27,15 +27,17 @@ const options = [
 interface VoteButtonsProps {
   selected: "sant" | "usant" | "delvis" | null;
   onVote: (value: "sant" | "usant" | "delvis") => void;
+  disabled?: boolean;
 }
 
-export function VoteButtons({ selected, onVote }: VoteButtonsProps) {
+export function VoteButtons({ selected, onVote, disabled }: VoteButtonsProps) {
   return (
     <div className="flex justify-center gap-4">
       {options.map((opt) => (
         <button
           key={opt.value}
           onClick={() => onVote(opt.value)}
+          disabled={disabled}
           className={cn(
             "rounded-2xl px-8 py-4 text-lg font-extrabold text-white transition-all",
             opt.bg,
@@ -44,6 +46,7 @@ export function VoteButtons({ selected, onVote }: VoteButtonsProps) {
               ? `scale-105 ${opt.glow} shadow-[0_4px_0_rgba(0,0,0,0.2)]`
               : "shadow-[0_3px_0_rgba(0,0,0,0.15)]",
             selected && selected !== opt.value && "opacity-50 scale-95",
+            disabled && "pointer-events-none",
           )}
         >
           {opt.label}

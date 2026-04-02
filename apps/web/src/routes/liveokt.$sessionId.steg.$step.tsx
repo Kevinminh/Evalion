@@ -1,29 +1,25 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { cn } from "@workspace/ui/lib/utils";
-import { useMutation } from "convex/react";
-import { Mic } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-
 import { DistributionChart } from "@workspace/ui/components/live/distribution-chart";
 import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
 import { StepNav } from "@workspace/ui/components/live/step-nav";
 import { TeacherPanel } from "@workspace/ui/components/live/teacher-panel";
 import { TimerCard } from "@workspace/ui/components/live/timer-card";
 import { VoteButtons } from "@workspace/ui/components/live/vote-buttons";
-import { fagpratQueries, liveSessionQueries, api } from "@/lib/convex";
-import type { Id } from "@/lib/convex";
-import type { FagPratId } from "@/lib/types";
+import { useMutation } from "convex/react";
+import { Mic } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
-export const Route = createFileRoute("/liveokt/$id/steg/$step")({
+import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
+import type { Id } from "@/lib/convex";
+
+export const Route = createFileRoute("/liveokt/$sessionId/steg/$step")({
   beforeLoad: ({ context }) => {
     if (!context.isAuthenticated) {
       throw redirect({ to: "/login" });
     }
   },
-  validateSearch: (search: Record<string, unknown>) => ({
-    sessionId: (search.sessionId as string) ?? "",
-  }),
   component: LiveStepPage,
 });
 
@@ -56,15 +52,17 @@ const RATING_COLORS = [
 ];
 
 function LiveStepPage() {
-  const { id, step: stepParam } = Route.useParams();
-  const { sessionId } = Route.useSearch();
+  const { sessionId, step: stepParam } = Route.useParams();
   const navigate = useNavigate();
   const step = Number(stepParam);
-  const { data: fagprat, isPending } = useQuery(fagpratQueries.getById(id as FagPratId));
-  const { data: session } = useQuery(liveSessionQueries.getById(sessionId as Id<"liveSessions">));
-  const { data: students } = useQuery(
-    liveSessionQueries.listStudents(sessionId as Id<"liveSessions">),
-  );
+  const typedSessionId = sessionId as Id<"liveSessions">;
+
+  const { data: session } = useQuery(liveSessionQueries.getById(typedSessionId));
+  const { data: fagprat, isPending } = useQuery({
+    ...fagpratQueries.getById(session?.fagpratId!),
+    enabled: !!session?.fagpratId,
+  });
+  const { data: students } = useQuery(liveSessionQueries.listStudents(typedSessionId));
 
   const updateStepMutation = useMutation(api.liveSessions.updateStep);
 
@@ -82,24 +80,21 @@ function LiveStepPage() {
   const selectedIdx = selectedStatement ?? session?.currentStatementIndex ?? 0;
   const statement = fagprat?.statements[selectedIdx];
 
-  // Get votes for current statement from Convex
+  // Get votes for current statement
   const { data: votes } = useQuery({
-    ...liveSessionQueries.getVotes(sessionId as Id<"liveSessions">, selectedIdx),
-    enabled: !!sessionId && !!fagprat,
+    ...liveSessionQueries.getVotes(typedSessionId, selectedIdx),
+    enabled: !!fagprat,
   });
 
   const goToStep = async (n: number) => {
-    if (sessionId) {
-      await updateStepMutation({
-        id: sessionId as Id<"liveSessions">,
-        step: n,
-        ...(n === 0 ? {} : { statementIndex: selectedIdx }),
-      });
-    }
+    await updateStepMutation({
+      id: typedSessionId,
+      step: n,
+      ...(n === 0 ? {} : { statementIndex: selectedIdx }),
+    });
     navigate({
-      to: "/liveokt/$id/steg/$step",
-      params: { id, step: String(n) },
-      search: { sessionId },
+      to: "/liveokt/$sessionId/steg/$step",
+      params: { sessionId, step: String(n) },
     });
   };
 
@@ -149,7 +144,6 @@ function LiveStepPage() {
   const studentList = students ?? [];
   const voteList = votes ?? [];
 
-  // Compute vote distribution from real data
   const santCount = voteList.filter((v) => v.vote === "sant").length;
   const usantCount = voteList.filter((v) => v.vote === "usant").length;
   const delvisCount = voteList.filter((v) => v.vote === "delvis").length;
@@ -161,14 +155,12 @@ function LiveStepPage() {
     { label: "Delvis", value: delvisCount, color: "bg-delvis" },
   ];
 
-  // Statement card used in steps 1, 3, 4, 6
   const statementCard = (
     <div className="mx-auto max-w-2xl rounded-2xl border-[1.5px] border-blue-200 bg-blue-50 p-6">
       <p className="text-center text-lg font-bold text-foreground">{statement?.text}</p>
     </div>
   );
 
-  // Teacher panel: student vote list
   const studentVoteList = (
     <div className="space-y-2">
       {studentList.map((s) => {
@@ -191,16 +183,14 @@ function LiveStepPage() {
     </div>
   );
 
-  // Render step content
   const renderStepContent = () => {
     switch (step) {
-      // Step 0 -- Statement Selection
       case 0: {
         const isOdd = fagprat.statements.length % 2 !== 0;
         return (
           <div className="flex flex-col items-center">
             <h2 className="mb-8 text-center text-2xl font-extrabold text-foreground">
-              Velg en p&aring;stand
+              Velg en påstand
             </h2>
             <div className="grid max-w-3xl grid-cols-2 gap-6">
               {fagprat.statements.map((s, i) => {
@@ -232,7 +222,6 @@ function LiveStepPage() {
         );
       }
 
-      // Step 1 -- First Vote
       case 1:
         return (
           <div className="flex flex-col items-center gap-8 pt-8">
@@ -241,7 +230,6 @@ function LiveStepPage() {
           </div>
         );
 
-      // Step 2 -- Group Discussion
       case 2:
         return (
           <div className="flex flex-col items-center gap-6 pt-8">
@@ -254,7 +242,6 @@ function LiveStepPage() {
           </div>
         );
 
-      // Step 3 -- Second Vote
       case 3:
         return (
           <div className="flex flex-col items-center gap-8 pt-8">
@@ -263,7 +250,6 @@ function LiveStepPage() {
           </div>
         );
 
-      // Step 4 -- Answer Reveal
       case 4: {
         const fasitLabel = statement ? (VOTE_LABELS[statement.fasit] ?? statement.fasit) : "";
         const fasitColor =
@@ -303,7 +289,6 @@ function LiveStepPage() {
         );
       }
 
-      // Step 5 -- Explanation
       case 5:
         return (
           <div className="mx-auto max-w-2xl pt-8">
@@ -328,14 +313,13 @@ function LiveStepPage() {
           </div>
         );
 
-      // Step 6 -- Self Evaluation
       case 6:
         return (
           <div className="flex flex-col items-center gap-8 pt-8">
             {statementCard}
             <div className="mx-auto max-w-2xl rounded-2xl border border-primary/20 bg-primary/5 p-4">
               <p className="text-center text-sm italic text-foreground/80">
-                Vurder fra 1 til 5 hvor godt du forst&aring;r p&aring;standen n&aring;.
+                Vurder fra 1 til 5 hvor godt du forstår påstanden nå.
               </p>
             </div>
             <div className="flex justify-center gap-4">
@@ -366,11 +350,10 @@ function LiveStepPage() {
     }
   };
 
-  // Render teacher panel content
   const renderTeacherContent = () => {
     switch (step) {
       case 0:
-        return <p className="text-center text-sm text-muted-foreground">Venter p&aring; valg...</p>;
+        return <p className="text-center text-sm text-muted-foreground">Venter på valg...</p>;
 
       case 1:
         return (
@@ -398,7 +381,7 @@ function LiveStepPage() {
           </div>
         );
 
-      case 3: {
+      case 3:
         return (
           <div className="space-y-4">
             <TimerCard />
@@ -408,7 +391,6 @@ function LiveStepPage() {
             <DistributionChart bars={voteBars} total={totalVotes} />
           </div>
         );
-      }
 
       case 4: {
         const correctCount = voteList.filter((v) => statement && v.vote === statement.fasit).length;
@@ -426,7 +408,6 @@ function LiveStepPage() {
         return null;
 
       case 6: {
-        // Self-eval distribution — placeholder until real data exists
         const mockDistribution = [2, 3, 8, 6, 5];
         const mockTotal = mockDistribution.reduce((a, b) => a + b, 0);
         const ratingBars = mockDistribution.map((value, i) => ({
@@ -454,7 +435,7 @@ function LiveStepPage() {
 
   return (
     <div className="min-h-svh bg-background">
-      <SessionTopBar title={fagprat.title} onExit={() => navigate({ to: "/min-samling" })}>
+      <SessionTopBar title={fagprat.title}>
         {(step === 2 || step === 4) && (
           <button
             onClick={() => setRecording(!recording)}
@@ -472,7 +453,6 @@ function LiveStepPage() {
 
       <div className="flex pt-16 pb-14">
         <main className="flex-1 px-8 py-8">{renderStepContent()}</main>
-
         <TeacherPanel defaultOpen={step !== 5}>{renderTeacherContent()}</TeacherPanel>
       </div>
 
