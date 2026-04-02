@@ -82,6 +82,7 @@ function LiveStepPage() {
   const [begrunnelseIdx, setBegrunnelseIdx] = useState(0);
   const [recording, setRecording] = useState(false);
   const [recordElapsed, setRecordElapsed] = useState(0);
+  const [panelOpen, setPanelOpen] = useState(true);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [usedStatements, setUsedStatements] = useState<Set<number>>(new Set());
 
@@ -688,8 +689,8 @@ function LiveStepPage() {
       </SessionTopBar>
 
       <div className="flex pt-16 pb-14">
-        <main className="flex-1 px-8 py-8">{renderStepContent()}</main>
-        <TeacherPanel defaultOpen={step !== 5} footer={renderPanelFooter()}>
+        <main className="flex-1 px-8 py-8 transition-[margin] duration-300" style={{ marginRight: panelOpen ? 340 : 0 }}>{renderStepContent()}</main>
+        <TeacherPanel defaultOpen={step !== 5} footer={renderPanelFooter()} onOpenChange={setPanelOpen}>
           {renderTeacherContent()}
         </TeacherPanel>
       </div>

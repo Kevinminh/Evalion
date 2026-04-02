@@ -1,6 +1,6 @@
 import { cn } from "@workspace/ui/lib/utils";
 import { PanelRightClose, PanelRightOpen } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 const STORAGE_KEY = "fagprat-panel-collapsed";
 
@@ -8,18 +8,25 @@ interface TeacherPanelProps {
   children: ReactNode;
   defaultOpen?: boolean;
   footer?: ReactNode;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function TeacherPanel({ children, defaultOpen = true, footer }: TeacherPanelProps) {
+export function TeacherPanel({ children, defaultOpen = true, footer, onOpenChange }: TeacherPanelProps) {
   const [open, setOpen] = useState(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored !== null) return stored !== "true";
     return defaultOpen;
   });
 
+  // Notify parent of initial state
+  useEffect(() => {
+    onOpenChange?.(open);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const toggle = () => {
     const next = !open;
     setOpen(next);
+    onOpenChange?.(next);
     localStorage.setItem(STORAGE_KEY, next ? "false" : "true");
   };
 
