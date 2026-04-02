@@ -53,6 +53,38 @@ const RATING_COLORS = [
   "bg-green-400",
 ];
 
+function RecordButton() {
+  const [recording, setRecording] = useState(false);
+  const [time, setTime] = useState(0);
+
+  useEffect(() => {
+    if (!recording) {
+      setTime(0);
+      return;
+    }
+    const interval = setInterval(() => setTime((t) => t + 1), 1000);
+    return () => clearInterval(interval);
+  }, [recording]);
+
+  return (
+    <button
+      onClick={() => setRecording(!recording)}
+      className={cn(
+        "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition-all",
+        recording ? "bg-foreground text-white" : "bg-muted text-muted-foreground",
+      )}
+    >
+      {recording && (
+        <span className="size-2 rounded-full bg-red-500 animate-[blink_1s_ease-in-out_infinite]" />
+      )}
+      <Mic className="size-4" />
+      {recording
+        ? `${String(Math.floor(time / 60)).padStart(2, "0")}:${String(time % 60).padStart(2, "0")}`
+        : "Opptak"}
+    </button>
+  );
+}
+
 function LiveStepPage() {
   const { sessionId, step: stepParam } = Route.useParams();
   const navigate = useNavigate();
@@ -74,8 +106,6 @@ function LiveStepPage() {
   const [showCountdown, setShowCountdown] = useState(false);
   const [countdownNumber, setCountdownNumber] = useState(3);
   const [countdownDone, setCountdownDone] = useState(false);
-  const [recording, setRecording] = useState(false);
-  const [recordingTime, setRecordingTime] = useState(0);
 
   const countdownTriggered = useRef(false);
 
@@ -128,23 +158,6 @@ function LiveStepPage() {
       clearTimeout(t3);
     };
   }, [step]);
-
-  // Reset recording when leaving recording-enabled steps
-  useEffect(() => {
-    if (step !== 2 && step !== 4) {
-      setRecording(false);
-    }
-  }, [step]);
-
-  // Recording timer
-  useEffect(() => {
-    if (!recording) {
-      setRecordingTime(0);
-      return;
-    }
-    const interval = setInterval(() => setRecordingTime((t) => t + 1), 1000);
-    return () => clearInterval(interval);
-  }, [recording]);
 
   if (isPending) {
     return (
@@ -446,23 +459,7 @@ function LiveStepPage() {
   return (
     <div className="min-h-svh bg-background">
       <SessionTopBar title={fagprat.title}>
-        {(step === 2 || step === 4) && (
-          <button
-            onClick={() => setRecording(!recording)}
-            className={cn(
-              "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition-all",
-              recording ? "bg-foreground text-white" : "bg-muted text-muted-foreground",
-            )}
-          >
-            {recording && (
-              <span className="size-2 rounded-full bg-red-500 animate-[blink_1s_ease-in-out_infinite]" />
-            )}
-            <Mic className="size-4" />
-            {recording
-              ? `${String(Math.floor(recordingTime / 60)).padStart(2, "0")}:${String(recordingTime % 60).padStart(2, "0")}`
-              : "Opptak"}
-          </button>
-        )}
+        {(step === 2 || step === 4) && <RecordButton />}
       </SessionTopBar>
 
       <div className="flex pt-16 pb-14">
