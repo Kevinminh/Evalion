@@ -220,7 +220,7 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/liveokt/$sessionId/steg/$step': {
+    '/liveokt/$sessionId_/steg/$step': {
       id: '/liveokt/$sessionId_/steg/$step'
       path: '/liveokt/$sessionId/steg/$step'
       fullPath: '/liveokt/$sessionId/steg/$step'
