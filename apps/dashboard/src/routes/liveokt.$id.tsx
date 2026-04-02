@@ -1,5 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@workspace/ui/components/alert-dialog";
+import { Button } from "@workspace/ui/components/button";
 import { useMutation } from "convex/react";
 import { Users, Mic, CheckSquare, ArrowRight } from "lucide-react";
 import { useState } from "react";
@@ -30,6 +41,7 @@ function LiveoktSetupPage() {
   const [transcriptionEnabled, setTranscriptionEnabled] = useState(false);
   const [selfEvalEnabled, setSelfEvalEnabled] = useState(true);
   const [launching, setLaunching] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
 
   if (isPending) {
     return (
@@ -66,7 +78,7 @@ function LiveoktSetupPage() {
 
   return (
     <div className="min-h-svh bg-background">
-      <SessionTopBar title={fagprat.title} onExit={() => navigate({ to: "/min-samling" })} />
+      <SessionTopBar title={fagprat.title} onExit={() => setCancelOpen(true)} />
 
       <div className="mx-auto max-w-[1100px] px-8 pt-24 pb-12">
         <h1 className="mb-8 text-3xl font-extrabold text-foreground">Oppsett for liveøkt</h1>
@@ -120,28 +132,46 @@ function LiveoktSetupPage() {
             <div className="rounded-2xl border-[1.5px] border-border bg-card p-6">
               {/* QR placeholder */}
               <div className="mb-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Elevenes skjerm
+                Lærer-analytics
               </div>
               <div className="mb-4 flex aspect-square items-center justify-center rounded-xl border-2 border-dashed border-primary/30 bg-primary/5">
                 <span className="text-sm text-primary/60">QR-kode</span>
               </div>
               <p className="mb-6 text-xs text-muted-foreground">
-                Skann for å koble til elevenes enheter
+                Se sanntidsdata og elevrespons under økten
               </p>
 
               {/* Launch button */}
-              <button
+              <Button
+                variant="teal"
+                className="w-full"
                 onClick={handleLaunch}
                 disabled={launching}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-secondary-teal px-6 py-3.5 text-sm font-bold text-white shadow-[0_3px_0_var(--secondary-teal-dark)] transition-all hover:-translate-y-0.5 hover:shadow-[0_4px_0_var(--secondary-teal-dark)] active:translate-y-0.5 active:shadow-[0_1px_0_var(--secondary-teal-dark)] disabled:opacity-50"
               >
                 {launching ? "Oppretter..." : "Neste — opprett lobby"}
                 <ArrowRight className="size-4" />
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       </div>
+
+      <AlertDialog open={cancelOpen} onOpenChange={setCancelOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Er du sikker på at du vil avbryte?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Oppsettet for liveøkten vil ikke bli lagret hvis du avbryter nå.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Nei, fortsett oppsettet</AlertDialogCancel>
+            <AlertDialogAction onClick={() => navigate({ to: "/min-samling" })}>
+              Ja, avbryt
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

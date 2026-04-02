@@ -293,6 +293,251 @@ export const castVote = mutation({
   },
 });
 
+// ── Timer mutations ──
+
+export const startTimer = mutation({
+  args: { id: v.id("liveSessions"), duration: v.number() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+    const session = await ctx.db.get(args.id);
+    if (!session || session.teacherId !== identity.subject) {
+      throw new Error("Not authorized");
+    }
+    await ctx.db.patch(args.id, {
+      timerDuration: args.duration,
+      timerStartedAt: Date.now(),
+      timerPausedAt: undefined,
+      timerRemainingAtPause: undefined,
+    });
+  },
+});
+
+export const pauseTimer = mutation({
+  args: { id: v.id("liveSessions") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+    const session = await ctx.db.get(args.id);
+    if (!session || session.teacherId !== identity.subject) {
+      throw new Error("Not authorized");
+    }
+    if (!session.timerStartedAt || session.timerPausedAt) return;
+    const elapsed = (Date.now() - session.timerStartedAt) / 1000;
+    const remaining = Math.max(0, (session.timerDuration ?? 0) - elapsed);
+    await ctx.db.patch(args.id, {
+      timerPausedAt: Date.now(),
+      timerRemainingAtPause: remaining,
+    });
+  },
+});
+
+export const stopTimer = mutation({
+  args: { id: v.id("liveSessions") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+    const session = await ctx.db.get(args.id);
+    if (!session || session.teacherId !== identity.subject) {
+      throw new Error("Not authorized");
+    }
+    await ctx.db.patch(args.id, {
+      timerDuration: undefined,
+      timerStartedAt: undefined,
+      timerPausedAt: undefined,
+      timerRemainingAtPause: undefined,
+    });
+  },
+});
+
+// ── Vote analytics ──
+
+export const getVoteAnalytics = query({
+  args: {
+    sessionId: v.id("liveSessions"),
+    statementIndex: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const session = await ctx.db.get(args.sessionId);
+    if (!session) return null;
+    const fagprat = await ctx.db.get(session.fagpratId);
+    const fasit = fagprat?.statements[args.statementIndex]?.fasit;
+
+    const allVotes = await ctx.db
+      .query("sessionVotes")
+      .withIndex("by_session_statement", (q) =>
+        q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
+      )
+      .collect();
+
+    const round1Votes = allVotes.filter((v) => v.round === 1);
+    const round2Votes = allVotes.filter((v) => v.round === 2);
+
+    const distribution = (votes: typeof allVotes) => {
+      const sant = votes.filter((v) => v.vote === "sant").length;
+      const usant = votes.filter((v) => v.vote === "usant").length;
+      const delvis = votes.filter((v) => v.vote === "delvis").length;
+      const total = votes.length;
+      return {
+        sant,
+        usant,
+        delvis,
+        total,
+        santPct: total ? Math.round((sant / total) * 100) : 0,
+        usantPct: total ? Math.round((usant / total) * 100) : 0,
+        delvisPct: total ? Math.round((delvis / total) * 100) : 0,
+      };
+    };
+
+    // R1 vs R2 changes
+    const r1ByStudent = new Map(round1Votes.map((v) => [v.studentId, v.vote]));
+    const r2ByStudent = new Map(round2Votes.map((v) => [v.studentId, v.vote]));
+    let correctR2 = 0;
+    let wrongToRight = 0;
+    let rightToWrong = 0;
+
+    for (const [studentId, r2Vote] of r2ByStudent) {
+      const r1Vote = r1ByStudent.get(studentId);
+      const r2Correct = r2Vote === fasit;
+      const r1Correct = r1Vote === fasit;
+      if (r2Correct) correctR2++;
+      if (r1Vote && !r1Correct && r2Correct) wrongToRight++;
+      if (r1Vote && r1Correct && !r2Correct) rightToWrong++;
+    }
+
+    // Ratings
+    const ratings = await ctx.db
+      .query("sessionRatings")
+      .withIndex("by_session_statement", (q) =>
+        q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
+      )
+      .collect();
+    const avgRating = ratings.length
+      ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
+      : 0;
+
+    return {
+      round1: distribution(round1Votes),
+      round2: distribution(round2Votes),
+      fasit,
+      correctR2,
+      totalR2: round2Votes.length,
+      wrongToRight,
+      rightToWrong,
+      avgRating: Math.round(avgRating * 10) / 10,
+      ratingDistribution: [1, 2, 3, 4, 5].map((score) => ({
+        score,
+        count: ratings.filter((r) => r.rating === score).length,
+      })),
+    };
+  },
+});
+
+export const getRatings = query({
+  args: {
+    sessionId: v.id("liveSessions"),
+    statementIndex: v.number(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("sessionRatings")
+      .withIndex("by_session_statement", (q) =>
+        q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
+      )
+      .collect();
+  },
+});
+
+// ── Begrunnelser ──
+
+export const submitBegrunnelse = mutation({
+  args: {
+    sessionId: v.id("liveSessions"),
+    studentId: v.id("sessionStudents"),
+    statementIndex: v.number(),
+    round: v.number(),
+    text: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const trimmed = args.text.trim();
+    if (!trimmed) throw new Error("Begrunnelse cannot be empty");
+
+    const existing = await ctx.db
+      .query("sessionBegrunnelser")
+      .withIndex("by_session_statement", (q) =>
+        q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
+      )
+      .filter((q) =>
+        q.and(q.eq(q.field("studentId"), args.studentId), q.eq(q.field("round"), args.round)),
+      )
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, { text: trimmed });
+      return existing._id;
+    }
+    return await ctx.db.insert("sessionBegrunnelser", {
+      sessionId: args.sessionId,
+      studentId: args.studentId,
+      statementIndex: args.statementIndex,
+      round: args.round,
+      text: trimmed,
+    });
+  },
+});
+
+export const getBegrunnelser = query({
+  args: {
+    sessionId: v.id("liveSessions"),
+    statementIndex: v.number(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("sessionBegrunnelser")
+      .withIndex("by_session_statement", (q) =>
+        q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
+      )
+      .collect();
+  },
+});
+
+export const highlightBegrunnelse = mutation({
+  args: {
+    id: v.id("sessionBegrunnelser"),
+    highlighted: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const begrunnelse = await ctx.db.get(args.id);
+    if (!begrunnelse) throw new Error("Begrunnelse not found");
+
+    // Clear any other highlighted begrunnelse for the same statement
+    if (args.highlighted) {
+      const others = await ctx.db
+        .query("sessionBegrunnelser")
+        .withIndex("by_session_statement", (q) =>
+          q
+            .eq("sessionId", begrunnelse.sessionId)
+            .eq("statementIndex", begrunnelse.statementIndex),
+        )
+        .filter((q) => q.eq(q.field("highlighted"), true))
+        .collect();
+      for (const other of others) {
+        await ctx.db.patch(other._id, { highlighted: false });
+      }
+    }
+    await ctx.db.patch(args.id, { highlighted: args.highlighted });
+  },
+});
+
 // ── Rating mutations ──
 
 export const submitRating = mutation({

@@ -3,10 +3,11 @@ import { X } from "lucide-react";
 interface SessionTopBarProps {
   title: string;
   onExit?: () => void;
+  center?: React.ReactNode;
   children?: React.ReactNode;
 }
 
-export function SessionTopBar({ title, onExit, children }: SessionTopBarProps) {
+export function SessionTopBar({ title, onExit, center, children }: SessionTopBarProps) {
   return (
     <div className="fixed top-0 right-0 left-0 z-40 flex h-16 items-center justify-between border-b bg-card px-6">
       <div className="flex items-center gap-4">
@@ -14,6 +15,7 @@ export function SessionTopBar({ title, onExit, children }: SessionTopBarProps) {
         <div className="h-6 w-px bg-border" />
         <span className="text-sm font-bold text-foreground">{title}</span>
       </div>
+      {center && <div className="absolute left-1/2 -translate-x-1/2">{center}</div>}
       <div className="flex items-center gap-3">
         {children}
         {onExit && (

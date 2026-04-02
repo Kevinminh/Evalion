@@ -1,9 +1,10 @@
 import { cn } from "@workspace/ui/lib/utils";
 import { GraduationCap } from "lucide-react";
+import type { ReactNode } from "react";
 
 interface ProfessorProps {
   size?: "xs" | "sm" | "lg";
-  text?: string;
+  text?: ReactNode;
   label?: string;
   animate?: boolean;
   className?: string;

@@ -1,16 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { cn } from "@workspace/ui/lib/utils";
+import { BackButton } from "@workspace/ui/components/live/back-button";
+import { BegrunnelseCard } from "@workspace/ui/components/live/begrunnelse-card";
 import { DistributionChart } from "@workspace/ui/components/live/distribution-chart";
+import { EndringerCard } from "@workspace/ui/components/live/endringer-card";
+import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
+import { PanelTabs } from "@workspace/ui/components/live/panel-tabs";
+import { Professor } from "@workspace/ui/components/live/professor";
+import { RatingChart } from "@workspace/ui/components/live/rating-chart";
+import { RecordButton } from "@workspace/ui/components/live/record-button";
 import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
 import { StepNav } from "@workspace/ui/components/live/step-nav";
 import { TeacherPanel } from "@workspace/ui/components/live/teacher-panel";
 import { TimerCard } from "@workspace/ui/components/live/timer-card";
 import { VoteButtons } from "@workspace/ui/components/live/vote-buttons";
 import { useMutation } from "convex/react";
-import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
-import { Professor } from "@workspace/ui/components/live/professor";
-import { Mic } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
@@ -40,45 +46,11 @@ const STATEMENT_COLORS = [
   { bg: "#FFEBEE", border: "#EF9A9A" },
 ];
 
-const RATING_COLORS = [
-  "bg-red-400",
-  "bg-orange-400",
-  "bg-yellow-400",
-  "bg-lime-400",
-  "bg-green-400",
-];
-
-function RecordButton() {
-  const [recording, setRecording] = useState(false);
-  const [time, setTime] = useState(0);
-
-  useEffect(() => {
-    if (!recording) {
-      setTime(0);
-      return;
-    }
-    const interval = setInterval(() => setTime((t) => t + 1), 1000);
-    return () => clearInterval(interval);
-  }, [recording]);
-
-  return (
-    <button
-      onClick={() => setRecording(!recording)}
-      className={cn(
-        "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition-all",
-        recording ? "bg-foreground text-white" : "bg-muted text-muted-foreground",
-      )}
-    >
-      {recording && (
-        <span className="size-2 rounded-full bg-red-500 animate-[blink_1s_ease-in-out_infinite]" />
-      )}
-      <Mic className="size-4" />
-      {recording
-        ? `${String(Math.floor(time / 60)).padStart(2, "0")}:${String(time % 60).padStart(2, "0")}`
-        : "Opptak"}
-    </button>
-  );
-}
+const FASIT_TEXT: Record<string, string> = {
+  sant: "sant",
+  usant: "usant",
+  delvis: "delvis sant",
+};
 
 function LiveStepPage() {
   const { sessionId, step: stepParam } = Route.useParams();
@@ -102,18 +74,35 @@ function LiveStepPage() {
   const [showCountdown, setShowCountdown] = useState(false);
   const [countdownNumber, setCountdownNumber] = useState(3);
   const [countdownDone, setCountdownDone] = useState(false);
+  const [panelTab, setPanelTab] = useState("default");
+  const [recording, setRecording] = useState(false);
+  const [recordElapsed, setRecordElapsed] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
   const countdownTriggered = useRef(false);
 
-  // Use session's current statement index if available
   const selectedIdx = selectedStatement ?? session?.currentStatementIndex ?? 0;
   const statement = fagprat?.statements[selectedIdx];
 
-  // Get votes for current statement
   const { data: votes } = useQuery({
     ...liveSessionQueries.getVotes(typedSessionId, selectedIdx),
     enabled: !!fagprat,
   });
+
+  const { data: ratings } = useQuery({
+    ...liveSessionQueries.getRatings(typedSessionId, selectedIdx),
+    enabled: !!fagprat && step === 6,
+  });
+
+  // Recording timer
+  useEffect(() => {
+    if (!recording) {
+      setRecordElapsed(0);
+      return;
+    }
+    const interval = setInterval(() => setRecordElapsed((t) => t + 1), 1000);
+    return () => clearInterval(interval);
+  }, [recording]);
 
   const handleEnd = async () => {
     await endSessionMutation({ id: typedSessionId });
@@ -121,6 +110,10 @@ function LiveStepPage() {
   };
 
   const goToStep = async (n: number) => {
+    // Mark current step as completed when advancing
+    if (step > 0 && step < n) {
+      setCompletedSteps((prev) => (prev.includes(step) ? prev : [...prev, step]));
+    }
     await updateStepMutation({
       id: typedSessionId,
       step: n,
@@ -160,6 +153,11 @@ function LiveStepPage() {
     };
   }, [step]);
 
+  // Reset panel tab when step changes
+  useEffect(() => {
+    setPanelTab("default");
+  }, [step]);
+
   if (isPending) {
     return (
       <div className="flex min-h-svh items-center justify-center">
@@ -178,17 +176,64 @@ function LiveStepPage() {
 
   const studentList = students ?? [];
   const voteList = votes ?? [];
+  const ratingList = ratings ?? [];
 
-  const santCount = voteList.filter((v) => v.vote === "sant").length;
-  const usantCount = voteList.filter((v) => v.vote === "usant").length;
-  const delvisCount = voteList.filter((v) => v.vote === "delvis").length;
-  const totalVotes = voteList.length;
+  // Round-filtered votes
+  const r1Votes = voteList.filter((v) => v.round === 1);
+  const r2Votes = voteList.filter((v) => v.round === 2);
+
+  const activeRoundVotes = step <= 2 ? r1Votes : r2Votes;
+
+  const santCount = activeRoundVotes.filter((v) => v.vote === "sant").length;
+  const usantCount = activeRoundVotes.filter((v) => v.vote === "usant").length;
+  const delvisCount = activeRoundVotes.filter((v) => v.vote === "delvis").length;
+  const totalVotes = activeRoundVotes.length;
 
   const voteBars = [
     { label: "Sant", value: santCount, color: "bg-sant" },
     { label: "Usant", value: usantCount, color: "bg-usant" },
     { label: "Delvis", value: delvisCount, color: "bg-delvis" },
   ];
+
+  // Step 4 endringer data
+  const r2CorrectCount = statement
+    ? r2Votes.filter((v) => v.vote === statement.fasit).length
+    : 0;
+  const r2Total = r2Votes.length;
+
+  const changedToCorrect = (() => {
+    if (!statement) return 0;
+    let count = 0;
+    for (const v2 of r2Votes) {
+      const v1 = r1Votes.find((v) => v.studentId === v2.studentId);
+      if (v1 && v1.vote !== statement.fasit && v2.vote === statement.fasit) {
+        count++;
+      }
+    }
+    return count;
+  })();
+
+  const changedToIncorrect = (() => {
+    if (!statement) return 0;
+    let count = 0;
+    for (const v2 of r2Votes) {
+      const v1 = r1Votes.find((v) => v.studentId === v2.studentId);
+      if (v1 && v1.vote === statement.fasit && v2.vote !== statement.fasit) {
+        count++;
+      }
+    }
+    return count;
+  })();
+
+  // Rating distribution for step 6
+  const ratingDistribution = [1, 2, 3, 4, 5].map((score) => ({
+    score,
+    count: ratingList.filter((r) => r.rating === score).length,
+  }));
+  const avgRating =
+    ratingList.length > 0
+      ? ratingList.reduce((sum, r) => sum + r.rating, 0) / ratingList.length
+      : undefined;
 
   const statementCard = (
     <div className="mx-auto max-w-2xl rounded-2xl border-[1.5px] border-blue-200 bg-blue-50 p-6">
@@ -199,7 +244,7 @@ function LiveStepPage() {
   const studentVoteList = (
     <div className="space-y-2">
       {studentList.map((s) => {
-        const studentVote = voteList.find((v) => v.studentId === s._id);
+        const studentVote = activeRoundVotes.find((v) => v.studentId === s._id);
         return (
           <div key={s._id} className="flex items-center gap-2 text-sm">
             <span
@@ -216,6 +261,19 @@ function LiveStepPage() {
         );
       })}
     </div>
+  );
+
+  const recordButtonState: "disabled" | "ready" | "recording" =
+    recording ? "recording" : [2, 4].includes(step) ? "ready" : "disabled";
+
+  const nextStepButton = (
+    <button
+      onClick={() => goToStep(step + 1)}
+      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-[0_2px_0_oklch(0.35_0.16_295)] transition-all hover:-translate-y-px"
+    >
+      Neste steg
+      <ArrowRight className="size-4" />
+    </button>
   );
 
   const renderStepContent = () => {
@@ -260,7 +318,10 @@ function LiveStepPage() {
 
       case 1:
         return (
-          <div className="flex flex-col items-center gap-8 pt-8">
+          <div className="flex flex-col items-center gap-8 pt-4">
+            <div className="self-start">
+              <BackButton onClick={() => goToStep(0)} />
+            </div>
             {statementCard}
             <Professor size="sm" text="Stem uten å avsløre hva du tenker..." />
             <VoteButtons selected={vote} onVote={setVote} />
@@ -269,18 +330,21 @@ function LiveStepPage() {
 
       case 2:
         return (
-          <div className="flex flex-col items-center gap-6 pt-8">
+          <div className="flex flex-col items-center gap-6 pt-4">
             {statementCard}
             <Professor
               size="sm"
-              text="Diskuter med læringspartneren din. Forklar til hverandre hva dere tenker."
+              text="Diskuter med læringspartneren din. Forklar hva du tenker og lytt til hva den andre mener."
             />
           </div>
         );
 
       case 3:
         return (
-          <div className="flex flex-col items-center gap-8 pt-8">
+          <div className="flex flex-col items-center gap-8 pt-4">
+            <div className="self-start">
+              <BackButton onClick={() => goToStep(0)} />
+            </div>
             {statementCard}
             <Professor size="sm" text="Har du endret mening etter diskusjonen? Stem på nytt!" />
             <VoteButtons selected={vote} onVote={setVote} />
@@ -305,6 +369,17 @@ function LiveStepPage() {
                 <FasitBadge answer={statement.fasit} animated />
               )}
               {statementCard}
+              {countdownDone && statement && (
+                <Professor
+                  size="sm"
+                  text={
+                    <>
+                      Hvorfor er denne påstanden{" "}
+                      <strong>{FASIT_TEXT[statement.fasit]}</strong>?
+                    </>
+                  }
+                />
+              )}
             </div>
           </>
         );
@@ -314,7 +389,7 @@ function LiveStepPage() {
         return (
           <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 pt-8">
             {statement && <FasitBadge answer={statement.fasit} />}
-            <div className="w-full overflow-hidden rounded-2xl border-[1.5px] border-blue-200">
+            <div className="w-full overflow-hidden rounded-2xl border-[1.5px] border-blue-200 animate-[fadeInUp_0.5s_ease_0.2s_both]">
               <div className="bg-gradient-to-b from-blue-100 to-blue-50 p-6">
                 <p className="text-center text-lg font-bold text-foreground">
                   {statement?.text}
@@ -350,13 +425,20 @@ function LiveStepPage() {
               {[1, 2, 3, 4, 5].map((n) => {
                 const isSelected = rating === n;
                 const hasRating = rating !== null;
+                const ratingColors = [
+                  "bg-red-400",
+                  "bg-orange-400",
+                  "bg-yellow-400",
+                  "bg-lime-400",
+                  "bg-green-400",
+                ];
                 return (
                   <button
                     key={n}
                     onClick={() => setRating(n)}
                     className={cn(
                       "rounded-xl px-6 py-4 text-lg font-bold text-white transition-all",
-                      RATING_COLORS[n - 1],
+                      ratingColors[n - 1],
                       isSelected && "scale-110 shadow-[0_0_20px_rgba(0,0,0,0.25)]",
                       hasRating && !isSelected && "opacity-40",
                     )}
@@ -390,20 +472,35 @@ function LiveStepPage() {
           </div>
         );
 
-      case 2:
+      case 2: {
+        const begrunnelseTab = panelTab === "default" || panelTab === "begrunnelser";
         return (
-          <div className="space-y-4">
-            <TimerCard />
-            <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Transkript
-            </div>
-            <div className="space-y-3">
-              <p className="text-xs italic text-foreground/70">
-                Transkribering er ikke tilgjengelig ennå.
-              </p>
-            </div>
-          </div>
+          <PanelTabs
+            tabs={[
+              { key: "begrunnelser", label: "Begrunnelser" },
+              { key: "stemmefordeling", label: "Stemmefordeling" },
+            ]}
+            activeTab={begrunnelseTab ? "begrunnelser" : "stemmefordeling"}
+            onTabChange={setPanelTab}
+          >
+            {begrunnelseTab ? (
+              <div className="space-y-4">
+                <TimerCard />
+                <p className="text-xs italic text-muted-foreground">
+                  Ingen begrunnelser ennå
+                </p>
+                <BegrunnelseCard text="Eksempel: Fordi påstanden stemmer med det vi lærte om..." />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {studentVoteList}
+                <div className="h-px bg-border" />
+                <DistributionChart bars={voteBars} total={totalVotes} />
+              </div>
+            )}
+          </PanelTabs>
         );
+      }
 
       case 3:
         return (
@@ -417,50 +514,116 @@ function LiveStepPage() {
         );
 
       case 4: {
-        const correctCount = voteList.filter((v) => statement && v.vote === statement.fasit).length;
+        const endringerTab = panelTab === "default" || panelTab === "endringer";
         return (
-          <div className="space-y-4">
-            <p className="text-sm font-bold text-foreground">
-              {correctCount} av {totalVotes} svarte riktig
-            </p>
-            <DistributionChart bars={voteBars} total={totalVotes} />
-          </div>
-        );
-      }
-
-      case 5:
-        return null;
-
-      case 6: {
-        const mockDistribution = [2, 3, 8, 6, 5];
-        const mockTotal = mockDistribution.reduce((a, b) => a + b, 0);
-        const ratingBars = mockDistribution.map((value, i) => ({
-          label: String(i + 1),
-          value,
-          color: RATING_COLORS[i],
-        }));
-        return (
-          <div className="space-y-4">
-            <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Gjennomsnitt
+          <PanelTabs
+            tabs={[
+              { key: "endringer", label: "Endringer" },
+              { key: "stemmefordeling", label: "Stemmefordeling" },
+            ]}
+            activeTab={endringerTab ? "endringer" : "stemmefordeling"}
+            onTabChange={setPanelTab}
+          >
+            {endringerTab ? (
+              <EndringerCard
+                correctCount={r2CorrectCount}
+                totalVotes={r2Total}
+                changedToCorrect={changedToCorrect}
+                changedToIncorrect={changedToIncorrect}
+              />
+            ) : (
+              <div className="space-y-4">
+                <DistributionChart
+                  bars={[
+                    { label: "Sant", value: r2Votes.filter((v) => v.vote === "sant").length, color: "bg-sant" },
+                    { label: "Usant", value: r2Votes.filter((v) => v.vote === "usant").length, color: "bg-usant" },
+                    { label: "Delvis", value: r2Votes.filter((v) => v.vote === "delvis").length, color: "bg-delvis" },
+                  ]}
+                  total={r2Total}
+                />
               </div>
-              <p className="text-3xl font-extrabold text-foreground">3.4</p>
+            )}
+          </PanelTabs>
+        );
+      }
+
+      case 5: {
+        const correctCount = r2Votes.filter((v) => statement && v.vote === statement.fasit).length;
+        return (
+          <div className="space-y-4">
+            <div className="rounded-lg bg-sant/10 p-3">
+              <div className="text-xs font-bold uppercase tracking-wider text-sant">
+                Svarte riktig
+              </div>
+              <p className="text-lg font-extrabold text-sant">
+                {correctCount}/{r2Total}
+              </p>
             </div>
-            <DistributionChart bars={ratingBars} total={mockTotal} />
+            <div className="rounded-lg border-l-[3px] border-l-primary/30 bg-primary/5 p-4">
+              <p className="text-xs italic text-muted-foreground">
+                Ingen fremhevet begrunnelse ennå
+              </p>
+            </div>
           </div>
         );
       }
+
+      case 6:
+        return (
+          <RatingChart distribution={ratingDistribution} average={avgRating} />
+        );
 
       default:
         return null;
     }
   };
 
+  const renderPanelFooter = () => {
+    if (step === 0) return null;
+    if (step === 6) {
+      const hasMoreStatements = fagprat.statements.length > 1;
+      return (
+        <div className="flex gap-2">
+          {hasMoreStatements && (
+            <button
+              onClick={() => goToStep(0)}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-[0_2px_0_oklch(0.35_0.16_295)] transition-all hover:-translate-y-px"
+            >
+              Neste påstand
+              <ArrowRight className="size-4" />
+            </button>
+          )}
+          <button
+            onClick={handleEnd}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-destructive px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-px"
+          >
+            Avslutt
+          </button>
+        </div>
+      );
+    }
+    return nextStepButton;
+  };
+
   return (
     <div className="min-h-svh bg-background">
-      <SessionTopBar title={fagprat.title}>
-        {(step === 2 || step === 4) && <RecordButton />}
+      <SessionTopBar
+        title={fagprat.title}
+        center={
+          [2, 4].includes(step) ? (
+            <RecordButton
+              state={recordButtonState}
+              onToggle={() => setRecording(!recording)}
+              elapsed={recordElapsed}
+            />
+          ) : [1, 3, 5, 6].includes(step) ? (
+            <RecordButton
+              state="disabled"
+              onToggle={() => {}}
+            />
+          ) : undefined
+        }
+      >
         <button
           onClick={handleEnd}
           className="inline-flex items-center gap-2 rounded-xl bg-destructive px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_oklch(0.45_0.15_25)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_oklch(0.45_0.15_25)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.45_0.15_25)]"
@@ -471,10 +634,19 @@ function LiveStepPage() {
 
       <div className="flex pt-16 pb-14">
         <main className="flex-1 px-8 py-8">{renderStepContent()}</main>
-        <TeacherPanel defaultOpen={step !== 5}>{renderTeacherContent()}</TeacherPanel>
+        <TeacherPanel
+          defaultOpen={step !== 5}
+          footer={renderPanelFooter()}
+        >
+          {renderTeacherContent()}
+        </TeacherPanel>
       </div>
 
-      <StepNav currentStep={step} onStepClick={goToStep} />
+      <StepNav
+        currentStep={step}
+        completedSteps={completedSteps}
+        onStepClick={goToStep}
+      />
     </div>
   );
 }

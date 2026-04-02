@@ -1,13 +1,19 @@
+import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import { Plus, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ConceptTags } from "@/components/concept-tags";
 import { ForkunnskapSelector } from "@/components/forkunnskap-selector";
+import { ReddiModal } from "@/components/reddi-modal";
 import { StatementEditor } from "@/components/statement-editor";
 
 export const Route = createFileRoute("/_dashboard/lag-fagprat")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    draft: (search.draft as string) ?? "",
+  }),
   component: LagFagPratPage,
 });
 
@@ -19,12 +25,44 @@ interface StatementDraft {
 
 function LagFagPratPage() {
   const navigate = useNavigate();
+  const { draft: draftParam } = Route.useSearch();
   const [title, setTitle] = useState("");
   const [concepts, setConcepts] = useState<string[]>([]);
   const [fag, setFag] = useState("");
   const [trinn, setTrinn] = useState("");
   const [forkunnskap, setForkunnskap] = useState<"intro" | "oppsummering" | null>(null);
   const [statements, setStatements] = useState<StatementDraft[]>([]);
+  const [reddiOpen, setReddiOpen] = useState(false);
+
+  useEffect(() => {
+    if (!draftParam) return;
+    try {
+      const draft = JSON.parse(draftParam) as {
+        title?: string;
+        concepts?: string[];
+        subject?: string;
+        level?: string;
+        type?: "intro" | "oppsummering";
+        statements?: { text: string; fasit: "sant" | "usant" | "delvis"; explanation: string }[];
+      };
+      if (draft.title) setTitle(draft.title);
+      if (draft.concepts) setConcepts(draft.concepts);
+      if (draft.subject) setFag(draft.subject);
+      if (draft.level) setTrinn(draft.level);
+      if (draft.type) setForkunnskap(draft.type);
+      if (draft.statements) {
+        setStatements(
+          draft.statements.map((s) => ({
+            statement: s.text,
+            fasit: s.fasit,
+            explanation: s.explanation,
+          })),
+        );
+      }
+    } catch {
+      // Invalid JSON
+    }
+  }, [draftParam]);
 
   const addStatement = () => {
     setStatements([...statements, { statement: "", fasit: "sant", explanation: "" }]);
@@ -38,6 +76,37 @@ function LagFagPratPage() {
 
   const removeStatement = (index: number) => {
     setStatements(statements.filter((_, i) => i !== index));
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = Number(active.id);
+      const newIndex = Number(over.id);
+      setStatements((prev) => arrayMove(prev, oldIndex, newIndex));
+    }
+  };
+
+  const buildDraftJson = () =>
+    JSON.stringify({
+      title,
+      concepts,
+      subject: fag,
+      level: trinn,
+      type: forkunnskap,
+      statements: statements.map((s) => ({
+        text: s.statement,
+        fasit: s.fasit,
+        explanation: s.explanation,
+      })),
+    });
+
+  const handleReddiSubmit = (topic: string) => {
+    setReddiOpen(false);
+    navigate({
+      to: "/velg-pastander",
+      search: { draft: buildDraftJson(), statements: "", topic },
+    });
   };
 
   const canProceed = title.trim() && fag && trinn && forkunnskap;
@@ -134,18 +203,21 @@ function LagFagPratPage() {
       {/* REDDI button */}
       <div className="mb-8">
         <button
-          disabled={!fag || !trinn}
+          disabled={!fag || !trinn || !forkunnskap}
+          onClick={() => setReddiOpen(true)}
           className="flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-primary via-teal-500 to-accent px-6 py-4 text-base font-bold text-white shadow-lg transition-all disabled:opacity-40 disabled:saturate-50"
         >
           <Sparkles className="size-5" />
           Lag påstander med REDDI
         </button>
-        {(!fag || !trinn) && (
+        {(!fag || !trinn || !forkunnskap) && (
           <p className="mt-2 text-center text-xs text-muted-foreground">
-            Velg fag og trinn for å bruke REDDI
+            Velg fag, trinn og forkunnskap for å bruke REDDI
           </p>
         )}
       </div>
+
+      <ReddiModal open={reddiOpen} onClose={() => setReddiOpen(false)} onSubmit={handleReddiSubmit} />
 
       {/* Manual statements */}
       <div>
@@ -156,26 +228,36 @@ function LagFagPratPage() {
             Legg til påstand
           </Button>
         </div>
-        <div className="space-y-4">
-          {statements.map((stmt, i) => (
-            <StatementEditor
-              key={i}
-              index={i}
-              statement={stmt.statement}
-              fasit={stmt.fasit}
-              explanation={stmt.explanation}
-              onStatementChange={(v) => updateStatement(i, "statement", v)}
-              onFasitChange={(v) => updateStatement(i, "fasit", v)}
-              onExplanationChange={(v) => updateStatement(i, "explanation", v)}
-              onDelete={() => removeStatement(i)}
-            />
-          ))}
-          {statements.length === 0 && (
-            <div className="rounded-2xl border-2 border-dashed border-border py-12 text-center">
-              <p className="text-muted-foreground">Bruk REDDI eller legg til påstander manuelt</p>
+        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext
+            items={statements.map((_, i) => i)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="space-y-4">
+              {statements.map((stmt, i) => (
+                <StatementEditor
+                  key={i}
+                  id={i}
+                  index={i}
+                  statement={stmt.statement}
+                  fasit={stmt.fasit}
+                  explanation={stmt.explanation}
+                  onStatementChange={(v) => updateStatement(i, "statement", v)}
+                  onFasitChange={(v) => updateStatement(i, "fasit", v)}
+                  onExplanationChange={(v) => updateStatement(i, "explanation", v)}
+                  onDelete={() => removeStatement(i)}
+                />
+              ))}
+              {statements.length === 0 && (
+                <div className="rounded-2xl border-2 border-dashed border-border py-12 text-center">
+                  <p className="text-muted-foreground">
+                    Bruk REDDI eller legg til påstander manuelt
+                  </p>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </SortableContext>
+        </DndContext>
       </div>
     </div>
   );

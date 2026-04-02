@@ -1,5 +1,7 @@
 import { mutation } from "./_generated/server";
 
+const STATEMENT_COLORS = ["yellow", "blue", "orange", "purple", "red"] as const;
+
 const SEED_DATA = [
   {
     title: "Klimaendringer og bærekraft",
@@ -285,10 +287,16 @@ export const seed = mutation({
     }
 
     for (const data of SEED_DATA) {
+      const statements = data.statements.map((stmt, i) => ({
+        ...stmt,
+        color: STATEMENT_COLORS[i % STATEMENT_COLORS.length],
+      }));
       await ctx.db.insert("fagprats", {
         ...data,
+        statements,
         visibility: "public",
         authorId: "seed",
+        updatedAt: Date.now(),
       });
     }
 

@@ -1,11 +1,17 @@
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@workspace/ui/lib/utils";
-import { GripVertical, Trash2 } from "lucide-react";
+import { GripVertical, Trash2, Sparkles, ImageIcon } from "lucide-react";
+
+import { getStatementColor } from "@/lib/statement-colors";
 
 interface StatementEditorProps {
+  id: number;
   index: number;
   statement: string;
   fasit: "sant" | "usant" | "delvis";
   explanation: string;
+  colorIndex?: number;
   onStatementChange: (value: string) => void;
   onFasitChange: (value: "sant" | "usant" | "delvis") => void;
   onExplanationChange: (value: string) => void;
@@ -37,24 +43,64 @@ const fasitOptions = [
 ];
 
 export function StatementEditor({
+  id,
   index,
   statement,
   fasit,
   explanation,
+  colorIndex,
   onStatementChange,
   onFasitChange,
   onExplanationChange,
   onDelete,
 }: StatementEditorProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  const color = colorIndex !== undefined ? getStatementColor(colorIndex) : null;
+
   return (
-    <div className="rounded-2xl border-[1.5px] border-border bg-card">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        "rounded-2xl border-[1.5px] border-border bg-card",
+        isDragging && "z-10 opacity-80 shadow-lg",
+      )}
+    >
       {/* Top bar */}
       <div className="flex items-center justify-between border-b border-border/50 px-4 py-2.5">
         <div className="flex items-center gap-2">
-          <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary">
+          <div
+            className={cn(
+              "flex size-7 items-center justify-center rounded-full text-xs font-extrabold",
+              color
+                ? `${color.bg} ${color.text}`
+                : "bg-primary text-white",
+            )}
+          >
             {index + 1}
           </div>
-          <GripVertical className="size-4 text-muted-foreground/50" />
+          <button
+            className="cursor-grab touch-none text-muted-foreground/50 hover:text-muted-foreground active:cursor-grabbing"
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical className="size-4" />
+          </button>
+          <button
+            disabled
+            title="Kommer snart"
+            className="rounded-lg p-1.5 text-muted-foreground/40"
+          >
+            <Sparkles className="size-4" />
+          </button>
         </div>
         <button
           onClick={onDelete}
@@ -70,12 +116,21 @@ export function StatementEditor({
           <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Påstand
           </label>
-          <textarea
-            value={statement}
-            onChange={(e) => onStatementChange(e.target.value)}
-            placeholder="Skriv en påstand..."
-            className="min-h-16 w-full resize-none rounded-xl border-2 border-input bg-background px-4 py-3 text-base outline-none transition-colors placeholder:text-muted-foreground/60 hover:border-muted-foreground/30 focus:border-primary focus:ring-3 focus:ring-primary/20"
-          />
+          <div className="flex gap-2">
+            <textarea
+              value={statement}
+              onChange={(e) => onStatementChange(e.target.value)}
+              placeholder="Skriv en påstand..."
+              className="min-h-16 w-full resize-none rounded-xl border-2 border-input bg-background px-4 py-3 text-base outline-none transition-colors placeholder:text-muted-foreground/60 hover:border-muted-foreground/30 focus:border-primary focus:ring-3 focus:ring-primary/20"
+            />
+            <button
+              disabled
+              title="Kommer snart"
+              className="flex size-10 shrink-0 items-center justify-center self-start rounded-lg border-2 border-dashed border-muted-foreground/30 text-muted-foreground/40"
+            >
+              <ImageIcon className="size-4" />
+            </button>
+          </div>
         </div>
 
         {/* Fasit */}
@@ -106,12 +161,21 @@ export function StatementEditor({
           <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Forklaring
           </label>
-          <textarea
-            value={explanation}
-            onChange={(e) => onExplanationChange(e.target.value)}
-            placeholder="Forklar hvorfor svaret er riktig..."
-            className="min-h-16 w-full resize-none rounded-xl border-2 border-input bg-background px-4 py-3 text-base outline-none transition-colors placeholder:text-muted-foreground/60 hover:border-muted-foreground/30 focus:border-primary focus:ring-3 focus:ring-primary/20"
-          />
+          <div className="flex gap-2">
+            <textarea
+              value={explanation}
+              onChange={(e) => onExplanationChange(e.target.value)}
+              placeholder="Forklar hvorfor svaret er riktig..."
+              className="min-h-16 w-full resize-none rounded-xl border-2 border-input bg-background px-4 py-3 text-base outline-none transition-colors placeholder:text-muted-foreground/60 hover:border-muted-foreground/30 focus:border-primary focus:ring-3 focus:ring-primary/20"
+            />
+            <button
+              disabled
+              title="Kommer snart"
+              className="flex size-10 shrink-0 items-center justify-center self-start rounded-lg border-2 border-dashed border-muted-foreground/30 text-muted-foreground/40"
+            >
+              <ImageIcon className="size-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

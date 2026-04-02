@@ -1,12 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { cn } from "@workspace/ui/lib/utils";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/_dashboard/velg-pastander")({
   validateSearch: (search: Record<string, unknown>) => ({
     statements: (search.statements as string) ?? "",
     draft: (search.draft as string) ?? "",
+    topic: (search.topic as string) ?? "",
   }),
   component: VelgPastanderPage,
 });
@@ -27,6 +28,7 @@ function StatementColumn({
   headerText,
   selectedBorder,
   selectedGlow,
+  borderTopColor,
 }: {
   title: string;
   statements: Statement[];
@@ -36,9 +38,16 @@ function StatementColumn({
   headerText: string;
   selectedBorder: string;
   selectedGlow: string;
+  borderTopColor: string;
 }) {
   return (
-    <div className="flex flex-col">
+    <div
+      className={cn(
+        "flex flex-col rounded-2xl border-[1.5px] border-border bg-card p-4",
+        "border-t-4",
+        borderTopColor,
+      )}
+    >
       <div
         className={cn(
           "mb-4 rounded-xl px-4 py-3 text-center text-sm font-extrabold uppercase tracking-wider",
@@ -218,7 +227,7 @@ function VelgPastanderPage() {
     draft.statements = newStatements;
 
     navigate({
-      to: "/lagre-fagprat",
+      to: "/lag-fagprat",
       search: { draft: JSON.stringify(draft) },
     });
   };
@@ -227,7 +236,7 @@ function VelgPastanderPage() {
     <div>
       {/* Back link */}
       <button
-        onClick={() => navigate({ to: "/lag-fagprat" })}
+        onClick={() => navigate({ to: "/lag-fagprat", search: { draft: draftJson } })}
         className="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
@@ -250,6 +259,7 @@ function VelgPastanderPage() {
           headerText="text-sant"
           selectedBorder="border-sant"
           selectedGlow="shadow-[0_0_12px_color-mix(in_oklch,var(--sant)_25%,transparent)]"
+          borderTopColor="border-t-sant"
         />
         <StatementColumn
           title="Usant"
@@ -260,6 +270,7 @@ function VelgPastanderPage() {
           headerText="text-usant"
           selectedBorder="border-usant"
           selectedGlow="shadow-[0_0_12px_color-mix(in_oklch,var(--usant)_25%,transparent)]"
+          borderTopColor="border-t-usant"
         />
         <StatementColumn
           title="Delvis sant"
@@ -270,12 +281,14 @@ function VelgPastanderPage() {
           headerText="text-delvis"
           selectedBorder="border-delvis"
           selectedGlow="shadow-[0_0_12px_color-mix(in_oklch,var(--delvis)_25%,transparent)]"
+          borderTopColor="border-t-delvis"
         />
       </div>
 
       {/* Fixed bottom bar */}
       <div className="fixed right-0 bottom-0 left-[220px] z-20 flex items-center justify-between border-t bg-card px-8 py-4">
-        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Sparkles className="size-4 text-primary" />
           <span className="font-semibold">Foreslått av REDDI</span>
         </div>
         <button

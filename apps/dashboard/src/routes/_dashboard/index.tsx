@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, Sprout, Target } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
 import { FagPratCard } from "@/components/fagprat-card";
@@ -13,19 +13,40 @@ export const Route = createFileRoute("/_dashboard/")({
 function UtforskPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<"relevant" | "newest">("relevant");
+  const [forkunnskapIntro, setForkunnskapIntro] = useState(true);
+  const [forkunnskapOppsummering, setForkunnskapOppsummering] = useState(true);
+  const [selectedFag, setSelectedFag] = useState("");
+  const [selectedTrinn, setSelectedTrinn] = useState("");
   const filterRef = useRef<HTMLDivElement>(null);
 
   const { data: allFagPrats, isPending } = useQuery(fagpratQueries.list());
 
   const filtered = allFagPrats
-    ? searchQuery
-      ? allFagPrats.filter(
-          (fp) =>
-            fp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            fp.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            fp.level.toLowerCase().includes(searchQuery.toLowerCase()),
-        )
-      : allFagPrats
+    ? allFagPrats
+        .filter((fp) => {
+          if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            if (
+              !fp.title.toLowerCase().includes(q) &&
+              !fp.subject.toLowerCase().includes(q) &&
+              !fp.level.toLowerCase().includes(q)
+            ) {
+              return false;
+            }
+          }
+          if (!forkunnskapIntro && fp.type === "intro") return false;
+          if (!forkunnskapOppsummering && fp.type === "oppsummering") return false;
+          if (selectedFag && fp.subject !== selectedFag) return false;
+          if (selectedTrinn && fp.level !== selectedTrinn) return false;
+          return true;
+        })
+        .sort((a, b) => {
+          if (sortBy === "newest") {
+            return (b._creationTime ?? 0) - (a._creationTime ?? 0);
+          }
+          return (b.usageCount ?? 0) - (a.usageCount ?? 0);
+        })
     : [];
 
   useEffect(() => {
@@ -85,13 +106,20 @@ function UtforskPage() {
                   <input
                     type="radio"
                     name="sort"
-                    defaultChecked
+                    checked={sortBy === "relevant"}
+                    onChange={() => setSortBy("relevant")}
                     className="size-4 accent-primary"
                   />
                   Mest relevant
                 </label>
                 <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
-                  <input type="radio" name="sort" className="size-4 accent-primary" />
+                  <input
+                    type="radio"
+                    name="sort"
+                    checked={sortBy === "newest"}
+                    onChange={() => setSortBy("newest")}
+                    className="size-4 accent-primary"
+                  />
                   Nyeste
                 </label>
               </div>
@@ -104,11 +132,23 @@ function UtforskPage() {
               </div>
               <div className="flex gap-4">
                 <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
-                  <input type="checkbox" defaultChecked className="size-4 accent-primary" />
+                  <input
+                    type="checkbox"
+                    checked={forkunnskapIntro}
+                    onChange={() => setForkunnskapIntro(!forkunnskapIntro)}
+                    className="size-4 accent-primary"
+                  />
+                  <Sprout className="size-3.5 text-teal-500" />
                   Introduksjon
                 </label>
                 <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
-                  <input type="checkbox" className="size-4 accent-primary" />
+                  <input
+                    type="checkbox"
+                    checked={forkunnskapOppsummering}
+                    onChange={() => setForkunnskapOppsummering(!forkunnskapOppsummering)}
+                    className="size-4 accent-primary"
+                  />
+                  <Target className="size-3.5 text-amber-500" />
                   Oppsummering
                 </label>
               </div>
@@ -120,27 +160,35 @@ function UtforskPage() {
                 <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-foreground">
                   Fag
                 </label>
-                <select className="w-full appearance-none rounded-lg border-[1.5px] border-border bg-card px-3 py-2 text-sm font-medium text-foreground outline-none transition-colors focus:border-primary focus:ring-3 focus:ring-primary/20">
-                  <option>Alle fag</option>
-                  <option>Naturfag</option>
-                  <option>Matematikk</option>
-                  <option>Samfunnsfag</option>
-                  <option>Norsk</option>
-                  <option>Engelsk</option>
+                <select
+                  value={selectedFag}
+                  onChange={(e) => setSelectedFag(e.target.value)}
+                  className="w-full appearance-none rounded-lg border-[1.5px] border-border bg-card px-3 py-2 text-sm font-medium text-foreground outline-none transition-colors focus:border-primary focus:ring-3 focus:ring-primary/20"
+                >
+                  <option value="">Alle fag</option>
+                  <option value="Naturfag">Naturfag</option>
+                  <option value="Matematikk">Matematikk</option>
+                  <option value="Samfunnsfag">Samfunnsfag</option>
+                  <option value="Norsk">Norsk</option>
+                  <option value="Engelsk">Engelsk</option>
                 </select>
               </div>
               <div>
                 <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-foreground">
                   Trinn
                 </label>
-                <select className="w-full appearance-none rounded-lg border-[1.5px] border-border bg-card px-3 py-2 text-sm font-medium text-foreground outline-none transition-colors focus:border-primary focus:ring-3 focus:ring-primary/20">
-                  <option>Alle trinn</option>
-                  <option>8. trinn</option>
-                  <option>9. trinn</option>
-                  <option>10. trinn</option>
-                  <option>VG1</option>
-                  <option>VG2</option>
-                  <option>VG3</option>
+                <select
+                  value={selectedTrinn}
+                  onChange={(e) => setSelectedTrinn(e.target.value)}
+                  className="w-full appearance-none rounded-lg border-[1.5px] border-border bg-card px-3 py-2 text-sm font-medium text-foreground outline-none transition-colors focus:border-primary focus:ring-3 focus:ring-primary/20"
+                >
+                  <option value="">Alle trinn</option>
+                  <option value="8. trinn">8. trinn</option>
+                  <option value="9. trinn">9. trinn</option>
+                  <option value="10. trinn">10. trinn</option>
+                  <option value="VG1">VG1</option>
+                  <option value="VG2">VG2</option>
+                  <option value="VG3">VG3</option>
                 </select>
               </div>
             </div>

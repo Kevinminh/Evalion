@@ -18,6 +18,7 @@ import {
   DropdownMenuSeparator,
 } from "@workspace/ui/components/dropdown-menu";
 import { useMutation } from "convex/react";
+import { Button } from "@workspace/ui/components/button";
 import {
   ArrowLeft,
   Users,
@@ -95,13 +96,14 @@ function FagPratPreviewPage() {
       <div className="mb-1 flex items-start justify-between">
         <h1 className="text-3xl font-extrabold text-foreground">{fagprat.title}</h1>
         <div className="flex shrink-0 items-center gap-3">
-          <button
+          <Button
+            variant="teal"
+            size="lg"
             onClick={() => navigate({ to: "/liveokt/$id", params: { id } })}
-            className="inline-flex items-center gap-2 rounded-xl bg-secondary-teal px-6 py-3 text-sm font-bold text-white shadow-[0_3px_0_var(--secondary-teal-dark)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_var(--secondary-teal-dark)] active:translate-y-0.5 active:shadow-[0_1px_0_var(--secondary-teal-dark)]"
           >
             <Users className="size-4" />
             Start liveøkt
-          </button>
+          </Button>
 
           {isAuthor ? (
             /* Author view: Edit + More menu with duplicate/delete */

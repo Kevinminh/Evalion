@@ -1,13 +1,14 @@
-import { X, Plus } from "lucide-react";
+import { X, Plus, Sparkles } from "lucide-react";
 import { useState } from "react";
 
 interface ConceptTagsProps {
   concepts: string[];
   onChange: (concepts: string[]) => void;
   editable?: boolean;
+  showAiButton?: boolean;
 }
 
-export function ConceptTags({ concepts, onChange, editable = true }: ConceptTagsProps) {
+export function ConceptTags({ concepts, onChange, editable = true, showAiButton }: ConceptTagsProps) {
   const [inputValue, setInputValue] = useState("");
   const [showInput, setShowInput] = useState(false);
 
@@ -26,8 +27,17 @@ export function ConceptTags({ concepts, onChange, editable = true }: ConceptTags
 
   return (
     <div>
-      <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+      <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
         Viktige begreper
+        {showAiButton && (
+          <button
+            disabled
+            title="Kommer snart"
+            className="rounded-md p-1 text-muted-foreground/40"
+          >
+            <Sparkles className="size-3.5" />
+          </button>
+        )}
       </div>
       <div className="flex flex-wrap items-center gap-2">
         {concepts.map((concept) => (

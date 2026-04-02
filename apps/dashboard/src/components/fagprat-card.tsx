@@ -16,6 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@workspace/ui/components/dropdown-menu";
+import { Button } from "@workspace/ui/components/button";
 import { useMutation } from "convex/react";
 import { Sprout, Target, Users, Pencil, MoreVertical, Play, Copy, Trash2 } from "lucide-react";
 import { useState } from "react";
@@ -119,8 +120,9 @@ export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
       ) : (
         /* Collection actions */
         <div className="mt-auto flex items-center gap-3">
-          <button
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-secondary-teal px-4 py-2.5 text-sm font-bold text-white shadow-[0_3px_0_var(--secondary-teal-dark)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_var(--secondary-teal-dark)] active:translate-y-0.5 active:shadow-[0_1px_0_var(--secondary-teal-dark)]"
+          <Button
+            variant="teal"
+            className="flex-1"
             onClick={(e) => {
               e.stopPropagation();
               navigate({ to: "/liveokt/$id", params: { id: fagprat._id } });
@@ -128,7 +130,7 @@ export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
           >
             <Users className="size-4" />
             Start liveøkt
-          </button>
+          </Button>
           <button
             className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border-2 border-primary/30 bg-card text-primary transition-all hover:border-primary/60 hover:bg-primary/5"
             onClick={(e) => {

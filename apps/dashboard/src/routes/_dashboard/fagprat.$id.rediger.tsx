@@ -1,3 +1,5 @@
+import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
@@ -76,6 +78,15 @@ function EditFagPratPage() {
     const updated = [...statements];
     updated[index] = { ...updated[index], [field]: value };
     setStatements(updated);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = Number(active.id);
+      const newIndex = Number(over.id);
+      setStatements((prev) => arrayMove(prev, oldIndex, newIndex));
+    }
   };
 
   const handleSave = async () => {
@@ -248,21 +259,29 @@ function EditFagPratPage() {
           Legg til påstand
         </Button>
       </div>
-      <div className="space-y-4">
-        {statements.map((stmt, i) => (
-          <StatementEditor
-            key={i}
-            index={i}
-            statement={stmt.statement}
-            fasit={stmt.fasit}
-            explanation={stmt.explanation}
-            onStatementChange={(v) => updateStatement(i, "statement", v)}
-            onFasitChange={(v) => updateStatement(i, "fasit", v)}
-            onExplanationChange={(v) => updateStatement(i, "explanation", v)}
-            onDelete={() => setStatements(statements.filter((_, j) => j !== i))}
-          />
-        ))}
-      </div>
+      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext
+          items={statements.map((_, i) => i)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="space-y-4">
+            {statements.map((stmt, i) => (
+              <StatementEditor
+                key={i}
+                id={i}
+                index={i}
+                statement={stmt.statement}
+                fasit={stmt.fasit}
+                explanation={stmt.explanation}
+                onStatementChange={(v) => updateStatement(i, "statement", v)}
+                onFasitChange={(v) => updateStatement(i, "fasit", v)}
+                onExplanationChange={(v) => updateStatement(i, "explanation", v)}
+                onDelete={() => setStatements(statements.filter((_, j) => j !== i))}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 }

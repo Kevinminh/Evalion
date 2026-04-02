@@ -47,8 +47,8 @@ export function TimerCard({ onComplete }: TimerCardProps) {
       <div className="mb-3 text-center font-mono text-4xl font-bold tabular-nums text-foreground">
         {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
       </div>
-      <div className="mb-3 flex justify-center gap-2">
-        {[60, 180, 300].map((s) => (
+      <div className="mb-2 flex justify-center gap-2">
+        {[30, 60, 120].map((s) => (
           <button
             key={s}
             onClick={() => setPreset(s)}
@@ -59,9 +59,24 @@ export function TimerCard({ onComplete }: TimerCardProps) {
                 : "bg-muted text-muted-foreground hover:bg-muted/80",
             )}
           >
-            {s / 60} min
+            {s < 60 ? `${s}s` : `${s / 60}m`}
           </button>
         ))}
+      </div>
+      <div className="mb-3 flex justify-center px-2">
+        <input
+          type="range"
+          min={10}
+          max={300}
+          step={5}
+          value={totalSeconds}
+          onChange={(e) => {
+            const val = Number(e.target.value);
+            setTotalSeconds(val);
+            if (!running) setRemaining(val);
+          }}
+          className="w-full accent-primary"
+        />
       </div>
       <div className="flex justify-center gap-2">
         {!running ? (
@@ -70,7 +85,7 @@ export function TimerCard({ onComplete }: TimerCardProps) {
               if (remaining === 0) setRemaining(totalSeconds);
               setRunning(true);
             }}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground shadow-[0_2px_0_oklch(0.35_0.16_295)]"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-sant px-4 py-2 text-sm font-bold text-white shadow-[0_2px_0_oklch(0.45_0.15_145)]"
           >
             <Play className="size-3.5" /> Start
           </button>

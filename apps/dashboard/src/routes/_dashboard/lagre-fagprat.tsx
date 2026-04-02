@@ -78,7 +78,7 @@ function LagreFagPratPage() {
       <div className="mb-8 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => navigate({ to: "/lag-fagprat" })}
+            onClick={() => navigate({ to: "/lag-fagprat", search: { draft: "" } })}
             className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="size-4" />

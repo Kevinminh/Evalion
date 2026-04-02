@@ -1,4 +1,5 @@
 import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { Button } from "@workspace/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,13 +57,14 @@ export function AppSidebar() {
 
       {/* CTA Button */}
       <div className="px-4 py-2">
-        <Link
-          to="/lag-fagprat"
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-bold text-white shadow-[0_3px_0_oklch(0.4_0.15_15)] transition-transform hover:-translate-y-px"
+        <Button
+          variant="accent"
+          className="w-full rounded-lg"
+          render={<Link to="/lag-fagprat" search={{ draft: "" }} />}
         >
           <Plus className="size-5" />
           Lag en FagPrat
-        </Link>
+        </Button>
       </div>
 
       {/* Nav items */}
