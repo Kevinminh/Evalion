@@ -118,6 +118,12 @@ function LiveStepPage() {
       setShowCountdown(false);
       setCountdownDone(true);
     }, 1800);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
   }, [step]);
 
   if (isPending) {
