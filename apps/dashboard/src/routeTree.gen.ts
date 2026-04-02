@@ -23,7 +23,7 @@ import { Route as DashboardLagFagpratRouteImport } from './routes/_dashboard/lag
 import { Route as DashboardHistorikkRouteImport } from './routes/_dashboard/historikk'
 import { Route as AuthedPrivateRouteImport } from './routes/_authed/private'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as DashboardFagpratIdRouteImport } from './routes/_dashboard/fagprat.$id'
+import { Route as DashboardFagpratIdIndexRouteImport } from './routes/_dashboard/fagprat.$id.index'
 import { Route as DashboardFagpratIdRedigerRouteImport } from './routes/_dashboard/fagprat.$id.rediger'
 
 const RegisterRoute = RegisterRouteImport.update({
@@ -94,16 +94,16 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardFagpratIdRoute = DashboardFagpratIdRouteImport.update({
-  id: '/fagprat/$id',
-  path: '/fagprat/$id',
+const DashboardFagpratIdIndexRoute = DashboardFagpratIdIndexRouteImport.update({
+  id: '/fagprat/$id/',
+  path: '/fagprat/$id/',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardFagpratIdRedigerRoute =
   DashboardFagpratIdRedigerRouteImport.update({
-    id: '/rediger',
-    path: '/rediger',
-    getParentRoute: () => DashboardFagpratIdRoute,
+    id: '/fagprat/$id/rediger',
+    path: '/fagprat/$id/rediger',
+    getParentRoute: () => DashboardRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -118,9 +118,9 @@ export interface FileRoutesByFullPath {
   '/min-samling': typeof DashboardMinSamlingRoute
   '/velg-pastander': typeof DashboardVelgPastanderRoute
   '/liveokt/$id': typeof LiveoktIdRoute
-  '/fagprat/$id': typeof DashboardFagpratIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/fagprat/$id/rediger': typeof DashboardFagpratIdRedigerRoute
+  '/fagprat/$id/': typeof DashboardFagpratIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof DashboardIndexRoute
@@ -134,9 +134,9 @@ export interface FileRoutesByTo {
   '/min-samling': typeof DashboardMinSamlingRoute
   '/velg-pastander': typeof DashboardVelgPastanderRoute
   '/liveokt/$id': typeof LiveoktIdRoute
-  '/fagprat/$id': typeof DashboardFagpratIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/fagprat/$id/rediger': typeof DashboardFagpratIdRedigerRoute
+  '/fagprat/$id': typeof DashboardFagpratIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -153,9 +153,9 @@ export interface FileRoutesById {
   '/_dashboard/velg-pastander': typeof DashboardVelgPastanderRoute
   '/liveokt/$id': typeof LiveoktIdRoute
   '/_dashboard/': typeof DashboardIndexRoute
-  '/_dashboard/fagprat/$id': typeof DashboardFagpratIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_dashboard/fagprat/$id/rediger': typeof DashboardFagpratIdRedigerRoute
+  '/_dashboard/fagprat/$id/': typeof DashboardFagpratIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -171,9 +171,9 @@ export interface FileRouteTypes {
     | '/min-samling'
     | '/velg-pastander'
     | '/liveokt/$id'
-    | '/fagprat/$id'
     | '/api/auth/$'
     | '/fagprat/$id/rediger'
+    | '/fagprat/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -187,9 +187,9 @@ export interface FileRouteTypes {
     | '/min-samling'
     | '/velg-pastander'
     | '/liveokt/$id'
-    | '/fagprat/$id'
     | '/api/auth/$'
     | '/fagprat/$id/rediger'
+    | '/fagprat/$id'
   id:
     | '__root__'
     | '/_authed'
@@ -205,9 +205,9 @@ export interface FileRouteTypes {
     | '/_dashboard/velg-pastander'
     | '/liveokt/$id'
     | '/_dashboard/'
-    | '/_dashboard/fagprat/$id'
     | '/api/auth/$'
     | '/_dashboard/fagprat/$id/rediger'
+    | '/_dashboard/fagprat/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -320,19 +320,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_dashboard/fagprat/$id': {
-      id: '/_dashboard/fagprat/$id'
+    '/_dashboard/fagprat/$id/': {
+      id: '/_dashboard/fagprat/$id/'
       path: '/fagprat/$id'
-      fullPath: '/fagprat/$id'
-      preLoaderRoute: typeof DashboardFagpratIdRouteImport
+      fullPath: '/fagprat/$id/'
+      preLoaderRoute: typeof DashboardFagpratIdIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/fagprat/$id/rediger': {
       id: '/_dashboard/fagprat/$id/rediger'
-      path: '/rediger'
+      path: '/fagprat/$id/rediger'
       fullPath: '/fagprat/$id/rediger'
       preLoaderRoute: typeof DashboardFagpratIdRedigerRouteImport
-      parentRoute: typeof DashboardFagpratIdRoute
+      parentRoute: typeof DashboardRoute
     }
   }
 }
@@ -348,17 +348,6 @@ const AuthedRouteChildren: AuthedRouteChildren = {
 const AuthedRouteWithChildren =
   AuthedRoute._addFileChildren(AuthedRouteChildren)
 
-interface DashboardFagpratIdRouteChildren {
-  DashboardFagpratIdRedigerRoute: typeof DashboardFagpratIdRedigerRoute
-}
-
-const DashboardFagpratIdRouteChildren: DashboardFagpratIdRouteChildren = {
-  DashboardFagpratIdRedigerRoute: DashboardFagpratIdRedigerRoute,
-}
-
-const DashboardFagpratIdRouteWithChildren =
-  DashboardFagpratIdRoute._addFileChildren(DashboardFagpratIdRouteChildren)
-
 interface DashboardRouteChildren {
   DashboardHistorikkRoute: typeof DashboardHistorikkRoute
   DashboardLagFagpratRoute: typeof DashboardLagFagpratRoute
@@ -366,7 +355,8 @@ interface DashboardRouteChildren {
   DashboardMinSamlingRoute: typeof DashboardMinSamlingRoute
   DashboardVelgPastanderRoute: typeof DashboardVelgPastanderRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
-  DashboardFagpratIdRoute: typeof DashboardFagpratIdRouteWithChildren
+  DashboardFagpratIdRedigerRoute: typeof DashboardFagpratIdRedigerRoute
+  DashboardFagpratIdIndexRoute: typeof DashboardFagpratIdIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
@@ -376,7 +366,8 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardMinSamlingRoute: DashboardMinSamlingRoute,
   DashboardVelgPastanderRoute: DashboardVelgPastanderRoute,
   DashboardIndexRoute: DashboardIndexRoute,
-  DashboardFagpratIdRoute: DashboardFagpratIdRouteWithChildren,
+  DashboardFagpratIdRedigerRoute: DashboardFagpratIdRedigerRoute,
+  DashboardFagpratIdIndexRoute: DashboardFagpratIdIndexRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(

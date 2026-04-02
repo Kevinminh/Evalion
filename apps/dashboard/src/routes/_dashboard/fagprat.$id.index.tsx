@@ -37,7 +37,7 @@ import { authClient } from "@/lib/auth-client";
 import { api, fagpratQueries } from "@/lib/convex";
 import type { FagPratId } from "@/lib/types";
 
-export const Route = createFileRoute("/_dashboard/fagprat/$id")({
+export const Route = createFileRoute("/_dashboard/fagprat/$id/")({
   component: FagPratPreviewPage,
 });
 
@@ -91,7 +91,6 @@ function FagPratPreviewPage() {
         <ArrowLeft className="size-4" />
         Tilbake
       </button>
-
       {/* Header */}
       <div className="mb-1 flex items-start justify-between">
         <h1 className="text-3xl font-extrabold text-foreground">{fagprat.title}</h1>
@@ -107,7 +106,7 @@ function FagPratPreviewPage() {
 
           {isAuthor ? (
             /* Author view: Edit + More menu with duplicate/delete */
-            <>
+            (<>
               <button
                 onClick={() => navigate({ to: "/fagprat/$id/rediger", params: { id } })}
                 className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-5 py-3 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5"
@@ -132,16 +131,15 @@ function FagPratPreviewPage() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </>
+            </>)
           ) : (
             /* Browse view: Add to collection */
-            <button
+            (<button
               onClick={handleDuplicate}
               className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-5 py-3 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5"
             >
-              <FolderPlus className="size-4" />
-              Legg til i min samling
-            </button>
+              <FolderPlus className="size-4" />Legg til i min samling
+                          </button>)
           )}
 
           {/* Delete confirmation dialog */}
@@ -169,7 +167,6 @@ function FagPratPreviewPage() {
           </AlertDialog>
         </div>
       </div>
-
       {/* Meta tags */}
       <div className="mb-6 flex items-center gap-3">
         <span className="inline-block rounded-full border-[1.5px] border-muted-foreground/30 bg-card px-3 py-1 text-xs font-semibold text-muted-foreground">
@@ -188,7 +185,6 @@ function FagPratPreviewPage() {
           </span>
         )}
       </div>
-
       {/* Author info (only shown when browsing) */}
       {!isAuthor && fagprat.authorName && (
         <div className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
@@ -209,7 +205,6 @@ function FagPratPreviewPage() {
           <span className="font-medium">{fagprat.authorName}</span>
         </div>
       )}
-
       {/* Begreper */}
       <div className="mt-6 mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
         Viktige begreper
@@ -224,9 +219,8 @@ function FagPratPreviewPage() {
           </span>
         ))}
       </div>
-
       {/* Statements table */}
       <StatementTable statements={fagprat.statements} />
     </div>
-  );
+  )
 }
