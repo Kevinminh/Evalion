@@ -23,4 +23,34 @@ export default defineSchema({
     .index("by_author", ["authorId"])
     .index("by_visibility", ["visibility"])
     .index("by_subject", ["subject"]),
+
+  liveSessions: defineTable({
+    fagpratId: v.id("fagprats"),
+    teacherId: v.string(),
+    joinCode: v.string(),
+    status: v.union(v.literal("lobby"), v.literal("active"), v.literal("ended")),
+    currentStep: v.number(),
+    currentStatementIndex: v.optional(v.number()),
+    groupsEnabled: v.boolean(),
+    groupCount: v.number(),
+    transcriptionEnabled: v.boolean(),
+    selfEvalEnabled: v.boolean(),
+  })
+    .index("by_joinCode", ["joinCode"])
+    .index("by_teacher", ["teacherId"]),
+
+  sessionStudents: defineTable({
+    sessionId: v.id("liveSessions"),
+    name: v.string(),
+    avatarColor: v.string(),
+    groupIndex: v.optional(v.number()),
+  }).index("by_session", ["sessionId"]),
+
+  sessionVotes: defineTable({
+    sessionId: v.id("liveSessions"),
+    studentId: v.id("sessionStudents"),
+    statementIndex: v.number(),
+    round: v.number(),
+    vote: v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis")),
+  }).index("by_session_statement", ["sessionId", "statementIndex"]),
 });

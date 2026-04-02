@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
 import { useMutation } from "convex/react";
-import { Pencil, Globe, Lock } from "lucide-react";
+import { Pencil, Globe, Lock, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 
 import { ConceptTags } from "@/components/concept-tags";
@@ -235,7 +235,19 @@ function EditFagPratPage() {
       </div>
 
       {/* Statements */}
-      <h2 className="mb-4 text-lg font-extrabold text-foreground">Påstander</h2>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-lg font-extrabold text-foreground">Påstander</h2>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() =>
+            setStatements([...statements, { statement: "", fasit: "sant", explanation: "" }])
+          }
+        >
+          <Plus className="size-4" />
+          Legg til påstand
+        </Button>
+      </div>
       <div className="space-y-4">
         {statements.map((stmt, i) => (
           <StatementEditor

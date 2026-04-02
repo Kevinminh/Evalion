@@ -1,6 +1,4 @@
 import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
-import { Search, FolderOpen, Plus, LogOut, Settings, HelpCircle } from "lucide-react";
-import { cn } from "@workspace/ui/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +8,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
+import { cn } from "@workspace/ui/lib/utils";
+import { Search, FolderOpen, Plus, LogOut, Settings, HelpCircle } from "lucide-react";
+
 import { authClient } from "@/lib/auth-client";
 
 const navItems = [
@@ -17,9 +18,20 @@ const navItems = [
   { label: "Min samling", path: "/min-samling" as const, icon: FolderOpen },
 ];
 
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((part) => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
 export function AppSidebar() {
   const matchRoute = useMatchRoute();
   const navigate = useNavigate();
+  const { data: session } = authClient.useSession();
   const isActive = (path: string) => {
     if (path === "/") return matchRoute({ to: "/", fuzzy: false });
     return matchRoute({ to: path, fuzzy: true });
@@ -29,6 +41,10 @@ export function AppSidebar() {
     await authClient.signOut();
     navigate({ to: "/login" });
   };
+
+  const userName = session?.user?.name ?? "Bruker";
+  const userEmail = session?.user?.email ?? "";
+  const initials = getInitials(userName);
 
   return (
     <aside className="fixed left-0 top-0 z-30 flex h-screen w-[220px] flex-col border-r bg-white">
@@ -73,23 +89,23 @@ export function AppSidebar() {
       {/* User profile with dropdown */}
       <div className="px-3 pb-3">
         <DropdownMenu>
-          <DropdownMenuTrigger
-            className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-colors hover:bg-muted"
-          >
+          <DropdownMenuTrigger className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-colors hover:bg-muted">
             <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-extrabold text-primary-foreground">
-              MF
+              {initials}
             </div>
             <div className="flex flex-col text-left">
-              <span className="text-sm font-semibold">Markus Furseth</span>
-              <span className="text-xs text-muted-foreground">markus@evalion.no</span>
+              <span className="text-sm font-semibold">{userName}</span>
+              {userEmail && <span className="text-xs text-muted-foreground">{userEmail}</span>}
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="top" sideOffset={8} align="start">
             <DropdownMenuGroup>
               <DropdownMenuLabel>
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold">Markus Furseth</span>
-                  <span className="text-xs font-normal text-muted-foreground">markus@evalion.no</span>
+                  <span className="text-sm font-semibold">{userName}</span>
+                  {userEmail && (
+                    <span className="text-xs font-normal text-muted-foreground">{userEmail}</span>
+                  )}
                 </div>
               </DropdownMenuLabel>
             </DropdownMenuGroup>
