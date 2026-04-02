@@ -18,7 +18,7 @@ import { Route as SpillStudentIdRouteImport } from './routes/spill.$studentId'
 import { Route as LiveoktSessionIdRouteImport } from './routes/liveokt.$sessionId'
 import { Route as AuthedPrivateRouteImport } from './routes/_authed/private'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as LiveoktSessionIdStegStepRouteImport } from './routes/liveokt.$sessionId.steg.$step'
+import { Route as LiveoktSessionIdStegStepRouteImport } from './routes/liveokt.$sessionId_.steg.$step'
 
 const LogoutRoute = LogoutRouteImport.update({
   id: '/logout',
@@ -66,9 +66,9 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 } as any)
 const LiveoktSessionIdStegStepRoute =
   LiveoktSessionIdStegStepRouteImport.update({
-    id: '/steg/$step',
-    path: '/steg/$step',
-    getParentRoute: () => LiveoktSessionIdRoute,
+    id: '/liveokt/$sessionId_/steg/$step',
+    path: '/liveokt/$sessionId/steg/$step',
+    getParentRoute: () => rootRouteImport,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -77,7 +77,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/private': typeof AuthedPrivateRoute
-  '/liveokt/$sessionId': typeof LiveoktSessionIdRouteWithChildren
+  '/liveokt/$sessionId': typeof LiveoktSessionIdRoute
   '/spill/$studentId': typeof SpillStudentIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/liveokt/$sessionId/steg/$step': typeof LiveoktSessionIdStegStepRoute
@@ -88,7 +88,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/private': typeof AuthedPrivateRoute
-  '/liveokt/$sessionId': typeof LiveoktSessionIdRouteWithChildren
+  '/liveokt/$sessionId': typeof LiveoktSessionIdRoute
   '/spill/$studentId': typeof SpillStudentIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/liveokt/$sessionId/steg/$step': typeof LiveoktSessionIdStegStepRoute
@@ -101,10 +101,10 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
   '/_authed/private': typeof AuthedPrivateRoute
-  '/liveokt/$sessionId': typeof LiveoktSessionIdRouteWithChildren
+  '/liveokt/$sessionId': typeof LiveoktSessionIdRoute
   '/spill/$studentId': typeof SpillStudentIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/liveokt/$sessionId/steg/$step': typeof LiveoktSessionIdStegStepRoute
+  '/liveokt/$sessionId_/steg/$step': typeof LiveoktSessionIdStegStepRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -140,7 +140,7 @@ export interface FileRouteTypes {
     | '/liveokt/$sessionId'
     | '/spill/$studentId'
     | '/api/auth/$'
-    | '/liveokt/$sessionId/steg/$step'
+    | '/liveokt/$sessionId_/steg/$step'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -149,9 +149,10 @@ export interface RootRouteChildren {
   DeltaRoute: typeof DeltaRoute
   LoginRoute: typeof LoginRoute
   LogoutRoute: typeof LogoutRoute
-  LiveoktSessionIdRoute: typeof LiveoktSessionIdRouteWithChildren
+  LiveoktSessionIdRoute: typeof LiveoktSessionIdRoute
   SpillStudentIdRoute: typeof SpillStudentIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  LiveoktSessionIdStegStepRoute: typeof LiveoktSessionIdStegStepRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -220,11 +221,11 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof rootRouteImport
     }
     '/liveokt/$sessionId/steg/$step': {
-      id: '/liveokt/$sessionId/steg/$step'
-      path: '/steg/$step'
+      id: '/liveokt/$sessionId_/steg/$step'
+      path: '/liveokt/$sessionId/steg/$step'
       fullPath: '/liveokt/$sessionId/steg/$step'
       preLoaderRoute: typeof LiveoktSessionIdStegStepRouteImport
-      parentRoute: typeof LiveoktSessionIdRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -240,26 +241,16 @@ const AuthedRouteChildren: AuthedRouteChildren = {
 const AuthedRouteWithChildren =
   AuthedRoute._addFileChildren(AuthedRouteChildren)
 
-interface LiveoktSessionIdRouteChildren {
-  LiveoktSessionIdStegStepRoute: typeof LiveoktSessionIdStegStepRoute
-}
-
-const LiveoktSessionIdRouteChildren: LiveoktSessionIdRouteChildren = {
-  LiveoktSessionIdStegStepRoute: LiveoktSessionIdStegStepRoute,
-}
-
-const LiveoktSessionIdRouteWithChildren =
-  LiveoktSessionIdRoute._addFileChildren(LiveoktSessionIdRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
   DeltaRoute: DeltaRoute,
   LoginRoute: LoginRoute,
   LogoutRoute: LogoutRoute,
-  LiveoktSessionIdRoute: LiveoktSessionIdRouteWithChildren,
+  LiveoktSessionIdRoute: LiveoktSessionIdRoute,
   SpillStudentIdRoute: SpillStudentIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  LiveoktSessionIdStegStepRoute: LiveoktSessionIdStegStepRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

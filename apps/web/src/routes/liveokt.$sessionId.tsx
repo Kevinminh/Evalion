@@ -81,7 +81,6 @@ function TeacherLobbyPage() {
   const studentList = students ?? [];
   const hasGroups = studentList.some((s) => s.groupIndex !== undefined);
   const showGroupButton = session.groupsEnabled && !hasGroups;
-  const showStartButton = !session.groupsEnabled || hasGroups;
 
   const handleCreateGroups = async () => {
     await createGroupsMutation({
@@ -118,14 +117,12 @@ function TeacherLobbyPage() {
             Opprett grupper
           </button>
         )}
-        {showStartButton && (
-          <button
-            onClick={handleStart}
-            className="inline-flex items-center gap-2 rounded-xl bg-secondary-teal px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_var(--secondary-teal-dark)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_var(--secondary-teal-dark)] active:translate-y-0.5 active:shadow-[0_1px_0_var(--secondary-teal-dark)]"
-          >
-            Start aktiviteten
-          </button>
-        )}
+        <button
+          onClick={handleStart}
+          className="inline-flex items-center gap-2 rounded-xl bg-secondary-teal px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_var(--secondary-teal-dark)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_var(--secondary-teal-dark)] active:translate-y-0.5 active:shadow-[0_1px_0_var(--secondary-teal-dark)]"
+        >
+          Start aktiviteten
+        </button>
       </SessionTopBar>
 
       <div className="flex flex-1 pt-16">
