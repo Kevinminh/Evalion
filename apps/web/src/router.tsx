@@ -5,7 +5,7 @@ import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 
 export function getRouter() {
-  if (typeof document !== "undefined") {
+  if (typeof window !== "undefined") {
     notifyManager.setScheduler(window.requestAnimationFrame);
   }
 
