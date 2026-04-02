@@ -8,6 +8,8 @@ import { TeacherPanel } from "@workspace/ui/components/live/teacher-panel";
 import { TimerCard } from "@workspace/ui/components/live/timer-card";
 import { VoteButtons } from "@workspace/ui/components/live/vote-buttons";
 import { useMutation } from "convex/react";
+import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
+import { Professor } from "@workspace/ui/components/live/professor";
 import { Mic } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -36,11 +38,11 @@ const VOTE_LABELS: Record<string, string> = {
 };
 
 const STATEMENT_COLORS = [
-  "bg-yellow-100 border-yellow-300",
-  "bg-blue-100 border-blue-300",
-  "bg-orange-100 border-orange-300",
-  "bg-purple-100 border-purple-300",
-  "bg-red-100 border-red-300",
+  { bg: "#FFFDE7", border: "#FFE082" },
+  { bg: "#E3F1FC", border: "#B8DAF0" },
+  { bg: "#FFF3E0", border: "#FFCC80" },
+  { bg: "#F3E5F5", border: "#CE93D8" },
+  { bg: "#FFEBEE", border: "#EF9A9A" },
 ];
 
 const RATING_COLORS = [
@@ -73,6 +75,7 @@ function LiveStepPage() {
   const [countdownNumber, setCountdownNumber] = useState(3);
   const [countdownDone, setCountdownDone] = useState(false);
   const [recording, setRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
 
   const countdownTriggered = useRef(false);
 
@@ -125,6 +128,23 @@ function LiveStepPage() {
       clearTimeout(t3);
     };
   }, [step]);
+
+  // Reset recording when leaving recording-enabled steps
+  useEffect(() => {
+    if (step !== 2 && step !== 4) {
+      setRecording(false);
+    }
+  }, [step]);
+
+  // Recording timer
+  useEffect(() => {
+    if (!recording) {
+      setRecordingTime(0);
+      return;
+    }
+    const interval = setInterval(() => setRecordingTime((t) => t + 1), 1000);
+    return () => clearInterval(interval);
+  }, [recording]);
 
   if (isPending) {
     return (
@@ -189,16 +209,14 @@ function LiveStepPage() {
       case 0: {
         const isOdd = fagprat.statements.length % 2 !== 0;
         return (
-          <div className="flex flex-col items-center">
-            <h2 className="mb-8 text-center text-2xl font-extrabold text-foreground">
-              Velg en påstand
-            </h2>
-            <div className="grid max-w-3xl grid-cols-2 gap-6">
+          <div className="flex items-start gap-10">
+            <Professor size="lg" label="Velg en påstand" className="flex-col pt-8" />
+            <div className="grid flex-1 grid-cols-2 gap-6">
               {fagprat.statements.map((s, i) => {
                 const isSelected = selectedStatement === i;
                 const hasSomeSelected = selectedStatement !== null;
                 const isLast = i === fagprat.statements.length - 1;
-                const colorClass = STATEMENT_COLORS[i % STATEMENT_COLORS.length];
+                const color = STATEMENT_COLORS[i % STATEMENT_COLORS.length];
                 return (
                   <button
                     key={i}
@@ -206,11 +224,14 @@ function LiveStepPage() {
                       setSelectedStatement(i);
                       setTimeout(() => goToStep(1), 600);
                     }}
+                    style={{
+                      backgroundColor: color.bg,
+                      borderColor: color.border,
+                    }}
                     className={cn(
-                      "rounded-2xl border-2 p-6 text-left text-sm font-semibold transition-all duration-300",
-                      colorClass,
+                      "rounded-2xl border-2 p-6 text-left text-base font-semibold transition-all duration-300 hover:scale-[1.03]",
                       isSelected && "scale-105 ring-2 ring-primary",
-                      hasSomeSelected && !isSelected && "opacity-40",
+                      hasSomeSelected && !isSelected && "scale-[0.97] opacity-40",
                       isOdd && isLast && "col-span-2 mx-auto max-w-[calc(50%-12px)]",
                     )}
                   >
@@ -227,6 +248,7 @@ function LiveStepPage() {
         return (
           <div className="flex flex-col items-center gap-8 pt-8">
             {statementCard}
+            <Professor size="sm" text="Stem uten å avsløre hva du tenker..." />
             <VoteButtons selected={vote} onVote={setVote} />
           </div>
         );
@@ -235,11 +257,10 @@ function LiveStepPage() {
         return (
           <div className="flex flex-col items-center gap-6 pt-8">
             {statementCard}
-            <div className="mx-auto max-w-2xl rounded-2xl border border-primary/20 bg-primary/5 p-4">
-              <p className="text-center text-sm italic text-foreground/80">
-                Snakk i gruppene. Hva tenker dere?
-              </p>
-            </div>
+            <Professor
+              size="sm"
+              text="Diskuter med læringspartneren din. Forklar til hverandre hva dere tenker."
+            />
           </div>
         );
 
@@ -247,42 +268,27 @@ function LiveStepPage() {
         return (
           <div className="flex flex-col items-center gap-8 pt-8">
             {statementCard}
+            <Professor size="sm" text="Har du endret mening etter diskusjonen? Stem på nytt!" />
             <VoteButtons selected={vote} onVote={setVote} />
           </div>
         );
 
       case 4: {
-        const fasitLabel = statement ? (VOTE_LABELS[statement.fasit] ?? statement.fasit) : "";
-        const fasitColor =
-          statement?.fasit === "sant"
-            ? "bg-sant"
-            : statement?.fasit === "usant"
-              ? "bg-usant"
-              : "bg-delvis";
-
         return (
           <>
             {showCountdown && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
                 <span
                   key={countdownNumber}
-                  className="animate-ping text-8xl font-extrabold text-white"
-                  style={{ animationDuration: "500ms", animationIterationCount: 1 }}
+                  className="text-[160px] font-extrabold text-white animate-[countdown-pop_0.8s_ease_both]"
                 >
                   {countdownNumber}
                 </span>
               </div>
             )}
             <div className="flex flex-col items-center gap-6 pt-8">
-              {countdownDone && (
-                <span
-                  className={cn(
-                    "animate-bounce rounded-full px-6 py-2 text-lg font-extrabold text-white",
-                    fasitColor,
-                  )}
-                >
-                  {fasitLabel}
-                </span>
+              {countdownDone && statement && (
+                <FasitBadge answer={statement.fasit} animated />
               )}
               {statementCard}
             </div>
@@ -292,23 +298,26 @@ function LiveStepPage() {
 
       case 5:
         return (
-          <div className="mx-auto max-w-2xl pt-8">
-            <div className="overflow-hidden rounded-2xl border-[1.5px] border-blue-200">
+          <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 pt-8">
+            {statement && <FasitBadge answer={statement.fasit} />}
+            <div className="w-full overflow-hidden rounded-2xl border-[1.5px] border-blue-200">
               <div className="bg-gradient-to-b from-blue-100 to-blue-50 p-6">
-                <p className="text-center text-lg font-bold text-foreground">{statement?.text}</p>
+                <p className="text-center text-lg font-bold text-foreground">
+                  {statement?.text}
+                </p>
               </div>
               <div className="bg-white p-6">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex size-[96px] shrink-0 items-center justify-center rounded-full bg-primary/10">
-                    <span className="text-3xl font-extrabold text-primary">P</span>
-                  </div>
-                  <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    Forklaring
+                <div className="flex gap-4">
+                  <Professor size="sm" className="shrink-0" />
+                  <div>
+                    <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      Forklaring
+                    </div>
+                    <p className="text-sm leading-relaxed text-foreground/80">
+                      {statement?.explanation}
+                    </p>
                   </div>
                 </div>
-                <p className="text-sm leading-relaxed text-foreground/80">
-                  {statement?.explanation}
-                </p>
               </div>
             </div>
           </div>
@@ -317,12 +326,12 @@ function LiveStepPage() {
       case 6:
         return (
           <div className="flex flex-col items-center gap-8 pt-8">
+            {statement && <FasitBadge answer={statement.fasit} />}
             {statementCard}
-            <div className="mx-auto max-w-2xl rounded-2xl border border-primary/20 bg-primary/5 p-4">
-              <p className="text-center text-sm italic text-foreground/80">
-                Vurder fra 1 til 5 hvor godt du forstår påstanden nå.
-              </p>
-            </div>
+            <Professor
+              size="sm"
+              text="Vurder fra 1 til 5 hvor godt du forstår påstanden nå."
+            />
             <div className="flex justify-center gap-4">
               {[1, 2, 3, 4, 5].map((n) => {
                 const isSelected = rating === n;
@@ -445,9 +454,13 @@ function LiveStepPage() {
               recording ? "bg-foreground text-white" : "bg-muted text-muted-foreground",
             )}
           >
-            {recording && <span className="size-2 rounded-full bg-red-500" />}
+            {recording && (
+              <span className="size-2 rounded-full bg-red-500 animate-[blink_1s_ease-in-out_infinite]" />
+            )}
             <Mic className="size-4" />
-            Opptak
+            {recording
+              ? `${String(Math.floor(recordingTime / 60)).padStart(2, "0")}:${String(recordingTime % 60).padStart(2, "0")}`
+              : "Opptak"}
           </button>
         )}
       </SessionTopBar>

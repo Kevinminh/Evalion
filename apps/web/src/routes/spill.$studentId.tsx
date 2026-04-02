@@ -6,6 +6,9 @@ import { useMutation } from "convex/react";
 import { Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
+import { Professor } from "@workspace/ui/components/live/professor";
+
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 
@@ -271,6 +274,7 @@ function StudentGamePage() {
               1. stemmerunde
             </h2>
             {studentStatementCard}
+            <Professor size="sm" text="Stem uten å avsløre hva du tenker..." />
             {hasVoted ? (
               <div className="rounded-xl bg-primary/10 px-6 py-3">
                 <p className="text-sm font-bold text-primary">
@@ -291,11 +295,10 @@ function StudentGamePage() {
               Diskusjon
             </h2>
             {studentStatementCard}
-            <div className="w-full max-w-md rounded-2xl border border-primary/20 bg-primary/5 p-4">
-              <p className="text-center text-sm italic text-foreground/80">
-                Diskuter med gruppen din. Hva tenker dere?
-              </p>
-            </div>
+            <Professor
+              size="sm"
+              text="Diskuter med læringspartneren din. Hva tenker dere?"
+            />
             {groupMembers.length > 0 && (
               <div className="w-full max-w-md">
                 <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -332,6 +335,7 @@ function StudentGamePage() {
               2. stemmerunde
             </h2>
             {studentStatementCard}
+            <Professor size="sm" text="Har du endret mening? Stem på nytt!" />
             {hasVoted ? (
               <div className="rounded-xl bg-primary/10 px-6 py-3">
                 <p className="text-sm font-bold text-primary">
@@ -346,22 +350,13 @@ function StudentGamePage() {
 
       // Step 4: Answer reveal
       case 4: {
-        const fasitLabel = statement ? (VOTE_LABELS[statement.fasit] ?? statement.fasit) : "";
-        const fasitColor =
-          statement?.fasit === "sant"
-            ? "bg-[#4CAF50]"
-            : statement?.fasit === "usant"
-              ? "bg-[#EF5350]"
-              : "bg-[#FF9800]";
-
         return (
           <>
             {showCountdown && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
                 <span
                   key={countdownNumber}
-                  className="animate-ping text-8xl font-extrabold text-white"
-                  style={{ animationDuration: "500ms", animationIterationCount: 1 }}
+                  className="text-[160px] font-extrabold text-white animate-[countdown-pop_0.8s_ease_both]"
                 >
                   {countdownNumber}
                 </span>
@@ -371,15 +366,8 @@ function StudentGamePage() {
               <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                 Fasit
               </h2>
-              {countdownDone && (
-                <span
-                  className={cn(
-                    "animate-bounce rounded-full px-6 py-2 text-lg font-extrabold text-white",
-                    fasitColor,
-                  )}
-                >
-                  {fasitLabel}
-                </span>
+              {countdownDone && statement && (
+                <FasitBadge answer={statement.fasit} animated />
               )}
               {studentStatementCard}
             </div>
@@ -390,10 +378,11 @@ function StudentGamePage() {
       // Step 5: Explanation
       case 5:
         return (
-          <div className="flex w-full flex-col items-center gap-6">
+          <div className="flex w-full flex-col items-center gap-4">
             <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
               Forklaring
             </h2>
+            {statement && <FasitBadge answer={statement.fasit} />}
             <div className="w-full max-w-md overflow-hidden rounded-2xl border-[1.5px] border-blue-200">
               <div className="bg-gradient-to-b from-blue-100 to-blue-50 p-5">
                 <p className="text-center text-base font-bold text-foreground">
@@ -401,17 +390,17 @@ function StudentGamePage() {
                 </p>
               </div>
               <div className="bg-white p-5">
-                <div className="mb-3 flex items-center gap-3">
-                  <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                    <span className="text-lg font-extrabold text-primary">P</span>
-                  </div>
-                  <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    Forklaring
+                <div className="flex gap-3">
+                  <Professor size="xs" className="shrink-0" />
+                  <div>
+                    <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      Forklaring
+                    </div>
+                    <p className="text-sm leading-relaxed text-foreground/80">
+                      {statement?.explanation}
+                    </p>
                   </div>
                 </div>
-                <p className="text-sm leading-relaxed text-foreground/80">
-                  {statement?.explanation}
-                </p>
               </div>
             </div>
           </div>
@@ -424,12 +413,12 @@ function StudentGamePage() {
             <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
               Egenvurdering
             </h2>
+            {statement && <FasitBadge answer={statement.fasit} />}
             {studentStatementCard}
-            <div className="w-full max-w-md rounded-2xl border border-primary/20 bg-primary/5 p-4">
-              <p className="text-center text-sm italic text-foreground/80">
-                Vurder fra 1 til 5 hvor godt du forstår påstanden nå.
-              </p>
-            </div>
+            <Professor
+              size="sm"
+              text="Vurder fra 1 til 5 hvor godt du forstår påstanden nå."
+            />
             {ratingSent ? (
               <div className="rounded-xl bg-primary/10 px-6 py-3">
                 <p className="text-sm font-bold text-primary">Takk!</p>
