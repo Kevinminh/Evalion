@@ -1,11 +1,13 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { Users, X } from "lucide-react";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { cn } from "@workspace/ui/lib/utils";
-import { fagpratQueries } from "@/lib/convex";
-import type { FagPratId } from "@/lib/types";
+import { useMutation } from "convex/react";
+import { Users, X } from "lucide-react";
+
 import { SessionTopBar } from "@/components/live/session-top-bar";
+import { fagpratQueries, liveSessionQueries, api } from "@/lib/convex";
+import type { Id } from "@/lib/convex";
+import type { FagPratId } from "@/lib/types";
 
 export const Route = createFileRoute("/liveokt/$id/lobby")({
   beforeLoad: ({ context }) => {
@@ -14,40 +16,10 @@ export const Route = createFileRoute("/liveokt/$id/lobby")({
     }
   },
   validateSearch: (search: Record<string, unknown>) => ({
-    groups: search.groups === "true" || search.groups === true,
-    groupCount: Number(search.groupCount) || 4,
+    sessionId: (search.sessionId as string) ?? "",
   }),
   component: LobbyPage,
 });
-
-interface Student {
-  name: string;
-  color: string;
-}
-
-const MOCK_STUDENTS: Student[] = [
-  { name: "Emma S.", color: "bg-purple-400" },
-  { name: "Oliver H.", color: "bg-teal-400" },
-  { name: "Sofia L.", color: "bg-pink-400" },
-  { name: "Lucas B.", color: "bg-green-500" },
-  { name: "Nora K.", color: "bg-orange-400" },
-  { name: "Henrik A.", color: "bg-purple-400" },
-  { name: "Amalie J.", color: "bg-teal-400" },
-  { name: "Mathias R.", color: "bg-pink-400" },
-];
-
-function shuffleIntoGroups<T>(items: T[], groupCount: number): T[][] {
-  const shuffled = [...items];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i]!, shuffled[j]!] = [shuffled[j]!, shuffled[i]!];
-  }
-  const groups: T[][] = Array.from({ length: groupCount }, () => []);
-  shuffled.forEach((item, idx) => {
-    groups[idx % groupCount]!.push(item);
-  });
-  return groups;
-}
 
 function WaitingDots() {
   return (
@@ -74,27 +46,23 @@ function WaitingDots() {
 
 function LobbyPage() {
   const { id } = Route.useParams();
-  const { groups: groupsEnabled, groupCount } = Route.useSearch();
+  const { sessionId } = Route.useSearch();
   const navigate = useNavigate();
-  const { data: fagprat, isPending } = useQuery(fagpratQueries.getById(id as FagPratId));
+  const { data: fagprat, isPending: fagpratLoading } = useQuery(
+    fagpratQueries.getById(id as FagPratId),
+  );
+  const { data: session, isPending: sessionLoading } = useQuery(
+    liveSessionQueries.getById(sessionId as Id<"liveSessions">),
+  );
+  const { data: students } = useQuery(
+    liveSessionQueries.listStudents(sessionId as Id<"liveSessions">),
+  );
 
-  const [students, setStudents] = useState<Student[]>(MOCK_STUDENTS);
-  const [groups, setGroups] = useState<Student[][] | null>(null);
-  const [groupsCreated, setGroupsCreated] = useState(false);
+  const removeStudentMutation = useMutation(api.liveSessions.removeStudent);
+  const createGroupsMutation = useMutation(api.liveSessions.createGroups);
+  const updateStepMutation = useMutation(api.liveSessions.updateStep);
 
-  const removeStudent = (name: string) => {
-    setStudents((prev) => prev.filter((s) => s.name !== name));
-  };
-
-  const handleCreateGroups = () => {
-    const result = shuffleIntoGroups(students, groupCount);
-    setGroups(result);
-    setGroupsCreated(true);
-  };
-
-  const handleStart = () => {
-    navigate({ to: "/liveokt/$id/steg/$step", params: { id, step: "0" } });
-  };
+  const isPending = fagpratLoading || sessionLoading;
 
   if (isPending) {
     return (
@@ -104,16 +72,41 @@ function LobbyPage() {
     );
   }
 
-  if (!fagprat) {
+  if (!fagprat || !session) {
     return (
       <div className="flex min-h-svh items-center justify-center">
-        <p className="text-muted-foreground">FagPrat ikke funnet.</p>
+        <p className="text-muted-foreground">Økt ikke funnet.</p>
       </div>
     );
   }
 
-  const showGroupButton = groupsEnabled && !groupsCreated;
-  const showStartButton = !groupsEnabled || groupsCreated;
+  const studentList = students ?? [];
+  const hasGroups = studentList.some((s) => s.groupIndex !== undefined);
+  const showGroupButton = session.groupsEnabled && !hasGroups;
+  const showStartButton = !session.groupsEnabled || hasGroups;
+
+  const handleCreateGroups = async () => {
+    await createGroupsMutation({
+      sessionId: session._id,
+      groupCount: session.groupCount,
+    });
+  };
+
+  const handleStart = async () => {
+    await updateStepMutation({ id: session._id, step: 0 });
+    navigate({
+      to: "/liveokt/$id/steg/$step",
+      params: { id, step: "0" },
+      search: { sessionId },
+    });
+  };
+
+  // Group students for display
+  const groupedStudents = hasGroups
+    ? Array.from({ length: session.groupCount }, (_, gi) =>
+        studentList.filter((s) => s.groupIndex === gi),
+      )
+    : null;
 
   return (
     <div className="flex min-h-svh flex-col bg-background">
@@ -130,7 +123,7 @@ function LobbyPage() {
         {showStartButton && (
           <button
             onClick={handleStart}
-            className="inline-flex items-center gap-2 rounded-xl bg-teal-400 px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_theme(colors.teal.700)] transition-all hover:-translate-y-px hover:bg-teal-300 hover:shadow-[0_4px_0_theme(colors.teal.700)] active:translate-y-0.5 active:shadow-[0_1px_0_theme(colors.teal.700)]"
+            className="inline-flex items-center gap-2 rounded-xl bg-secondary-teal px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_var(--secondary-teal-dark)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_var(--secondary-teal-dark)] active:translate-y-0.5 active:shadow-[0_1px_0_var(--secondary-teal-dark)]"
           >
             Start aktiviteten
           </button>
@@ -152,7 +145,7 @@ function LobbyPage() {
           {/* Game code */}
           <div className="rounded-xl border-2 border-primary/30 bg-primary/5 px-8 py-4">
             <span className="font-mono text-4xl font-bold tracking-[0.25em] text-primary">
-              UBD2TS
+              {session.joinCode}
             </span>
           </div>
 
@@ -167,25 +160,25 @@ function LobbyPage() {
         {/* Right: Students panel */}
         <div className="flex flex-1 flex-col">
           <div className="flex-1 overflow-y-auto p-6">
-            {groups === null ? (
+            {groupedStudents === null ? (
               /* Ungrouped view */
               <div className="flex flex-wrap content-start gap-3">
-                {students.map((student) => (
+                {studentList.map((student) => (
                   <div
-                    key={student.name}
+                    key={student._id}
                     className="flex items-center gap-2 rounded-xl border-[1.5px] border-border bg-card p-2 pr-3 shadow-xs"
                   >
                     <div
                       className={cn(
                         "flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white",
-                        student.color,
+                        student.avatarColor,
                       )}
                     >
                       {student.name[0]}
                     </div>
                     <span className="text-sm font-bold text-foreground">{student.name}</span>
                     <button
-                      onClick={() => removeStudent(student.name)}
+                      onClick={() => removeStudentMutation({ id: student._id })}
                       className="ml-1 rounded-full p-0.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                     >
                       <X className="size-3.5" />
@@ -196,7 +189,7 @@ function LobbyPage() {
             ) : (
               /* Grouped view */
               <div className="flex flex-wrap gap-4">
-                {groups.map((group, gi) => (
+                {groupedStudents.map((group, gi) => (
                   <div
                     key={gi}
                     className="w-[180px]"
@@ -210,11 +203,11 @@ function LobbyPage() {
                     </div>
                     <div className="flex flex-col gap-2 rounded-xl border-[1.5px] border-border bg-card p-3">
                       {group.map((student) => (
-                        <div key={student.name} className="flex items-center gap-2">
+                        <div key={student._id} className="flex items-center gap-2">
                           <div
                             className={cn(
                               "flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white",
-                              student.color,
+                              student.avatarColor,
                             )}
                           >
                             {student.name[0]}
@@ -245,7 +238,7 @@ function LobbyPage() {
             </div>
             <div className="flex items-center gap-2 text-sm font-bold text-muted-foreground">
               <Users className="size-4" />
-              {students.length}
+              {studentList.length}
             </div>
           </div>
         </div>

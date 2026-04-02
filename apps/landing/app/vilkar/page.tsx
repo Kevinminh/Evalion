@@ -20,10 +20,10 @@ export default function TermsPage() {
           <div>
             <h2 className="text-2xl font-bold text-gray-700">1. Aksept av vilkår</h2>
             <p className="mt-3 leading-relaxed">
-              Ved å opprette en konto eller bruke Evalion («tjenesten») godtar du disse vilkårene for
-              bruk. Hvis du ikke godtar vilkårene, må du ikke bruke tjenesten. Evalion AS forbeholder
-              seg retten til å endre disse vilkårene når som helst. Endringer trår i kraft når de
-              publiseres på denne siden.
+              Ved å opprette en konto eller bruke Evalion («tjenesten») godtar du disse vilkårene
+              for bruk. Hvis du ikke godtar vilkårene, må du ikke bruke tjenesten. Evalion AS
+              forbeholder seg retten til å endre disse vilkårene når som helst. Endringer trår i
+              kraft når de publiseres på denne siden.
             </p>
           </div>
 
@@ -61,8 +61,8 @@ export default function TermsPage() {
             </h2>
             <p className="mt-3 leading-relaxed">
               Spørsmålssett og innhold du oppretter tilhører deg. Du gir Evalion en begrenset lisens
-              til å vise og distribuere innholdet ditt innenfor tjenesten. Evalions varemerker, logo,
-              design og programvare er beskyttet av lov om opphavsrett og tilhører Evalion AS.
+              til å vise og distribuere innholdet ditt innenfor tjenesten. Evalions varemerker,
+              logo, design og programvare er beskyttet av lov om opphavsrett og tilhører Evalion AS.
             </p>
           </div>
 
@@ -70,8 +70,8 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold text-gray-700">5. Abonnement og betaling</h2>
             <p className="mt-3 leading-relaxed">
               Premiumfunksjoner krever et betalt abonnement. Priser er oppgitt inkludert mva.
-              Abonnementet fornyes automatisk med mindre du avbryter før fornyelsesdatoen. Refusjoner
-              gis i henhold til norsk forbrukerkjøpslov og angrerettloven.
+              Abonnementet fornyes automatisk med mindre du avbryter før fornyelsesdatoen.
+              Refusjoner gis i henhold til norsk forbrukerkjøpslov og angrerettloven.
             </p>
           </div>
 
@@ -79,8 +79,9 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold text-gray-700">6. Ansvarsbegrensning</h2>
             <p className="mt-3 leading-relaxed">
               Evalion leveres «som den er». Vi gjør vårt beste for å sikre tilgjengelighet og
-              kvalitet, men garanterer ikke uavbrutt drift. Evalion AS er ikke ansvarlig for indirekte
-              tap, tapte data eller driftsavbrudd utover det som følger av ufravikelig norsk lov.
+              kvalitet, men garanterer ikke uavbrutt drift. Evalion AS er ikke ansvarlig for
+              indirekte tap, tapte data eller driftsavbrudd utover det som følger av ufravikelig
+              norsk lov.
             </p>
           </div>
 

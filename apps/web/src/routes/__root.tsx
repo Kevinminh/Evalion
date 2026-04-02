@@ -1,3 +1,6 @@
+import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
+import { ConvexQueryClient } from "@convex-dev/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import {
   HeadContent,
   Outlet,
@@ -5,9 +8,6 @@ import {
   createRootRouteWithContext,
   useRouteContext,
 } from "@tanstack/react-router";
-import { QueryClient } from "@tanstack/react-query";
-import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
-import { ConvexQueryClient } from "@convex-dev/react-query";
 import { createServerFn } from "@tanstack/react-start";
 
 import { authClient } from "@/lib/auth-client";

@@ -1,28 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMutation } from "convex/react";
-import {
-  ArrowLeft,
-  Users,
-  Pencil,
-  MoreVertical,
-  Sprout,
-  Target,
-  Copy,
-  Trash2,
-} from "lucide-react";
-import { useState } from "react";
-
-import { StatementTable } from "@/components/statement-table";
-import { api, fagpratQueries } from "@/lib/convex";
-import type { FagPratId } from "@/lib/types";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@workspace/ui/components/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -33,6 +10,31 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@workspace/ui/components/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@workspace/ui/components/dropdown-menu";
+import { useMutation } from "convex/react";
+import {
+  ArrowLeft,
+  Users,
+  Pencil,
+  MoreVertical,
+  Sprout,
+  Target,
+  Copy,
+  Trash2,
+  FolderPlus,
+} from "lucide-react";
+import { useState } from "react";
+
+import { StatementTable } from "@/components/statement-table";
+import { authClient } from "@/lib/auth-client";
+import { api, fagpratQueries } from "@/lib/convex";
+import type { FagPratId } from "@/lib/types";
 
 export const Route = createFileRoute("/_dashboard/fagprat/$id")({
   component: FagPratPreviewPage,
@@ -42,6 +44,7 @@ function FagPratPreviewPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const { data: fagprat, isPending } = useQuery(fagpratQueries.getById(id as FagPratId));
+  const { data: session } = authClient.useSession();
   const createFagPrat = useMutation(api.fagprats.create);
   const removeFagPrat = useMutation(api.fagprats.remove);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -62,11 +65,26 @@ function FagPratPreviewPage() {
     );
   }
 
+  const isAuthor = session?.user?.id && fagprat.authorId === session.user.id;
+
+  const handleDuplicate = async () => {
+    const newId = await createFagPrat({
+      title: fagprat.title + " (kopi)",
+      subject: fagprat.subject,
+      level: fagprat.level,
+      type: fagprat.type,
+      concepts: fagprat.concepts,
+      statements: fagprat.statements,
+      visibility: "private",
+    });
+    navigate({ to: "/fagprat/$id", params: { id: newId } });
+  };
+
   return (
     <div className="max-w-[1100px]">
       {/* Back link */}
       <button
-        onClick={() => navigate({ to: "/min-samling" })}
+        onClick={() => navigate({ to: isAuthor ? "/min-samling" : "/" })}
         className="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
@@ -79,48 +97,50 @@ function FagPratPreviewPage() {
         <div className="flex shrink-0 items-center gap-3">
           <button
             onClick={() => navigate({ to: "/liveokt/$id", params: { id } })}
-            className="inline-flex items-center gap-2 rounded-xl bg-teal-400 px-6 py-3 text-sm font-bold text-white shadow-[0_3px_0_theme(colors.teal.700)] transition-all hover:-translate-y-px hover:bg-teal-300 hover:shadow-[0_4px_0_theme(colors.teal.700)] active:translate-y-0.5 active:shadow-[0_1px_0_theme(colors.teal.700)]"
+            className="inline-flex items-center gap-2 rounded-xl bg-secondary-teal px-6 py-3 text-sm font-bold text-white shadow-[0_3px_0_var(--secondary-teal-dark)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_var(--secondary-teal-dark)] active:translate-y-0.5 active:shadow-[0_1px_0_var(--secondary-teal-dark)]"
           >
             <Users className="size-4" />
             Start liveøkt
           </button>
-          <button
-            onClick={() => navigate({ to: "/fagprat/$id/rediger", params: { id } })}
-            className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-5 py-3 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5"
-          >
-            <Pencil className="size-4" />
-            Endre
-          </button>
-          <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex items-center gap-1 rounded-xl border-2 border-border px-4 py-3 text-sm font-bold text-muted-foreground transition-all hover:border-muted-foreground/50 hover:bg-muted">
-              <MoreVertical className="size-4" />
-              Mer
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" sideOffset={4}>
-              <DropdownMenuItem
-                onClick={async () => {
-                  const newId = await createFagPrat({
-                    title: fagprat.title + " (kopi)",
-                    subject: fagprat.subject,
-                    level: fagprat.level,
-                    type: fagprat.type,
-                    concepts: fagprat.concepts,
-                    statements: fagprat.statements,
-                    visibility: fagprat.visibility,
-                  });
-                  navigate({ to: "/fagprat/$id", params: { id: newId } });
-                }}
+
+          {isAuthor ? (
+            /* Author view: Edit + More menu with duplicate/delete */
+            <>
+              <button
+                onClick={() => navigate({ to: "/fagprat/$id/rediger", params: { id } })}
+                className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-5 py-3 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5"
               >
-                <Copy className="size-4" />
-                Dupliser
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
-                <Trash2 className="size-4" />
-                Slett
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <Pencil className="size-4" />
+                Endre
+              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="inline-flex items-center gap-1 rounded-xl border-2 border-border px-4 py-3 text-sm font-bold text-muted-foreground transition-all hover:border-muted-foreground/50 hover:bg-muted">
+                  <MoreVertical className="size-4" />
+                  Mer
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" sideOffset={4}>
+                  <DropdownMenuItem onClick={handleDuplicate}>
+                    <Copy className="size-4" />
+                    Dupliser
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
+                    <Trash2 className="size-4" />
+                    Slett
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            /* Browse view: Add to collection */
+            <button
+              onClick={handleDuplicate}
+              className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-5 py-3 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5"
+            >
+              <FolderPlus className="size-4" />
+              Legg til i min samling
+            </button>
+          )}
 
           {/* Delete confirmation dialog */}
           <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
@@ -166,6 +186,27 @@ function FagPratPreviewPage() {
           </span>
         )}
       </div>
+
+      {/* Author info (only shown when browsing) */}
+      {!isAuthor && fagprat.authorName && (
+        <div className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted">
+            <svg
+              className="size-4 text-muted-foreground"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </div>
+          <span className="font-medium">{fagprat.authorName}</span>
+        </div>
+      )}
 
       {/* Begreper */}
       <div className="mt-6 mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">

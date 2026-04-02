@@ -21,8 +21,8 @@ export default function CookiesPage() {
             <h2 className="text-2xl font-bold text-gray-700">1. Hva er informasjonskapsler?</h2>
             <p className="mt-3 leading-relaxed">
               Informasjonskapsler (cookies) er små tekstfiler som lagres på enheten din når du
-              besøker et nettsted. De brukes til å huske innstillinger, forbedre brukeropplevelsen og
-              samle inn anonymisert statistikk.
+              besøker et nettsted. De brukes til å huske innstillinger, forbedre brukeropplevelsen
+              og samle inn anonymisert statistikk.
             </p>
           </div>
 

@@ -1,6 +1,6 @@
+import { ConvexQueryClient } from "@convex-dev/react-query";
 import { QueryClient, notifyManager } from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
-import { ConvexQueryClient } from "@convex-dev/react-query";
 
 import { routeTree } from "./routeTree.gen";
 
@@ -9,8 +9,7 @@ export function getRouter() {
     notifyManager.setScheduler(window.requestAnimationFrame);
   }
 
-  const convexUrl =
-    (import.meta as any).env.VITE_CONVEX_URL ?? process.env.VITE_CONVEX_URL!;
+  const convexUrl = (import.meta as any).env.VITE_CONVEX_URL ?? process.env.VITE_CONVEX_URL!;
   const convexQueryClient = new ConvexQueryClient(convexUrl, {
     expectAuth: true,
   });

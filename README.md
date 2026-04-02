@@ -30,11 +30,11 @@ This starts all apps concurrently via Turborepo.
 
 ## Apps
 
-| App | Stack | Port | Path |
-|-----|-------|------|------|
-| **web** | TanStack Start + Vite | 3000 | `apps/web` |
-| **dashboard** | TanStack Start + Vite | 3001 | `apps/dashboard` |
-| **landing** | Next.js 15 + Turbopack | 3002 | `apps/landing` |
+| App           | Stack                  | Port | Path             |
+| ------------- | ---------------------- | ---- | ---------------- |
+| **web**       | TanStack Start + Vite  | 3000 | `apps/web`       |
+| **dashboard** | TanStack Start + Vite  | 3001 | `apps/dashboard` |
+| **landing**   | Next.js 15 + Turbopack | 3002 | `apps/landing`   |
 
 Run a single app:
 
@@ -44,20 +44,20 @@ pnpm --filter web dev
 
 ## Packages
 
-| Package | Name | Purpose |
-|---------|------|---------|
-| `packages/ui` | `@workspace/ui` | Shared UI components (shadcn/ui + Base UI + Tailwind CSS 4) |
-| `packages/config` | `@evalion/config` | Shared TypeScript base configuration |
+| Package           | Name              | Purpose                                                     |
+| ----------------- | ----------------- | ----------------------------------------------------------- |
+| `packages/ui`     | `@workspace/ui`   | Shared UI components (shadcn/ui + Base UI + Tailwind CSS 4) |
+| `packages/config` | `@evalion/config` | Shared TypeScript base configuration                        |
 
 ## Commands
 
-| Task | Command |
-|------|---------|
-| Dev (all) | `pnpm dev` |
-| Build | `pnpm build` |
-| Lint | `pnpm lint` |
-| Lint + fix | `pnpm lint:fix` |
-| Format | `pnpm format` |
+| Task       | Command          |
+| ---------- | ---------------- |
+| Dev (all)  | `pnpm dev`       |
+| Build      | `pnpm build`     |
+| Lint       | `pnpm lint`      |
+| Lint + fix | `pnpm lint:fix`  |
+| Format     | `pnpm format`    |
 | Type check | `pnpm typecheck` |
 
 ## Adding UI Components
@@ -69,7 +69,7 @@ pnpm dlx shadcn@latest add <component> -c apps/web
 Components are placed in `packages/ui/src/components/` and can be imported across all apps:
 
 ```tsx
-import { Button } from "@workspace/ui/components/button"
+import { Button } from "@workspace/ui/components/button";
 ```
 
 ## Dependency Management

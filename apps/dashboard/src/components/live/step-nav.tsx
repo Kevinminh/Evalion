@@ -33,12 +33,14 @@ export function StepNav({ currentStep, onStepClick }: StepNavProps) {
               !isActive && !isCompleted && "text-muted-foreground/50",
             )}
           >
-            <span className={cn(
-              "flex size-6 items-center justify-center rounded-full text-xs font-bold",
-              isActive && "bg-primary text-primary-foreground",
-              isCompleted && "bg-[#4CAF50] text-white",
-              !isActive && !isCompleted && "bg-muted text-muted-foreground/60",
-            )}>
+            <span
+              className={cn(
+                "flex size-6 items-center justify-center rounded-full text-xs font-bold",
+                isActive && "bg-primary text-primary-foreground",
+                isCompleted && "bg-[#4CAF50] text-white",
+                !isActive && !isCompleted && "bg-muted text-muted-foreground/60",
+              )}
+            >
               {isCompleted ? <Check className="size-3.5" /> : i}
             </span>
             <span className="hidden lg:inline">{step.label}</span>

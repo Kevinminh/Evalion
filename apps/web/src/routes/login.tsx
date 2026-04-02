@@ -1,7 +1,7 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { LoginForm } from "@workspace/ui/components/login-form";
 import { useState } from "react";
 
-import { LoginForm } from "@workspace/ui/components/login-form";
 import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/login")({

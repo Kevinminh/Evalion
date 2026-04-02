@@ -1,40 +1,22 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useState } from "react";
 
 export const Route = createFileRoute("/_dashboard/velg-pastander")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    statements: (search.statements as string) ?? "",
+    draft: (search.draft as string) ?? "",
+  }),
   component: VelgPastanderPage,
 });
 
-interface MockStatement {
+interface Statement {
   id: string;
   text: string;
+  fasit: "sant" | "usant" | "delvis";
+  explanation: string;
 }
-
-const mockSant: MockStatement[] = [
-  { id: "s1", text: "Drivhuseffekten er en naturlig prosess som gjør jorda beboelig." },
-  { id: "s2", text: "Fossile brånsler er dannet av organisk materiale over millioner av år." },
-  { id: "s3", text: "CO₂ er den viktigste menneskeskapte klimagassen." },
-  { id: "s4", text: "Fornybar energi inkluderer sol, vind og vannkraft." },
-  { id: "s5", text: "Parisavtalen har som mål å begrense global oppvarming til 1,5°C." },
-];
-
-const mockUsant: MockStatement[] = [
-  { id: "u1", text: "Klimaendringer skyldes kun naturlige prosesser." },
-  { id: "u2", text: "Norge påvirker ikke klimaet fordi vi er et lite land." },
-  { id: "u3", text: "Drivhuseffekten er utelukkende skadelig." },
-  { id: "u4", text: "Fornybar energi kan erstatte all fossil energi over natten." },
-  { id: "u5", text: "Ozonlaget og drivhuseffekten er det samme." },
-];
-
-const mockDelvis: MockStatement[] = [
-  { id: "d1", text: "Elbiler er helt utslippsfrie." },
-  { id: "d2", text: "Planting av trær er den beste løsningen mot klimaendringer." },
-  { id: "d3", text: "Kjernekraft er en fornybar energikilde." },
-  { id: "d4", text: "Klimaendringer rammer alle land likt." },
-  { id: "d5", text: "Resirkulering alene kan løse avfallsproblemet." },
-];
 
 function StatementColumn({
   title,
@@ -47,7 +29,7 @@ function StatementColumn({
   selectedGlow,
 }: {
   title: string;
-  statements: MockStatement[];
+  statements: Statement[];
   selected: Set<string>;
   onToggle: (id: string) => void;
   headerBg: string;
@@ -57,7 +39,13 @@ function StatementColumn({
 }) {
   return (
     <div className="flex flex-col">
-      <div className={cn("mb-4 rounded-xl px-4 py-3 text-center text-sm font-extrabold uppercase tracking-wider", headerBg, headerText)}>
+      <div
+        className={cn(
+          "mb-4 rounded-xl px-4 py-3 text-center text-sm font-extrabold uppercase tracking-wider",
+          headerBg,
+          headerText,
+        )}
+      >
         {title}
       </div>
       <div className="space-y-3">
@@ -78,6 +66,11 @@ function StatementColumn({
             </button>
           );
         })}
+        {statements.length === 0 && (
+          <p className="py-6 text-center text-sm text-muted-foreground">
+            Ingen påstander i denne kategorien
+          </p>
+        )}
       </div>
     </div>
   );
@@ -85,7 +78,108 @@ function StatementColumn({
 
 function VelgPastanderPage() {
   const navigate = useNavigate();
+  const { statements: statementsJson, draft: draftJson } = Route.useSearch();
   const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  // Parse statements from search params
+  let allStatements: Statement[] = [];
+  try {
+    if (statementsJson) {
+      allStatements = JSON.parse(statementsJson) as Statement[];
+    }
+  } catch {
+    // Invalid JSON
+  }
+
+  // If no statements from params, use fallback examples
+  if (allStatements.length === 0) {
+    allStatements = [
+      {
+        id: "s1",
+        text: "Drivhuseffekten er en naturlig prosess som gjør jorda beboelig.",
+        fasit: "sant",
+        explanation: "",
+      },
+      {
+        id: "s2",
+        text: "Fossile brånsler er dannet av organisk materiale over millioner av år.",
+        fasit: "sant",
+        explanation: "",
+      },
+      {
+        id: "s3",
+        text: "CO₂ er den viktigste menneskeskapte klimagassen.",
+        fasit: "sant",
+        explanation: "",
+      },
+      {
+        id: "s4",
+        text: "Fornybar energi inkluderer sol, vind og vannkraft.",
+        fasit: "sant",
+        explanation: "",
+      },
+      {
+        id: "s5",
+        text: "Parisavtalen har som mål å begrense global oppvarming til 1,5°C.",
+        fasit: "sant",
+        explanation: "",
+      },
+      {
+        id: "u1",
+        text: "Klimaendringer skyldes kun naturlige prosesser.",
+        fasit: "usant",
+        explanation: "",
+      },
+      {
+        id: "u2",
+        text: "Norge påvirker ikke klimaet fordi vi er et lite land.",
+        fasit: "usant",
+        explanation: "",
+      },
+      {
+        id: "u3",
+        text: "Drivhuseffekten er utelukkende skadelig.",
+        fasit: "usant",
+        explanation: "",
+      },
+      {
+        id: "u4",
+        text: "Fornybar energi kan erstatte all fossil energi over natten.",
+        fasit: "usant",
+        explanation: "",
+      },
+      {
+        id: "u5",
+        text: "Ozonlaget og drivhuseffekten er det samme.",
+        fasit: "usant",
+        explanation: "",
+      },
+      { id: "d1", text: "Elbiler er helt utslippsfrie.", fasit: "delvis", explanation: "" },
+      {
+        id: "d2",
+        text: "Planting av trær er den beste løsningen mot klimaendringer.",
+        fasit: "delvis",
+        explanation: "",
+      },
+      {
+        id: "d3",
+        text: "Kjernekraft er en fornybar energikilde.",
+        fasit: "delvis",
+        explanation: "",
+      },
+      { id: "d4", text: "Klimaendringer rammer alle land likt.", fasit: "delvis", explanation: "" },
+      {
+        id: "d5",
+        text: "Resirkulering alene kan løse avfallsproblemet.",
+        fasit: "delvis",
+        explanation: "",
+      },
+    ];
+  }
+
+  const santStatements = allStatements.filter((s) => s.fasit === "sant");
+  const usantStatements = allStatements.filter((s) => s.fasit === "usant");
+  const delvisStatements = allStatements.filter((s) => s.fasit === "delvis");
 
   const toggle = (id: string) => {
     setSelected((prev) => {
@@ -93,6 +187,39 @@ function VelgPastanderPage() {
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
+    });
+  };
+
+  const handleAddStatements = () => {
+    const selectedStatements = allStatements.filter((s) => selected.has(s.id));
+
+    // Parse existing draft or create empty one
+    let draft: Record<string, unknown> = {};
+    try {
+      if (draftJson) {
+        draft = JSON.parse(draftJson) as Record<string, unknown>;
+      }
+    } catch {
+      // Invalid JSON
+    }
+
+    // Merge selected statements into draft
+    const existingStatements =
+      (draft.statements as Array<{ text: string; fasit: string; explanation: string }>) ?? [];
+    const newStatements = [
+      ...existingStatements,
+      ...selectedStatements.map((s) => ({
+        text: s.text,
+        fasit: s.fasit,
+        explanation: s.explanation,
+      })),
+    ];
+
+    draft.statements = newStatements;
+
+    navigate({
+      to: "/lagre-fagprat",
+      search: { draft: JSON.stringify(draft) },
     });
   };
 
@@ -116,33 +243,33 @@ function VelgPastanderPage() {
       <div className="mb-24 grid grid-cols-3 gap-6">
         <StatementColumn
           title="Sant"
-          statements={mockSant}
+          statements={santStatements}
           selected={selected}
           onToggle={toggle}
-          headerBg="bg-[#E8F5E9]"
-          headerText="text-[#4CAF50]"
-          selectedBorder="border-[#4CAF50]"
-          selectedGlow="shadow-[0_0_12px_rgba(76,175,80,0.25)]"
+          headerBg="bg-sant-bg"
+          headerText="text-sant"
+          selectedBorder="border-sant"
+          selectedGlow="shadow-[0_0_12px_color-mix(in_oklch,var(--sant)_25%,transparent)]"
         />
         <StatementColumn
           title="Usant"
-          statements={mockUsant}
+          statements={usantStatements}
           selected={selected}
           onToggle={toggle}
-          headerBg="bg-[#FFEBEE]"
-          headerText="text-[#EF5350]"
-          selectedBorder="border-[#EF5350]"
-          selectedGlow="shadow-[0_0_12px_rgba(239,83,80,0.25)]"
+          headerBg="bg-usant-bg"
+          headerText="text-usant"
+          selectedBorder="border-usant"
+          selectedGlow="shadow-[0_0_12px_color-mix(in_oklch,var(--usant)_25%,transparent)]"
         />
         <StatementColumn
           title="Delvis sant"
-          statements={mockDelvis}
+          statements={delvisStatements}
           selected={selected}
           onToggle={toggle}
-          headerBg="bg-[#FFF3E0]"
-          headerText="text-[#E65100]"
-          selectedBorder="border-[#E65100]"
-          selectedGlow="shadow-[0_0_12px_rgba(230,81,0,0.25)]"
+          headerBg="bg-delvis-bg"
+          headerText="text-delvis"
+          selectedBorder="border-delvis"
+          selectedGlow="shadow-[0_0_12px_color-mix(in_oklch,var(--delvis)_25%,transparent)]"
         />
       </div>
 
@@ -153,7 +280,7 @@ function VelgPastanderPage() {
         </div>
         <button
           disabled={selected.size === 0}
-          onClick={() => navigate({ to: "/lagre-fagprat", search: { draft: "" } })}
+          onClick={handleAddStatements}
           className={cn(
             "inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition-all",
             selected.size > 0

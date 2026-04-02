@@ -2,17 +2,17 @@
 
 ## Commands
 
-| Task | Command |
-|------|---------|
-| Dev (all apps) | `pnpm dev` |
+| Task             | Command                                                                               |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| Dev (all apps)   | `pnpm dev`                                                                            |
 | Dev (single app) | `pnpm --filter web dev` / `pnpm --filter dashboard dev` / `pnpm --filter landing dev` |
-| Lint | `pnpm lint` |
-| Lint + fix | `pnpm lint:fix` |
-| Format | `pnpm format` |
-| Format check | `pnpm format:check` |
-| Type check | `pnpm typecheck` |
-| Build (all) | `pnpm build` |
-| Build (single) | `pnpm --filter web build` |
+| Lint             | `pnpm lint`                                                                           |
+| Lint + fix       | `pnpm lint:fix`                                                                       |
+| Format           | `pnpm format`                                                                         |
+| Format check     | `pnpm format:check`                                                                   |
+| Type check       | `pnpm typecheck`                                                                      |
+| Build (all)      | `pnpm build`                                                                          |
+| Build (single)   | `pnpm --filter web build`                                                             |
 
 Dev ports: web = 3000, dashboard = 3001, landing = 3002.
 

@@ -1,5 +1,5 @@
-import { GripVertical, Trash2 } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
+import { GripVertical, Trash2 } from "lucide-react";
 
 interface StatementEditorProps {
   index: number;
@@ -13,9 +13,27 @@ interface StatementEditorProps {
 }
 
 const fasitOptions = [
-  { value: "sant" as const, label: "Sant", bg: "bg-[#E8F5E9]", text: "text-[#4CAF50]", border: "border-[#4CAF50]" },
-  { value: "usant" as const, label: "Usant", bg: "bg-[#FFEBEE]", text: "text-[#EF5350]", border: "border-[#EF5350]" },
-  { value: "delvis" as const, label: "Delvis sant", bg: "bg-[#FFF3E0]", text: "text-[#E65100]", border: "border-[#E65100]" },
+  {
+    value: "sant" as const,
+    label: "Sant",
+    bg: "bg-[#E8F5E9]",
+    text: "text-[#4CAF50]",
+    border: "border-[#4CAF50]",
+  },
+  {
+    value: "usant" as const,
+    label: "Usant",
+    bg: "bg-[#FFEBEE]",
+    text: "text-[#EF5350]",
+    border: "border-[#EF5350]",
+  },
+  {
+    value: "delvis" as const,
+    label: "Delvis sant",
+    bg: "bg-[#FFF3E0]",
+    text: "text-[#E65100]",
+    border: "border-[#E65100]",
+  },
 ];
 
 export function StatementEditor({

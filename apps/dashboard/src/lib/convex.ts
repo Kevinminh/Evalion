@@ -8,5 +8,14 @@ export const fagpratQueries = {
   listByAuthor: () => convexQuery(api.fagprats.listByAuthor, {}),
 };
 
+export const liveSessionQueries = {
+  getById: (id: Id<"liveSessions">) => convexQuery(api.liveSessions.getById, { id }),
+  getByJoinCode: (joinCode: string) => convexQuery(api.liveSessions.getByJoinCode, { joinCode }),
+  listStudents: (sessionId: Id<"liveSessions">) =>
+    convexQuery(api.liveSessions.listStudents, { sessionId }),
+  getVotes: (sessionId: Id<"liveSessions">, statementIndex: number) =>
+    convexQuery(api.liveSessions.getVotes, { sessionId, statementIndex }),
+};
+
 export { api };
 export type { Id };

@@ -1,17 +1,4 @@
 import { useNavigate } from "@tanstack/react-router";
-import { useMutation } from "convex/react";
-import { Sprout, Target, Users, Pencil, MoreVertical, Play, Copy, Trash2 } from "lucide-react";
-import { useState } from "react";
-
-import { api } from "@/lib/convex";
-import type { FagPrat } from "@/lib/types";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@workspace/ui/components/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -22,6 +9,19 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@workspace/ui/components/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@workspace/ui/components/dropdown-menu";
+import { useMutation } from "convex/react";
+import { Sprout, Target, Users, Pencil, MoreVertical, Play, Copy, Trash2 } from "lucide-react";
+import { useState } from "react";
+
+import { api } from "@/lib/convex";
+import type { FagPrat } from "@/lib/types";
 
 function TypeIcon({ type }: { type: "intro" | "oppsummering" }) {
   if (type === "intro") {
@@ -120,7 +120,7 @@ export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
         /* Collection actions */
         <div className="mt-auto flex items-center gap-3">
           <button
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-teal-400 px-4 py-2.5 text-sm font-bold text-white shadow-[0_3px_0_theme(colors.teal.700)] transition-all hover:-translate-y-px hover:bg-teal-300 hover:shadow-[0_4px_0_theme(colors.teal.700)] active:translate-y-0.5 active:shadow-[0_1px_0_theme(colors.teal.700)]"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-secondary-teal px-4 py-2.5 text-sm font-bold text-white shadow-[0_3px_0_var(--secondary-teal-dark)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_var(--secondary-teal-dark)] active:translate-y-0.5 active:shadow-[0_1px_0_var(--secondary-teal-dark)]"
             onClick={(e) => {
               e.stopPropagation();
               navigate({ to: "/liveokt/$id", params: { id: fagprat._id } });

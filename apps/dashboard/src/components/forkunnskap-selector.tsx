@@ -1,5 +1,5 @@
-import { Sprout, Target } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
+import { Sprout, Target } from "lucide-react";
 
 interface ForkunnskapSelectorProps {
   value: "intro" | "oppsummering" | null;
@@ -22,16 +22,20 @@ export function ForkunnskapSelector({ value, onChange }: ForkunnskapSelectorProp
               : "border-border hover:border-teal-200 hover:bg-teal-50/50",
           )}
         >
-          <div className={cn(
-            "flex size-10 items-center justify-center rounded-full",
-            value === "intro" ? "bg-teal-100 text-teal-600" : "bg-muted text-muted-foreground",
-          )}>
+          <div
+            className={cn(
+              "flex size-10 items-center justify-center rounded-full",
+              value === "intro" ? "bg-teal-100 text-teal-600" : "bg-muted text-muted-foreground",
+            )}
+          >
             <Sprout className="size-5" />
           </div>
-          <span className={cn(
-            "text-sm font-bold",
-            value === "intro" ? "text-teal-700" : "text-foreground",
-          )}>
+          <span
+            className={cn(
+              "text-sm font-bold",
+              value === "intro" ? "text-teal-700" : "text-foreground",
+            )}
+          >
             Introduksjon
           </span>
           <span className="text-xs text-muted-foreground text-center">
@@ -48,16 +52,22 @@ export function ForkunnskapSelector({ value, onChange }: ForkunnskapSelectorProp
               : "border-border hover:border-amber-200 hover:bg-amber-50/50",
           )}
         >
-          <div className={cn(
-            "flex size-10 items-center justify-center rounded-full",
-            value === "oppsummering" ? "bg-amber-100 text-amber-600" : "bg-muted text-muted-foreground",
-          )}>
+          <div
+            className={cn(
+              "flex size-10 items-center justify-center rounded-full",
+              value === "oppsummering"
+                ? "bg-amber-100 text-amber-600"
+                : "bg-muted text-muted-foreground",
+            )}
+          >
             <Target className="size-5" />
           </div>
-          <span className={cn(
-            "text-sm font-bold",
-            value === "oppsummering" ? "text-amber-700" : "text-foreground",
-          )}>
+          <span
+            className={cn(
+              "text-sm font-bold",
+              value === "oppsummering" ? "text-amber-700" : "text-foreground",
+            )}
+          >
             Oppsummering
           </span>
           <span className="text-xs text-muted-foreground text-center">

@@ -1,9 +1,9 @@
 import { cn } from "@workspace/ui/lib/utils";
 
 const fasitStyles = {
-  sant: "bg-[#E8F5E9] text-[#4CAF50]",
-  usant: "bg-[#FFEBEE] text-[#EF5350]",
-  delvis: "bg-[#FFF3E0] text-[#E65100]",
+  sant: "bg-sant-bg text-sant",
+  usant: "bg-usant-bg text-usant",
+  delvis: "bg-delvis-bg text-delvis",
 } as const;
 
 const fasitLabels = {

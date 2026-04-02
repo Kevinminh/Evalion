@@ -1,7 +1,7 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
+import { RegisterForm } from "@workspace/ui/components/register-form";
 import { useState } from "react";
 
-import { RegisterForm } from "@workspace/ui/components/register-form";
 import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/register")({

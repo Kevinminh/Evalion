@@ -1,6 +1,5 @@
-import * as React from "react"
-
-import { cn } from "@workspace/ui/lib/utils"
+import { cn } from "@workspace/ui/lib/utils";
+import * as React from "react";
 
 function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
   return (
@@ -8,11 +7,11 @@ function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
       data-slot="textarea"
       className={cn(
         "flex field-sizing-content min-h-20 w-full resize-vertical rounded-xl border-2 border-input bg-card px-4 py-3 text-base transition-colors outline-none placeholder:text-muted-foreground/60 hover:border-muted-foreground/30 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
-export { Textarea }
+export { Textarea };

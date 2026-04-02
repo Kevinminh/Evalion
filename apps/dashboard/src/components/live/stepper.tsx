@@ -20,7 +20,9 @@ export function Stepper({ value, min, max, onChange, label }: StepperProps) {
         >
           <Minus className="size-4" />
         </button>
-        <span className="min-w-[40px] text-center text-base font-bold text-foreground">{value}</span>
+        <span className="min-w-[40px] text-center text-base font-bold text-foreground">
+          {value}
+        </span>
         <button
           onClick={() => onChange(Math.min(max, value + 1))}
           disabled={value >= max}

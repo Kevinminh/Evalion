@@ -1,12 +1,14 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { useMutation } from "convex/react";
 import { Users, Mic, CheckSquare, ArrowRight } from "lucide-react";
-import { fagpratQueries } from "@/lib/convex";
-import type { FagPratId } from "@/lib/types";
-import { SessionTopBar } from "@/components/live/session-top-bar";
+import { useState } from "react";
+
 import { OptionCard } from "@/components/live/option-card";
+import { SessionTopBar } from "@/components/live/session-top-bar";
 import { Stepper } from "@/components/live/stepper";
+import { fagpratQueries, api } from "@/lib/convex";
+import type { FagPratId } from "@/lib/types";
 
 export const Route = createFileRoute("/liveokt/$id")({
   beforeLoad: ({ context }) => {
@@ -20,14 +22,14 @@ export const Route = createFileRoute("/liveokt/$id")({
 function LiveoktSetupPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const { data: fagprat, isPending } = useQuery(
-    fagpratQueries.getById(id as FagPratId),
-  );
+  const { data: fagprat, isPending } = useQuery(fagpratQueries.getById(id as FagPratId));
+  const createSession = useMutation(api.liveSessions.create);
 
   const [groupsEnabled, setGroupsEnabled] = useState(true);
   const [groupCount, setGroupCount] = useState(4);
   const [transcriptionEnabled, setTranscriptionEnabled] = useState(false);
   const [selfEvalEnabled, setSelfEvalEnabled] = useState(true);
+  const [launching, setLaunching] = useState(false);
 
   if (isPending) {
     return (
@@ -44,6 +46,26 @@ function LiveoktSetupPage() {
       </div>
     );
   }
+
+  const handleLaunch = async () => {
+    setLaunching(true);
+    try {
+      const sessionId = await createSession({
+        fagpratId: fagprat._id,
+        groupsEnabled,
+        groupCount,
+        transcriptionEnabled,
+        selfEvalEnabled,
+      });
+      navigate({
+        to: "/liveokt/$id/lobby",
+        params: { id },
+        search: { sessionId },
+      });
+    } catch {
+      setLaunching(false);
+    }
+  };
 
   return (
     <div className="min-h-svh bg-background">
@@ -112,16 +134,11 @@ function LiveoktSetupPage() {
 
               {/* Launch button */}
               <button
-                onClick={() =>
-                  navigate({
-                    to: "/liveokt/$id/lobby",
-                    params: { id },
-                    search: { groups: groupsEnabled, groupCount },
-                  })
-                }
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-400 px-6 py-3.5 text-sm font-bold text-white shadow-[0_3px_0_theme(colors.teal.700)] transition-all hover:-translate-y-0.5 hover:bg-teal-300 hover:shadow-[0_4px_0_theme(colors.teal.700)] active:translate-y-0.5 active:shadow-[0_1px_0_theme(colors.teal.700)]"
+                onClick={handleLaunch}
+                disabled={launching}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-secondary-teal px-6 py-3.5 text-sm font-bold text-white shadow-[0_3px_0_var(--secondary-teal-dark)] transition-all hover:-translate-y-0.5 hover:shadow-[0_4px_0_var(--secondary-teal-dark)] active:translate-y-0.5 active:shadow-[0_1px_0_var(--secondary-teal-dark)] disabled:opacity-50"
               >
-                Neste — opprett lobby
+                {launching ? "Oppretter..." : "Neste — opprett lobby"}
                 <ArrowRight className="size-4" />
               </button>
             </div>

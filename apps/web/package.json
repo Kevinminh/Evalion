@@ -1,8 +1,8 @@
 {
   "name": "web",
   "version": "0.0.1",
-  "type": "module",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",
@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@convex-dev/better-auth": "catalog:",
     "@convex-dev/react-query": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/react-query": "catalog:",
@@ -21,7 +22,6 @@
     "@workspace/backend": "workspace:*",
     "@workspace/ui": "workspace:*",
     "better-auth": "catalog:",
-    "@convex-dev/better-auth": "catalog:",
     "convex": "catalog:",
     "lucide-react": "catalog:",
     "nitro": "catalog:",

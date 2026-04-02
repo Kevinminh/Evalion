@@ -17,11 +17,11 @@ Always use `type` keyword for type-only imports:
 
 ```tsx
 // Correct
-import type { ButtonProps } from "./button"
-import { type VariantProps } from "class-variance-authority"
+import type { ButtonProps } from "./button";
+import { type VariantProps } from "class-variance-authority";
 
 // Wrong — verbatimModuleSyntax will error
-import { ButtonProps } from "./button"
+import { ButtonProps } from "./button";
 ```
 
 ## Prefer Inference
@@ -30,12 +30,12 @@ Let TypeScript infer types wherever possible. Don't add annotations the compiler
 
 ```tsx
 // Preferred — type is inferred
-const count = 0
-const items = posts.map((p) => p.title)
+const count = 0;
+const items = posts.map((p) => p.title);
 
 // Avoid — redundant annotation
-const count: number = 0
-const items: string[] = posts.map((p: Post) => p.title)
+const count: number = 0;
+const items: string[] = posts.map((p: Post) => p.title);
 ```
 
 ## Component Props
@@ -49,7 +49,7 @@ function Button({
   size = "default",
   ...props
 }: React.ComponentProps<typeof ButtonPrimitive> & VariantProps<typeof buttonVariants>) {
-  return <ButtonPrimitive {...props} />
+  return <ButtonPrimitive {...props} />;
 }
 ```
 
@@ -63,7 +63,7 @@ Avoid `as` casts and non-null assertions (`!`). If the type system doesn't agree
 - `@workspace/ui/*` — shared UI package (`../../packages/ui/src/*`)
 
 ```tsx
-import { Button } from "@workspace/ui/components/button"
-import { cn } from "@workspace/ui/lib/utils"
-import { getUser } from "@/lib/auth"
+import { Button } from "@workspace/ui/components/button";
+import { cn } from "@workspace/ui/lib/utils";
+import { getUser } from "@/lib/auth";
 ```

@@ -1,22 +1,21 @@
-import * as React from "react"
-
-import { Button } from "@workspace/ui/components/button"
+import { Button } from "@workspace/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@workspace/ui/components/card"
-import { cn } from "@workspace/ui/lib/utils"
+} from "@workspace/ui/components/card";
+import { cn } from "@workspace/ui/lib/utils";
+import * as React from "react";
 
 interface LogoutCardProps {
-  className?: string
-  logo?: React.ReactNode
-  title?: string
-  description?: string
-  onLogout?: () => void
-  onCancel?: () => void
+  className?: string;
+  logo?: React.ReactNode;
+  title?: string;
+  description?: string;
+  onLogout?: () => void;
+  onCancel?: () => void;
 }
 
 function LogoutCard({
@@ -45,7 +44,7 @@ function LogoutCard({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
-export { LogoutCard }
+export { LogoutCard };
