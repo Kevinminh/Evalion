@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "exports": {
+    "./convex/_generated/*": "./convex/_generated/*"
+  },
   "scripts": {
     "build": "convex codegen",
     "dev": "convex dev",
