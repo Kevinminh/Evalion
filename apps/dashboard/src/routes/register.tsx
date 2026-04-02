@@ -43,7 +43,7 @@ function RegisterPage() {
   };
 
   const handleGoogleSignIn = () => {
-    authClient.signIn.social({ provider: "google", callbackURL: "/" });
+    authClient.signIn.social({ provider: "google", callbackURL: window.location.origin + "/" });
   };
 
   return (
