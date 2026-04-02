@@ -1,10 +1,38 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Users, Pencil, MoreVertical, Sprout, Target, FolderPlus } from "lucide-react";
+import { useMutation } from "convex/react";
+import {
+  ArrowLeft,
+  Users,
+  Pencil,
+  MoreVertical,
+  Sprout,
+  Target,
+  Copy,
+  Trash2,
+} from "lucide-react";
+import { useState } from "react";
 
 import { StatementTable } from "@/components/statement-table";
-import { fagpratQueries } from "@/lib/convex";
+import { api, fagpratQueries } from "@/lib/convex";
 import type { FagPratId } from "@/lib/types";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@workspace/ui/components/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@workspace/ui/components/alert-dialog";
 
 export const Route = createFileRoute("/_dashboard/fagprat/$id")({
   component: FagPratPreviewPage,
@@ -14,6 +42,9 @@ function FagPratPreviewPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const { data: fagprat, isPending } = useQuery(fagpratQueries.getById(id as FagPratId));
+  const createFagPrat = useMutation(api.fagprats.create);
+  const removeFagPrat = useMutation(api.fagprats.remove);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   if (isPending) {
     return (
@@ -60,14 +91,60 @@ function FagPratPreviewPage() {
             <Pencil className="size-4" />
             Endre
           </button>
-          <button className="inline-flex items-center gap-2 rounded-xl border-2 border-border bg-card px-4 py-3 text-sm font-bold text-muted-foreground transition-all hover:border-primary/30 hover:text-primary hover:bg-primary/5">
-            <FolderPlus className="size-4" />
-            Min samling
-          </button>
-          <button className="inline-flex items-center gap-1 rounded-xl border-2 border-border px-4 py-3 text-sm font-bold text-muted-foreground transition-all hover:border-muted-foreground/50 hover:bg-muted">
-            <MoreVertical className="size-4" />
-            Mer
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="inline-flex items-center gap-1 rounded-xl border-2 border-border px-4 py-3 text-sm font-bold text-muted-foreground transition-all hover:border-muted-foreground/50 hover:bg-muted">
+              <MoreVertical className="size-4" />
+              Mer
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" sideOffset={4}>
+              <DropdownMenuItem
+                onClick={async () => {
+                  const newId = await createFagPrat({
+                    title: fagprat.title + " (kopi)",
+                    subject: fagprat.subject,
+                    level: fagprat.level,
+                    type: fagprat.type,
+                    concepts: fagprat.concepts,
+                    statements: fagprat.statements,
+                    visibility: fagprat.visibility,
+                  });
+                  navigate({ to: "/fagprat/$id", params: { id: newId } });
+                }}
+              >
+                <Copy className="size-4" />
+                Dupliser
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
+                <Trash2 className="size-4" />
+                Slett
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Delete confirmation dialog */}
+          <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Denne handlingen kan ikke angres. FagPraten &ldquo;{fagprat.title}&rdquo; vil bli
+                  permanent slettet.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Avbryt</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={async () => {
+                    await removeFagPrat({ id: fagprat._id });
+                    navigate({ to: "/min-samling" });
+                  }}
+                >
+                  Slett
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 

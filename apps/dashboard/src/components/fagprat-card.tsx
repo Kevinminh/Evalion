@@ -1,7 +1,27 @@
 import { useNavigate } from "@tanstack/react-router";
-import { Sprout, Target, Users, Pencil, MoreVertical, Play } from "lucide-react";
+import { useMutation } from "convex/react";
+import { Sprout, Target, Users, Pencil, MoreVertical, Play, Copy, Trash2 } from "lucide-react";
+import { useState } from "react";
 
+import { api } from "@/lib/convex";
 import type { FagPrat } from "@/lib/types";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@workspace/ui/components/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@workspace/ui/components/alert-dialog";
 
 function TypeIcon({ type }: { type: "intro" | "oppsummering" }) {
   if (type === "intro") {
@@ -25,6 +45,28 @@ interface FagPratCardProps {
 
 export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
   const navigate = useNavigate();
+  const createFagPrat = useMutation(api.fagprats.create);
+  const removeFagPrat = useMutation(api.fagprats.remove);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  const handleDuplicate = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newId = await createFagPrat({
+      title: fagprat.title + " (kopi)",
+      subject: fagprat.subject,
+      level: fagprat.level,
+      type: fagprat.type,
+      concepts: fagprat.concepts,
+      statements: fagprat.statements,
+      visibility: fagprat.visibility,
+    });
+    navigate({ to: "/fagprat/$id", params: { id: newId } });
+  };
+
+  const handleDelete = async () => {
+    await removeFagPrat({ id: fagprat._id });
+    setDeleteOpen(false);
+  };
 
   return (
     <div
@@ -79,23 +121,67 @@ export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
         <div className="mt-auto flex items-center gap-3">
           <button
             className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-teal-400 px-4 py-2.5 text-sm font-bold text-white shadow-[0_3px_0_theme(colors.teal.700)] transition-all hover:-translate-y-px hover:bg-teal-300 hover:shadow-[0_4px_0_theme(colors.teal.700)] active:translate-y-0.5 active:shadow-[0_1px_0_theme(colors.teal.700)]"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate({ to: "/liveokt/$id", params: { id: fagprat._id } });
+            }}
           >
             <Users className="size-4" />
             Start liveøkt
           </button>
           <button
             className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border-2 border-primary/30 bg-card text-primary transition-all hover:border-primary/60 hover:bg-primary/5"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate({ to: "/fagprat/$id/rediger", params: { id: fagprat._id } });
+            }}
           >
             <Pencil className="size-4" />
           </button>
-          <button
-            className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border-2 border-border text-muted-foreground transition-all hover:border-muted-foreground/50 hover:bg-muted"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <MoreVertical className="size-4" />
-          </button>
+
+          {/* Mer dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border-2 border-border text-muted-foreground transition-all hover:border-muted-foreground/50 hover:bg-muted"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MoreVertical className="size-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" sideOffset={4}>
+              <DropdownMenuItem onClick={handleDuplicate}>
+                <Copy className="size-4" />
+                Dupliser
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDeleteOpen(true);
+                }}
+              >
+                <Trash2 className="size-4" />
+                Slett
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Delete confirmation dialog */}
+          <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+            <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Denne handlingen kan ikke angres. FagPraten &ldquo;{fagprat.title}&rdquo; vil bli
+                  permanent slettet.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Avbryt</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete}>Slett</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       )}
     </div>
