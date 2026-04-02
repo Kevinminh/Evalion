@@ -9,13 +9,14 @@ import {
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
 import { cn } from "@workspace/ui/lib/utils";
-import { Search, FolderOpen, Plus, LogOut, Settings, HelpCircle } from "lucide-react";
+import { Search, FolderOpen, Clock, Plus, LogOut, Settings, HelpCircle } from "lucide-react";
 
 import { authClient } from "@/lib/auth-client";
 
 const navItems = [
   { label: "Utforsk", path: "/" as const, icon: Search },
   { label: "Min samling", path: "/min-samling" as const, icon: FolderOpen },
+  { label: "Historikk", path: "/historikk" as const, icon: Clock },
 ];
 
 function getInitials(name: string): string {

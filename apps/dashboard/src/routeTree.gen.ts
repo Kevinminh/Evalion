@@ -20,6 +20,7 @@ import { Route as DashboardVelgPastanderRouteImport } from './routes/_dashboard/
 import { Route as DashboardMinSamlingRouteImport } from './routes/_dashboard/min-samling'
 import { Route as DashboardLagreFagpratRouteImport } from './routes/_dashboard/lagre-fagprat'
 import { Route as DashboardLagFagpratRouteImport } from './routes/_dashboard/lag-fagprat'
+import { Route as DashboardHistorikkRouteImport } from './routes/_dashboard/historikk'
 import { Route as AuthedPrivateRouteImport } from './routes/_authed/private'
 import { Route as LiveoktIdLobbyRouteImport } from './routes/liveokt.$id.lobby'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -80,6 +81,11 @@ const DashboardLagFagpratRoute = DashboardLagFagpratRouteImport.update({
   path: '/lag-fagprat',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardHistorikkRoute = DashboardHistorikkRouteImport.update({
+  id: '/historikk',
+  path: '/historikk',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const AuthedPrivateRoute = AuthedPrivateRouteImport.update({
   id: '/private',
   path: '/private',
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/logout': typeof LogoutRoute
   '/register': typeof RegisterRoute
   '/private': typeof AuthedPrivateRoute
+  '/historikk': typeof DashboardHistorikkRoute
   '/lag-fagprat': typeof DashboardLagFagpratRoute
   '/lagre-fagprat': typeof DashboardLagreFagpratRoute
   '/min-samling': typeof DashboardMinSamlingRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/logout': typeof LogoutRoute
   '/register': typeof RegisterRoute
   '/private': typeof AuthedPrivateRoute
+  '/historikk': typeof DashboardHistorikkRoute
   '/lag-fagprat': typeof DashboardLagFagpratRoute
   '/lagre-fagprat': typeof DashboardLagreFagpratRoute
   '/min-samling': typeof DashboardMinSamlingRoute
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/logout': typeof LogoutRoute
   '/register': typeof RegisterRoute
   '/_authed/private': typeof AuthedPrivateRoute
+  '/_dashboard/historikk': typeof DashboardHistorikkRoute
   '/_dashboard/lag-fagprat': typeof DashboardLagFagpratRoute
   '/_dashboard/lagre-fagprat': typeof DashboardLagreFagpratRoute
   '/_dashboard/min-samling': typeof DashboardMinSamlingRoute
@@ -174,6 +183,7 @@ export interface FileRouteTypes {
     | '/logout'
     | '/register'
     | '/private'
+    | '/historikk'
     | '/lag-fagprat'
     | '/lagre-fagprat'
     | '/min-samling'
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/logout'
     | '/register'
     | '/private'
+    | '/historikk'
     | '/lag-fagprat'
     | '/lagre-fagprat'
     | '/min-samling'
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/logout'
     | '/register'
     | '/_authed/private'
+    | '/_dashboard/historikk'
     | '/_dashboard/lag-fagprat'
     | '/_dashboard/lagre-fagprat'
     | '/_dashboard/min-samling'
@@ -311,6 +323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLagFagpratRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/historikk': {
+      id: '/_dashboard/historikk'
+      path: '/historikk'
+      fullPath: '/historikk'
+      preLoaderRoute: typeof DashboardHistorikkRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_authed/private': {
       id: '/_authed/private'
       path: '/private'
@@ -379,6 +398,7 @@ const DashboardFagpratIdRouteWithChildren =
   DashboardFagpratIdRoute._addFileChildren(DashboardFagpratIdRouteChildren)
 
 interface DashboardRouteChildren {
+  DashboardHistorikkRoute: typeof DashboardHistorikkRoute
   DashboardLagFagpratRoute: typeof DashboardLagFagpratRoute
   DashboardLagreFagpratRoute: typeof DashboardLagreFagpratRoute
   DashboardMinSamlingRoute: typeof DashboardMinSamlingRoute
@@ -388,6 +408,7 @@ interface DashboardRouteChildren {
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardHistorikkRoute: DashboardHistorikkRoute,
   DashboardLagFagpratRoute: DashboardLagFagpratRoute,
   DashboardLagreFagpratRoute: DashboardLagreFagpratRoute,
   DashboardMinSamlingRoute: DashboardMinSamlingRoute,

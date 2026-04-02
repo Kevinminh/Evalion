@@ -24,6 +24,38 @@ const AVATAR_COLORS = [
 
 // ── Session queries ──
 
+export const listByTeacher = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return [];
+    }
+    const sessions = await ctx.db
+      .query("liveSessions")
+      .withIndex("by_teacher", (q) => q.eq("teacherId", identity.subject))
+      .order("desc")
+      .collect();
+
+    const ended = sessions.filter((s) => s.status === "ended");
+
+    return await Promise.all(
+      ended.map(async (session) => {
+        const fagprat = await ctx.db.get(session.fagpratId);
+        const students = await ctx.db
+          .query("sessionStudents")
+          .withIndex("by_session", (q) => q.eq("sessionId", session._id))
+          .collect();
+        return {
+          ...session,
+          fagpratTitle: fagprat?.title ?? "Slettet FagPrat",
+          studentCount: students.length,
+        };
+      }),
+    );
+  },
+});
+
 export const getById = query({
   args: { id: v.id("liveSessions") },
   handler: async (ctx, args) => {

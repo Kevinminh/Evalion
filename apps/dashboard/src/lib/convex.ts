@@ -9,6 +9,7 @@ export const fagpratQueries = {
 };
 
 export const liveSessionQueries = {
+  listByTeacher: () => convexQuery(api.liveSessions.listByTeacher, {}),
   getById: (id: Id<"liveSessions">) => convexQuery(api.liveSessions.getById, { id }),
   getByJoinCode: (joinCode: string) => convexQuery(api.liveSessions.getByJoinCode, { joinCode }),
   listStudents: (sessionId: Id<"liveSessions">) =>
