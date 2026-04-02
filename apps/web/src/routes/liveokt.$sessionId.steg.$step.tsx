@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { BackButton } from "@workspace/ui/components/live/back-button";
 import { BegrunnelseCard } from "@workspace/ui/components/live/begrunnelse-card";
+import { BegrunnelseNav } from "@workspace/ui/components/live/begrunnelse-nav";
 import { DistributionChart } from "@workspace/ui/components/live/distribution-chart";
 import { EndringerCard } from "@workspace/ui/components/live/endringer-card";
 import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
@@ -16,7 +17,7 @@ import { TimerCard } from "@workspace/ui/components/live/timer-card";
 import { cn } from "@workspace/ui/lib/utils";
 // VoteButtons removed — teacher view doesn't vote
 import { useMutation } from "convex/react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Users } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
@@ -67,6 +68,10 @@ function LiveStepPage() {
 
   const updateStepMutation = useMutation(api.liveSessions.updateStep);
   const endSessionMutation = useMutation(api.liveSessions.end);
+  const startTimerMutation = useMutation(api.liveSessions.startTimer);
+  const pauseTimerMutation = useMutation(api.liveSessions.pauseTimer);
+  const stopTimerMutation = useMutation(api.liveSessions.stopTimer);
+  const highlightBegrunnelseMutation = useMutation(api.liveSessions.highlightBegrunnelse);
 
   const [selectedStatement, setSelectedStatement] = useState<number | null>(null);
   // vote and rating state not needed — teacher doesn't interact with student UI
@@ -74,9 +79,11 @@ function LiveStepPage() {
   const [countdownNumber, setCountdownNumber] = useState(3);
   const [countdownDone, setCountdownDone] = useState(false);
   const [panelTab, setPanelTab] = useState("default");
+  const [begrunnelseIdx, setBegrunnelseIdx] = useState(0);
   const [recording, setRecording] = useState(false);
   const [recordElapsed, setRecordElapsed] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [usedStatements, setUsedStatements] = useState<Set<number>>(new Set());
 
   const countdownTriggered = useRef(false);
 
@@ -91,6 +98,16 @@ function LiveStepPage() {
   const { data: ratings } = useQuery({
     ...liveSessionQueries.getRatings(typedSessionId, selectedIdx),
     enabled: !!fagprat && step === 6,
+  });
+
+  const { data: analytics } = useQuery({
+    ...liveSessionQueries.getVoteAnalytics(typedSessionId, selectedIdx),
+    enabled: !!fagprat && step >= 4,
+  });
+
+  const { data: begrunnelser } = useQuery({
+    ...liveSessionQueries.getBegrunnelser(typedSessionId, selectedIdx),
+    enabled: !!fagprat && [2, 5].includes(step),
   });
 
   // Recording timer
@@ -152,10 +169,11 @@ function LiveStepPage() {
     };
   }, [step]);
 
-  // Reset panel tab when step changes
+  // Reset panel tab and begrunnelse index when step or statement changes
   useEffect(() => {
     setPanelTab("default");
-  }, [step]);
+    setBegrunnelseIdx(0);
+  }, [step, selectedIdx]);
 
   if (isPending) {
     return (
@@ -194,41 +212,20 @@ function LiveStepPage() {
     { label: "Delvis", value: delvisCount, color: "bg-delvis" },
   ];
 
-  // Step 4 endringer data
-  const r2CorrectCount = statement ? r2Votes.filter((v) => v.vote === statement.fasit).length : 0;
-  const r2Total = r2Votes.length;
+  // Step 4+ analytics — prefer backend query when available, fallback to client-side
+  const r2CorrectCount = analytics?.correctR2 ?? (statement ? r2Votes.filter((v) => v.vote === statement.fasit).length : 0);
+  const r2Total = analytics?.totalR2 ?? r2Votes.length;
+  const changedToCorrect = analytics?.wrongToRight ?? 0;
+  const changedToIncorrect = analytics?.rightToWrong ?? 0;
 
-  const changedToCorrect = (() => {
-    if (!statement) return 0;
-    let count = 0;
-    for (const v2 of r2Votes) {
-      const v1 = r1Votes.find((v) => v.studentId === v2.studentId);
-      if (v1 && v1.vote !== statement.fasit && v2.vote === statement.fasit) {
-        count++;
-      }
-    }
-    return count;
-  })();
-
-  const changedToIncorrect = (() => {
-    if (!statement) return 0;
-    let count = 0;
-    for (const v2 of r2Votes) {
-      const v1 = r1Votes.find((v) => v.studentId === v2.studentId);
-      if (v1 && v1.vote === statement.fasit && v2.vote !== statement.fasit) {
-        count++;
-      }
-    }
-    return count;
-  })();
-
-  // Rating distribution for step 6
-  const ratingDistribution = [1, 2, 3, 4, 5].map((score) => ({
+  // Rating distribution for step 6 — prefer backend analytics
+  const ratingDistribution = analytics?.ratingDistribution ?? [1, 2, 3, 4, 5].map((score) => ({
     score,
     count: ratingList.filter((r) => r.rating === score).length,
   }));
-  const avgRating =
-    ratingList.length > 0
+  const avgRating = analytics?.avgRating !== undefined && analytics.avgRating > 0
+    ? analytics.avgRating
+    : ratingList.length > 0
       ? ratingList.reduce((sum, r) => sum + r.rating, 0) / ratingList.length
       : undefined;
 
@@ -288,11 +285,14 @@ function LiveStepPage() {
                 const isSelected = selectedStatement === i;
                 const hasSomeSelected = selectedStatement !== null;
                 const isLast = i === fagprat.statements.length - 1;
+                const isUsed = usedStatements.has(i);
                 const color = STATEMENT_COLORS[i % STATEMENT_COLORS.length];
                 return (
                   <button
                     key={i}
+                    disabled={isUsed}
                     onClick={() => {
+                      if (isUsed) return;
                       setSelectedStatement(i);
                       setTimeout(() => goToStep(1), 600);
                     }}
@@ -301,13 +301,19 @@ function LiveStepPage() {
                       borderColor: color.border,
                     }}
                     className={cn(
-                      "rounded-2xl border-2 p-6 text-left text-base font-semibold transition-all duration-300 hover:scale-[1.03]",
+                      "relative rounded-2xl border-2 p-6 text-left text-base font-semibold transition-all duration-300 hover:scale-[1.03]",
                       isSelected && "scale-105 ring-2 ring-primary",
                       hasSomeSelected && !isSelected && "scale-[0.97] opacity-40",
+                      isUsed && "cursor-default opacity-40 hover:scale-100",
                       isOdd && isLast && "col-span-2 mx-auto max-w-[calc(50%-12px)]",
                     )}
                   >
                     {s.text}
+                    {isUsed && (
+                      <span className="absolute top-2 right-2 flex size-6 items-center justify-center rounded-full bg-primary/80 text-xs text-white">
+                        ✓
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -319,8 +325,12 @@ function LiveStepPage() {
       case 1:
         return (
           <div className="flex flex-col items-center gap-8 pt-4">
-            <div className="self-start">
+            <div className="flex w-full items-center justify-between">
               <BackButton onClick={() => goToStep(0)} />
+              <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                <Users className="size-4" />
+                {activeRoundVotes.length}/{studentList.length} har stemt
+              </div>
             </div>
             {statementCard}
             <Professor
@@ -344,8 +354,12 @@ function LiveStepPage() {
       case 3:
         return (
           <div className="flex flex-col items-center gap-8 pt-4">
-            <div className="self-start">
+            <div className="flex w-full items-center justify-between">
               <BackButton onClick={() => goToStep(0)} />
+              <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                <Users className="size-4" />
+                {activeRoundVotes.length}/{studentList.length} har stemt
+              </div>
             </div>
             {statementCard}
             <Professor size="sm" text="Har du endret mening etter diskusjonen? Stem på nytt!" />
@@ -430,7 +444,15 @@ function LiveStepPage() {
       case 1:
         return (
           <div className="space-y-4">
-            <TimerCard />
+            <TimerCard
+              duration={session?.timerDuration}
+              startedAt={session?.timerStartedAt}
+              pausedAt={session?.timerPausedAt}
+              remainingAtPause={session?.timerRemainingAtPause}
+              onStart={(d) => startTimerMutation({ id: typedSessionId, duration: d })}
+              onPause={() => pauseTimerMutation({ id: typedSessionId })}
+              onStop={() => stopTimerMutation({ id: typedSessionId })}
+            />
             <div className="h-px bg-border" />
             {studentVoteList}
             <div className="h-px bg-border" />
@@ -451,9 +473,48 @@ function LiveStepPage() {
           >
             {begrunnelseTab ? (
               <div className="space-y-4">
-                <TimerCard />
-                <p className="text-xs italic text-muted-foreground">Ingen begrunnelser ennå</p>
-                <BegrunnelseCard text="Eksempel: Fordi påstanden stemmer med det vi lærte om..." />
+                <TimerCard
+              duration={session?.timerDuration}
+              startedAt={session?.timerStartedAt}
+              pausedAt={session?.timerPausedAt}
+              remainingAtPause={session?.timerRemainingAtPause}
+              onStart={(d) => startTimerMutation({ id: typedSessionId, duration: d })}
+              onPause={() => pauseTimerMutation({ id: typedSessionId })}
+              onStop={() => stopTimerMutation({ id: typedSessionId })}
+            />
+                {!begrunnelser || begrunnelser.length === 0 ? (
+                  <p className="text-xs italic text-muted-foreground">Ingen begrunnelser ennå</p>
+                ) : (
+                  <>
+                    <BegrunnelseNav
+                      current={begrunnelseIdx + 1}
+                      total={begrunnelser.length}
+                      onPrev={() => setBegrunnelseIdx((i) => Math.max(0, i - 1))}
+                      onNext={() => setBegrunnelseIdx((i) => Math.min(begrunnelser.length - 1, i + 1))}
+                    />
+                    {(() => {
+                      const b = begrunnelser[begrunnelseIdx];
+                      if (!b) return null;
+                      const studentName = studentList.find((s) => s._id === b.studentId)?.name;
+                      return (
+                        <div className="space-y-2">
+                          <BegrunnelseCard text={b.text} studentName={studentName} />
+                          <button
+                            onClick={() => highlightBegrunnelseMutation({ id: b._id, highlighted: !b.highlighted })}
+                            className={cn(
+                              "w-full rounded-lg px-3 py-2 text-xs font-bold transition-all",
+                              b.highlighted
+                                ? "bg-primary text-primary-foreground"
+                                : "border border-border text-muted-foreground hover:bg-primary/10 hover:text-primary",
+                            )}
+                          >
+                            {b.highlighted ? "Fremhevet" : "Fremhev"}
+                          </button>
+                        </div>
+                      );
+                    })()}
+                  </>
+                )}
               </div>
             ) : (
               <div className="space-y-4">
@@ -469,7 +530,15 @@ function LiveStepPage() {
       case 3:
         return (
           <div className="space-y-4">
-            <TimerCard />
+            <TimerCard
+              duration={session?.timerDuration}
+              startedAt={session?.timerStartedAt}
+              pausedAt={session?.timerPausedAt}
+              remainingAtPause={session?.timerRemainingAtPause}
+              onStart={(d) => startTimerMutation({ id: typedSessionId, duration: d })}
+              onPause={() => pauseTimerMutation({ id: typedSessionId })}
+              onStop={() => stopTimerMutation({ id: typedSessionId })}
+            />
             <div className="h-px bg-border" />
             {studentVoteList}
             <div className="h-px bg-border" />
@@ -525,6 +594,10 @@ function LiveStepPage() {
 
       case 5: {
         const correctCount = r2Votes.filter((v) => statement && v.vote === statement.fasit).length;
+        const highlightedBegrunnelse = begrunnelser?.find((b) => b.highlighted);
+        const highlightedStudent = highlightedBegrunnelse
+          ? studentList.find((s) => s._id === highlightedBegrunnelse.studentId)
+          : null;
         return (
           <div className="space-y-4">
             <div className="rounded-lg bg-sant/10 p-3">
@@ -535,11 +608,20 @@ function LiveStepPage() {
                 {correctCount}/{r2Total}
               </p>
             </div>
-            <div className="rounded-lg border-l-[3px] border-l-primary/30 bg-primary/5 p-4">
-              <p className="text-xs italic text-muted-foreground">
-                Ingen fremhevet begrunnelse ennå
-              </p>
-            </div>
+            {highlightedBegrunnelse ? (
+              <div className="rounded-lg border-l-[3px] border-l-primary/30 bg-primary/5 p-4">
+                <div className="mb-1 text-xs font-bold uppercase tracking-wider text-primary/60">
+                  Fremhevet begrunnelse
+                </div>
+                <BegrunnelseCard text={highlightedBegrunnelse.text} studentName={highlightedStudent?.name} />
+              </div>
+            ) : (
+              <div className="rounded-lg border-l-[3px] border-l-primary/30 bg-primary/5 p-4">
+                <p className="text-xs italic text-muted-foreground">
+                  Ingen fremhevet begrunnelse ennå
+                </p>
+              </div>
+            )}
           </div>
         );
       }
@@ -555,12 +637,16 @@ function LiveStepPage() {
   const renderPanelFooter = () => {
     if (step === 0) return null;
     if (step === 6) {
-      const hasMoreStatements = fagprat.statements.length > 1;
+      const unusedCount = fagprat.statements.length - usedStatements.size - (usedStatements.has(selectedIdx) ? 0 : 1);
+      const hasMoreStatements = unusedCount > 0;
       return (
         <div className="flex gap-2">
           {hasMoreStatements && (
             <button
-              onClick={() => goToStep(0)}
+              onClick={() => {
+                setUsedStatements((prev) => new Set(prev).add(selectedIdx));
+                goToStep(0);
+              }}
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-[0_2px_0_oklch(0.35_0.16_295)] transition-all hover:-translate-y-px"
             >
               Neste påstand
@@ -584,15 +670,13 @@ function LiveStepPage() {
       <SessionTopBar
         title={fagprat.title}
         center={
-          [2, 4].includes(step) ? (
-            <RecordButton
-              state={recordButtonState}
-              onToggle={() => setRecording(!recording)}
-              elapsed={recordElapsed}
-            />
-          ) : [1, 3, 5, 6].includes(step) ? (
-            <RecordButton state="disabled" onToggle={() => {}} />
-          ) : undefined
+          session?.transcriptionEnabled
+            ? [2, 4].includes(step)
+              ? <RecordButton state={recordButtonState} onToggle={() => setRecording(!recording)} elapsed={recordElapsed} />
+              : [1, 3, 5, 6].includes(step)
+                ? <RecordButton state="disabled" onToggle={() => {}} />
+                : undefined
+            : undefined
         }
       >
         <button

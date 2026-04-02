@@ -46,21 +46,13 @@ interface FagPratCardProps {
 
 export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
   const navigate = useNavigate();
-  const createFagPrat = useMutation(api.fagprats.create);
+  const duplicateFagPrat = useMutation(api.fagprats.duplicate);
   const removeFagPrat = useMutation(api.fagprats.remove);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const handleDuplicate = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const newId = await createFagPrat({
-      title: fagprat.title + " (kopi)",
-      subject: fagprat.subject,
-      level: fagprat.level,
-      type: fagprat.type,
-      concepts: fagprat.concepts,
-      statements: fagprat.statements,
-      visibility: fagprat.visibility,
-    });
+    const newId = await duplicateFagPrat({ id: fagprat._id });
     navigate({ to: "/fagprat/$id", params: { id: newId } });
   };
 

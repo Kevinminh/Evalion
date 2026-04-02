@@ -16,6 +16,10 @@ export const liveSessionQueries = {
     convexQuery(api.liveSessions.getVotes, { sessionId, statementIndex }),
   getRatings: (sessionId: Id<"liveSessions">, statementIndex: number) =>
     convexQuery(api.liveSessions.getRatings, { sessionId, statementIndex }),
+  getVoteAnalytics: (sessionId: Id<"liveSessions">, statementIndex: number) =>
+    convexQuery(api.liveSessions.getVoteAnalytics, { sessionId, statementIndex }),
+  getBegrunnelser: (sessionId: Id<"liveSessions">, statementIndex: number) =>
+    convexQuery(api.liveSessions.getBegrunnelser, { sessionId, statementIndex }),
 };
 
 export { api };

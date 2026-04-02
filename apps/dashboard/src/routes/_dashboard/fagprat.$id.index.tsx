@@ -19,17 +19,7 @@ import {
 } from "@workspace/ui/components/dropdown-menu";
 import { useMutation } from "convex/react";
 import { Button } from "@workspace/ui/components/button";
-import {
-  ArrowLeft,
-  Users,
-  Pencil,
-  MoreVertical,
-  Sprout,
-  Target,
-  Copy,
-  Trash2,
-  FolderPlus,
-} from "lucide-react";
+import { ArrowLeft, Users, Pencil, MoreVertical, Sprout, Target, Copy, Trash2, FolderPlus } from "lucide-react";
 import { useState } from "react";
 
 import { StatementTable } from "@/components/statement-table";
@@ -46,7 +36,7 @@ function FagPratPreviewPage() {
   const navigate = useNavigate();
   const { data: fagprat, isPending } = useQuery(fagpratQueries.getById(id as FagPratId));
   const { data: session } = authClient.useSession();
-  const createFagPrat = useMutation(api.fagprats.create);
+  const duplicateFagPrat = useMutation(api.fagprats.duplicate);
   const removeFagPrat = useMutation(api.fagprats.remove);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -69,15 +59,7 @@ function FagPratPreviewPage() {
   const isAuthor = session?.user?.id && fagprat.authorId === session.user.id;
 
   const handleDuplicate = async () => {
-    const newId = await createFagPrat({
-      title: fagprat.title + " (kopi)",
-      subject: fagprat.subject,
-      level: fagprat.level,
-      type: fagprat.type,
-      concepts: fagprat.concepts,
-      statements: fagprat.statements,
-      visibility: "private",
-    });
+    const newId = await duplicateFagPrat({ id: fagprat._id });
     navigate({ to: "/fagprat/$id", params: { id: newId } });
   };
 

@@ -20,34 +20,29 @@ function UtforskPage() {
   const [selectedTrinn, setSelectedTrinn] = useState("");
   const filterRef = useRef<HTMLDivElement>(null);
 
-  const { data: allFagPrats, isPending } = useQuery(fagpratQueries.list());
+  // Determine type filter: both checked = no filter, one checked = that type, neither = show nothing
+  const typeFilter =
+    forkunnskapIntro && forkunnskapOppsummering
+      ? undefined
+      : forkunnskapIntro
+        ? ("intro" as const)
+        : forkunnskapOppsummering
+          ? ("oppsummering" as const)
+          : undefined;
 
-  const filtered = allFagPrats
-    ? allFagPrats
-        .filter((fp) => {
-          if (searchQuery) {
-            const q = searchQuery.toLowerCase();
-            if (
-              !fp.title.toLowerCase().includes(q) &&
-              !fp.subject.toLowerCase().includes(q) &&
-              !fp.level.toLowerCase().includes(q)
-            ) {
-              return false;
-            }
-          }
-          if (!forkunnskapIntro && fp.type === "intro") return false;
-          if (!forkunnskapOppsummering && fp.type === "oppsummering") return false;
-          if (selectedFag && fp.subject !== selectedFag) return false;
-          if (selectedTrinn && fp.level !== selectedTrinn) return false;
-          return true;
-        })
-        .sort((a, b) => {
-          if (sortBy === "newest") {
-            return (b._creationTime ?? 0) - (a._creationTime ?? 0);
-          }
-          return (b.usageCount ?? 0) - (a.usageCount ?? 0);
-        })
-    : [];
+  const showNone = !forkunnskapIntro && !forkunnskapOppsummering;
+
+  const { data: searchResults, isPending } = useQuery(
+    fagpratQueries.search({
+      searchText: searchQuery || undefined,
+      subject: selectedFag || undefined,
+      level: selectedTrinn || undefined,
+      type: typeFilter,
+      sortBy: sortBy === "newest" ? "recent" : "relevant",
+    }),
+  );
+
+  const filtered = showNone ? [] : (searchResults ?? []);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {

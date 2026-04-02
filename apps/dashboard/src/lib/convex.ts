@@ -6,6 +6,13 @@ export const fagpratQueries = {
   list: () => convexQuery(api.fagprats.list, {}),
   getById: (id: Id<"fagprats">) => convexQuery(api.fagprats.getById, { id }),
   listByAuthor: () => convexQuery(api.fagprats.listByAuthor, {}),
+  search: (args: {
+    searchText?: string;
+    subject?: string;
+    level?: string;
+    type?: "intro" | "oppsummering";
+    sortBy?: "relevant" | "recent";
+  }) => convexQuery(api.fagprats.search, args),
 };
 
 export const liveSessionQueries = {
