@@ -5,7 +5,7 @@ import { Users, Mic, CheckSquare, ArrowRight } from "lucide-react";
 import { useState } from "react";
 
 import { OptionCard } from "@/components/live/option-card";
-import { SessionTopBar } from "@/components/live/session-top-bar";
+import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
 import { Stepper } from "@/components/live/stepper";
 import { fagpratQueries, api } from "@/lib/convex";
 import type { FagPratId } from "@/lib/types";
@@ -66,7 +66,7 @@ function LiveoktSetupPage() {
 
   return (
     <div className="min-h-svh bg-background">
-      <SessionTopBar title={fagprat.title} />
+      <SessionTopBar title={fagprat.title} onExit={() => navigate({ to: "/min-samling" })} />
 
       <div className="mx-auto max-w-[1100px] px-8 pt-24 pb-12">
         <h1 className="mb-8 text-3xl font-extrabold text-foreground">Oppsett for liveøkt</h1>

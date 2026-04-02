@@ -4,7 +4,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { useMutation } from "convex/react";
 import { Users, X } from "lucide-react";
 
-import { SessionTopBar } from "@/components/live/session-top-bar";
+import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
 import { fagpratQueries, liveSessionQueries, api } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 import type { FagPratId } from "@/lib/types";
@@ -110,7 +110,7 @@ function LobbyPage() {
 
   return (
     <div className="flex min-h-svh flex-col bg-background">
-      <SessionTopBar title={fagprat.title}>
+      <SessionTopBar title={fagprat.title} onExit={() => navigate({ to: "/min-samling" })}>
         {showGroupButton && (
           <button
             onClick={handleCreateGroups}

@@ -5,12 +5,12 @@ import { useMutation } from "convex/react";
 import { Mic } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-import { DistributionChart } from "@/components/live/distribution-chart";
-import { SessionTopBar } from "@/components/live/session-top-bar";
-import { StepNav } from "@/components/live/step-nav";
-import { TeacherPanel } from "@/components/live/teacher-panel";
-import { TimerCard } from "@/components/live/timer-card";
-import { VoteButtons } from "@/components/live/vote-buttons";
+import { DistributionChart } from "@workspace/ui/components/live/distribution-chart";
+import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
+import { StepNav } from "@workspace/ui/components/live/step-nav";
+import { TeacherPanel } from "@workspace/ui/components/live/teacher-panel";
+import { TimerCard } from "@workspace/ui/components/live/timer-card";
+import { VoteButtons } from "@workspace/ui/components/live/vote-buttons";
 import { fagpratQueries, liveSessionQueries, api } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 import type { FagPratId } from "@/lib/types";
@@ -455,7 +455,7 @@ function LiveStepPage() {
 
   return (
     <div className="min-h-svh bg-background">
-      <SessionTopBar title={fagprat.title}>
+      <SessionTopBar title={fagprat.title} onExit={() => navigate({ to: "/min-samling" })}>
         {(step === 2 || step === 4) && (
           <button
             onClick={() => setRecording(!recording)}
