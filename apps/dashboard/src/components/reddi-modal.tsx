@@ -1,5 +1,4 @@
 import { Button } from "@workspace/ui/components/button";
-import { Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface ReddiModalProps {
@@ -38,11 +37,9 @@ export function ReddiModal({ open, onClose, onSubmit }: ReddiModalProps) {
       }}
     >
       <div className="w-full max-w-lg rounded-2xl bg-card p-8 shadow-xl">
-        {/* Robot placeholder + badge */}
+        {/* Reddi robot + badge */}
         <div className="mb-4 flex items-center gap-3">
-          <div className="flex size-12 items-center justify-center rounded-full bg-primary/10">
-            <Sparkles className="size-6 text-primary" />
-          </div>
+          <img src="/reddi.png" alt="Reddi" className="size-12 rounded-full object-cover" />
           <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
             AI-assistent
           </span>
