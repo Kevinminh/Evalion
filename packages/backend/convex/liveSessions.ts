@@ -173,6 +173,13 @@ export const listStudents = query({
   },
 });
 
+export const getStudent = query({
+  args: { id: v.id("sessionStudents") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
 export const addStudent = mutation({
   args: {
     sessionId: v.id("liveSessions"),
