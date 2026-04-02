@@ -11,7 +11,7 @@ export function SessionTopBar({ title, onExit, center, children }: SessionTopBar
   return (
     <div className="fixed top-0 right-0 left-0 z-40 flex h-16 items-center justify-between border-b bg-card px-6">
       <div className="flex items-center gap-4">
-        <img src="/logo.png" alt="Evalion" className="h-8 object-contain" />
+        <img src="/fagprat-logo.png" alt="FagPrat" className="h-10 object-contain" />
         <div className="h-6 w-px bg-border" />
         <span className="text-sm font-bold text-foreground">{title}</span>
       </div>

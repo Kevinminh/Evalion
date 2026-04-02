@@ -1,5 +1,4 @@
 import { cn } from "@workspace/ui/lib/utils";
-import { GraduationCap } from "lucide-react";
 import type { ReactNode } from "react";
 
 interface ProfessorProps {
@@ -11,9 +10,9 @@ interface ProfessorProps {
 }
 
 const sizeConfig = {
-  xs: { container: "size-12", icon: "size-5" },
-  sm: { container: "size-24", icon: "size-10" },
-  lg: { container: "size-[220px]", icon: "size-20" },
+  xs: "size-12",
+  sm: "size-24",
+  lg: "size-[220px]",
 };
 
 export function Professor({
@@ -23,19 +22,16 @@ export function Professor({
   animate = true,
   className,
 }: ProfessorProps) {
-  const { container, icon } = sizeConfig[size];
+  const container = sizeConfig[size];
 
   return (
     <div className={cn("flex items-center gap-4", className)}>
       <div className="flex shrink-0 flex-col items-center gap-2">
-        <div
-          className={cn(
-            "flex items-center justify-center rounded-full bg-primary/10",
-            container,
-          )}
-        >
-          <GraduationCap className={cn("text-primary", icon)} />
-        </div>
+        <img
+          src="/professoren.png"
+          alt="Professoren"
+          className={cn("rounded-full object-cover", container)}
+        />
         {label && (
           <span className="text-sm font-medium text-muted-foreground">{label}</span>
         )}
