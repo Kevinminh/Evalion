@@ -121,9 +121,11 @@ function LiveStepPage() {
     return () => clearInterval(interval);
   }, [recording]);
 
+  const dashboardUrl = import.meta.env.DEV ? "http://localhost:3001" : "https://dashboard.evalion.no";
+
   const handleEnd = async () => {
     await endSessionMutation({ id: typedSessionId });
-    await navigate({ to: "/" });
+    window.location.href = dashboardUrl;
   };
 
   const goToStep = async (n: number) => {
@@ -680,6 +682,12 @@ function LiveStepPage() {
             : undefined
         }
       >
+        <a
+          href={dashboardUrl}
+          className="inline-flex items-center gap-2 rounded-xl border-2 border-border px-4 py-2 text-sm font-bold text-muted-foreground transition-all hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+        >
+          Gå til dashboard
+        </a>
         <button
           onClick={handleEnd}
           className="inline-flex items-center gap-2 rounded-xl bg-destructive px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_oklch(0.45_0.15_25)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_oklch(0.45_0.15_25)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.45_0.15_25)]"
