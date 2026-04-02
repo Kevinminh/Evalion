@@ -145,7 +145,7 @@ function StudentGamePage() {
     };
   }, [currentStep]);
 
-  if (studentLoading || sessionLoading) {
+  if (studentLoading) {
     return (
       <div className="flex min-h-svh items-center justify-center bg-background">
         <Loader2 className="size-8 animate-spin text-primary" />
@@ -153,12 +153,32 @@ function StudentGamePage() {
     );
   }
 
-  if (!student || !session) {
+  if (!student) {
     return (
       <div className="flex min-h-svh items-center justify-center bg-background px-6">
         <p className="text-center text-lg font-bold text-foreground">
-          Økten ble ikke funnet
+          Eleven ble ikke funnet
         </p>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background px-6">
+        <div
+          className={cn(
+            "flex size-16 items-center justify-center rounded-full text-2xl font-bold text-white",
+            student.avatarColor,
+          )}
+        >
+          {student.name[0]}
+        </div>
+        <h1 className="text-xl font-extrabold text-foreground">Hei, {student.name}!</h1>
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" />
+          Kobler til økten...
+        </div>
       </div>
     );
   }
