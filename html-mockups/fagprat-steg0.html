@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FagPrat – Velg en påstand</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: var(--font-family-body);
+      background: var(--color-bg-primary);
+      color: var(--color-text-primary);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ══════════════════════════════════════
+       TOP BAR (identical to steg1)
+       ══════════════════════════════════════ */
+    .top-bar {
+      height: 80px; min-height: 80px;
+      background: var(--color-neutral-0);
+      border-bottom: 1.5px solid var(--color-neutral-200);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 var(--space-8);
+      z-index: var(--z-sticky);
+    }
+    .top-bar-left { display: flex; align-items: center; gap: var(--space-4); }
+    .top-bar-logo { height: 48px; object-fit: contain; }
+    .top-bar-divider { width: 1.5px; height: 32px; background: var(--color-neutral-300); }
+    .top-bar-title { font-size: var(--text-lg); font-weight: var(--font-bold); color: var(--color-text-primary); }
+    .btn-end-activity {
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-2-5) var(--space-5);
+      background: var(--color-error); color: var(--color-text-inverse);
+      border: none; border-radius: var(--radius-full);
+      font-family: var(--font-family-body); font-size: var(--text-sm); font-weight: var(--font-bold);
+      cursor: pointer; transition: background var(--transition-fast);
+    }
+    .btn-end-activity:hover { background: #D32F2F; }
+    .btn-end-activity svg { width: 18px; height: 18px; }
+
+    /* ══════════════════════════════════════
+       MAIN CONTENT – Statement selection
+       ══════════════════════════════════════ */
+    .main-content {
+      flex: 1; display: flex; align-items: center;
+      justify-content: space-evenly;
+      min-height: 0; overflow: hidden;
+      padding: var(--space-4) 0;
+    }
+
+    /* Professor – large, left side, overlapping grid slightly */
+    .professor-side {
+      flex-shrink: 0;
+      display: flex; flex-direction: column; align-items: center;
+      gap: var(--space-2);
+      z-index: 5;
+    }
+    .professor-img {
+      width: 220px; height: 220px; border-radius: var(--radius-full);
+      object-fit: cover;
+      border: 5px solid var(--color-primary-200);
+      background: var(--color-bg-tertiary);
+    }
+    .professor-label {
+      font-size: var(--text-base); font-weight: var(--font-semibold);
+      color: var(--color-text-tertiary);
+    }
+
+    /* Statement cards grid: 3 rows, 2 cols, last centered */
+    .statements-grid {
+      flex-shrink: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+      max-width: 900px;
+    }
+
+    .stmt-card {
+      padding: var(--space-4) var(--space-5);
+      border-radius: var(--radius-xl);
+      font-size: var(--text-sm); font-weight: var(--font-semibold);
+      line-height: var(--leading-relaxed);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border: 2px solid;
+      min-height: 110px;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+    }
+    .stmt-card:hover {
+      transform: scale(1.03);
+      box-shadow: var(--shadow-lg);
+    }
+    .stmt-card:active {
+      transform: scale(0.98);
+    }
+
+    /* Odd last card centered (only for odd counts) */
+    .statements-grid.count-odd .stmt-card:last-child {
+      grid-column: 1 / -1;
+      max-width: 50%;
+      justify-self: center;
+    }
+
+    /* Larger cards for 4 or fewer statements */
+    .statements-grid.count-small .stmt-card {
+      min-height: 130px;
+      font-size: var(--text-base);
+      padding: var(--space-5) var(--space-6);
+    }
+
+    /* 5 color variants */
+    .stmt-card.yellow {
+      background: #FFFDE7; border-color: #FFE082; color: #8D6E00;
+    }
+    .stmt-card.blue {
+      background: #E3F1FC; border-color: #90CAF9; color: #2C5F8A;
+    }
+    .stmt-card.orange {
+      background: #FFF3E0; border-color: #FFCC80; color: #B35C00;
+    }
+    .stmt-card.purple {
+      background: #F3EEFF; border-color: #CE93D8; color: #6A1B9A;
+    }
+    .stmt-card.red {
+      background: #FFEBEE; border-color: #EF9A9A; color: #C62828;
+    }
+
+    /* ══════════════════════════════════════
+       BOTTOM NAV (identical to steg1, but inactive)
+       ══════════════════════════════════════ */
+    .bottom-nav {
+      height: 100px; min-height: 100px;
+      background: var(--color-neutral-0);
+      border-top: 1.5px solid var(--color-neutral-200);
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 var(--space-6);
+    }
+    .step-nav {
+      display: flex; align-items: stretch;
+      width: 100%;
+      gap: var(--space-2);
+    }
+    .step-item {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center;
+      gap: var(--space-1-5);
+      padding: var(--space-3) var(--space-2);
+      border-radius: var(--radius-xl);
+      text-align: center;
+      opacity: 0.45;
+      cursor: default;
+    }
+    .step-num {
+      display: flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: var(--radius-full);
+      font-size: var(--text-sm); font-weight: var(--font-extrabold);
+      background: var(--color-neutral-200); color: var(--color-neutral-500); flex-shrink: 0;
+    }
+    .step-label {
+      font-size: var(--text-xs); font-weight: var(--font-bold);
+      color: var(--color-text-tertiary); line-height: 1.2;
+    }
+
+    /* Active state (for after selection) */
+    .step-item.active {
+      opacity: 1;
+      background: var(--color-primary-100);
+      border-radius: var(--radius-xl);
+      cursor: pointer;
+    }
+    .step-item.active .step-num { background: var(--color-primary-500); color: white; }
+    .step-item.active .step-label { color: var(--color-primary-700); }
+
+    /* Selected card state */
+    .stmt-card.selected {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-xl);
+    }
+    .stmt-card.dimmed {
+      opacity: 0.4;
+      transform: scale(0.97);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BAR ═══════════ -->
+  <header class="top-bar">
+    <div class="top-bar-left">
+      <img src="../Logoer og professoren/FagPrat - logo.png" alt="FagPrat" class="top-bar-logo">
+      <div class="top-bar-divider"></div>
+      <span class="top-bar-title">Newtons lover</span>
+    </div>
+    <button class="btn-end-activity">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      Avslutt aktiviteten
+    </button>
+  </header>
+
+  <!-- ═══════════ MAIN CONTENT ═══════════ -->
+  <div class="main-content">
+
+    <!-- Professor – large, left -->
+    <div class="professor-side">
+      <img src="../Logoer og professoren/Professoren.png" alt="Professoren" class="professor-img">
+      <span class="professor-label">Velg en påstand</span>
+    </div>
+
+    <!-- Statement cards – 2-2-1 grid -->
+    <div class="statements-grid">
+      <div class="stmt-card yellow">
+        Det fins ingen regel for hvor stort eller lite et økosystem kan være. Et økosystem kan være en liten vanndam eller en stor skog.
+      </div>
+      <div class="stmt-card blue" onclick="selectStatement(this)">
+        Dyr er avhengige av planter for å overleve, mens planter er ikke avhengige av dyr for overleve.
+      </div>
+      <div class="stmt-card orange">
+        De fleste økosystemer, som for eksempel skogen, jungelen og ørkenen, er avhengig av tilgang på vann og sollys.
+      </div>
+      <div class="stmt-card purple">
+        Økologi handler om samspillet mellom ulike arter i et avgrenset område kalt et økosystem.
+      </div>
+      <div class="stmt-card red">
+        Alle dyr og planter, både store og små, er like viktige i et økosystem.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════ BOTTOM NAV (inactive) ═══════════ -->
+  <nav class="bottom-nav">
+    <div class="step-nav">
+      <div class="step-item">
+        <span class="step-num">1</span>
+        <span class="step-label">Første stemmerunde</span>
+      </div>
+      <div class="step-item">
+        <span class="step-num">2</span>
+        <span class="step-label">Diskusjon</span>
+      </div>
+      <div class="step-item">
+        <span class="step-num">3</span>
+        <span class="step-label">Andre stemmerunde</span>
+      </div>
+      <div class="step-item">
+        <span class="step-num">4</span>
+        <span class="step-label">Vise fasit</span>
+      </div>
+      <div class="step-item">
+        <span class="step-num">5</span>
+        <span class="step-label">Professorens forklaring</span>
+      </div>
+      <div class="step-item">
+        <span class="step-num">6</span>
+        <span class="step-label">Egenvurdering</span>
+      </div>
+    </div>
+  </nav>
+
+  <script src="fagprat-data.js"></script>
+  <script>
+    const COLORS = ['yellow', 'blue', 'orange', 'purple', 'red'];
+
+    function selectStatement(card) {
+      const index = parseInt(card.dataset.index, 10);
+      if (!isNaN(index)) {
+        localStorage.setItem('fagprat-current-statement', index);
+      }
+
+      // Dim all other cards, highlight selected
+      document.querySelectorAll('.stmt-card').forEach(c => {
+        if (c === card) {
+          c.classList.add('selected');
+        } else {
+          c.classList.add('dimmed');
+        }
+      });
+
+      // Navigate to steg1 after a short delay
+      setTimeout(() => {
+        window.location.href = 'fagprat-steg1.html';
+      }, 600);
+    }
+
+    (function init() {
+      // Wire up "Avslutt aktiviteten" button
+      const btnEnd = document.querySelector('.btn-end-activity');
+      if (btnEnd) {
+        btnEnd.addEventListener('click', () => {
+          window.location.href = 'min-samling.html';
+        });
+      }
+
+      // Try to load current FagPrat from localStorage
+      const fagprat = (typeof getCurrentFagPrat === 'function') ? getCurrentFagPrat() : null;
+      if (!fagprat) {
+        // No data found – make existing hardcoded cards clickable
+        var hardcodedCards = document.querySelectorAll('.stmt-card');
+        var hGrid = document.querySelector('.statements-grid');
+        if (hardcodedCards.length % 2 === 1) hGrid.classList.add('count-odd');
+        if (hardcodedCards.length <= 4) hGrid.classList.add('count-small');
+        hardcodedCards.forEach((card, i) => {
+          card.dataset.index = i;
+          card.addEventListener('click', () => selectStatement(card));
+        });
+        return;
+      }
+
+      // Update title in top bar
+      const titleEl = document.querySelector('.top-bar-title');
+      if (titleEl && fagprat.title) {
+        titleEl.textContent = fagprat.title;
+      }
+
+      // Build dynamic cards
+      const statements = fagprat.statements || [];
+      if (!statements.length) {
+        document.querySelectorAll('.stmt-card').forEach((card, i) => {
+          card.dataset.index = i;
+          card.addEventListener('click', () => selectStatement(card));
+        });
+        return;
+      }
+
+      const grid = document.querySelector('.statements-grid');
+      grid.innerHTML = '';
+
+      // Add layout classes based on count
+      if (statements.length % 2 === 1) grid.classList.add('count-odd');
+      if (statements.length <= 4) grid.classList.add('count-small');
+
+      statements.forEach((stmt, i) => {
+        const color = (stmt.color && COLORS.includes(stmt.color))
+          ? stmt.color
+          : COLORS[i % COLORS.length];
+
+        const card = document.createElement('div');
+        card.className = 'stmt-card ' + color;
+        card.dataset.index = i;
+        card.textContent = stmt.text || stmt;
+        card.addEventListener('click', () => selectStatement(card));
+
+        grid.appendChild(card);
+      });
+    })();
+  </script>
+
+</body>
+</html>

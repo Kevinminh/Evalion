@@ -1,0 +1,218 @@
+/* ============================================
+   EVALION – Forslag 12
+   Design Tokens / CSS Variables
+   Basert på Forslag 1 (Blooket Leken)
+   med justeringer fra andre forslag
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* ── Color Palette ── */
+
+  /* Primary (Lilla) */
+  --color-primary-50:  #F3EEFF;
+  --color-primary-100: #E0D4FF;
+  --color-primary-200: #C2A9FF;
+  --color-primary-300: #A37EFF;
+  --color-primary-400: #8554F6;
+  --color-primary-500: #6C3FC5;
+  --color-primary-600: #5A2FA8;
+  --color-primary-700: #48208B;
+  --color-primary-800: #36126E;
+  --color-primary-900: #240851;
+
+  /* Secondary (Turkis) */
+  --color-secondary-50:  #E6FAF8;
+  --color-secondary-100: #B3F0EB;
+  --color-secondary-200: #80E6DD;
+  --color-secondary-300: #4DDCD0;
+  --color-secondary-400: #2BBCB3;
+  --color-secondary-500: #1FA89F;
+  --color-secondary-600: #178E86;
+  --color-secondary-700: #10746D;
+  --color-secondary-800: #0A5A54;
+  --color-secondary-900: #05403B;
+
+  /* Accent (Rosa/Oransje) */
+  --color-accent-50:  #FFF0F3;
+  --color-accent-100: #FFD6DF;
+  --color-accent-200: #FFB3C5;
+  --color-accent-300: #FF8FAB;
+  --color-accent-400: #FF6B8A;
+  --color-accent-500: #E84E6E;
+  --color-accent-600: #C43555;
+  --color-accent-700: #A0203E;
+  --color-accent-800: #7D0E29;
+  --color-accent-900: #590016;
+
+  /* Semantic: FagPrat stemmer */
+  --color-sant:        #4CAF50;
+  --color-sant-bg:     #E8F5E9;
+  --color-sant-hover:  #43A047;
+  --color-delvis:      #FF9800;
+  --color-delvis-bg:   #FFF3E0;
+  --color-delvis-hover:#FB8C00;
+  --color-usant:       #EF5350;
+  --color-usant-bg:    #FFEBEE;
+  --color-usant-hover: #E53935;
+
+  /* Semantic: Status */
+  --color-success:     #4CAF50;
+  --color-warning:     #FFB74D;
+  --color-error:       #EF5350;
+  --color-info:        #42A5F5;
+
+  /* Neutrals */
+  --color-neutral-0:   #FFFFFF;
+  --color-neutral-50:  #FAFAFA;
+  --color-neutral-100: #F5F5F5;
+  --color-neutral-200: #EEEEEE;
+  --color-neutral-300: #E0E0E0;
+  --color-neutral-400: #BDBDBD;
+  --color-neutral-500: #9E9E9E;
+  --color-neutral-600: #757575;
+  --color-neutral-700: #616161;
+  --color-neutral-800: #424242;
+  --color-neutral-900: #212121;
+
+  /* Background */
+  --color-bg-primary:   #FFF8F2;
+  --color-bg-secondary: #FFFFFF;
+  --color-bg-tertiary:  #F5F0FF;
+  --color-bg-sidebar:   #FFFFFF;
+
+  /* Text */
+  --color-text-primary:   #212121;
+  --color-text-secondary: #616161;
+  --color-text-tertiary:  #9E9E9E;
+  --color-text-muted:     #BDBDBD;
+  --color-text-inverse:   #FFFFFF;
+
+  /* ── Typography ── */
+  --font-family-heading: 'Nunito', sans-serif;
+  --font-family-body:    'Nunito', sans-serif;
+  --font-family-mono:    'JetBrains Mono', monospace;
+
+  /* Font sizes */
+  --text-xs:   0.75rem;    /* 12px */
+  --text-sm:   0.875rem;   /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-lg:   1.125rem;   /* 18px */
+  --text-xl:   1.25rem;    /* 20px */
+  --text-2xl:  1.5rem;     /* 24px */
+  --text-3xl:  1.875rem;   /* 30px */
+  --text-4xl:  2.25rem;    /* 36px */
+  --text-5xl:  3rem;       /* 48px */
+  --text-6xl:  3.75rem;    /* 60px */
+
+  /* Font weights */
+  --font-regular:    400;
+  --font-medium:     500;
+  --font-semibold:   600;
+  --font-bold:       700;
+  --font-extrabold:  800;
+
+  /* Line heights */
+  --leading-tight:   1.2;
+  --leading-snug:    1.375;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.625;
+
+  /* ── Spacing (4px grid) ── */
+  --space-0:   0;
+  --space-px:  1px;
+  --space-0-5: 0.125rem;  /* 2px */
+  --space-1:   0.25rem;   /* 4px */
+  --space-1-5: 0.375rem;  /* 6px */
+  --space-2:   0.5rem;    /* 8px */
+  --space-2-5: 0.625rem;  /* 10px */
+  --space-3:   0.75rem;   /* 12px */
+  --space-3-5: 0.875rem;  /* 14px */
+  --space-4:   1rem;      /* 16px */
+  --space-5:   1.25rem;   /* 20px */
+  --space-6:   1.5rem;    /* 24px */
+  --space-8:   2rem;      /* 32px */
+  --space-10:  2.5rem;    /* 40px */
+  --space-12:  3rem;      /* 48px */
+  --space-16:  4rem;      /* 64px */
+  --space-20:  5rem;      /* 80px */
+  --space-24:  6rem;      /* 96px */
+
+  /* ── Border Radius ── */
+  --radius-sm:   0.375rem;  /* 6px */
+  --radius-md:   0.5rem;    /* 8px */
+  --radius-lg:   0.75rem;   /* 12px */
+  --radius-xl:   1rem;      /* 16px */
+  --radius-2xl:  1.5rem;    /* 24px */
+  --radius-3xl:  2rem;      /* 32px */
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-xs:    0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md:    0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg:    0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04);
+  --shadow-xl:    0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+  --shadow-3d:    0 3px 0 rgba(0, 0, 0, 0.12);
+  --shadow-3d-sm: 0 2px 0 rgba(0, 0, 0, 0.12);
+  --shadow-3d-lg: 0 5px 0 rgba(0, 0, 0, 0.12);
+  --shadow-glow-primary:   0 0 20px rgba(108, 63, 197, 0.25);
+  --shadow-glow-secondary: 0 0 20px rgba(43, 188, 179, 0.25);
+  --shadow-glow-accent:    0 0 20px rgba(255, 107, 138, 0.25);
+
+  /* ── Transitions ── */
+  --transition-fast:   150ms ease;
+  --transition-base:   200ms ease;
+  --transition-slow:   300ms ease;
+  --transition-spring: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-sidebar: 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  /* ── Z-index ── */
+  --z-base:      0;
+  --z-dropdown:  10;
+  --z-sticky:    20;
+  --z-sidebar:   25;
+  --z-overlay:   30;
+  --z-modal:     40;
+  --z-toast:     50;
+
+  /* ── Container widths ── */
+  --container-sm:  640px;
+  --container-md:  768px;
+  --container-lg:  1024px;
+  --container-xl:  1280px;
+  --container-2xl: 1440px;
+
+  /* ── Sidebar ── */
+  --sidebar-collapsed: 72px;
+  --sidebar-expanded:  220px;
+}
+
+/* ── Dark Mode ── */
+[data-theme="dark"] {
+  --color-bg-primary:   #1A1128;
+  --color-bg-secondary: #241835;
+  --color-bg-tertiary:  #2E2042;
+  --color-bg-sidebar:   #1A1128;
+
+  --color-text-primary:   #F8F5FC;
+  --color-text-secondary: #C4B8D8;
+  --color-text-tertiary:  #7A6899;
+
+  --color-neutral-0:   #1A1128;
+  --color-neutral-50:  #241835;
+  --color-neutral-100: #2E2042;
+  --color-neutral-200: #3D2D56;
+  --color-neutral-300: #4D3A6B;
+  --color-neutral-400: #7A6899;
+  --color-neutral-500: #A898BE;
+  --color-neutral-600: #C4B8D8;
+  --color-neutral-700: #DDD4EC;
+  --color-neutral-800: #EDE8F5;
+  --color-neutral-900: #F8F5FC;
+
+  --color-primary-500: #A37EFF;
+  --color-secondary-400: #4DDCD0;
+  --color-accent-400: #FF8FAB;
+}

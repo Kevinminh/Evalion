@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Start liveøkt | Evalion</title>
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="components.css">
+  <style>
+    /* ══════════════════════════════════════════
+       TOP NAV BAR (replaces sidebar)
+       ══════════════════════════════════════════ */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: var(--color-neutral-0);
+      border-bottom: 1.5px solid var(--color-neutral-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-8);
+      z-index: 100;
+    }
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+    .top-bar-logo {
+      height: 48px;
+      object-fit: contain;
+    }
+    .top-bar-divider {
+      width: 1.5px;
+      height: 28px;
+      background: var(--color-neutral-200);
+    }
+    .top-bar-title {
+      font-size: var(--text-lg);
+      font-weight: var(--font-bold);
+      color: var(--color-text-primary);
+    }
+    .btn-avbryt {
+      padding: var(--space-3) var(--space-6);
+      font-size: var(--text-sm);
+      font-weight: var(--font-bold);
+      border-radius: var(--radius-xl);
+      background: var(--color-neutral-0);
+      color: var(--color-text-secondary);
+      border: 2px solid var(--color-neutral-300);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-family: var(--font-family-body);
+    }
+    .btn-avbryt:hover {
+      border-color: var(--color-neutral-400);
+      color: var(--color-text-primary);
+    }
+
+    /* ══════════════════════════════════════════
+       PAGE CONTENT (no sidebar offset)
+       ══════════════════════════════════════════ */
+    .page-content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: calc(80px + var(--space-8)) var(--space-10) var(--space-10);
+    }
+
+    /* ── Page header ── */
+    .setup-header {
+      margin-bottom: var(--space-8);
+    }
+    .setup-header h1 {
+      font-size: var(--text-3xl);
+      font-weight: var(--font-extrabold);
+      color: var(--color-text-primary);
+    }
+
+    /* ── Two-column layout ── */
+    .setup-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: var(--space-8);
+      align-items: start;
+    }
+
+    /* ── Option cards ── */
+    .option-card {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-2xl);
+      border: 2px solid var(--color-neutral-200);
+      background: var(--color-neutral-0);
+      transition: all var(--transition-fast);
+      margin-bottom: var(--space-2);
+      position: relative;
+      border-left: 4px solid var(--color-neutral-200);
+    }
+    .option-card.active {
+      border-color: var(--color-primary-200);
+      border-left-color: var(--color-primary-500);
+      background: var(--color-primary-50);
+    }
+    .option-icon {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-neutral-50);
+      border-radius: var(--radius-lg);
+      color: var(--color-text-tertiary);
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+    .option-card.active .option-icon {
+      background: var(--color-primary-100);
+      color: var(--color-primary-500);
+    }
+    .option-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .option-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      margin-bottom: 0;
+    }
+    .option-title {
+      font-size: var(--text-base);
+      font-weight: var(--font-bold);
+      color: var(--color-text-primary);
+    }
+    .option-desc {
+      font-size: var(--text-xs);
+      color: var(--color-text-tertiary);
+      line-height: 1.4;
+    }
+
+    /* ── Expandable content ── */
+    .option-expand {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, margin-top 0.3s ease, opacity 0.3s ease;
+      opacity: 0;
+      margin-top: 0;
+    }
+    .option-expand.open {
+      max-height: 200px;
+      opacity: 1;
+      margin-top: var(--space-2);
+    }
+
+    /* ── Group stepper ── */
+    .group-stepper {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .group-stepper-label {
+      font-size: var(--text-sm);
+      font-weight: var(--font-semibold);
+      color: var(--color-text-secondary);
+    }
+    .stepper-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      border: 2px solid var(--color-primary-200);
+      background: var(--color-neutral-0);
+      color: var(--color-primary-500);
+      font-size: var(--text-xl);
+      font-weight: var(--font-bold);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+      font-family: var(--font-family-body);
+      line-height: 1;
+    }
+    .stepper-btn:hover {
+      background: var(--color-primary-100);
+      border-color: var(--color-primary-400);
+    }
+    .stepper-btn:active {
+      transform: scale(0.95);
+    }
+    .stepper-value {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-extrabold);
+      color: var(--color-primary-500);
+      min-width: 36px;
+      text-align: center;
+    }
+
+    /* ── Transcription notice ── */
+    .warning-box {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-2);
+      padding: var(--space-2-5) var(--space-3);
+      border-radius: var(--radius-lg);
+      background: var(--color-neutral-50);
+      font-size: var(--text-xs);
+      color: var(--color-text-tertiary);
+      line-height: 1.5;
+    }
+    .warning-box-icon {
+      font-size: 13px;
+      flex-shrink: 0;
+      line-height: 1.5;
+    }
+
+    /* ── Toggle switch ── */
+    .toggle {
+      position: relative;
+      width: 48px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: var(--color-neutral-300);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      transition: transform var(--transition-fast);
+    }
+    .toggle input:checked + .toggle-track {
+      background: var(--color-primary-500);
+    }
+    .toggle input:checked + .toggle-track::after {
+      transform: translateX(20px);
+    }
+
+    /* ── Right column: Panel ── */
+    .summary-panel {
+      position: sticky;
+      top: calc(80px + var(--space-6));
+      padding: var(--space-6);
+      border-radius: var(--radius-2xl);
+      border: 2px solid var(--color-neutral-200);
+      background: var(--color-neutral-0);
+    }
+
+    /* ── QR section ── */
+    .qr-section {
+      text-align: center;
+    }
+    .qr-label {
+      font-size: var(--text-xs);
+      font-weight: var(--font-bold);
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-3);
+    }
+    .qr-placeholder {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto var(--space-3);
+      border-radius: var(--radius-xl);
+      border: 3px dashed var(--color-primary-200);
+      background: var(--color-primary-50);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qr-placeholder svg {
+      width: 100px;
+      height: 100px;
+      color: var(--color-primary-300);
+    }
+    .qr-desc {
+      font-size: var(--text-xs);
+      color: var(--color-text-tertiary);
+      line-height: 1.5;
+    }
+
+    /* ── CTA button ── */
+    .btn-neste {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      width: 100%;
+      padding: var(--space-4) var(--space-6);
+      margin-top: var(--space-6);
+      font-size: var(--text-base);
+      font-weight: var(--font-bold);
+      border-radius: var(--radius-xl);
+      background: var(--color-secondary-400);
+      color: white;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 3px 0 var(--color-secondary-700);
+      transition: all var(--transition-fast);
+      font-family: var(--font-family-body);
+    }
+    .btn-neste:hover {
+      background: var(--color-secondary-300);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 0 var(--color-secondary-700);
+    }
+    .btn-neste:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 var(--color-secondary-700);
+    }
+    .btn-neste svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ══════════════════════════════════════════
+       MODAL
+       ══════════════════════════════════════════ */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open {
+      display: flex;
+    }
+    .modal-box {
+      background: var(--color-neutral-0);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-lg);
+      padding: var(--space-8);
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      animation: modalIn 0.2s ease;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-icon {
+      font-size: 48px;
+      margin-bottom: var(--space-4);
+      line-height: 1;
+    }
+    .modal-title {
+      font-size: var(--text-xl);
+      font-weight: var(--font-extrabold);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-2);
+    }
+    .modal-desc {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin-bottom: var(--space-6);
+    }
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .modal-btn-primary {
+      padding: var(--space-3) var(--space-6);
+      font-size: var(--text-sm);
+      font-weight: var(--font-bold);
+      border-radius: var(--radius-xl);
+      background: var(--color-usant);
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-family: var(--font-family-body);
+      box-shadow: 0 3px 0 #B71C1C;
+    }
+    .modal-btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 0 #B71C1C;
+    }
+    .modal-btn-primary:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #B71C1C;
+    }
+    .modal-btn-secondary {
+      padding: var(--space-3) var(--space-6);
+      font-size: var(--text-sm);
+      font-weight: var(--font-bold);
+      border-radius: var(--radius-xl);
+      background: var(--color-neutral-0);
+      color: var(--color-text-secondary);
+      border: 2px solid var(--color-neutral-300);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-family: var(--font-family-body);
+    }
+    .modal-btn-secondary:hover {
+      border-color: var(--color-neutral-400);
+      color: var(--color-text-primary);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .setup-grid {
+        grid-template-columns: 1fr;
+      }
+      .summary-panel {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP NAV BAR ═══════════ -->
+  <header class="top-bar">
+    <div class="top-bar-left">
+      <img class="top-bar-logo" src="../Logoer og professoren/FagPrat - logo.png" alt="FagPrat">
+      <div class="top-bar-divider"></div>
+      <span class="top-bar-title">Newtons lover</span>
+    </div>
+    <button class="btn-avbryt" onclick="openModal()">Avbryt</button>
+  </header>
+
+  <!-- ═══════════ MAIN CONTENT ═══════════ -->
+  <main class="page-content">
+
+    <!-- Header -->
+    <div class="setup-header">
+      <h1>Oppsett for liveøkt</h1>
+    </div>
+
+    <!-- Two-column grid -->
+    <div class="setup-grid">
+
+      <!-- Left column: Option cards -->
+      <div class="setup-options">
+
+        <!-- Card 1: Grupper -->
+        <div class="option-card" id="card-groups">
+          <div class="option-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div class="option-body">
+            <div class="option-top">
+              <div>
+                <div class="option-title">Grupper</div>
+                <div class="option-desc">Del elevene inn i tilfeldige grupper. Du kan endre gruppene mellom hver påstand.</div>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" onchange="toggleCard('groups', this.checked)">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            <div class="option-expand" id="expand-groups">
+              <div class="group-stepper">
+                <span class="group-stepper-label">Antall grupper:</span>
+                <button class="stepper-btn" onclick="changeGroupSize(-1)">−</button>
+                <span class="stepper-value" id="group-size">4</span>
+                <button class="stepper-btn" onclick="changeGroupSize(1)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Transkripsjon -->
+        <div class="option-card" id="card-transcription">
+          <div class="option-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div>
+          <div class="option-body">
+            <div class="option-top">
+              <div>
+                <div class="option-title">Transkribering</div>
+                <div class="option-desc">Fang opp samtalene elevene har seg i mellom når de diskuterer påstandene i grupper eller læringspar.</div>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" onchange="toggleCard('transcription', this.checked)">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            <div class="option-expand" id="expand-transcription">
+              <div class="warning-box">
+                <span class="warning-box-icon">⚠️</span>
+                <span>Krever at elevene godkjenner mikrofontilgang. Transkripsjon lagres ikke etter økten.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Egenvurdering -->
+        <div class="option-card" id="card-selfeval">
+          <div class="option-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14l2 2 4-4"/></svg></div>
+          <div class="option-body">
+            <div class="option-top">
+              <div>
+                <div class="option-title">Egenvurdering og refleksjon</div>
+                <div class="option-desc">Elevene vurderer sin egen forståelse og reflekterer over hva de har lært etter at økten er avsluttet.</div>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" onchange="toggleCard('selfeval', this.checked)">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right column: Panel -->
+      <div class="summary-panel">
+
+        <!-- QR Code section -->
+        <div class="qr-section">
+          <div class="qr-label">Lærer-analytics</div>
+          <div class="qr-placeholder">
+            <svg viewBox="0 0 100 100" fill="none">
+              <rect x="5" y="5" width="25" height="25" rx="3" fill="currentColor" opacity="0.7"/>
+              <rect x="70" y="5" width="25" height="25" rx="3" fill="currentColor" opacity="0.7"/>
+              <rect x="5" y="70" width="25" height="25" rx="3" fill="currentColor" opacity="0.7"/>
+              <rect x="10" y="10" width="15" height="15" rx="2" fill="white"/>
+              <rect x="75" y="10" width="15" height="15" rx="2" fill="white"/>
+              <rect x="10" y="75" width="15" height="15" rx="2" fill="white"/>
+              <rect x="14" y="14" width="7" height="7" rx="1" fill="currentColor" opacity="0.7"/>
+              <rect x="79" y="14" width="7" height="7" rx="1" fill="currentColor" opacity="0.7"/>
+              <rect x="14" y="79" width="7" height="7" rx="1" fill="currentColor" opacity="0.7"/>
+              <rect x="35" y="5" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="48" y="5" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="35" y="18" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="5" y="35" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="18" y="35" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="35" y="35" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+              <rect x="48" y="35" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="65" y="35" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="82" y="35" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="35" y="48" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="5" y="55" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="48" y="48" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="65" y="55" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="82" y="55" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="48" y="65" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="65" y="70" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="82" y="70" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="48" y="82" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="65" y="85" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+              <rect x="82" y="82" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+            </svg>
+          </div>
+          <p class="qr-desc">Skann for sanntidsinnsikt i gruppeaktivitet og elevsvar underveis i økten.</p>
+        </div>
+
+        <!-- CTA -->
+        <button class="btn-neste">
+          Neste — opprett lobby
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 4l5 5-5 5"/>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ═══════════ AVBRYT MODAL ═══════════ -->
+  <div class="modal-overlay" id="modal-avbryt">
+    <div class="modal-box">
+      <h2 class="modal-title">Er du sikker på at du vil avbryte?</h2>
+      <p class="modal-desc">Hvis du avbryter nå, vil innstillingene du har gjort ikke bli lagret. Du kan starte et nytt oppsett når som helst.</p>
+      <div class="modal-actions">
+        <button class="modal-btn-primary" onclick="confirmCancel()">Ja, avbryt</button>
+        <button class="modal-btn-secondary" onclick="closeModal()">Nei, fortsett oppsettet</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="fagprat-data.js"></script>
+  <script>
+    // ── Dynamic title ──
+    (function() {
+      var fp = getCurrentFagPrat();
+      if (fp) {
+        var titleEl = document.querySelector('.top-bar-title');
+        if (titleEl) titleEl.textContent = fp.title;
+      }
+    })();
+
+    let groupSize = 4;
+
+    function toggleCard(key, on) {
+      const card = document.getElementById('card-' + key);
+      const expand = document.getElementById('expand-' + key);
+
+      if (on) {
+        card.classList.add('active');
+        if (expand) expand.classList.add('open');
+      } else {
+        card.classList.remove('active');
+        if (expand) expand.classList.remove('open');
+      }
+    }
+
+    function changeGroupSize(delta) {
+      groupSize = Math.max(2, Math.min(8, groupSize + delta));
+      document.getElementById('group-size').textContent = groupSize;
+    }
+
+    // Modal
+    function openModal() {
+      document.getElementById('modal-avbryt').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-avbryt').classList.remove('open');
+    }
+
+    function confirmCancel() {
+      window.location.href = 'preview-fagprat.html';
+    }
+
+    // Close modal on overlay click
+    document.getElementById('modal-avbryt').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    document.querySelector('.btn-neste').addEventListener('click', function() {
+      // Save group settings for lobby
+      var groupsOn = document.getElementById('card-groups').classList.contains('active');
+      localStorage.setItem('fagprat-groups-enabled', groupsOn ? '1' : '0');
+      localStorage.setItem('fagprat-group-count', groupSize);
+      window.location.href = 'fagprat-lobby.html';
+    });
+  </script>
+
+</body>
+</html>

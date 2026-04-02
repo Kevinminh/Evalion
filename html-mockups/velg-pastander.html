@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Velg påstander | Evalion</title>
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="sidebar.css">
+  <style>
+    .page-content {
+      max-width: calc(1100px + var(--sidebar-expanded));
+      padding-bottom: var(--space-24);
+    }
+
+    /* ── Tilbake-lenke ── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-sm);
+      font-weight: var(--font-semibold);
+      color: var(--color-text-tertiary);
+      text-decoration: none;
+      margin-bottom: var(--space-2);
+      transition: color var(--transition-fast);
+    }
+    .back-link:hover { color: var(--color-text-primary); }
+    .back-link svg { width: 16px; height: 16px; }
+
+    /* ── Page header ── */
+    .page-title {
+      font-size: var(--text-3xl);
+      font-weight: var(--font-extrabold);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-1);
+    }
+    .page-subtitle {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-8);
+    }
+
+    /* ══════════════════════════════════════════
+       3-COLUMN LAYOUT
+       ══════════════════════════════════════════ */
+    .category-sections {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--space-5);
+      align-items: start;
+    }
+
+    .category-strip {
+      background: var(--color-neutral-0);
+      border-radius: var(--radius-2xl);
+      border: 1.5px solid var(--color-neutral-200);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    /* ── Colored strip headers ── */
+    .strip-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4) var(--space-6);
+      font-size: var(--text-base);
+      font-weight: var(--font-extrabold);
+      letter-spacing: 0.01em;
+    }
+    .strip-sant .strip-header {
+      background: var(--color-sant-bg);
+      color: var(--color-sant);
+      border-bottom: 3px solid #81C784;
+    }
+    .strip-usant .strip-header {
+      background: var(--color-usant-bg);
+      color: var(--color-usant);
+      border-bottom: 3px solid #EF9A9A;
+    }
+    .strip-delvis .strip-header {
+      background: var(--color-delvis-bg);
+      color: #E65100;
+      border-bottom: 3px solid #FFCC80;
+    }
+
+    /* Strip body */
+    .strip-body {
+      padding: var(--space-4) var(--space-4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    /* ── Påstand card ── */
+    .pastand-card {
+      padding: var(--space-3-5) var(--space-4);
+      background: var(--color-neutral-50);
+      border: 1.5px solid var(--color-neutral-200);
+      border-radius: var(--radius-xl);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      user-select: none;
+      font-size: var(--text-sm);
+      line-height: var(--leading-normal);
+      color: var(--color-text-primary);
+    }
+    .pastand-card:hover {
+      border-color: var(--color-neutral-300);
+      background: var(--color-neutral-100);
+    }
+
+    /* ── Selected states per category — colored border only ── */
+    .strip-sant .pastand-card.selected {
+      border-color: var(--color-sant);
+      background: var(--color-neutral-0);
+      box-shadow: 0 0 0 2px #C8E6C9;
+    }
+    .strip-usant .pastand-card.selected {
+      border-color: var(--color-usant);
+      background: var(--color-neutral-0);
+      box-shadow: 0 0 0 2px #FFCDD2;
+    }
+    .strip-delvis .pastand-card.selected {
+      border-color: #FB8C00;
+      background: var(--color-neutral-0);
+      box-shadow: 0 0 0 2px #FFE0B2;
+    }
+
+    /* ══════════════════════════════════════════
+       BOTTOM BAR
+       ══════════════════════════════════════════ */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: var(--sidebar-expanded);
+      right: 0;
+      background: var(--color-neutral-0);
+      border-top: 1.5px solid var(--color-neutral-200);
+      box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+      padding: var(--space-4) var(--space-8);
+      z-index: var(--z-sticky);
+    }
+    .bottom-bar-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .reddi-attribution {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .reddi-attribution img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
+    .reddi-attribution-text {
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
+      font-weight: var(--font-bold);
+    }
+
+    .btn-legg-til {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-6);
+      font-family: var(--font-family-body);
+      font-size: var(--text-sm);
+      font-weight: var(--font-bold);
+      border-radius: var(--radius-xl);
+      background: var(--color-neutral-300);
+      color: white;
+      border: none;
+      cursor: not-allowed;
+      transition: all var(--transition-fast);
+    }
+    .btn-legg-til.active {
+      background: var(--color-primary-500);
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--color-primary-700);
+    }
+    .btn-legg-til.active:hover {
+      background: var(--color-primary-400);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 var(--color-primary-700), var(--shadow-glow-primary);
+    }
+    .btn-legg-til.active:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 var(--color-primary-700);
+    }
+    .btn-legg-til svg {
+      width: 16px;
+      height: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <img class="logo-mini" src="../Logoer og professoren/E-minilogo.jpg" alt="E">
+      <img class="logo-full" src="../Logoer og professoren/Evalion (gjennomsiktig).png" alt="Evalion">
+    </div>
+    <div class="sidebar-cta">
+      <button class="sidebar-cta-btn" onclick="window.location.href='lag-pastand.html'">
+        <span class="sidebar-cta-icon">+</span>
+        <span class="sidebar-cta-label">Lag en FagPrat</span>
+      </button>
+    </div>
+    <div class="sidebar-nav">
+      <a class="sidebar-item" href="utforsk.html">
+        <span class="sidebar-item-icon">🔍</span>
+        <span class="sidebar-item-label">Utforsk</span>
+      </a>
+      <a class="sidebar-item" href="min-samling.html">
+        <span class="sidebar-item-icon">📁</span>
+        <span class="sidebar-item-label">Min samling</span>
+      </a>
+      <a class="sidebar-item" href="#">
+        <span class="sidebar-item-icon">🕐</span>
+        <span class="sidebar-item-label">Historikk</span>
+      </a>
+    </div>
+    <div class="sidebar-spacer"></div>
+    <a class="sidebar-user" href="#">
+      <div class="sidebar-user-avatar">MF</div>
+      <div class="sidebar-user-info">
+        <span class="sidebar-user-name">Markus Furseth</span>
+        <span class="sidebar-user-email">markus@evalion.no</span>
+      </div>
+    </a>
+  </nav>
+
+  <!-- ═══════════ MAIN CONTENT ═══════════ -->
+  <main class="page-content">
+
+    <a class="back-link" href="lag-pastand.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 19 5 12 12 5"/>
+      </svg>
+      Tilbake
+    </a>
+
+    <h1 class="page-title">Velg påstander</h1>
+    <p class="page-subtitle">Velg påstandene du vil ha med — REDDI lager forklaringene automatisk.</p>
+
+    <div class="category-sections">
+
+      <!-- SANT -->
+      <div class="category-strip strip-sant">
+        <div class="strip-header">Sant</div>
+        <div class="strip-body">
+          <div class="pastand-card" data-type="sant">Et legeme i ro forblir i ro hvis ingen kraft virker på det.</div>
+          <div class="pastand-card" data-type="sant">Kraft måles i newton (N).</div>
+          <div class="pastand-card" data-type="sant">Aksjon og reaksjon er like store, men motsatt rettet.</div>
+          <div class="pastand-card" data-type="sant">Akselerasjon øker når kraften øker, gitt samme masse.</div>
+          <div class="pastand-card" data-type="sant">Et objekt i bevegelse fortsetter i bevegelse med samme hastighet og retning med mindre en kraft virker på det.</div>
+        </div>
+      </div>
+
+      <!-- USANT -->
+      <div class="category-strip strip-usant">
+        <div class="strip-header">Usant</div>
+        <div class="strip-body">
+          <div class="pastand-card" data-type="usant">Kraft er lik masse delt på akselerasjon.</div>
+          <div class="pastand-card" data-type="usant">Tunge objekter faller alltid raskere enn lette objekter.</div>
+          <div class="pastand-card" data-type="usant">En gjenstand trenger en konstant kraft for å holde seg i bevegelse.</div>
+          <div class="pastand-card" data-type="usant">Newtons lover gjelder bare for store objekter, ikke for små partikler.</div>
+          <div class="pastand-card" data-type="usant">Friksjon er en kraft som alltid øker farten til et objekt.</div>
+        </div>
+      </div>
+
+      <!-- DELVIS SANT -->
+      <div class="category-strip strip-delvis">
+        <div class="strip-header">Delvis sant</div>
+        <div class="strip-body">
+          <div class="pastand-card" data-type="delvis">Tyngre gjenstander er vanskeligere å flytte.</div>
+          <div class="pastand-card" data-type="delvis">I verdensrommet er det ingen tyngdekraft.</div>
+          <div class="pastand-card" data-type="delvis">Hvis du dytter en vegg, dytter veggen like hardt tilbake.</div>
+          <div class="pastand-card" data-type="delvis">Et objekt som faller øker alltid i fart.</div>
+          <div class="pastand-card" data-type="delvis">Raketter fungerer fordi de dytter mot luften bak seg.</div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ══════════ BOTTOM BAR ══════════ -->
+  <div class="bottom-bar">
+    <div class="bottom-bar-inner">
+      <div class="reddi-attribution">
+        <img src="../Logoer og professoren/Reddi.png" alt="Reddi">
+        <span class="reddi-attribution-text">Foreslått av REDDI</span>
+      </div>
+      <button class="btn-legg-til" id="btn-legg-til">
+        <span id="btn-label">Legg til påstander</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const cards = document.querySelectorAll('.pastand-card');
+    const btnLeggTil = document.getElementById('btn-legg-til');
+    const btnLabel = document.getElementById('btn-label');
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        card.classList.toggle('selected');
+        updateUI();
+      });
+    });
+
+    function updateUI() {
+      const total = document.querySelectorAll('.pastand-card.selected').length;
+      if (total > 0) {
+        btnLeggTil.classList.add('active');
+        btnLabel.textContent = `Legg til ${total} påstand${total === 1 ? '' : 'er'}`;
+      } else {
+        btnLeggTil.classList.remove('active');
+        btnLabel.textContent = 'Legg til påstander';
+      }
+    }
+
+    btnLeggTil.addEventListener('click', () => {
+      if (document.querySelectorAll('.pastand-card.selected').length > 0) {
+        window.location.href = 'lag-pastand.html';
+      }
+    });
+  </script>
+</body>
+</html>

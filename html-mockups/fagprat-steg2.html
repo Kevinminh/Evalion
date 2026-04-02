@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diskusjon – FagPrat</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: var(--font-family-body);
+      background: var(--color-bg-primary);
+      color: var(--color-text-primary);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ══════════════════════════════════════
+       TOP BAR
+       ══════════════════════════════════════ */
+    .top-bar {
+      position: relative;
+      height: 80px; min-height: 80px;
+      background: var(--color-neutral-0);
+      border-bottom: 1.5px solid var(--color-neutral-200);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 var(--space-8);
+      z-index: var(--z-sticky);
+    }
+    .top-bar-left { display: flex; align-items: center; gap: var(--space-4); }
+    .top-bar-logo { height: 48px; object-fit: contain; }
+    .top-bar-divider { width: 1.5px; height: 32px; background: var(--color-neutral-300); }
+    .top-bar-title { font-size: var(--text-lg); font-weight: var(--font-bold); color: var(--color-text-primary); }
+    .btn-back {
+      display: flex; align-items: center; gap: var(--space-1-5);
+      align-self: flex-start;
+      padding: var(--space-2) var(--space-4);
+      background: none; border: 1.5px solid var(--color-neutral-300);
+      border-radius: var(--radius-full);
+      font-family: var(--font-family-body); font-size: var(--text-sm); font-weight: var(--font-semibold);
+      color: var(--color-text-secondary); cursor: pointer;
+      transition: all var(--transition-fast);
+      flex-shrink: 0;
+    }
+    .btn-back:hover {
+      border-color: var(--color-neutral-400);
+      color: var(--color-text-primary);
+      background: rgba(255,255,255,0.6);
+    }
+    .btn-back svg { width: 16px; height: 16px; }
+
+    .top-bar-right { display: flex; align-items: center; gap: var(--space-4); }
+
+    .btn-end-activity {
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-2-5) var(--space-5);
+      background: var(--color-error); color: var(--color-text-inverse);
+      border: none; border-radius: var(--radius-full);
+      font-family: var(--font-family-body); font-size: var(--text-sm); font-weight: var(--font-bold);
+      cursor: pointer; transition: background var(--transition-fast);
+    }
+    .btn-end-activity:hover { background: #D32F2F; }
+    .btn-end-activity svg { width: 18px; height: 18px; }
+
+    /* ── Top-bar recording button ── */
+    .btn-record-topbar {
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: var(--color-primary-50);
+      border: 1.5px solid var(--color-primary-200);
+      border-radius: var(--radius-full);
+      font-family: var(--font-family-body);
+      font-size: var(--text-sm); font-weight: var(--font-bold);
+      color: var(--color-primary-600);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .btn-record-topbar:hover:not(.disabled) {
+      background: var(--color-primary-100);
+      border-color: var(--color-primary-300);
+    }
+    .btn-record-topbar svg { width: 18px; height: 18px; }
+    .btn-record-topbar.recording {
+      background: var(--color-neutral-800);
+      border-color: var(--color-neutral-800);
+      color: white;
+    }
+    .btn-record-topbar.recording:hover { background: var(--color-neutral-700); }
+    .btn-record-topbar .record-dot {
+      width: 8px; height: 8px; border-radius: var(--radius-full);
+      background: var(--color-error);
+      animation: blink 1s ease-in-out infinite;
+      display: none;
+    }
+    .btn-record-topbar.recording .record-dot { display: block; }
+    .btn-record-topbar .record-time {
+      font-family: var(--font-family-mono); display: none;
+    }
+    .btn-record-topbar.recording .record-time { display: inline; }
+    .btn-record-topbar.recording .record-icon { display: none; }
+    .btn-record-topbar.recording .record-label { display: none; }
+    .btn-record-topbar .record-stop-icon { display: none; }
+    .btn-record-topbar.recording .record-stop-icon { display: block; }
+    .btn-record-topbar.disabled {
+      opacity: 0.35; cursor: default; pointer-events: none;
+    }
+
+    /* ══════════════════════════════════════
+       MAIN LAYOUT
+       ══════════════════════════════════════ */
+    .main-layout {
+      flex: 1; display: flex; min-height: 0; overflow: hidden;
+    }
+
+    /* ── Student-facing area (left) ── */
+    .student-area {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center;
+      padding: var(--space-5) var(--space-8);
+      min-height: 0;
+    }
+
+    .student-area-top {
+      display: flex; justify-content: space-between; align-items: center; width: 100%;
+    }
+
+    /* Push statement up, professor down */
+    .statement-spacer { flex: 1; }
+    .professor-spacer { flex: 2; }
+    .bottom-spacer { flex: 1.5; }
+
+    /* Statement Card */
+    .statement-card {
+      width: 100%; max-width: 760px;
+      background: linear-gradient(135deg, #E3F1FC, #D6ECFA);
+      border-radius: var(--radius-2xl);
+      border: 2px solid #B8DAF0;
+      padding: var(--space-8) var(--space-10);
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+    }
+    .statement-text {
+      font-size: var(--text-2xl); font-weight: var(--font-bold);
+      line-height: var(--leading-relaxed); color: #2C5F8A;
+    }
+
+    /* Professor row */
+    .professor-row {
+      width: 100%; max-width: 640px;
+      display: flex; align-items: center; gap: var(--space-4);
+    }
+    .professor-img {
+      width: 96px; height: 96px; border-radius: var(--radius-full);
+      object-fit: cover; flex-shrink: 0;
+      border: 3px solid var(--color-primary-200); background: var(--color-bg-tertiary);
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .professor-bubble {
+      flex: 1;
+      background: var(--color-neutral-0); border-radius: var(--radius-2xl);
+      animation: fadeInUp 0.5s ease 0.2s both;
+      box-shadow: var(--shadow-md); border: 1.5px solid var(--color-neutral-200);
+      padding: var(--space-5) var(--space-6); position: relative;
+      font-size: var(--text-xl); font-weight: var(--font-medium);
+      line-height: var(--leading-relaxed); color: var(--color-text-primary);
+      text-align: center;
+    }
+    .professor-bubble::before {
+      content: ''; position: absolute; left: -10px; top: 50%; transform: translateY(-50%);
+      width: 0; height: 0;
+      border-top: 10px solid transparent; border-bottom: 10px solid transparent;
+      border-right: 10px solid var(--color-neutral-0);
+      filter: drop-shadow(-2px 0 1px rgba(0,0,0,0.04));
+    }
+
+    /* ══════════════════════════════════════
+       TEACHER PANEL
+       ══════════════════════════════════════ */
+    .teacher-panel-wrap {
+      position: relative;
+      display: flex;
+      flex-shrink: 0;
+    }
+
+    /* Toggle button – outside panel */
+    .panel-toggle {
+      position: absolute;
+      top: 50%; left: 0; transform: translate(-100%, -50%);
+      width: 28px; height: 64px;
+      background: var(--color-neutral-50);
+      border: 1.5px solid var(--color-neutral-200);
+      border-right: none;
+      border-radius: 14px 0 0 14px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 20;
+      transition: all 0.2s ease;
+      color: var(--color-primary-500);
+    }
+    .panel-toggle:hover {
+      background: var(--color-neutral-200);
+      color: var(--color-text-primary);
+    }
+    .panel-toggle svg {
+      width: 16px; height: 16px; flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
+    .panel-toggle.flipped svg {
+      transform: rotate(180deg);
+    }
+    .teacher-panel {
+      width: 340px;
+      background: var(--color-neutral-50);
+      border-left: 1.5px solid var(--color-neutral-200);
+      display: flex; flex-direction: column;
+      transition: width 0.35s ease, opacity 0.25s ease;
+      overflow: hidden;
+    }
+    .teacher-panel.collapsed {
+      width: 0;
+      opacity: 0; pointer-events: none;
+    }
+
+    /* Panel section labels */
+    .panel-section-label {
+      font-size: var(--text-xs); font-weight: var(--font-bold);
+      color: var(--color-text-secondary); text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0 var(--space-1);
+      margin-bottom: var(--space-1);
+      white-space: nowrap;
+    }
+
+    /* Panel body */
+    .panel-body {
+      flex: 1; display: flex; flex-direction: column;
+      padding: var(--space-4) var(--space-4);
+      gap: var(--space-3);
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    /* ── Elevsvar group ── */
+    .elevsvar-group {
+      display: flex; flex-direction: column; gap: var(--space-3);
+      flex: 1;
+      overflow: visible;
+    }
+
+    /* ── Section Toggle Tabs ── */
+    .section-tabs {
+      display: flex;
+      background: var(--color-neutral-200);
+      border-radius: var(--radius-lg);
+      padding: 3px;
+      gap: 3px;
+    }
+    .section-tab {
+      flex: 1;
+      padding: var(--space-2) var(--space-2);
+      border: none; background: none;
+      border-radius: var(--radius-md);
+      font-family: var(--font-family-body);
+      font-size: var(--text-xs); font-weight: var(--font-bold);
+      color: var(--color-text-tertiary);
+      cursor: pointer; transition: all var(--transition-fast);
+      text-align: center;
+    }
+    .section-tab:hover { color: var(--color-text-secondary); }
+    .section-tab.active {
+      background: var(--color-neutral-0);
+      color: var(--color-text-primary);
+      box-shadow: var(--shadow-sm);
+    }
+    .tab-content { display: none; flex: 1; min-height: 0; }
+    .tab-content.active { display: flex; flex-direction: column; gap: var(--space-2-5); flex: 1; }
+
+    /* ── Elevsvar card wrapper (fixed size for both tabs) ── */
+    .elevsvar-card-wrap {
+      background: var(--color-neutral-0);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-md);
+      padding: var(--space-3);
+      display: flex; flex-direction: column;
+      gap: var(--space-2);
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    /* ── Stats from Runde 1 ── */
+    .stats-card {
+      display: flex; flex-direction: column;
+      gap: var(--space-2);
+      flex: 1;
+    }
+    .distribution-rows {
+      flex: 1;
+      display: flex; flex-direction: row;
+      gap: var(--space-4);
+      justify-content: center;
+      align-items: stretch;
+      padding: var(--space-2) 0;
+      min-height: 0;
+    }
+    .avg-confidence {
+      display: flex; align-items: center; gap: var(--space-2);
+      position: relative;
+    }
+    .avg-left {
+      display: flex; align-items: center; gap: var(--space-2); flex: 1;
+    }
+    .avg-number {
+      font-family: var(--font-family-mono);
+      font-size: var(--text-xl); font-weight: var(--font-bold);
+      color: var(--color-secondary-500); line-height: 1;
+    }
+    .avg-label {
+      font-size: var(--text-sm); font-weight: var(--font-semibold);
+      color: var(--color-text-secondary); line-height: var(--leading-normal);
+    }
+    .btn-expand-avg {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--color-neutral-100); border: 1.5px solid var(--color-neutral-200);
+      border-radius: var(--radius-lg); cursor: pointer;
+      color: var(--color-text-tertiary); flex-shrink: 0;
+      transition: all var(--transition-fast);
+    }
+    .btn-expand-avg:hover {
+      background: var(--color-neutral-200); border-color: var(--color-neutral-300);
+      color: var(--color-text-secondary);
+    }
+    .btn-expand-avg svg { width: 14px; height: 14px; }
+    .btn-expand-avg.active {
+      background: var(--color-neutral-200); border-color: var(--color-neutral-300);
+      color: var(--color-text-secondary);
+    }
+
+    /* Floating avg breakdown popover */
+    .avg-breakdown {
+      display: none;
+      flex-direction: column;
+      gap: var(--space-1-5);
+      position: absolute;
+      top: 100%; right: 0;
+      margin-top: var(--space-2);
+      background: var(--color-neutral-0);
+      border: 1.5px solid var(--color-neutral-200);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      padding: var(--space-3) var(--space-4);
+      z-index: 10;
+      min-width: 160px;
+    }
+    .avg-breakdown.visible { display: flex; }
+    .avg-breakdown-row {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: var(--text-sm); font-weight: var(--font-semibold);
+      gap: var(--space-4);
+    }
+    .avg-breakdown-label { color: var(--color-text-secondary); }
+    .avg-breakdown-value {
+      font-family: var(--font-family-mono);
+      font-weight: var(--font-bold); color: var(--color-text-primary);
+    }
+
+    .stats-divider {
+      height: 1px; background: var(--color-neutral-200);
+    }
+
+    /* Vertical bar chart */
+    .dist-row {
+      display: flex; flex-direction: column; align-items: center; gap: var(--space-1-5);
+      flex: 1; min-height: 0;
+    }
+    .dist-count {
+      font-size: var(--text-xs); font-weight: var(--font-bold);
+      color: var(--color-text-primary); line-height: 1;
+    }
+    .dist-bar-wrap {
+      width: 100%; flex: 1; background: var(--color-neutral-100);
+      border-radius: var(--radius-lg);
+      position: relative;
+      display: flex; flex-direction: column;
+      justify-content: flex-end; align-items: center;
+    }
+    .dist-pct {
+      font-size: 11px; font-weight: var(--font-bold);
+      color: var(--color-text-secondary); line-height: 1;
+      position: absolute; width: 100%; text-align: center;
+      z-index: 2;
+    }
+    .dist-bar {
+      width: 100%; border-radius: var(--radius-lg);
+      transition: height 0.6s ease;
+    }
+    .dist-bar.sant { background: var(--color-sant); }
+    .dist-bar.delvis { background: var(--color-delvis); }
+    .dist-bar.usant { background: var(--color-error); }
+    .dist-label {
+      font-size: var(--text-xs); font-weight: var(--font-bold);
+      color: var(--color-text-secondary);
+    }
+
+    /* ── Begrunnelser ── */
+    .begrunnelser-card {
+      display: flex; flex-direction: column;
+      gap: var(--space-3);
+      flex: 1;
+    }
+    .begrunnelse-empty {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: var(--space-3);
+      padding: var(--space-6) var(--space-4);
+      text-align: center;
+    }
+    .begrunnelse-empty-icon {
+      color: var(--color-neutral-300);
+    }
+    .begrunnelse-empty-text {
+      font-size: var(--text-sm);
+      color: var(--color-text-tertiary);
+      line-height: var(--leading-relaxed);
+      max-width: 240px;
+    }
+    .begrunnelse-item {
+      padding: var(--space-4) var(--space-5);
+      border-left: 3px solid var(--color-primary-300);
+      background: var(--color-primary-50);
+      border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+      font-size: var(--text-base); font-weight: var(--font-medium);
+      color: var(--color-text-primary);
+      line-height: var(--leading-relaxed);
+      font-style: italic;
+    }
+    .begrunnelse-nav {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .begrunnelse-nav-right {
+      display: flex; align-items: center; gap: var(--space-2);
+      margin-left: auto;
+    }
+    .begrunnelse-counter {
+      font-size: var(--text-xs); font-weight: var(--font-semibold);
+      color: var(--color-text-tertiary);
+    }
+    .btn-back-highlighted {
+      display: none;
+      align-items: center; gap: var(--space-1);
+      padding: var(--space-1) var(--space-2);
+      background: var(--color-primary-50);
+      border: 1.5px solid var(--color-primary-200);
+      border-radius: var(--radius-lg);
+      font-family: var(--font-family-body);
+      font-size: var(--text-xs); font-weight: var(--font-bold);
+      color: var(--color-primary-500);
+      cursor: pointer; transition: all var(--transition-fast);
+    }
+    .btn-back-highlighted:hover {
+      background: var(--color-primary-100);
+      border-color: var(--color-primary-300);
+    }
+    .btn-back-highlighted svg { width: 12px; height: 12px; }
+    .btn-back-highlighted.visible { display: flex; }
+    .begrunnelse-btns {
+      display: flex; gap: var(--space-2);
+    }
+    .btn-begrunnelse {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--color-neutral-100); border: 1.5px solid var(--color-neutral-200);
+      border-radius: var(--radius-lg);
+      cursor: pointer; transition: all var(--transition-fast);
+      color: var(--color-text-secondary);
+    }
+    .btn-begrunnelse:hover {
+      background: var(--color-primary-50); border-color: var(--color-primary-300);
+      color: var(--color-primary-500);
+    }
+    .btn-begrunnelse svg { width: 16px; height: 16px; }
+
+
+    /* ══════════════════════════════════════
+       BOTTOM NAV
+       ══════════════════════════════════════ */
+    .bottom-nav {
+      height: 100px; min-height: 100px;
+      background: var(--color-neutral-0);
+      border-top: 1.5px solid var(--color-neutral-200);
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 var(--space-6);
+    }
+    .step-nav {
+      display: flex; align-items: stretch;
+      width: 100%;
+      gap: var(--space-2);
+    }
+    .step-item {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center;
+      gap: var(--space-1-5);
+      padding: var(--space-3) var(--space-2);
+      border-radius: var(--radius-xl);
+      cursor: pointer; transition: all 0.2s ease;
+      text-align: center;
+    }
+    .step-item:hover:not(.active):not(.completed) { background: var(--color-neutral-100); }
+    .step-num {
+      display: flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: var(--radius-full);
+      font-size: var(--text-sm); font-weight: var(--font-extrabold);
+      background: var(--color-neutral-200); color: var(--color-neutral-500); flex-shrink: 0;
+    }
+    .step-label {
+      font-size: var(--text-xs); font-weight: var(--font-bold);
+      color: var(--color-text-tertiary); line-height: 1.2;
+    }
+
+    .step-item.completed .step-num { background: var(--color-sant); color: white; }
+    .step-item.completed .step-label { color: var(--color-text-secondary); }
+    .step-item.active {
+      background: var(--color-primary-100);
+      border-radius: var(--radius-xl);
+    }
+    .step-item.active .step-num { background: var(--color-primary-500); color: white; }
+    .step-item.active .step-label { color: var(--color-primary-700); }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════ TOP BAR ═══════════ -->
+  <header class="top-bar">
+    <div class="top-bar-left">
+      <img src="../Logoer og professoren/FagPrat - logo.png" alt="FagPrat" class="top-bar-logo">
+      <div class="top-bar-divider"></div>
+      <span class="top-bar-title">Newtons lover</span>
+    </div>
+    <div class="top-bar-right">
+      <button class="btn-record-topbar" id="btn-record-topbar" title="Ta opp diskusjonen">
+        <svg class="record-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        <svg class="record-stop-icon" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+        <span class="record-dot"></span>
+        <span class="record-time" id="record-time">00:00</span>
+        <span class="record-label">Opptak</span>
+      </button>
+      <button class="btn-end-activity">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Avslutt aktiviteten
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══════════ MAIN LAYOUT ═══════════ -->
+  <div class="main-layout">
+
+    <!-- Student-facing area -->
+    <div class="student-area">
+      <div class="student-area-top">
+        <button class="btn-back" onclick="window.location.href='fagprat-steg0.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Alle påstander
+        </button>
+      </div>
+      <div class="statement-spacer"></div>
+
+      <!-- Statement – colored, no label -->
+      <div class="statement-card">
+        <div class="statement-text">Dyr er avhengige av planter for å overleve, mens planter er ikke avhengige av dyr for å overleve.</div>
+      </div>
+
+      <div class="professor-spacer"></div>
+
+      <!-- Professor -->
+      <div class="professor-row">
+        <img src="../Logoer og professoren/Professoren.png" alt="Professoren" class="professor-img">
+        <div class="professor-bubble">
+          Diskuter med læringspartneren din. Forklar hva du tenker og lytt til hva den andre mener.
+        </div>
+      </div>
+
+      <div class="bottom-spacer"></div>
+    </div>
+
+    <!-- Teacher Panel -->
+    <div class="teacher-panel-wrap">
+      <button class="panel-toggle flipped" id="panel-toggle" title="Skjul/vis lærerpanel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <aside class="teacher-panel collapsed" id="teacher-panel">
+
+        <div class="panel-body">
+
+          <div class="panel-section-label">Elevsvar – Første stemmerunde</div>
+
+          <div class="elevsvar-group">
+            <div class="section-tabs">
+              <button class="section-tab active" data-tab="begrunnelser">Begrunnelser</button>
+              <button class="section-tab" data-tab="statistikk">Stemmefordeling</button>
+            </div>
+
+            <div class="elevsvar-card-wrap">
+              <!-- Tab: Statistikk -->
+              <div class="tab-content" id="tab-statistikk">
+                <div class="stats-card">
+                  <div class="avg-confidence">
+                    <div class="avg-left">
+                      <span class="avg-label">Gjennomsnittlig sikkerhet:</span>
+                      <span class="avg-number">2.8</span>
+                    </div>
+                    <button class="btn-expand-avg" id="btn-expand-avg" title="Vis fordelt på kategori">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    </button>
+                    <div class="avg-breakdown" id="avg-breakdown">
+                      <div class="avg-breakdown-row">
+                        <span class="avg-breakdown-label">Sant:</span>
+                        <span class="avg-breakdown-value">3,4</span>
+                      </div>
+                      <div class="avg-breakdown-row">
+                        <span class="avg-breakdown-label">Delvis sant:</span>
+                        <span class="avg-breakdown-value">2,6</span>
+                      </div>
+                      <div class="avg-breakdown-row">
+                        <span class="avg-breakdown-label">Usant:</span>
+                        <span class="avg-breakdown-value">3,2</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="stats-divider"></div>
+                  <div class="distribution-rows">
+                    <div class="dist-row">
+                      <span class="dist-count">10 stk</span>
+                      <div class="dist-bar-wrap">
+                        <span class="dist-pct" data-pct="42">42%</span>
+                        <div class="dist-bar sant" data-pct="42"></div>
+                      </div>
+                      <span class="dist-label">Sant</span>
+                    </div>
+                    <div class="dist-row">
+                      <span class="dist-count">8 stk</span>
+                      <div class="dist-bar-wrap">
+                        <span class="dist-pct" data-pct="33">33%</span>
+                        <div class="dist-bar delvis" data-pct="33"></div>
+                      </div>
+                      <span class="dist-label">Delvis sant</span>
+                    </div>
+                    <div class="dist-row">
+                      <span class="dist-count">6 stk</span>
+                      <div class="dist-bar-wrap">
+                        <span class="dist-pct" data-pct="25">25%</span>
+                        <div class="dist-bar usant" data-pct="25"></div>
+                      </div>
+                      <span class="dist-label">Usant</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab: Begrunnelser -->
+              <div class="tab-content active" id="tab-begrunnelser">
+                <div class="begrunnelser-card">
+                  <div class="begrunnelse-nav">
+                    <button class="btn-back-highlighted" id="btn-back-highlighted" title="Tilbake til fremhevet">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                      Fremhevet
+                    </button>
+                    <div class="begrunnelse-nav-right">
+                      <span class="begrunnelse-counter" id="begrunnelse-counter">1 av 3</span>
+                      <div class="begrunnelse-btns">
+                        <button class="btn-begrunnelse" id="btn-prev-begrunnelse">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                        </button>
+                        <button class="btn-begrunnelse" id="btn-next-begrunnelse">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="begrunnelse-empty" id="begrunnelse-empty">
+                    <div class="begrunnelse-empty-icon">
+                      <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                    </div>
+                    <div class="begrunnelse-empty-text">Velg en begrunnelse fra live-oversikten på din enhet for å vise den her.</div>
+                  </div>
+                  <div class="begrunnelse-item" id="begrunnelse-text" style="display:none;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+      </aside>
+    </div>
+
+  </div>
+
+  <!-- ═══════════ BOTTOM NAV ═══════════ -->
+  <nav class="bottom-nav">
+    <div class="step-nav">
+      <div class="step-item completed" onclick="window.location.href='fagprat-steg1.html'">
+        <span class="step-num">1</span>
+        <span class="step-label">Første stemmerunde</span>
+      </div>
+      <div class="step-item active" onclick="window.location.href='fagprat-steg2.html'">
+        <span class="step-num">2</span>
+        <span class="step-label">Diskusjon</span>
+      </div>
+      <div class="step-item" onclick="window.location.href='fagprat-steg3.html'">
+        <span class="step-num">3</span>
+        <span class="step-label">Andre stemmerunde</span>
+      </div>
+      <div class="step-item" onclick="window.location.href='fagprat-steg4.html'">
+        <span class="step-num">4</span>
+        <span class="step-label">Vise fasit</span>
+      </div>
+      <div class="step-item" onclick="window.location.href='fagprat-steg5.html'">
+        <span class="step-num">5</span>
+        <span class="step-label">Professorens forklaring</span>
+      </div>
+      <div class="step-item" onclick="window.location.href='fagprat-steg6.html'">
+        <span class="step-num">6</span>
+        <span class="step-label">Egenvurdering</span>
+      </div>
+    </div>
+  </nav>
+
+  <script src="fagprat-data.js"></script>
+  <script>
+    // ── Dynamic data loading ──
+    (function() {
+      var fp = getCurrentFagPrat();
+      var stmt = getCurrentStatement();
+      if (fp) {
+        var titleEl = document.querySelector('.top-bar-title');
+        if (titleEl) titleEl.textContent = fp.title;
+      }
+      if (stmt) {
+        var stmtText = document.querySelector('.statement-text');
+        if (stmtText) stmtText.textContent = stmt.text;
+      }
+    })();
+
+    // ── End activity ──
+    document.querySelector('.btn-end-activity').addEventListener('click', function() {
+      window.location.href = 'min-samling.html';
+    });
+
+    // ── Set vertical bar heights + position pct labels ──
+    function positionPctLabels() {
+      document.querySelectorAll('.dist-bar-wrap').forEach(wrap => {
+        const bar = wrap.querySelector('.dist-bar');
+        const pct = wrap.querySelector('.dist-pct');
+        if (!bar || !pct) return;
+        const val = parseInt(bar.dataset.pct);
+        bar.style.height = val + '%';
+        // Position pct just above the colored bar, inside the grey area
+        if (val >= 85) {
+          // Inside the colored bar (near the top)
+          pct.style.bottom = (val - 5) + '%';
+          pct.style.color = 'white';
+        } else {
+          // Just above the colored bar
+          pct.style.bottom = (val + 2) + '%';
+          pct.style.color = 'var(--color-text-secondary)';
+        }
+      });
+    }
+    positionPctLabels();
+
+    // ── Avg breakdown toggle ──
+    const btnExpandAvg = document.getElementById('btn-expand-avg');
+    const avgBreakdown = document.getElementById('avg-breakdown');
+    btnExpandAvg.addEventListener('click', () => {
+      avgBreakdown.classList.toggle('visible');
+      btnExpandAvg.classList.toggle('active');
+    });
+
+    // ── Section tabs ──
+    document.querySelectorAll('.section-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // ── Panel toggle ──
+    const panel = document.getElementById('teacher-panel');
+    const toggleBtn = document.getElementById('panel-toggle');
+
+    toggleBtn.addEventListener('click', () => {
+      panel.classList.toggle('collapsed');
+      toggleBtn.classList.toggle('flipped');
+      localStorage.setItem('fagprat-panel-collapsed', panel.classList.contains('collapsed') ? '1' : '0');
+      if (!panel.classList.contains('collapsed')) {
+        document.querySelector('.panel-body').style.opacity = '';
+        setTimeout(positionPctLabels, 50);
+      }
+    });
+
+    // Steg 2: Panel should always START CLOSED (set in HTML, just update localStorage)
+    localStorage.setItem('fagprat-panel-collapsed', '1');
+
+    // Position chart labels on load
+    setTimeout(positionPctLabels, 100);
+
+    // ── Recording (top bar) ──
+    const btnRecordTopbar = document.getElementById('btn-record-topbar');
+    const recordTime = document.getElementById('record-time');
+    let isRecording = false;
+    let recordInterval = null;
+    let recordSeconds = 0;
+
+    function startRecording() {
+      isRecording = true;
+      recordSeconds = 0;
+      btnRecordTopbar.classList.add('recording');
+      recordInterval = setInterval(() => {
+        recordSeconds++;
+        const m = Math.floor(recordSeconds / 60);
+        const s = recordSeconds % 60;
+        recordTime.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+      }, 1000);
+    }
+
+    function stopRecording() {
+      isRecording = false;
+      clearInterval(recordInterval);
+      btnRecordTopbar.classList.remove('recording');
+    }
+
+    btnRecordTopbar.addEventListener('click', () => {
+      if (!isRecording) startRecording(); else stopRecording();
+    });
+
+    // ── Begrunnelser navigation ──
+    const begrunnelser = [
+      '«Planter er de eneste som har klorofyll»',
+      '«Alger kan også drive fotosyntese»',
+      '«Bare grønne deler av planten gjør det»'
+    ];
+    let currentBegrunnelse = -1;
+    let highlightedBegrunnelse = 0; // the one teacher highlighted from mobile
+    const begrunnelseText = document.getElementById('begrunnelse-text');
+    const begrunnelseCounter = document.getElementById('begrunnelse-counter');
+    const begrunnelseEmpty = document.getElementById('begrunnelse-empty');
+    const btnBackHighlighted = document.getElementById('btn-back-highlighted');
+
+    function showBegrunnelse() {
+      begrunnelseEmpty.style.display = 'none';
+      begrunnelseText.style.display = '';
+      begrunnelseText.textContent = begrunnelser[currentBegrunnelse];
+      begrunnelseCounter.textContent = (currentBegrunnelse + 1) + ' av ' + begrunnelser.length;
+      // Show back button if browsing away from highlighted
+      if (currentBegrunnelse !== highlightedBegrunnelse) {
+        btnBackHighlighted.classList.add('visible');
+      } else {
+        btnBackHighlighted.classList.remove('visible');
+      }
+    }
+
+    btnBackHighlighted.addEventListener('click', () => {
+      currentBegrunnelse = highlightedBegrunnelse;
+      showBegrunnelse();
+    });
+
+    document.getElementById('btn-prev-begrunnelse').addEventListener('click', () => {
+      if (currentBegrunnelse <= 0) currentBegrunnelse = begrunnelser.length - 1;
+      else currentBegrunnelse--;
+      showBegrunnelse();
+    });
+    document.getElementById('btn-next-begrunnelse').addEventListener('click', () => {
+      currentBegrunnelse = (currentBegrunnelse + 1) % begrunnelser.length;
+      showBegrunnelse();
+    });
+
+  </script>
+
+</body>
+</html>
