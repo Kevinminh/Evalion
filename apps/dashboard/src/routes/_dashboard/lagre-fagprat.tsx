@@ -6,6 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { ConceptTags } from "@/components/concept-tags";
+import { NotFoundState } from "@/components/not-found-state";
 import { VisibilityToggle } from "@/components/visibility-toggle";
 import { api } from "@/lib/convex";
 import { parseDraftJson } from "@/lib/draft-utils";
@@ -46,18 +47,13 @@ function LagreFagPratPage() {
       navigate({ to: "/fagprat/$id", params: { id } });
     } catch {
       toast.error("Kunne ikke lagre FagPraten. Prøv igjen.");
+    } finally {
       setSaving(false);
     }
   };
 
   if (!draft) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-muted-foreground">
-          Ingen FagPrat-data funnet. Gå tilbake og lag en FagPrat først.
-        </p>
-      </div>
-    );
+    return <NotFoundState message="Ingen FagPrat-data funnet. Gå tilbake og lag en FagPrat først." />;
   }
 
   return (

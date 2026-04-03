@@ -1,6 +1,24 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+export const statementValidator = v.object({
+  text: v.string(),
+  fasit: v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis")),
+  explanation: v.string(),
+  color: v.optional(
+    v.union(
+      v.literal("yellow"),
+      v.literal("blue"),
+      v.literal("orange"),
+      v.literal("purple"),
+      v.literal("red"),
+    ),
+  ),
+  begrunnelse: v.optional(v.string()),
+  image: v.optional(v.id("_storage")),
+  explanationImage: v.optional(v.id("_storage")),
+});
+
 export default defineSchema({
   fagprats: defineTable({
     title: v.string(),
@@ -8,25 +26,7 @@ export default defineSchema({
     level: v.string(),
     type: v.union(v.literal("intro"), v.literal("oppsummering")),
     concepts: v.array(v.string()),
-    statements: v.array(
-      v.object({
-        text: v.string(),
-        fasit: v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis")),
-        explanation: v.string(),
-        color: v.optional(
-          v.union(
-            v.literal("yellow"),
-            v.literal("blue"),
-            v.literal("orange"),
-            v.literal("purple"),
-            v.literal("red"),
-          ),
-        ),
-        begrunnelse: v.optional(v.string()),
-        image: v.optional(v.id("_storage")),
-        explanationImage: v.optional(v.id("_storage")),
-      }),
-    ),
+    statements: v.array(statementValidator),
     visibility: v.union(v.literal("public"), v.literal("private")),
     usageCount: v.number(),
     authorId: v.string(),

@@ -1,11 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Search, ChevronDown } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 
+import { ErrorState } from "@/components/error-state";
 import { FagPratCard } from "@/components/fagprat-card";
 import { FagPratCardSkeleton } from "@workspace/ui/components/skeletons/fagprat-card-skeleton";
+import { CARD_GRID_CLASS, SKELETON_COUNT } from "@/lib/constants";
 import { fagpratQueries } from "@/lib/convex";
+import { useClickOutside } from "@/lib/use-click-outside";
 
 export const Route = createFileRoute("/_dashboard/min-samling")({
   component: MinSamlingPage,
@@ -17,16 +20,7 @@ function MinSamlingPage() {
   const [sortOpen, setSortOpen] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!sortOpen) return;
-    function handleClick(e: MouseEvent) {
-      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
-        setSortOpen(false);
-      }
-    }
-    document.addEventListener("click", handleClick);
-    return () => document.removeEventListener("click", handleClick);
-  }, [sortOpen]);
+  useClickOutside(sortRef, () => setSortOpen(false), sortOpen);
 
   const { data: allFagPrats, isPending, isError } = useQuery(fagpratQueries.listByAuthor());
 
@@ -117,16 +111,12 @@ function MinSamlingPage() {
       </div>
 
       {/* Error state */}
-      {isError && (
-        <p className="py-12 text-center text-destructive">
-          Noe gikk galt. Prøv å laste siden på nytt.
-        </p>
-      )}
+      {isError && <ErrorState className="py-12 text-center" />}
 
       {/* Loading state */}
       {isPending && (
-        <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className={CARD_GRID_CLASS}>
+          {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
             <FagPratCardSkeleton key={i} />
           ))}
         </div>
@@ -134,7 +124,7 @@ function MinSamlingPage() {
 
       {/* Flat view */}
       {!isPending && sortBy === "sist-endret" && (
-        <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+        <div className={CARD_GRID_CLASS}>
           {filtered.map((fp) => (
             <FagPratCard key={fp._id} fagprat={fp} variant="collection" />
           ))}
@@ -147,7 +137,7 @@ function MinSamlingPage() {
         Object.entries(grouped).map(([subject, items]) => (
           <div key={subject} className="mb-10">
             <h2 className="mb-6 text-2xl font-extrabold text-foreground">{subject}</h2>
-            <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+            <div className={CARD_GRID_CLASS}>
               {items.map((fp) => (
                 <FagPratCard key={fp._id} fagprat={fp} variant="collection" />
               ))}

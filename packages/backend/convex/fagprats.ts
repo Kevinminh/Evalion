@@ -1,6 +1,8 @@
 import { v } from "convex/values";
 
 import { query, mutation } from "./_generated/server";
+import { requireAuth } from "./helpers";
+import { statementValidator } from "./schema";
 
 export const list = query({
   args: {},
@@ -33,24 +35,6 @@ export const listByAuthor = query({
   },
 });
 
-const statementValidator = v.object({
-  text: v.string(),
-  fasit: v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis")),
-  explanation: v.string(),
-  color: v.optional(
-    v.union(
-      v.literal("yellow"),
-      v.literal("blue"),
-      v.literal("orange"),
-      v.literal("purple"),
-      v.literal("red"),
-    ),
-  ),
-  begrunnelse: v.optional(v.string()),
-  image: v.optional(v.id("_storage")),
-  explanationImage: v.optional(v.id("_storage")),
-});
-
 export const create = mutation({
   args: {
     title: v.string(),
@@ -62,10 +46,7 @@ export const create = mutation({
     visibility: v.union(v.literal("public"), v.literal("private")),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Not authenticated");
-    }
+    const identity = await requireAuth(ctx);
     return await ctx.db.insert("fagprats", {
       ...args,
       usageCount: 0,
@@ -88,10 +69,7 @@ export const update = mutation({
     visibility: v.optional(v.union(v.literal("public"), v.literal("private"))),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Not authenticated");
-    }
+    const identity = await requireAuth(ctx);
     const existing = await ctx.db.get(args.id);
     if (!existing) {
       throw new Error("FagPrat not found");
@@ -107,10 +85,7 @@ export const update = mutation({
 export const remove = mutation({
   args: { id: v.id("fagprats") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Not authenticated");
-    }
+    const identity = await requireAuth(ctx);
     const existing = await ctx.db.get(args.id);
     if (!existing) {
       throw new Error("FagPrat not found");
@@ -125,10 +100,7 @@ export const remove = mutation({
 export const duplicate = mutation({
   args: { id: v.id("fagprats") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Not authenticated");
-    }
+    const identity = await requireAuth(ctx);
     const existing = await ctx.db.get(args.id);
     if (!existing) {
       throw new Error("FagPrat not found");
@@ -196,10 +168,7 @@ export const search = query({
 export const generateUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Not authenticated");
-    }
+    await requireAuth(ctx);
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -207,10 +176,7 @@ export const generateUploadUrl = mutation({
 export const deleteFile = mutation({
   args: { storageId: v.id("_storage") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Not authenticated");
-    }
+    await requireAuth(ctx);
     await ctx.storage.delete(args.storageId);
   },
 });

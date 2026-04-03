@@ -17,9 +17,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { LiveoktSetupSkeleton } from "@workspace/ui/components/skeletons/liveokt-setup-skeleton";
+import { ErrorState } from "@/components/error-state";
+import { NotFoundState } from "@/components/not-found-state";
 import { OptionCard } from "@/components/live/option-card";
 import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
 import { Stepper } from "@/components/live/stepper";
+import { DEFAULT_GROUP_COUNT, MIN_GROUP_COUNT, MAX_GROUP_COUNT } from "@/lib/constants";
 import { fagpratQueries, api } from "@/lib/convex";
 import type { FagPratId } from "@/lib/types";
 
@@ -34,7 +37,7 @@ function LiveoktSetupPage() {
   const createSession = useMutation(api.liveSessions.create);
 
   const [groupsEnabled, setGroupsEnabled] = useState(true);
-  const [groupCount, setGroupCount] = useState(4);
+  const [groupCount, setGroupCount] = useState(DEFAULT_GROUP_COUNT);
   const [transcriptionEnabled, setTranscriptionEnabled] = useState(false);
   const [selfEvalEnabled, setSelfEvalEnabled] = useState(true);
   const [launching, setLaunching] = useState(false);
@@ -45,19 +48,11 @@ function LiveoktSetupPage() {
   }
 
   if (isError) {
-    return (
-      <div className="flex min-h-svh items-center justify-center">
-        <p className="text-destructive">Noe gikk galt. Prøv å laste siden på nytt.</p>
-      </div>
-    );
+    return <ErrorState className="flex min-h-svh items-center justify-center" />;
   }
 
   if (!fagprat) {
-    return (
-      <div className="flex min-h-svh items-center justify-center">
-        <p className="text-muted-foreground">FagPrat ikke funnet.</p>
-      </div>
-    );
+    return <NotFoundState className="flex min-h-svh items-center justify-center" />;
   }
 
   const handleLaunch = async () => {
@@ -71,6 +66,11 @@ function LiveoktSetupPage() {
         selfEvalEnabled,
       });
       const playUrl = import.meta.env.VITE_PLAY_URL;
+      if (!playUrl) {
+        toast.error("Spillerlenke er ikke konfigurert. Kontakt administrator.");
+        setLaunching(false);
+        return;
+      }
       window.location.href = `${playUrl}/liveokt/${sessionId}`;
     } catch {
       toast.error("Kunne ikke opprette liveøkt. Prøv igjen.");
@@ -98,8 +98,8 @@ function LiveoktSetupPage() {
               <Stepper
                 label="Antall grupper"
                 value={groupCount}
-                min={2}
-                max={8}
+                min={MIN_GROUP_COUNT}
+                max={MAX_GROUP_COUNT}
                 onChange={setGroupCount}
               />
             </OptionCard>

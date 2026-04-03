@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 
 import { query, mutation } from "./_generated/server";
+import { requireAuth } from "./helpers";
 
 function generateJoinCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -39,20 +40,28 @@ export const listByTeacher = query({
 
     const ended = sessions.filter((s) => s.status === "ended");
 
-    return await Promise.all(
-      ended.map(async (session) => {
-        const fagprat = await ctx.db.get(session.fagpratId);
-        const students = await ctx.db
+    // Deduplicate fagprat lookups to avoid redundant queries
+    const uniqueFagpratIds = [...new Set(ended.map((s) => s.fagpratId))];
+    const fagpratEntries = await Promise.all(
+      uniqueFagpratIds.map(async (id) => [id, await ctx.db.get(id)] as const),
+    );
+    const fagpratMap = new Map(fagpratEntries);
+
+    const studentCounts = await Promise.all(
+      ended.map((session) =>
+        ctx.db
           .query("sessionStudents")
           .withIndex("by_session", (q) => q.eq("sessionId", session._id))
-          .collect();
-        return {
-          ...session,
-          fagpratTitle: fagprat?.title ?? "Slettet FagPrat",
-          studentCount: students.length,
-        };
-      }),
+          .collect()
+          .then((students) => students.length),
+      ),
     );
+
+    return ended.map((session, i) => ({
+      ...session,
+      fagpratTitle: fagpratMap.get(session.fagpratId)?.title ?? "Slettet FagPrat",
+      studentCount: studentCounts[i]!,
+    }));
   },
 });
 
@@ -84,9 +93,10 @@ export const create = mutation({
     selfEvalEnabled: v.boolean(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Not authenticated");
+    const identity = await requireAuth(ctx);
+
+    if (args.groupCount < 2 || args.groupCount > 8) {
+      throw new Error("Group count must be between 2 and 8");
     }
 
     // Generate unique join code
@@ -128,10 +138,7 @@ export const updateStep = mutation({
     statementIndex: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Not authenticated");
-    }
+    const identity = await requireAuth(ctx);
     const session = await ctx.db.get(args.id);
     if (!session || session.teacherId !== identity.subject) {
       throw new Error("Not authorized");
@@ -153,10 +160,7 @@ export const updateStep = mutation({
 export const end = mutation({
   args: { id: v.id("liveSessions") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Not authenticated");
-    }
+    const identity = await requireAuth(ctx);
     const session = await ctx.db.get(args.id);
     if (!session || session.teacherId !== identity.subject) {
       throw new Error("Not authorized");
@@ -278,6 +282,12 @@ export const castVote = mutation({
     vote: v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis")),
   },
   handler: async (ctx, args) => {
+    // Verify student belongs to this session
+    const student = await ctx.db.get(args.studentId);
+    if (!student || student.sessionId !== args.sessionId) {
+      throw new Error("Student not found in this session");
+    }
+
     // Prevent duplicate votes for same student/statement/round
     const existing = await ctx.db
       .query("sessionVotes")
@@ -302,10 +312,7 @@ export const castVote = mutation({
 export const startTimer = mutation({
   args: { id: v.id("liveSessions"), duration: v.number() },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Not authenticated");
-    }
+    const identity = await requireAuth(ctx);
     const session = await ctx.db.get(args.id);
     if (!session || session.teacherId !== identity.subject) {
       throw new Error("Not authorized");
@@ -322,10 +329,7 @@ export const startTimer = mutation({
 export const pauseTimer = mutation({
   args: { id: v.id("liveSessions") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Not authenticated");
-    }
+    const identity = await requireAuth(ctx);
     const session = await ctx.db.get(args.id);
     if (!session || session.teacherId !== identity.subject) {
       throw new Error("Not authorized");
@@ -343,10 +347,7 @@ export const pauseTimer = mutation({
 export const stopTimer = mutation({
   args: { id: v.id("liveSessions") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Not authenticated");
-    }
+    const identity = await requireAuth(ctx);
     const session = await ctx.db.get(args.id);
     if (!session || session.teacherId !== identity.subject) {
       throw new Error("Not authorized");
@@ -472,6 +473,12 @@ export const submitBegrunnelse = mutation({
     const trimmed = args.text.trim();
     if (!trimmed) throw new Error("Begrunnelse cannot be empty");
 
+    // Verify student belongs to this session
+    const student = await ctx.db.get(args.studentId);
+    if (!student || student.sessionId !== args.sessionId) {
+      throw new Error("Student not found in this session");
+    }
+
     const existing = await ctx.db
       .query("sessionBegrunnelser")
       .withIndex("by_session_statement", (q) =>
@@ -517,8 +524,7 @@ export const highlightBegrunnelse = mutation({
     highlighted: v.boolean(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
+    await requireAuth(ctx);
 
     const begrunnelse = await ctx.db.get(args.id);
     if (!begrunnelse) throw new Error("Begrunnelse not found");
@@ -554,6 +560,12 @@ export const submitRating = mutation({
   handler: async (ctx, args) => {
     if (args.rating < 1 || args.rating > 5) {
       throw new Error("Rating must be between 1 and 5");
+    }
+
+    // Verify student belongs to this session
+    const student = await ctx.db.get(args.studentId);
+    if (!student || student.sessionId !== args.sessionId) {
+      throw new Error("Student not found in this session");
     }
 
     // Prevent duplicate ratings

@@ -9,6 +9,8 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 import { FagPratDetailSkeleton } from "@workspace/ui/components/skeletons/fagprat-detail-skeleton";
+import { ErrorState } from "@/components/error-state";
+import { NotFoundState } from "@/components/not-found-state";
 import { ConceptTags } from "@/components/concept-tags";
 import { ForkunnskapSelector } from "@/components/forkunnskap-selector";
 import { StatementEditor } from "@/components/statement-editor";
@@ -62,19 +64,11 @@ function EditFagPratPage() {
   }
 
   if (isError) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-destructive">Noe gikk galt. Prøv å laste siden på nytt.</p>
-      </div>
-    );
+    return <ErrorState />;
   }
 
   if (!fagprat) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-muted-foreground">FagPrat ikke funnet.</p>
-      </div>
-    );
+    return <NotFoundState />;
   }
 
   const handleSave = async () => {

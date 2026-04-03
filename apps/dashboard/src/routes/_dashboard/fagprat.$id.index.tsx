@@ -14,6 +14,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { FagPratDetailSkeleton } from "@workspace/ui/components/skeletons/fagprat-detail-skeleton";
+import { ErrorState } from "@/components/error-state";
+import { NotFoundState } from "@/components/not-found-state";
 import { AuthorAvatar } from "@/components/author-avatar";
 import { DeleteFagPratDialog } from "@/components/delete-fagprat-dialog";
 import { StatementTable } from "@/components/statement-table";
@@ -40,19 +42,11 @@ function FagPratPreviewPage() {
   }
 
   if (isError) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-destructive">Noe gikk galt. Prøv å laste siden på nytt.</p>
-      </div>
-    );
+    return <ErrorState />;
   }
 
   if (!fagprat) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-muted-foreground">FagPrat ikke funnet.</p>
-      </div>
-    );
+    return <NotFoundState />;
   }
 
   const isAuthor = session?.user?.id && fagprat.authorId === session.user.id;

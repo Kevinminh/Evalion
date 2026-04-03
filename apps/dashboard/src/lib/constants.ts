@@ -14,3 +14,15 @@ export const LEVEL_OPTIONS = [
   { value: "VG2", label: "VG2" },
   { value: "VG3", label: "VG3" },
 ] as const;
+
+/** Standard 3-column responsive card grid */
+export const CARD_GRID_CLASS =
+  "grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3";
+
+/** Skeleton placeholder count for loading states */
+export const SKELETON_COUNT = 6;
+
+/** Group count bounds for live sessions */
+export const DEFAULT_GROUP_COUNT = 4;
+export const MIN_GROUP_COUNT = 2;
+export const MAX_GROUP_COUNT = 8;

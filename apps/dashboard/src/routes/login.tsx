@@ -27,16 +27,21 @@ function LoginPage() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    const { error: authError } = await authClient.signIn.email({
-      email,
-      password,
-    });
+    try {
+      const { error: authError } = await authClient.signIn.email({
+        email,
+        password,
+      });
 
-    if (authError) {
-      setError(authError.message ?? "Innlogging feilet");
+      if (authError) {
+        setError(authError.message ?? "Innlogging feilet");
+      } else {
+        navigate({ to: "/" });
+      }
+    } catch {
+      setError("Innlogging feilet. Prøv igjen.");
+    } finally {
       setLoading(false);
-    } else {
-      navigate({ to: "/" });
     }
   };
 

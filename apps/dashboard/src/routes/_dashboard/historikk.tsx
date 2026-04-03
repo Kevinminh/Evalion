@@ -3,6 +3,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Users, Calendar } from "lucide-react";
 
 import { SessionCardSkeleton } from "@workspace/ui/components/skeletons/session-card-skeleton";
+import { ErrorState } from "@/components/error-state";
+import { SKELETON_COUNT } from "@/lib/constants";
 import { liveSessionQueries } from "@/lib/convex";
 
 export const Route = createFileRoute("/_dashboard/historikk")({
@@ -29,15 +31,11 @@ function HistorikkPage() {
         <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">Historikk</h1>
       </div>
 
-      {isError && (
-        <p className="py-12 text-center text-destructive">
-          Noe gikk galt. Prøv å laste siden på nytt.
-        </p>
-      )}
+      {isError && <ErrorState className="py-12 text-center" />}
 
       {isPending && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
+          {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
             <SessionCardSkeleton key={i} />
           ))}
         </div>

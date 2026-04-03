@@ -1,12 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { ChevronDown, Search, SlidersHorizontal, Sprout, Target } from "lucide-react";
-import { useState, useRef, useEffect, useId } from "react";
+import { useState, useRef, useId } from "react";
 
+import { ErrorState } from "@/components/error-state";
 import { FagPratCard } from "@/components/fagprat-card";
 import { FagPratCardSkeleton } from "@workspace/ui/components/skeletons/fagprat-card-skeleton";
-import { SUBJECT_OPTIONS, LEVEL_OPTIONS } from "@/lib/constants";
+import { SUBJECT_OPTIONS, LEVEL_OPTIONS, CARD_GRID_CLASS, SKELETON_COUNT } from "@/lib/constants";
 import { fagpratQueries } from "@/lib/convex";
+import { useClickOutside } from "@/lib/use-click-outside";
 
 export const Route = createFileRoute("/_dashboard/")({
   component: UtforskPage,
@@ -31,16 +33,7 @@ function CustomDropdown({
   const listboxId = useId();
   const selected = options.find((o) => o.value === value);
 
-  useEffect(() => {
-    if (!open) return;
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("click", handleClick);
-    return () => document.removeEventListener("click", handleClick);
-  }, [open]);
+  useClickOutside(ref, () => setOpen(false), open);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
@@ -137,15 +130,7 @@ function UtforskPage() {
 
   const filtered = showNone ? [] : (searchResults ?? []);
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
-        setFilterOpen(false);
-      }
-    }
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
+  useClickOutside(filterRef, () => setFilterOpen(false));
 
   return (
     <div className="max-w-[1100px]">
@@ -267,16 +252,12 @@ function UtforskPage() {
       <h2 className="mb-4 text-xl font-extrabold text-foreground sm:mb-6 sm:text-2xl">Populære FagPrater</h2>
 
       {/* Error state */}
-      {isError && (
-        <p className="py-12 text-center text-destructive">
-          Noe gikk galt. Prøv å laste siden på nytt.
-        </p>
-      )}
+      {isError && <ErrorState className="py-12 text-center" />}
 
       {/* Loading state */}
       {isPending && (
-        <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className={CARD_GRID_CLASS}>
+          {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
             <FagPratCardSkeleton key={i} />
           ))}
         </div>
@@ -284,7 +265,7 @@ function UtforskPage() {
 
       {/* Card grid */}
       {!isPending && (
-        <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+        <div className={CARD_GRID_CLASS}>
           {filtered.map((fp) => (
             <FagPratCard key={fp._id} fagprat={fp} variant="browse" />
           ))}

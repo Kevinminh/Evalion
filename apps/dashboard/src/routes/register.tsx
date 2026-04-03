@@ -28,17 +28,22 @@ function RegisterPage() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    const { error: authError } = await authClient.signUp.email({
-      name,
-      email,
-      password,
-    });
+    try {
+      const { error: authError } = await authClient.signUp.email({
+        name,
+        email,
+        password,
+      });
 
-    if (authError) {
-      setError(authError.message ?? "Registrering feilet");
+      if (authError) {
+        setError(authError.message ?? "Registrering feilet");
+      } else {
+        navigate({ to: "/" });
+      }
+    } catch {
+      setError("Registrering feilet. Prøv igjen.");
+    } finally {
       setLoading(false);
-    } else {
-      navigate({ to: "/" });
     }
   };
 
