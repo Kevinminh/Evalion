@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
+import { JoinSessionSkeleton } from "@workspace/ui/components/skeletons/join-session-skeleton";
 import { ArrowLeft, Loader2, UserPlus } from "lucide-react";
 import { useMutation } from "convex/react";
 import { useState } from "react";
@@ -26,11 +27,7 @@ function DeltaPage() {
   const [error, setError] = useState("");
 
   if (isPending) {
-    return (
-      <div className="flex min-h-svh items-center justify-center bg-background">
-        <Loader2 className="size-8 animate-spin text-primary" />
-      </div>
-    );
+    return <JoinSessionSkeleton />;
   }
 
   if (!session || session.status === "ended") {

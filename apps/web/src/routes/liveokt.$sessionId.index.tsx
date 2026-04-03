@@ -6,6 +6,7 @@ import { useMutation } from "convex/react";
 import { Users, X } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
+import { TeacherLobbySkeleton } from "@workspace/ui/components/skeletons/teacher-lobby-skeleton";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 
@@ -59,11 +60,7 @@ function TeacherLobbyPage() {
   const isPending = sessionLoading || fagpratLoading;
 
   if (isPending) {
-    return (
-      <div className="flex min-h-svh items-center justify-center">
-        <p className="text-muted-foreground">Laster...</p>
-      </div>
-    );
+    return <TeacherLobbySkeleton />;
   }
 
   if (!session || !fagprat) {

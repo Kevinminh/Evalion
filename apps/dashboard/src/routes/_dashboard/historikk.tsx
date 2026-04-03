@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Users, Calendar } from "lucide-react";
 
+import { SessionCardSkeleton } from "@workspace/ui/components/skeletons/session-card-skeleton";
 import { liveSessionQueries } from "@/lib/convex";
 
 export const Route = createFileRoute("/_dashboard/historikk")({
@@ -28,7 +29,13 @@ function HistorikkPage() {
         <h1 className="text-3xl font-extrabold text-foreground">Historikk</h1>
       </div>
 
-      {isPending && <p className="py-12 text-center text-muted-foreground">Laster historikk...</p>}
+      {isPending && (
+        <div className="grid grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <SessionCardSkeleton key={i} />
+          ))}
+        </div>
+      )}
 
       {!isPending && sessions && sessions.length > 0 && (
         <div className="grid grid-cols-3 gap-6">

@@ -4,6 +4,7 @@ import { Search, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 import { FagPratCard } from "@/components/fagprat-card";
+import { FagPratCardSkeleton } from "@workspace/ui/components/skeletons/fagprat-card-skeleton";
 import { fagpratQueries } from "@/lib/convex";
 
 export const Route = createFileRoute("/_dashboard/min-samling")({
@@ -105,7 +106,11 @@ function MinSamlingPage() {
 
       {/* Loading state */}
       {isPending && (
-        <p className="py-12 text-center text-muted-foreground">Laster samlingen din...</p>
+        <div className="grid auto-rows-fr grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <FagPratCardSkeleton key={i} />
+          ))}
+        </div>
       )}
 
       {/* Flat view */}

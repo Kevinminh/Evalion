@@ -4,6 +4,7 @@ import { ChevronDown, Search, SlidersHorizontal, Sprout, Target } from "lucide-r
 import { useState, useRef, useEffect } from "react";
 
 import { FagPratCard } from "@/components/fagprat-card";
+import { FagPratCardSkeleton } from "@workspace/ui/components/skeletons/fagprat-card-skeleton";
 import { fagpratQueries } from "@/lib/convex";
 
 export const Route = createFileRoute("/_dashboard/")({
@@ -277,7 +278,13 @@ function UtforskPage() {
       <h2 className="mb-6 text-2xl font-extrabold text-foreground">Populære FagPrater</h2>
 
       {/* Loading state */}
-      {isPending && <p className="py-12 text-center text-muted-foreground">Laster FagPrater...</p>}
+      {isPending && (
+        <div className="grid auto-rows-fr grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <FagPratCardSkeleton key={i} />
+          ))}
+        </div>
+      )}
 
       {/* Card grid */}
       {!isPending && (
