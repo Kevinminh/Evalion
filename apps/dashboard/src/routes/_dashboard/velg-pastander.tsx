@@ -5,13 +5,15 @@ import { useAction } from "convex/react";
 import { AlertTriangle, ArrowLeft, ArrowRight, RefreshCw, Sparkles } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { parseDraftJson } from "@/lib/draft-utils";
+import { FASIT_COLUMN_CONFIG } from "@/lib/fasit-config";
 import type { Fasit, FagPratType } from "@/lib/types";
 
 export const Route = createFileRoute("/_dashboard/velg-pastander")({
   validateSearch: (search: Record<string, unknown>) => ({
-    statements: (search.statements as string) ?? "",
-    draft: (search.draft as string) ?? "",
-    topic: (search.topic as string) ?? "",
+    statements: typeof search.statements === "string" ? search.statements : "",
+    draft: typeof search.draft === "string" ? search.draft : "",
+    topic: typeof search.topic === "string" ? search.topic : "",
   }),
   component: VelgPastanderPage,
 });
@@ -135,23 +137,10 @@ function VelgPastanderPage() {
   const generate = useAction(api.reddi.generateStatements);
 
   // Parse draft to extract context for AI generation
-  let draftSubject = "";
-  let draftLevel = "";
-  let draftType: FagPratType = "intro";
-  try {
-    if (draftJson) {
-      const draft = JSON.parse(draftJson) as {
-        subject?: string;
-        level?: string;
-        type?: FagPratType;
-      };
-      draftSubject = draft.subject ?? "";
-      draftLevel = draft.level ?? "";
-      draftType = draft.type ?? "intro";
-    }
-  } catch {
-    // Invalid JSON
-  }
+  const parsedDraft = parseDraftJson(draftJson);
+  const draftSubject = parsedDraft?.subject ?? "";
+  const draftLevel = parsedDraft?.level ?? "";
+  const draftType: FagPratType = parsedDraft?.type ?? "intro";
 
   const handleGenerate = useCallback(async () => {
     if (!topic) return;
@@ -174,15 +163,14 @@ function VelgPastanderPage() {
     }
   }, [topic, draftSubject, draftLevel, draftType, generate]);
 
-  // Generate statements on mount if we have a topic
-  const hasInitialized = useRef(false);
+  // Generate statements when topic changes, or load pre-existing statements on first mount
+  const prevTopicRef = useRef<string | null>(null);
   useEffect(() => {
-    if (hasInitialized.current) return;
-    hasInitialized.current = true;
-    if (topic) {
+    if (topic && topic !== prevTopicRef.current) {
+      prevTopicRef.current = topic;
       handleGenerate();
-    } else if (statementsJson) {
-      // Parse pre-existing statements from search params
+    } else if (!topic && statementsJson && prevTopicRef.current === null) {
+      prevTopicRef.current = "";
       try {
         setAllStatements(JSON.parse(statementsJson) as Statement[]);
       } catch {
@@ -207,19 +195,9 @@ function VelgPastanderPage() {
   const handleAddStatements = () => {
     const selectedStatements = allStatements.filter((s) => selected.has(s.id));
 
-    // Parse existing draft or create empty one
-    let draft: Record<string, unknown> = {};
-    try {
-      if (draftJson) {
-        draft = JSON.parse(draftJson) as Record<string, unknown>;
-      }
-    } catch {
-      // Invalid JSON
-    }
-
-    // Merge selected statements into draft
-    const existingStatements =
-      (draft.statements as Array<{ text: string; fasit: string; explanation: string }>) ?? [];
+    // Parse existing draft and merge selected statements
+    const draft = parseDraftJson(draftJson);
+    const existingStatements = draft?.statements ?? [];
     const newStatements = [
       ...existingStatements,
       ...selectedStatements.map((s) => ({
@@ -229,40 +207,15 @@ function VelgPastanderPage() {
       })),
     ];
 
-    draft.statements = newStatements;
+    const updatedDraft = { ...draft, statements: newStatements };
 
     navigate({
       to: "/lag-fagprat",
-      search: { draft: JSON.stringify(draft) },
+      search: { draft: JSON.stringify(updatedDraft) },
     });
   };
 
-  const columnConfig = {
-    sant: {
-      title: "Sant",
-      headerBg: "bg-sant-bg",
-      headerText: "text-sant",
-      selectedBorder: "border-sant",
-      selectedGlow: "shadow-[0_0_12px_color-mix(in_oklch,var(--sant)_25%,transparent)]",
-      borderTopColor: "border-t-sant",
-    },
-    usant: {
-      title: "Usant",
-      headerBg: "bg-usant-bg",
-      headerText: "text-usant",
-      selectedBorder: "border-usant",
-      selectedGlow: "shadow-[0_0_12px_color-mix(in_oklch,var(--usant)_25%,transparent)]",
-      borderTopColor: "border-t-usant",
-    },
-    delvis: {
-      title: "Delvis sant",
-      headerBg: "bg-delvis-bg",
-      headerText: "text-delvis",
-      selectedBorder: "border-delvis",
-      selectedGlow: "shadow-[0_0_12px_color-mix(in_oklch,var(--delvis)_25%,transparent)]",
-      borderTopColor: "border-t-delvis",
-    },
-  };
+  const columnConfig = FASIT_COLUMN_CONFIG;
 
   return (
     <div>

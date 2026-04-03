@@ -1,6 +1,8 @@
 import { Button } from "@workspace/ui/components/button";
 import { useEffect, useRef, useState } from "react";
 
+import { LABEL_CLASS, TEXTAREA_CLASS } from "@/lib/constants";
+
 interface ReddiModalProps {
   open: boolean;
   onClose: () => void;
@@ -73,14 +75,14 @@ export function ReddiModal({ open, onClose, onSubmit }: ReddiModalProps) {
 
         {/* Textarea */}
         <div className="mb-6">
-          <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <label className={`mb-1.5 block ${LABEL_CLASS}`}>
             Hva skal påstandene handle om?
           </label>
           <textarea
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             placeholder="f.eks. fotosyntese, Newtons lover, brøkregning..."
-            className="min-h-24 w-full resize-none rounded-xl border-2 border-input bg-background px-4 py-3 text-base outline-none transition-colors placeholder:text-muted-foreground/60 hover:border-muted-foreground/30 focus:border-primary focus:ring-3 focus:ring-primary/20"
+            className={`min-h-24 ${TEXTAREA_CLASS}`}
           />
         </div>
 
