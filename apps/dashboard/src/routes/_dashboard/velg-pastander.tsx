@@ -5,6 +5,8 @@ import { useAction } from "convex/react";
 import { AlertTriangle, ArrowLeft, ArrowRight, RefreshCw, Sparkles } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
+import type { Fasit, FagPratType } from "@/lib/types";
+
 export const Route = createFileRoute("/_dashboard/velg-pastander")({
   validateSearch: (search: Record<string, unknown>) => ({
     statements: (search.statements as string) ?? "",
@@ -17,7 +19,7 @@ export const Route = createFileRoute("/_dashboard/velg-pastander")({
 interface Statement {
   id: string;
   text: string;
-  fasit: "sant" | "usant" | "delvis";
+  fasit: Fasit;
   explanation: string;
 }
 
@@ -135,13 +137,13 @@ function VelgPastanderPage() {
   // Parse draft to extract context for AI generation
   let draftSubject = "";
   let draftLevel = "";
-  let draftType: "intro" | "oppsummering" = "intro";
+  let draftType: FagPratType = "intro";
   try {
     if (draftJson) {
       const draft = JSON.parse(draftJson) as {
         subject?: string;
         level?: string;
-        type?: "intro" | "oppsummering";
+        type?: FagPratType;
       };
       draftSubject = draft.subject ?? "";
       draftLevel = draft.level ?? "";

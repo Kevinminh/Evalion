@@ -4,16 +4,17 @@ import { cn } from "@workspace/ui/lib/utils";
 import { GripVertical, Trash2, Sparkles, ImageIcon } from "lucide-react";
 
 import { getStatementColor } from "@/lib/statement-colors";
+import type { Fasit } from "@/lib/types";
 
 interface StatementEditorProps {
-  id: number;
+  id: number | string;
   index: number;
   statement: string;
-  fasit: "sant" | "usant" | "delvis";
+  fasit: Fasit;
   explanation: string;
   colorIndex?: number;
   onStatementChange: (value: string) => void;
-  onFasitChange: (value: "sant" | "usant" | "delvis") => void;
+  onFasitChange: (value: Fasit) => void;
   onExplanationChange: (value: string) => void;
   onDelete: () => void;
 }

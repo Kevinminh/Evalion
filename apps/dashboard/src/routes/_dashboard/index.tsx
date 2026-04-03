@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { ChevronDown, Search, SlidersHorizontal, Sprout, Target } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useId } from "react";
 
 import { FagPratCard } from "@/components/fagprat-card";
 import { FagPratCardSkeleton } from "@workspace/ui/components/skeletons/fagprat-card-skeleton";
+import { SUBJECT_OPTIONS, LEVEL_OPTIONS } from "@/lib/constants";
 import { fagpratQueries } from "@/lib/convex";
 
 export const Route = createFileRoute("/_dashboard/")({
@@ -27,6 +28,7 @@ function CustomDropdown({
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const listboxId = useId();
   const selected = options.find((o) => o.value === value);
 
   useEffect(() => {
@@ -60,6 +62,7 @@ function CustomDropdown({
         type="button"
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-controls={open ? listboxId : undefined}
         onClick={(e) => {
           e.stopPropagation();
           setOpen(!open);
@@ -71,6 +74,7 @@ function CustomDropdown({
       </button>
       {open && (
         <div
+          id={listboxId}
           role="listbox"
           aria-label={label}
           className="absolute top-full left-0 z-20 mt-1 w-full rounded-lg border-[1.5px] border-border bg-card py-1 shadow-lg"
@@ -121,7 +125,7 @@ function UtforskPage() {
 
   const showNone = !forkunnskapIntro && !forkunnskapOppsummering;
 
-  const { data: searchResults, isPending } = useQuery(
+  const { data: searchResults, isPending, isError } = useQuery(
     fagpratQueries.search({
       searchText: searchQuery || undefined,
       subject: selectedFag || undefined,
@@ -245,29 +249,14 @@ function UtforskPage() {
                 value={selectedFag}
                 onChange={setSelectedFag}
                 placeholder="Alle fag"
-                options={[
-                  { value: "", label: "Alle fag" },
-                  { value: "Naturfag", label: "Naturfag" },
-                  { value: "Matematikk", label: "Matematikk" },
-                  { value: "Samfunnsfag", label: "Samfunnsfag" },
-                  { value: "Norsk", label: "Norsk" },
-                  { value: "Engelsk", label: "Engelsk" },
-                ]}
+                options={[{ value: "", label: "Alle fag" }, ...SUBJECT_OPTIONS]}
               />
               <CustomDropdown
                 label="Trinn"
                 value={selectedTrinn}
                 onChange={setSelectedTrinn}
                 placeholder="Alle trinn"
-                options={[
-                  { value: "", label: "Alle trinn" },
-                  { value: "8. trinn", label: "8. trinn" },
-                  { value: "9. trinn", label: "9. trinn" },
-                  { value: "10. trinn", label: "10. trinn" },
-                  { value: "VG1", label: "VG1" },
-                  { value: "VG2", label: "VG2" },
-                  { value: "VG3", label: "VG3" },
-                ]}
+                options={[{ value: "", label: "Alle trinn" }, ...LEVEL_OPTIONS]}
               />
             </div>
           </div>
@@ -276,6 +265,13 @@ function UtforskPage() {
 
       {/* Section title */}
       <h2 className="mb-4 text-xl font-extrabold text-foreground sm:mb-6 sm:text-2xl">Populære FagPrater</h2>
+
+      {/* Error state */}
+      {isError && (
+        <p className="py-12 text-center text-destructive">
+          Noe gikk galt. Prøv å laste siden på nytt.
+        </p>
+      )}
 
       {/* Loading state */}
       {isPending && (

@@ -1,9 +1,11 @@
 import { cn } from "@workspace/ui/lib/utils";
 import { Sprout, Target } from "lucide-react";
 
+import type { FagPratType } from "@/lib/types";
+
 interface ForkunnskapSelectorProps {
-  value: "intro" | "oppsummering" | null;
-  onChange: (value: "intro" | "oppsummering") => void;
+  value: FagPratType | null;
+  onChange: (value: FagPratType) => void;
 }
 
 export function ForkunnskapSelector({ value, onChange }: ForkunnskapSelectorProps) {

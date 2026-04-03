@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -14,6 +14,7 @@ import { Button } from "@workspace/ui/components/button";
 import { useMutation } from "convex/react";
 import { Users, Mic, CheckSquare, ArrowRight } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { LiveoktSetupSkeleton } from "@workspace/ui/components/skeletons/liveokt-setup-skeleton";
 import { OptionCard } from "@/components/live/option-card";
@@ -22,19 +23,14 @@ import { Stepper } from "@/components/live/stepper";
 import { fagpratQueries, api } from "@/lib/convex";
 import type { FagPratId } from "@/lib/types";
 
-export const Route = createFileRoute("/liveokt/$id")({
-  beforeLoad: ({ context }) => {
-    if (!context.isAuthenticated) {
-      throw redirect({ to: "/login" });
-    }
-  },
+export const Route = createFileRoute("/_authed/liveokt/$id")({
   component: LiveoktSetupPage,
 });
 
 function LiveoktSetupPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const { data: fagprat, isPending } = useQuery(fagpratQueries.getById(id as FagPratId));
+  const { data: fagprat, isPending, isError } = useQuery(fagpratQueries.getById(id as FagPratId));
   const createSession = useMutation(api.liveSessions.create);
 
   const [groupsEnabled, setGroupsEnabled] = useState(true);
@@ -46,6 +42,14 @@ function LiveoktSetupPage() {
 
   if (isPending) {
     return <LiveoktSetupSkeleton />;
+  }
+
+  if (isError) {
+    return (
+      <div className="flex min-h-svh items-center justify-center">
+        <p className="text-destructive">Noe gikk galt. Prøv å laste siden på nytt.</p>
+      </div>
+    );
   }
 
   if (!fagprat) {
@@ -66,9 +70,10 @@ function LiveoktSetupPage() {
         transcriptionEnabled,
         selfEvalEnabled,
       });
-      const playUrl = import.meta.env.DEV ? "http://localhost:3000" : "https://play.evalion.no";
+      const playUrl = import.meta.env.VITE_PLAY_URL;
       window.location.href = `${playUrl}/liveokt/${sessionId}`;
     } catch {
+      toast.error("Kunne ikke opprette liveøkt. Prøv igjen.");
       setLaunching(false);
     }
   };

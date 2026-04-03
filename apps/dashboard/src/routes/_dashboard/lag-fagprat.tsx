@@ -1,5 +1,5 @@
-import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import { Plus, Sparkles } from "lucide-react";
@@ -9,6 +9,9 @@ import { ConceptTags } from "@/components/concept-tags";
 import { ForkunnskapSelector } from "@/components/forkunnskap-selector";
 import { ReddiModal } from "@/components/reddi-modal";
 import { StatementEditor } from "@/components/statement-editor";
+import { SUBJECT_OPTIONS, LEVEL_OPTIONS } from "@/lib/constants";
+import { useStatements, toStatementsWithId, toStatementPayload } from "@/lib/use-statements";
+import type { FagPratType } from "@/lib/types";
 
 export const Route = createFileRoute("/_dashboard/lag-fagprat")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -17,12 +20,6 @@ export const Route = createFileRoute("/_dashboard/lag-fagprat")({
   component: LagFagPratPage,
 });
 
-interface StatementDraft {
-  statement: string;
-  fasit: "sant" | "usant" | "delvis";
-  explanation: string;
-}
-
 function LagFagPratPage() {
   const navigate = useNavigate();
   const { draft: draftParam } = Route.useSearch();
@@ -30,9 +27,16 @@ function LagFagPratPage() {
   const [concepts, setConcepts] = useState<string[]>([]);
   const [fag, setFag] = useState("");
   const [trinn, setTrinn] = useState("");
-  const [forkunnskap, setForkunnskap] = useState<"intro" | "oppsummering" | null>(null);
-  const [statements, setStatements] = useState<StatementDraft[]>([]);
+  const [forkunnskap, setForkunnskap] = useState<FagPratType | null>(null);
   const [reddiOpen, setReddiOpen] = useState(false);
+  const {
+    statements,
+    setStatements,
+    addStatement,
+    updateStatement,
+    removeStatement,
+    handleDragEnd,
+  } = useStatements();
 
   useEffect(() => {
     if (!draftParam) return;
@@ -42,8 +46,8 @@ function LagFagPratPage() {
         concepts?: string[];
         subject?: string;
         level?: string;
-        type?: "intro" | "oppsummering";
-        statements?: { text: string; fasit: "sant" | "usant" | "delvis"; explanation: string }[];
+        type?: FagPratType;
+        statements?: { text: string; fasit: string; explanation: string }[];
       };
       if (draft.title) setTitle(draft.title);
       if (draft.concepts) setConcepts(draft.concepts);
@@ -51,41 +55,12 @@ function LagFagPratPage() {
       if (draft.level) setTrinn(draft.level);
       if (draft.type) setForkunnskap(draft.type);
       if (draft.statements) {
-        setStatements(
-          draft.statements.map((s) => ({
-            statement: s.text,
-            fasit: s.fasit,
-            explanation: s.explanation,
-          })),
-        );
+        setStatements(toStatementsWithId(draft.statements));
       }
     } catch {
       // Invalid JSON
     }
   }, [draftParam]);
-
-  const addStatement = () => {
-    setStatements([...statements, { statement: "", fasit: "sant", explanation: "" }]);
-  };
-
-  const updateStatement = (index: number, field: keyof StatementDraft, value: string) => {
-    const updated = [...statements];
-    updated[index] = { ...updated[index], [field]: value };
-    setStatements(updated);
-  };
-
-  const removeStatement = (index: number) => {
-    setStatements(statements.filter((_, i) => i !== index));
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      const oldIndex = Number(active.id);
-      const newIndex = Number(over.id);
-      setStatements((prev) => arrayMove(prev, oldIndex, newIndex));
-    }
-  };
 
   const buildDraftJson = () =>
     JSON.stringify({
@@ -94,11 +69,7 @@ function LagFagPratPage() {
       subject: fag,
       level: trinn,
       type: forkunnskap,
-      statements: statements.map((s) => ({
-        text: s.statement,
-        fasit: s.fasit,
-        explanation: s.explanation,
-      })),
+      statements: toStatementPayload(statements),
     });
 
   const handleReddiSubmit = (topic: string) => {
@@ -112,21 +83,9 @@ function LagFagPratPage() {
   const canProceed = title.trim() && fag && trinn && forkunnskap;
 
   const handleNext = () => {
-    const draft = {
-      title,
-      concepts,
-      subject: fag,
-      level: trinn,
-      type: forkunnskap!,
-      statements: statements.map((s) => ({
-        text: s.statement,
-        fasit: s.fasit,
-        explanation: s.explanation,
-      })),
-    };
     navigate({
       to: "/lagre-fagprat",
-      search: { draft: JSON.stringify(draft) },
+      search: { draft: buildDraftJson() },
     });
   };
 
@@ -170,11 +129,9 @@ function LagFagPratPage() {
               className="w-full appearance-none rounded-xl border-2 border-input bg-card px-4 py-2.5 text-sm font-medium text-foreground outline-none transition-colors focus:border-primary focus:ring-3 focus:ring-primary/20"
             >
               <option value="">Velg fag...</option>
-              <option value="Naturfag">Naturfag</option>
-              <option value="Matematikk">Matematikk</option>
-              <option value="Samfunnsfag">Samfunnsfag</option>
-              <option value="Norsk">Norsk</option>
-              <option value="Engelsk">Engelsk</option>
+              {SUBJECT_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
             </select>
           </div>
           <div>
@@ -187,12 +144,9 @@ function LagFagPratPage() {
               className="w-full appearance-none rounded-xl border-2 border-input bg-card px-4 py-2.5 text-sm font-medium text-foreground outline-none transition-colors focus:border-primary focus:ring-3 focus:ring-primary/20"
             >
               <option value="">Velg trinn...</option>
-              <option value="8. trinn">8. trinn</option>
-              <option value="9. trinn">9. trinn</option>
-              <option value="10. trinn">10. trinn</option>
-              <option value="VG1">VG1</option>
-              <option value="VG2">VG2</option>
-              <option value="VG3">VG3</option>
+              {LEVEL_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
             </select>
           </div>
         </div>
@@ -230,14 +184,14 @@ function LagFagPratPage() {
         </div>
         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext
-            items={statements.map((_, i) => i)}
+            items={statements.map((s) => s.id)}
             strategy={verticalListSortingStrategy}
           >
             <div className="space-y-4">
               {statements.map((stmt, i) => (
                 <StatementEditor
-                  key={i}
-                  id={i}
+                  key={stmt.id}
+                  id={stmt.id}
                   index={i}
                   statement={stmt.statement}
                   fasit={stmt.fasit}

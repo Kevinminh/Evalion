@@ -15,7 +15,6 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
-import { Route as LiveoktIdRouteImport } from './routes/liveokt.$id'
 import { Route as DashboardVelgPastanderRouteImport } from './routes/_dashboard/velg-pastander'
 import { Route as DashboardMinSamlingRouteImport } from './routes/_dashboard/min-samling'
 import { Route as DashboardLagreFagpratRouteImport } from './routes/_dashboard/lagre-fagprat'
@@ -23,6 +22,7 @@ import { Route as DashboardLagFagpratRouteImport } from './routes/_dashboard/lag
 import { Route as DashboardHistorikkRouteImport } from './routes/_dashboard/historikk'
 import { Route as AuthedPrivateRouteImport } from './routes/_authed/private'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AuthedLiveoktIdRouteImport } from './routes/_authed/liveokt.$id'
 import { Route as DashboardFagpratIdIndexRouteImport } from './routes/_dashboard/fagprat.$id.index'
 import { Route as DashboardFagpratIdRedigerRouteImport } from './routes/_dashboard/fagprat.$id.rediger'
 
@@ -53,11 +53,6 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRoute,
-} as any)
-const LiveoktIdRoute = LiveoktIdRouteImport.update({
-  id: '/liveokt/$id',
-  path: '/liveokt/$id',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardVelgPastanderRoute = DashboardVelgPastanderRouteImport.update({
   id: '/velg-pastander',
@@ -94,6 +89,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedLiveoktIdRoute = AuthedLiveoktIdRouteImport.update({
+  id: '/liveokt/$id',
+  path: '/liveokt/$id',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const DashboardFagpratIdIndexRoute = DashboardFagpratIdIndexRouteImport.update({
   id: '/fagprat/$id/',
   path: '/fagprat/$id/',
@@ -117,7 +117,7 @@ export interface FileRoutesByFullPath {
   '/lagre-fagprat': typeof DashboardLagreFagpratRoute
   '/min-samling': typeof DashboardMinSamlingRoute
   '/velg-pastander': typeof DashboardVelgPastanderRoute
-  '/liveokt/$id': typeof LiveoktIdRoute
+  '/liveokt/$id': typeof AuthedLiveoktIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/fagprat/$id/rediger': typeof DashboardFagpratIdRedigerRoute
   '/fagprat/$id/': typeof DashboardFagpratIdIndexRoute
@@ -133,7 +133,7 @@ export interface FileRoutesByTo {
   '/lagre-fagprat': typeof DashboardLagreFagpratRoute
   '/min-samling': typeof DashboardMinSamlingRoute
   '/velg-pastander': typeof DashboardVelgPastanderRoute
-  '/liveokt/$id': typeof LiveoktIdRoute
+  '/liveokt/$id': typeof AuthedLiveoktIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/fagprat/$id/rediger': typeof DashboardFagpratIdRedigerRoute
   '/fagprat/$id': typeof DashboardFagpratIdIndexRoute
@@ -151,8 +151,8 @@ export interface FileRoutesById {
   '/_dashboard/lagre-fagprat': typeof DashboardLagreFagpratRoute
   '/_dashboard/min-samling': typeof DashboardMinSamlingRoute
   '/_dashboard/velg-pastander': typeof DashboardVelgPastanderRoute
-  '/liveokt/$id': typeof LiveoktIdRoute
   '/_dashboard/': typeof DashboardIndexRoute
+  '/_authed/liveokt/$id': typeof AuthedLiveoktIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_dashboard/fagprat/$id/rediger': typeof DashboardFagpratIdRedigerRoute
   '/_dashboard/fagprat/$id/': typeof DashboardFagpratIdIndexRoute
@@ -203,8 +203,8 @@ export interface FileRouteTypes {
     | '/_dashboard/lagre-fagprat'
     | '/_dashboard/min-samling'
     | '/_dashboard/velg-pastander'
-    | '/liveokt/$id'
     | '/_dashboard/'
+    | '/_authed/liveokt/$id'
     | '/api/auth/$'
     | '/_dashboard/fagprat/$id/rediger'
     | '/_dashboard/fagprat/$id/'
@@ -216,7 +216,6 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   LogoutRoute: typeof LogoutRoute
   RegisterRoute: typeof RegisterRoute
-  LiveoktIdRoute: typeof LiveoktIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -263,13 +262,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
-    }
-    '/liveokt/$id': {
-      id: '/liveokt/$id'
-      path: '/liveokt/$id'
-      fullPath: '/liveokt/$id'
-      preLoaderRoute: typeof LiveoktIdRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/_dashboard/velg-pastander': {
       id: '/_dashboard/velg-pastander'
@@ -320,6 +312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed/liveokt/$id': {
+      id: '/_authed/liveokt/$id'
+      path: '/liveokt/$id'
+      fullPath: '/liveokt/$id'
+      preLoaderRoute: typeof AuthedLiveoktIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_dashboard/fagprat/$id/': {
       id: '/_dashboard/fagprat/$id/'
       path: '/fagprat/$id'
@@ -339,10 +338,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthedRouteChildren {
   AuthedPrivateRoute: typeof AuthedPrivateRoute
+  AuthedLiveoktIdRoute: typeof AuthedLiveoktIdRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedPrivateRoute: AuthedPrivateRoute,
+  AuthedLiveoktIdRoute: AuthedLiveoktIdRoute,
 }
 
 const AuthedRouteWithChildren =
@@ -380,7 +381,6 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   LogoutRoute: LogoutRoute,
   RegisterRoute: RegisterRoute,
-  LiveoktIdRoute: LiveoktIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

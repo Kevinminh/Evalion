@@ -15,6 +15,7 @@ import { authClient } from "@/lib/auth-client";
 import { getToken } from "@/lib/auth-server";
 
 import appCss from "@workspace/ui/globals.css?url";
+import { Toaster } from "@workspace/ui/components/sonner";
 
 const getAuth = createServerFn({ method: "GET" }).handler(async () => {
   return await getToken();
@@ -59,6 +60,7 @@ function RootComponent() {
         initialToken={context.token}
       >
         <Outlet />
+        <Toaster />
       </ConvexBetterAuthProvider>
     </QueryClientProvider>
   );

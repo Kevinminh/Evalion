@@ -2,6 +2,8 @@ import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@workspace/backend/convex/_generated/api";
 import type { Id } from "@workspace/backend/convex/_generated/dataModel";
 
+import type { FagPratType } from "@/lib/types";
+
 export const fagpratQueries = {
   list: () => convexQuery(api.fagprats.list, {}),
   getById: (id: Id<"fagprats">) => convexQuery(api.fagprats.getById, { id }),
@@ -10,7 +12,7 @@ export const fagpratQueries = {
     searchText?: string;
     subject?: string;
     level?: string;
-    type?: "intro" | "oppsummering";
+    type?: FagPratType;
     sortBy?: "relevant" | "recent";
   }) => convexQuery(api.fagprats.search, args),
 };

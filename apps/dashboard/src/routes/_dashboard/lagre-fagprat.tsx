@@ -1,21 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
-import { cn } from "@workspace/ui/lib/utils";
 import { useMutation } from "convex/react";
-import { ArrowLeft, Globe, Lock } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { ConceptTags } from "@/components/concept-tags";
+import { VisibilityToggle } from "@/components/visibility-toggle";
 import { api } from "@/lib/convex";
-
-interface FagPratDraft {
-  title: string;
-  concepts: string[];
-  subject: string;
-  level: string;
-  type: "intro" | "oppsummering";
-  statements: { text: string; fasit: "sant" | "usant" | "delvis"; explanation: string }[];
-}
+import { parseDraftJson } from "@/lib/draft-utils";
+import type { Visibility } from "@/lib/types";
 
 export const Route = createFileRoute("/_dashboard/lagre-fagprat")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -29,18 +23,11 @@ function LagreFagPratPage() {
   const { draft: draftJson } = Route.useSearch();
   const createFagPrat = useMutation(api.fagprats.create);
 
-  let draft: FagPratDraft | null = null;
-  try {
-    if (draftJson) {
-      draft = JSON.parse(draftJson) as FagPratDraft;
-    }
-  } catch {
-    // Invalid JSON, draft stays null
-  }
+  const draft = parseDraftJson(draftJson);
 
   const [title, setTitle] = useState(draft?.title ?? "");
   const [concepts, setConcepts] = useState<string[]>(draft?.concepts ?? []);
-  const [visibility, setVisibility] = useState<"public" | "private">("public");
+  const [visibility, setVisibility] = useState<Visibility>("public");
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
@@ -58,6 +45,7 @@ function LagreFagPratPage() {
       });
       navigate({ to: "/fagprat/$id", params: { id } });
     } catch {
+      toast.error("Kunne ikke lagre FagPraten. Prøv igjen.");
       setSaving(false);
     }
   };
@@ -113,42 +101,7 @@ function LagreFagPratPage() {
         </div>
 
         {/* Visibility */}
-        <div>
-          <div className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Synlighet
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={() => setVisibility("public")}
-              className={cn(
-                "flex flex-1 items-center gap-3 rounded-xl border-2 px-4 py-3 text-left transition-all",
-                visibility === "public"
-                  ? "border-primary/40 bg-primary/5 text-primary"
-                  : "border-border text-muted-foreground hover:border-muted-foreground/30",
-              )}
-            >
-              <Globe className="size-5 shrink-0" />
-              <span className="text-sm font-semibold">Offentlig</span>
-            </button>
-            <button
-              onClick={() => setVisibility("private")}
-              className={cn(
-                "flex flex-1 items-center gap-3 rounded-xl border-2 px-4 py-3 text-left transition-all",
-                visibility === "private"
-                  ? "border-primary/40 bg-primary/5 text-primary"
-                  : "border-border text-muted-foreground hover:border-muted-foreground/30",
-              )}
-            >
-              <Lock className="size-5 shrink-0" />
-              <span className="text-sm font-semibold">Privat</span>
-            </button>
-          </div>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {visibility === "public"
-              ? "Alle kan finne og bruke denne FagPraten"
-              : "Bare du kan se og bruke denne FagPraten"}
-          </p>
-        </div>
+        <VisibilityToggle value={visibility} onChange={setVisibility} showDescription />
       </div>
     </div>
   );

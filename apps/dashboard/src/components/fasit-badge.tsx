@@ -1,5 +1,7 @@
 import { cn } from "@workspace/ui/lib/utils";
 
+import type { Fasit } from "@/lib/types";
+
 const fasitStyles = {
   sant: "bg-sant-bg text-sant",
   usant: "bg-usant-bg text-usant",
@@ -12,7 +14,7 @@ const fasitLabels = {
   delvis: "Delvis sant",
 } as const;
 
-export function FasitBadge({ fasit }: { fasit: "sant" | "usant" | "delvis" }) {
+export function FasitBadge({ fasit }: { fasit: Fasit }) {
   return (
     <span
       className={cn(

@@ -1,16 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogAction,
-  AlertDialogCancel,
-} from "@workspace/ui/components/alert-dialog";
-import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
@@ -19,11 +9,15 @@ import {
 } from "@workspace/ui/components/dropdown-menu";
 import { useMutation } from "convex/react";
 import { Button } from "@workspace/ui/components/button";
-import { ArrowLeft, Users, Pencil, MoreVertical, Sprout, Target, Copy, Trash2, FolderPlus } from "lucide-react";
+import { ArrowLeft, Users, Pencil, MoreVertical, Copy, Trash2, FolderPlus } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { FagPratDetailSkeleton } from "@workspace/ui/components/skeletons/fagprat-detail-skeleton";
+import { AuthorAvatar } from "@/components/author-avatar";
+import { DeleteFagPratDialog } from "@/components/delete-fagprat-dialog";
 import { StatementTable } from "@/components/statement-table";
+import { TypeIcon } from "@/components/type-icon";
 import { authClient } from "@/lib/auth-client";
 import { api, fagpratQueries } from "@/lib/convex";
 import type { FagPratId } from "@/lib/types";
@@ -35,7 +29,7 @@ export const Route = createFileRoute("/_dashboard/fagprat/$id/")({
 function FagPratPreviewPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const { data: fagprat, isPending } = useQuery(fagpratQueries.getById(id as FagPratId));
+  const { data: fagprat, isPending, isError } = useQuery(fagpratQueries.getById(id as FagPratId));
   const { data: session } = authClient.useSession();
   const duplicateFagPrat = useMutation(api.fagprats.duplicate);
   const removeFagPrat = useMutation(api.fagprats.remove);
@@ -43,6 +37,14 @@ function FagPratPreviewPage() {
 
   if (isPending) {
     return <FagPratDetailSkeleton />;
+  }
+
+  if (isError) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <p className="text-destructive">Noe gikk galt. Prøv å laste siden på nytt.</p>
+      </div>
+    );
   }
 
   if (!fagprat) {
@@ -56,8 +58,21 @@ function FagPratPreviewPage() {
   const isAuthor = session?.user?.id && fagprat.authorId === session.user.id;
 
   const handleDuplicate = async () => {
-    const newId = await duplicateFagPrat({ id: fagprat._id });
-    navigate({ to: "/fagprat/$id", params: { id: newId } });
+    try {
+      const newId = await duplicateFagPrat({ id: fagprat._id });
+      navigate({ to: "/fagprat/$id", params: { id: newId } });
+    } catch {
+      toast.error("Kunne ikke duplisere FagPraten. Prøv igjen.");
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await removeFagPrat({ id: fagprat._id });
+      navigate({ to: "/min-samling" });
+    } catch {
+      toast.error("Kunne ikke slette FagPraten. Prøv igjen.");
+    }
   };
 
   return (
@@ -118,32 +133,15 @@ function FagPratPreviewPage() {
               className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-4 py-2.5 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5 sm:px-5 sm:py-3"
             >
               <FolderPlus className="size-4" />Legg til i min samling
-                          </button>)
+            </button>)
           )}
 
-          {/* Delete confirmation dialog */}
-          <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Denne handlingen kan ikke angres. FagPraten &ldquo;{fagprat.title}&rdquo; vil bli
-                  permanent slettet.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Avbryt</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={async () => {
-                    await removeFagPrat({ id: fagprat._id });
-                    navigate({ to: "/min-samling" });
-                  }}
-                >
-                  Slett
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <DeleteFagPratDialog
+            open={deleteOpen}
+            onOpenChange={setDeleteOpen}
+            title={fagprat.title}
+            onConfirm={handleDelete}
+          />
         </div>
       </div>
       {/* Meta tags */}
@@ -154,34 +152,12 @@ function FagPratPreviewPage() {
         <span className="inline-block rounded-full border-[1.5px] border-muted-foreground/30 bg-card px-3 py-1 text-xs font-semibold text-muted-foreground">
           {fagprat.level}
         </span>
-        {fagprat.type === "intro" ? (
-          <span className="inline-flex size-7 items-center justify-center rounded-full border border-teal-200 bg-teal-50 text-teal-500">
-            <Sprout className="size-3.5" />
-          </span>
-        ) : (
-          <span className="inline-flex size-7 items-center justify-center rounded-full border border-amber-200 bg-amber-50 text-amber-600">
-            <Target className="size-3.5" />
-          </span>
-        )}
+        <TypeIcon type={fagprat.type} />
       </div>
       {/* Author info (only shown when browsing) */}
       {!isAuthor && fagprat.authorName && (
-        <div className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
-          <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted">
-            <svg
-              className="size-4 text-muted-foreground"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-          </div>
-          <span className="font-medium">{fagprat.authorName}</span>
+        <div className="mb-6">
+          <AuthorAvatar name={fagprat.authorName} />
         </div>
       )}
       {/* Begreper */}
@@ -201,5 +177,5 @@ function FagPratPreviewPage() {
       {/* Statements table */}
       <StatementTable statements={fagprat.statements} />
     </div>
-  )
+  );
 }

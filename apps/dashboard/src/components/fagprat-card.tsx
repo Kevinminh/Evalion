@@ -1,15 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
 import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogAction,
-  AlertDialogCancel,
-} from "@workspace/ui/components/alert-dialog";
-import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
@@ -18,26 +8,15 @@ import {
 } from "@workspace/ui/components/dropdown-menu";
 import { Button } from "@workspace/ui/components/button";
 import { useMutation } from "convex/react";
-import { Sprout, Target, Users, Pencil, MoreVertical, Play, Copy, Trash2 } from "lucide-react";
+import { Users, Pencil, MoreVertical, Play, Copy, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
+import { AuthorAvatar } from "@/components/author-avatar";
+import { DeleteFagPratDialog } from "@/components/delete-fagprat-dialog";
+import { TypeIcon } from "@/components/type-icon";
 import { api } from "@/lib/convex";
 import type { FagPrat } from "@/lib/types";
-
-function TypeIcon({ type }: { type: "intro" | "oppsummering" }) {
-  if (type === "intro") {
-    return (
-      <span className="inline-flex size-7 items-center justify-center rounded-full border border-teal-200 bg-teal-50 text-teal-500">
-        <Sprout className="size-3.5" />
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex size-7 items-center justify-center rounded-full border border-amber-200 bg-amber-50 text-amber-600">
-      <Target className="size-3.5" />
-    </span>
-  );
-}
 
 interface FagPratCardProps {
   fagprat: FagPrat;
@@ -52,13 +31,21 @@ export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
 
   const handleDuplicate = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const newId = await duplicateFagPrat({ id: fagprat._id });
-    navigate({ to: "/fagprat/$id", params: { id: newId } });
+    try {
+      const newId = await duplicateFagPrat({ id: fagprat._id });
+      navigate({ to: "/fagprat/$id", params: { id: newId } });
+    } catch {
+      toast.error("Kunne ikke duplisere FagPraten. Prøv igjen.");
+    }
   };
 
   const handleDelete = async () => {
-    await removeFagPrat({ id: fagprat._id });
-    setDeleteOpen(false);
+    try {
+      await removeFagPrat({ id: fagprat._id });
+      setDeleteOpen(false);
+    } catch {
+      toast.error("Kunne ikke slette FagPraten. Prøv igjen.");
+    }
   };
 
   return (
@@ -91,22 +78,8 @@ export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
             Brukt {fagprat.usageCount} ganger
           </div>
           {/* Author */}
-          <div className="flex items-center gap-2 border-t border-border/50 pt-3">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted">
-              <svg
-                className="size-4 text-muted-foreground"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-            </div>
-            <span className="text-sm font-medium text-muted-foreground">{fagprat.authorName}</span>
+          <div className="border-t border-border/50 pt-3">
+            <AuthorAvatar name={fagprat.authorName} />
           </div>
         </>
       ) : (
@@ -160,22 +133,13 @@ export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Delete confirmation dialog */}
-          <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-            <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Denne handlingen kan ikke angres. FagPraten &ldquo;{fagprat.title}&rdquo; vil bli
-                  permanent slettet.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Avbryt</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete}>Slett</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <DeleteFagPratDialog
+            open={deleteOpen}
+            onOpenChange={setDeleteOpen}
+            title={fagprat.title}
+            onConfirm={handleDelete}
+            stopPropagation
+          />
         </div>
       )}
     </div>

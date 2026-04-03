@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Search, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import { FagPratCard } from "@/components/fagprat-card";
 import { FagPratCardSkeleton } from "@workspace/ui/components/skeletons/fagprat-card-skeleton";
@@ -15,8 +15,20 @@ function MinSamlingPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"sist-endret" | "fag">("sist-endret");
   const [sortOpen, setSortOpen] = useState(false);
+  const sortRef = useRef<HTMLDivElement>(null);
 
-  const { data: allFagPrats, isPending } = useQuery(fagpratQueries.listByAuthor());
+  useEffect(() => {
+    if (!sortOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
+        setSortOpen(false);
+      }
+    }
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, [sortOpen]);
+
+  const { data: allFagPrats, isPending, isError } = useQuery(fagpratQueries.listByAuthor());
 
   const filtered = allFagPrats
     ? searchQuery
@@ -58,7 +70,7 @@ function MinSamlingPage() {
           </div>
 
           {/* Sort dropdown */}
-          <div className="relative">
+          <div className="relative" ref={sortRef}>
             <button
               onClick={() => setSortOpen(!sortOpen)}
               className={`inline-flex items-center gap-2 rounded-full border-[1.5px] bg-card px-4 py-2.5 text-sm font-semibold text-foreground transition-all ${
@@ -103,6 +115,13 @@ function MinSamlingPage() {
           </div>
         </div>
       </div>
+
+      {/* Error state */}
+      {isError && (
+        <p className="py-12 text-center text-destructive">
+          Noe gikk galt. Prøv å laste siden på nytt.
+        </p>
+      )}
 
       {/* Loading state */}
       {isPending && (

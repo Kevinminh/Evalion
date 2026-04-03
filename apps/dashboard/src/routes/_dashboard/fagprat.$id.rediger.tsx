@@ -1,19 +1,22 @@
-import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
-import { cn } from "@workspace/ui/lib/utils";
 import { useMutation } from "convex/react";
 import { Pencil, Globe, Lock, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 import { FagPratDetailSkeleton } from "@workspace/ui/components/skeletons/fagprat-detail-skeleton";
 import { ConceptTags } from "@/components/concept-tags";
 import { ForkunnskapSelector } from "@/components/forkunnskap-selector";
 import { StatementEditor } from "@/components/statement-editor";
+import { VisibilityToggle } from "@/components/visibility-toggle";
+import { SUBJECT_OPTIONS, LEVEL_OPTIONS } from "@/lib/constants";
 import { fagpratQueries, api } from "@/lib/convex";
-import type { FagPratId } from "@/lib/types";
+import { useStatements, toStatementsWithId, toStatementPayload } from "@/lib/use-statements";
+import type { FagPratId, FagPratType, Visibility } from "@/lib/types";
 
 export const Route = createFileRoute("/_dashboard/fagprat/$id/rediger")({
   component: EditFagPratPage,
@@ -22,19 +25,24 @@ export const Route = createFileRoute("/_dashboard/fagprat/$id/rediger")({
 function EditFagPratPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const { data: fagprat, isPending } = useQuery(fagpratQueries.getById(id as FagPratId));
+  const { data: fagprat, isPending, isError } = useQuery(fagpratQueries.getById(id as FagPratId));
   const updateFagPrat = useMutation(api.fagprats.update);
 
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState("");
   const [fag, setFag] = useState("");
   const [trinn, setTrinn] = useState("");
-  const [forkunnskap, setForkunnskap] = useState<"intro" | "oppsummering" | null>(null);
+  const [forkunnskap, setForkunnskap] = useState<FagPratType | null>(null);
   const [concepts, setConcepts] = useState<string[]>([]);
-  const [visibility, setVisibility] = useState<"public" | "private">("public");
-  const [statements, setStatements] = useState<
-    { statement: string; fasit: "sant" | "usant" | "delvis"; explanation: string }[]
-  >([]);
+  const [visibility, setVisibility] = useState<Visibility>("public");
+  const {
+    statements,
+    setStatements,
+    addStatement,
+    updateStatement,
+    removeStatement,
+    handleDragEnd,
+  } = useStatements();
 
   // Sync local state when data loads
   useEffect(() => {
@@ -45,18 +53,20 @@ function EditFagPratPage() {
       setForkunnskap(fagprat.type);
       setConcepts(fagprat.concepts);
       setVisibility(fagprat.visibility);
-      setStatements(
-        fagprat.statements.map((s) => ({
-          statement: s.text,
-          fasit: s.fasit,
-          explanation: s.explanation,
-        })),
-      );
+      setStatements(toStatementsWithId(fagprat.statements));
     }
   }, [fagprat]);
 
   if (isPending) {
     return <FagPratDetailSkeleton />;
+  }
+
+  if (isError) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <p className="text-destructive">Noe gikk galt. Prøv å laste siden på nytt.</p>
+      </div>
+    );
   }
 
   if (!fagprat) {
@@ -67,41 +77,22 @@ function EditFagPratPage() {
     );
   }
 
-  const updateStatement = (
-    index: number,
-    field: "statement" | "fasit" | "explanation",
-    value: string,
-  ) => {
-    const updated = [...statements];
-    updated[index] = { ...updated[index], [field]: value };
-    setStatements(updated);
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      const oldIndex = Number(active.id);
-      const newIndex = Number(over.id);
-      setStatements((prev) => arrayMove(prev, oldIndex, newIndex));
-    }
-  };
-
   const handleSave = async () => {
-    await updateFagPrat({
-      id: fagprat._id,
-      title,
-      subject: fag,
-      level: trinn,
-      type: forkunnskap ?? undefined,
-      concepts,
-      visibility,
-      statements: statements.map((s) => ({
-        text: s.statement,
-        fasit: s.fasit,
-        explanation: s.explanation,
-      })),
-    });
-    navigate({ to: "/fagprat/$id", params: { id } });
+    try {
+      await updateFagPrat({
+        id: fagprat._id,
+        title,
+        subject: fag,
+        level: trinn,
+        type: forkunnskap ?? undefined,
+        concepts,
+        visibility,
+        statements: toStatementPayload(statements),
+      });
+      navigate({ to: "/fagprat/$id", params: { id } });
+    } catch {
+      toast.error("Kunne ikke lagre endringene. Prøv igjen.");
+    }
   };
 
   return (
@@ -172,11 +163,9 @@ function EditFagPratPage() {
                   onChange={(e) => setFag(e.target.value)}
                   className="w-full appearance-none rounded-xl border-2 border-input bg-card px-4 py-2.5 text-sm font-medium outline-none focus:border-primary focus:ring-3 focus:ring-primary/20"
                 >
-                  <option value="Naturfag">Naturfag</option>
-                  <option value="Matematikk">Matematikk</option>
-                  <option value="Samfunnsfag">Samfunnsfag</option>
-                  <option value="Norsk">Norsk</option>
-                  <option value="Engelsk">Engelsk</option>
+                  {SUBJECT_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
                 </select>
               </div>
               <div>
@@ -188,12 +177,9 @@ function EditFagPratPage() {
                   onChange={(e) => setTrinn(e.target.value)}
                   className="w-full appearance-none rounded-xl border-2 border-input bg-card px-4 py-2.5 text-sm font-medium outline-none focus:border-primary focus:ring-3 focus:ring-primary/20"
                 >
-                  <option value="8. trinn">8. trinn</option>
-                  <option value="9. trinn">9. trinn</option>
-                  <option value="10. trinn">10. trinn</option>
-                  <option value="VG1">VG1</option>
-                  <option value="VG2">VG2</option>
-                  <option value="VG3">VG3</option>
+                  {LEVEL_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -202,33 +188,7 @@ function EditFagPratPage() {
             </div>
             <ForkunnskapSelector value={forkunnskap} onChange={setForkunnskap} />
             <div className="mt-4">
-              <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Synlighet
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setVisibility("public")}
-                  className={cn(
-                    "flex flex-1 items-center gap-2 rounded-xl border-2 px-3 py-2 text-sm font-semibold transition-all",
-                    visibility === "public"
-                      ? "border-primary/40 bg-primary/5 text-primary"
-                      : "border-border text-muted-foreground",
-                  )}
-                >
-                  <Globe className="size-4" /> Offentlig
-                </button>
-                <button
-                  onClick={() => setVisibility("private")}
-                  className={cn(
-                    "flex flex-1 items-center gap-2 rounded-xl border-2 px-3 py-2 text-sm font-semibold transition-all",
-                    visibility === "private"
-                      ? "border-primary/40 bg-primary/5 text-primary"
-                      : "border-border text-muted-foreground",
-                  )}
-                >
-                  <Lock className="size-4" /> Privat
-                </button>
-              </div>
+              <VisibilityToggle value={visibility} onChange={setVisibility} />
             </div>
             <div className="mt-4 flex justify-end gap-2">
               <Button variant="ghost" size="sm" onClick={() => setEditing(false)}>
@@ -245,27 +205,21 @@ function EditFagPratPage() {
       {/* Statements */}
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-extrabold text-foreground">Påstander</h2>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() =>
-            setStatements([...statements, { statement: "", fasit: "sant", explanation: "" }])
-          }
-        >
+        <Button variant="outline" size="sm" onClick={addStatement}>
           <Plus className="size-4" />
           Legg til påstand
         </Button>
       </div>
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext
-          items={statements.map((_, i) => i)}
+          items={statements.map((s) => s.id)}
           strategy={verticalListSortingStrategy}
         >
           <div className="space-y-4">
             {statements.map((stmt, i) => (
               <StatementEditor
-                key={i}
-                id={i}
+                key={stmt.id}
+                id={stmt.id}
                 index={i}
                 statement={stmt.statement}
                 fasit={stmt.fasit}
@@ -273,7 +227,7 @@ function EditFagPratPage() {
                 onStatementChange={(v) => updateStatement(i, "statement", v)}
                 onFasitChange={(v) => updateStatement(i, "fasit", v)}
                 onExplanationChange={(v) => updateStatement(i, "explanation", v)}
-                onDelete={() => setStatements(statements.filter((_, j) => j !== i))}
+                onDelete={() => removeStatement(i)}
               />
             ))}
           </div>

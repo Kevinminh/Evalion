@@ -96,6 +96,9 @@ catalogs:
     react-dom:
       specifier: ^19.2.4
       version: 19.2.4
+    sonner:
+      specifier: ^2.0.3
+      version: 2.0.7
     tailwind-merge:
       specifier: ^3.5.0
       version: 3.5.0
@@ -197,6 +200,9 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
+      sonner:
+        specifier: 'catalog:'
+        version: 2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       tailwindcss:
         specifier: 'catalog:'
         version: 4.2.2
@@ -291,7 +297,7 @@ importers:
         version: link:../../packages/ui
       better-auth:
         specifier: 'catalog:'
-        version: 1.5.6(@opentelemetry/api@1.9.1)(@tanstack/react-start@1.167.5(crossws@0.4.4(srvx@0.11.13))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)))(next@15.5.14(@opentelemetry/api@1.9.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 1.5.6(@opentelemetry/api@1.9.1)(@tanstack/react-start@1.167.5(crossws@0.4.4(srvx@0.11.13))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)))(next@15.5.14(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       convex:
         specifier: 'catalog:'
         version: 1.34.1(react@19.2.4)
@@ -343,7 +349,7 @@ importers:
         version: 0.11.3(@standard-schema/spec@1.1.0)(better-auth@1.5.6(@opentelemetry/api@1.9.1)(@tanstack/react-start@1.167.5(crossws@0.4.4(srvx@0.11.13))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)))(next@15.5.14(@opentelemetry/api@1.9.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(convex@1.34.1(react@19.2.4))(hono@4.12.9)(react@19.2.4)(typescript@6.0.2)
       better-auth:
         specifier: 'catalog:'
-        version: 1.5.6(@opentelemetry/api@1.9.1)(@tanstack/react-start@1.167.5(crossws@0.4.4(srvx@0.11.13))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)))(next@15.5.14(@opentelemetry/api@1.9.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 1.5.6(@opentelemetry/api@1.9.1)(@tanstack/react-start@1.167.5(crossws@0.4.4(srvx@0.11.13))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)))(next@15.5.14(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       convex:
         specifier: 'catalog:'
         version: 1.34.1(react@19.2.4)
@@ -389,6 +395,9 @@ importers:
       shadcn:
         specifier: ^4.1.0
         version: 4.1.0(@types/node@25.5.0)(typescript@6.0.2)
+      sonner:
+        specifier: 'catalog:'
+        version: 2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       tailwind-merge:
         specifier: 'catalog:'
         version: 3.5.0
@@ -4271,6 +4280,12 @@ packages:
 
   snake-case@2.1.0:
     resolution: {integrity: sha512-FMR5YoPFwOLuh4rRz92dywJjyKYZNLpMn1R5ujVpIYkbA9p01fq8RMg0FkO4M+Yobt4MjHeLTJVm5xFFBHSV2Q==}
+
+  sonner@2.0.7:
+    resolution: {integrity: sha512-W6ZN4p58k8aDKA4XPcx2hpIQXBRAgyiWVkYhT7CvK6D3iAu7xjvVyhQHg2/iaKJZ1XVJ4r7XuwGL+WGEK37i9w==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -8527,6 +8542,11 @@ snapshots:
   snake-case@2.1.0:
     dependencies:
       no-case: 2.3.2
+
+  sonner@2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+    dependencies:
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
 
   source-map-js@1.2.1: {}
 
