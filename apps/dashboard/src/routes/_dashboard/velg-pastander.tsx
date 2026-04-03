@@ -302,13 +302,25 @@ function VelgPastanderPage() {
         </div>
       )}
 
-      {/* Loading skeleton */}
+      {/* Loading indicator + skeleton */}
       {loading && (
-        <div className="mb-24 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-          <SkeletonColumn {...columnConfig.sant} />
-          <SkeletonColumn {...columnConfig.usant} />
-          <SkeletonColumn {...columnConfig.delvis} />
-        </div>
+        <>
+          <div className="mb-6 flex items-center gap-4 rounded-2xl border-[1.5px] border-primary/20 bg-primary/5 p-5">
+            <img src="/reddi.png" alt="Reddi" className="size-10 rounded-full object-cover" />
+            <div className="flex-1">
+              <p className="text-sm font-bold text-foreground">REDDI genererer påstander...</p>
+              <p className="text-xs text-muted-foreground">
+                Lager 9 påstander tilpasset {topic ? `«${topic}»` : "temaet ditt"}
+              </p>
+            </div>
+            <Sparkles className="size-5 animate-pulse text-primary" />
+          </div>
+          <div className="mb-24 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+            <SkeletonColumn {...columnConfig.sant} />
+            <SkeletonColumn {...columnConfig.usant} />
+            <SkeletonColumn {...columnConfig.delvis} />
+          </div>
+        </>
       )}
 
       {/* Statement columns */}
