@@ -1,7 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { api } from "@workspace/backend/convex/_generated/api";
 import { cn } from "@workspace/ui/lib/utils";
-import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { useAction } from "convex/react";
+import { AlertTriangle, ArrowLeft, ArrowRight, RefreshCw, Sparkles } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 export const Route = createFileRoute("/_dashboard/velg-pastander")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -17,6 +19,38 @@ interface Statement {
   text: string;
   fasit: "sant" | "usant" | "delvis";
   explanation: string;
+}
+
+function SkeletonColumn({ title, headerBg, headerText, borderTopColor }: {
+  title: string;
+  headerBg: string;
+  headerText: string;
+  borderTopColor: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col rounded-2xl border-[1.5px] border-border bg-card p-4",
+        "border-t-4",
+        borderTopColor,
+      )}
+    >
+      <div
+        className={cn(
+          "mb-4 rounded-xl px-4 py-3 text-center text-sm font-extrabold uppercase tracking-wider",
+          headerBg,
+          headerText,
+        )}
+      >
+        {title}
+      </div>
+      <div className="space-y-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-16 animate-pulse rounded-xl border-2 border-border bg-muted/30" />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function StatementColumn({
@@ -87,104 +121,67 @@ function StatementColumn({
 
 function VelgPastanderPage() {
   const navigate = useNavigate();
-  const { statements: statementsJson, draft: draftJson } = Route.useSearch();
+  const { statements: statementsJson, draft: draftJson, topic } = Route.useSearch();
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [allStatements, setAllStatements] = useState<Statement[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Parse statements from search params
-  let allStatements: Statement[] = [];
+  const generate = useAction(api.reddi.generateStatements);
+
+  // Parse draft to extract context for AI generation
+  let draftSubject = "";
+  let draftLevel = "";
+  let draftType: "intro" | "oppsummering" = "intro";
   try {
-    if (statementsJson) {
-      allStatements = JSON.parse(statementsJson) as Statement[];
+    if (draftJson) {
+      const draft = JSON.parse(draftJson) as {
+        subject?: string;
+        level?: string;
+        type?: "intro" | "oppsummering";
+      };
+      draftSubject = draft.subject ?? "";
+      draftLevel = draft.level ?? "";
+      draftType = draft.type ?? "intro";
     }
   } catch {
     // Invalid JSON
   }
 
-  // If no statements from params, use fallback examples
-  if (allStatements.length === 0) {
-    allStatements = [
-      {
-        id: "s1",
-        text: "Drivhuseffekten er en naturlig prosess som gjør jorda beboelig.",
-        fasit: "sant",
-        explanation: "",
-      },
-      {
-        id: "s2",
-        text: "Fossile brånsler er dannet av organisk materiale over millioner av år.",
-        fasit: "sant",
-        explanation: "",
-      },
-      {
-        id: "s3",
-        text: "CO₂ er den viktigste menneskeskapte klimagassen.",
-        fasit: "sant",
-        explanation: "",
-      },
-      {
-        id: "s4",
-        text: "Fornybar energi inkluderer sol, vind og vannkraft.",
-        fasit: "sant",
-        explanation: "",
-      },
-      {
-        id: "s5",
-        text: "Parisavtalen har som mål å begrense global oppvarming til 1,5°C.",
-        fasit: "sant",
-        explanation: "",
-      },
-      {
-        id: "u1",
-        text: "Klimaendringer skyldes kun naturlige prosesser.",
-        fasit: "usant",
-        explanation: "",
-      },
-      {
-        id: "u2",
-        text: "Norge påvirker ikke klimaet fordi vi er et lite land.",
-        fasit: "usant",
-        explanation: "",
-      },
-      {
-        id: "u3",
-        text: "Drivhuseffekten er utelukkende skadelig.",
-        fasit: "usant",
-        explanation: "",
-      },
-      {
-        id: "u4",
-        text: "Fornybar energi kan erstatte all fossil energi over natten.",
-        fasit: "usant",
-        explanation: "",
-      },
-      {
-        id: "u5",
-        text: "Ozonlaget og drivhuseffekten er det samme.",
-        fasit: "usant",
-        explanation: "",
-      },
-      { id: "d1", text: "Elbiler er helt utslippsfrie.", fasit: "delvis", explanation: "" },
-      {
-        id: "d2",
-        text: "Planting av trær er den beste løsningen mot klimaendringer.",
-        fasit: "delvis",
-        explanation: "",
-      },
-      {
-        id: "d3",
-        text: "Kjernekraft er en fornybar energikilde.",
-        fasit: "delvis",
-        explanation: "",
-      },
-      { id: "d4", text: "Klimaendringer rammer alle land likt.", fasit: "delvis", explanation: "" },
-      {
-        id: "d5",
-        text: "Resirkulering alene kan løse avfallsproblemet.",
-        fasit: "delvis",
-        explanation: "",
-      },
-    ];
-  }
+  const handleGenerate = useCallback(async () => {
+    if (!topic) return;
+    setLoading(true);
+    setError(null);
+    setAllStatements([]);
+    setSelected(new Set());
+    try {
+      const result = await generate({
+        topic,
+        subject: draftSubject,
+        level: draftLevel,
+        type: draftType,
+      });
+      setAllStatements(result);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Noe gikk galt. Prøv igjen.");
+    } finally {
+      setLoading(false);
+    }
+  }, [topic, draftSubject, draftLevel, draftType, generate]);
+
+  // Generate statements on mount if we have a topic
+  useEffect(() => {
+    if (topic) {
+      handleGenerate();
+    } else if (statementsJson) {
+      // Parse pre-existing statements from search params
+      try {
+        setAllStatements(JSON.parse(statementsJson) as Statement[]);
+      } catch {
+        // Invalid JSON
+      }
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const santStatements = allStatements.filter((s) => s.fasit === "sant");
   const usantStatements = allStatements.filter((s) => s.fasit === "usant");
@@ -232,6 +229,33 @@ function VelgPastanderPage() {
     });
   };
 
+  const columnConfig = {
+    sant: {
+      title: "Sant",
+      headerBg: "bg-sant-bg",
+      headerText: "text-sant",
+      selectedBorder: "border-sant",
+      selectedGlow: "shadow-[0_0_12px_color-mix(in_oklch,var(--sant)_25%,transparent)]",
+      borderTopColor: "border-t-sant",
+    },
+    usant: {
+      title: "Usant",
+      headerBg: "bg-usant-bg",
+      headerText: "text-usant",
+      selectedBorder: "border-usant",
+      selectedGlow: "shadow-[0_0_12px_color-mix(in_oklch,var(--usant)_25%,transparent)]",
+      borderTopColor: "border-t-usant",
+    },
+    delvis: {
+      title: "Delvis sant",
+      headerBg: "bg-delvis-bg",
+      headerText: "text-delvis",
+      selectedBorder: "border-delvis",
+      selectedGlow: "shadow-[0_0_12px_color-mix(in_oklch,var(--delvis)_25%,transparent)]",
+      borderTopColor: "border-t-delvis",
+    },
+  };
+
   return (
     <div>
       {/* Back link */}
@@ -243,47 +267,80 @@ function VelgPastanderPage() {
         Tilbake
       </button>
 
-      <h1 className="mb-2 text-2xl font-extrabold text-foreground sm:text-3xl">Velg påstander</h1>
-      <p className="mb-8 text-base text-muted-foreground">
-        Velg hvilke påstander du vil inkludere i FagPraten
-      </p>
-
-      {/* 3-column grid */}
-      <div className="mb-24 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-        <StatementColumn
-          title="Sant"
-          statements={santStatements}
-          selected={selected}
-          onToggle={toggle}
-          headerBg="bg-sant-bg"
-          headerText="text-sant"
-          selectedBorder="border-sant"
-          selectedGlow="shadow-[0_0_12px_color-mix(in_oklch,var(--sant)_25%,transparent)]"
-          borderTopColor="border-t-sant"
-        />
-        <StatementColumn
-          title="Usant"
-          statements={usantStatements}
-          selected={selected}
-          onToggle={toggle}
-          headerBg="bg-usant-bg"
-          headerText="text-usant"
-          selectedBorder="border-usant"
-          selectedGlow="shadow-[0_0_12px_color-mix(in_oklch,var(--usant)_25%,transparent)]"
-          borderTopColor="border-t-usant"
-        />
-        <StatementColumn
-          title="Delvis sant"
-          statements={delvisStatements}
-          selected={selected}
-          onToggle={toggle}
-          headerBg="bg-delvis-bg"
-          headerText="text-delvis"
-          selectedBorder="border-delvis"
-          selectedGlow="shadow-[0_0_12px_color-mix(in_oklch,var(--delvis)_25%,transparent)]"
-          borderTopColor="border-t-delvis"
-        />
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="mb-2 text-2xl font-extrabold text-foreground sm:text-3xl">
+            Velg påstander
+          </h1>
+          <p className="text-base text-muted-foreground">
+            Velg hvilke påstander du vil inkludere i FagPraten
+          </p>
+        </div>
+        {topic && !loading && allStatements.length > 0 && (
+          <button
+            onClick={handleGenerate}
+            className="inline-flex items-center gap-2 rounded-xl border-2 border-border px-4 py-2.5 text-sm font-bold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+          >
+            <RefreshCw className="size-4" />
+            Generer nye
+          </button>
+        )}
       </div>
+
+      {/* Error banner */}
+      {error && (
+        <div className="mb-6 flex items-center gap-3 rounded-2xl border-2 border-destructive/30 bg-destructive/5 p-4">
+          <AlertTriangle className="size-5 shrink-0 text-destructive" />
+          <p className="flex-1 text-sm font-medium text-destructive">{error}</p>
+          <button
+            onClick={handleGenerate}
+            className="inline-flex items-center gap-2 rounded-xl bg-destructive px-4 py-2 text-sm font-bold text-destructive-foreground transition-opacity hover:opacity-90"
+          >
+            <RefreshCw className="size-4" />
+            Prøv igjen
+          </button>
+        </div>
+      )}
+
+      {/* Loading skeleton */}
+      {loading && (
+        <div className="mb-24 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+          <SkeletonColumn {...columnConfig.sant} />
+          <SkeletonColumn {...columnConfig.usant} />
+          <SkeletonColumn {...columnConfig.delvis} />
+        </div>
+      )}
+
+      {/* Statement columns */}
+      {!loading && allStatements.length > 0 && (
+        <div className="mb-24 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+          <StatementColumn
+            {...columnConfig.sant}
+            statements={santStatements}
+            selected={selected}
+            onToggle={toggle}
+          />
+          <StatementColumn
+            {...columnConfig.usant}
+            statements={usantStatements}
+            selected={selected}
+            onToggle={toggle}
+          />
+          <StatementColumn
+            {...columnConfig.delvis}
+            statements={delvisStatements}
+            selected={selected}
+            onToggle={toggle}
+          />
+        </div>
+      )}
+
+      {/* Empty state when no topic and no statements */}
+      {!loading && !error && allStatements.length === 0 && (
+        <div className="mb-24 rounded-2xl border-2 border-dashed border-border py-16 text-center">
+          <p className="text-muted-foreground">Ingen påstander å vise</p>
+        </div>
+      )}
 
       {/* Fixed bottom bar */}
       <div className="fixed right-0 bottom-0 left-0 z-20 flex items-center justify-between border-t bg-card px-4 py-3 sm:px-8 sm:py-4 md:left-[220px]">
