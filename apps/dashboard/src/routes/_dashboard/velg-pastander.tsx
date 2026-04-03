@@ -46,7 +46,10 @@ function SkeletonColumn({ title, headerBg, headerText, borderTopColor }: {
       </div>
       <div className="space-y-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-16 animate-pulse rounded-xl border-2 border-border bg-muted/30" />
+          <div key={i} className="h-16 rounded-xl border-2 border-border bg-muted/30 p-4">
+            <div className="mb-2 h-3 w-4/5 animate-pulse rounded bg-muted" />
+            <div className="h-3 w-3/5 animate-pulse rounded bg-muted" />
+          </div>
         ))}
       </div>
     </div>
