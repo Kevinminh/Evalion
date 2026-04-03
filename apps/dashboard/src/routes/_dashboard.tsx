@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@workspace/ui/components/sidebar";
 
 import { AppSidebar } from "@/components/app-sidebar";
 
@@ -13,11 +14,16 @@ export const Route = createFileRoute("/_dashboard")({
 
 function DashboardLayout() {
   return (
-    <div className="min-h-svh bg-background">
+    <SidebarProvider>
       <AppSidebar />
-      <main className="min-h-svh py-8 pr-10 pl-[260px]">
-        <Outlet />
-      </main>
-    </div>
+      <SidebarInset>
+        <header className="flex h-12 items-center gap-2 px-4 md:hidden">
+          <SidebarTrigger />
+        </header>
+        <div className="py-8 px-10">
+          <Outlet />
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

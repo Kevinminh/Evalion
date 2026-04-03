@@ -9,7 +9,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
-import { cn } from "@workspace/ui/lib/utils";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@workspace/ui/components/sidebar";
 import { Search, FolderOpen, Clock, Plus, LogOut, Settings, HelpCircle } from "lucide-react";
 
 import { authClient } from "@/lib/auth-client";
@@ -49,14 +59,12 @@ export function AppSidebar() {
   const initials = getInitials(userName);
 
   return (
-    <aside className="fixed left-0 top-0 z-30 flex h-screen w-[220px] flex-col border-r bg-white">
-      {/* Logo */}
-      <div className="flex items-center justify-center px-4 pt-4 pb-2">
+    <Sidebar collapsible="none">
+      <SidebarHeader className="items-center justify-center px-4 pt-4 pb-2">
         <img src="/logo.png" alt="Evalion" className="h-16 object-contain" />
-      </div>
+      </SidebarHeader>
 
-      {/* CTA Button */}
-      <div className="px-4 py-2">
+      <SidebarGroup className="px-4 py-2">
         <Button
           variant="accent"
           className="w-full rounded-lg"
@@ -65,34 +73,32 @@ export function AppSidebar() {
           <Plus className="size-5" />
           Lag en FagPrat
         </Button>
-      </div>
+      </SidebarGroup>
 
-      {/* Nav items */}
-      <nav className="mt-2 flex flex-col gap-1 px-3">
-        {navItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-              isActive(item.path)
-                ? "bg-primary/10 font-medium text-primary"
-                : "text-muted-foreground hover:bg-muted",
-            )}
-          >
-            <item.icon className="size-5" />
-            {item.label}
-          </Link>
-        ))}
-      </nav>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navItems.map((item) => (
+                <SidebarMenuItem key={item.path}>
+                  <SidebarMenuButton
+                    isActive={!!isActive(item.path)}
+                    tooltip={item.label}
+                    render={<Link to={item.path} />}
+                  >
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
 
-      {/* Spacer */}
-      <div className="flex-1" />
-
-      {/* User profile with dropdown */}
-      <div className="px-3 pb-3">
+      <SidebarFooter>
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-colors hover:bg-muted">
+          <DropdownMenuTrigger className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-colors hover:bg-sidebar-accent">
             <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-extrabold text-primary-foreground">
               {initials}
             </div>
@@ -132,7 +138,7 @@ export function AppSidebar() {
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
-    </aside>
+      </SidebarFooter>
+    </Sidebar>
   );
 }
