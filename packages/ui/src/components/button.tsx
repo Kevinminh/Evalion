@@ -21,7 +21,7 @@ const buttonVariants = cva(
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         teal: "bg-secondary-teal text-white shadow-[0_3px_0_var(--secondary-teal-dark)] hover:-translate-y-0.5 hover:shadow-[0_4px_0_var(--secondary-teal-dark)] active:translate-y-0.5 active:shadow-[0_1px_0_var(--secondary-teal-dark)]",
         accent:
-          "bg-accent text-white shadow-[0_3px_0_oklch(0.4_0.15_15)] hover:-translate-y-px",
+          "bg-accent text-white shadow-[0_3px_0_oklch(0.4_0.15_15)] hover:-translate-y-0.5 hover:shadow-[0_5px_0_oklch(0.4_0.15_15)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.4_0.15_15)]",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

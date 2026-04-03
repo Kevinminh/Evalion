@@ -538,8 +538,8 @@ function StudentGamePage() {
               Forklaring
             </h2>
             {statement && <FasitBadge answer={statement.fasit} />}
-            <div className="w-full max-w-md overflow-hidden rounded-2xl border-[1.5px] border-blue-200">
-              <div className="bg-gradient-to-b from-blue-100 to-blue-50 p-5">
+            <div className="w-full max-w-md max-h-[392px] overflow-hidden rounded-2xl border-[1.5px] border-blue-200">
+              <div className="bg-gradient-to-br from-blue-100 to-blue-50 p-5">
                 <p className="text-center text-base font-bold text-foreground">
                   {statement?.text}
                 </p>

@@ -41,9 +41,9 @@ const VOTE_LABELS: Record<string, string> = {
 
 const STATEMENT_COLORS = [
   { bg: "#FFFDE7", border: "#FFE082" },
-  { bg: "#E3F1FC", border: "#B8DAF0" },
+  { bg: "#E3F1FC", border: "#90CAF9" },
   { bg: "#FFF3E0", border: "#FFCC80" },
-  { bg: "#F3E5F5", border: "#CE93D8" },
+  { bg: "#F3EEFF", border: "#CE93D8" },
   { bg: "#FFEBEE", border: "#EF9A9A" },
 ];
 
@@ -409,13 +409,17 @@ function LiveStepPage() {
         return (
           <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 pt-8">
             {statement && <FasitBadge answer={statement.fasit} />}
-            <div className="w-full overflow-hidden rounded-2xl border-[1.5px] border-blue-200 animate-[fadeInUp_0.5s_ease_0.2s_both]">
-              <div className="bg-gradient-to-b from-blue-100 to-blue-50 p-6">
+            <div className="w-full max-h-[392px] overflow-hidden rounded-2xl border-[1.5px] border-blue-200 animate-[fadeInUp_0.5s_ease_0.2s_both]">
+              <div className="bg-gradient-to-br from-blue-100 to-blue-50 p-6">
                 <p className="text-center text-lg font-bold text-foreground">{statement?.text}</p>
               </div>
               <div className="bg-white p-6">
                 <div className="flex gap-4">
-                  <Professor size="sm" className="shrink-0" />
+                  <img
+                    src="/professoren.png"
+                    alt="Professoren"
+                    className="size-24 shrink-0 rounded-full border-[3px] border-primary/20 object-cover"
+                  />
                   <div>
                     <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                       Forklaring
@@ -695,7 +699,7 @@ function LiveStepPage() {
         </a>
         <button
           onClick={handleEnd}
-          className="inline-flex items-center gap-2 rounded-xl bg-destructive px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_oklch(0.45_0.15_25)] transition-all hover:-translate-y-px hover:shadow-[0_4px_0_oklch(0.45_0.15_25)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.45_0.15_25)]"
+          className="inline-flex items-center gap-2 rounded-full bg-destructive px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_oklch(0.45_0.15_25)] transition-all hover:-translate-y-0.5 hover:shadow-[0_5px_0_oklch(0.45_0.15_25)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.45_0.15_25)]"
         >
           Avslutt
         </button>
