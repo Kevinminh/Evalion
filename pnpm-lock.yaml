@@ -383,12 +383,21 @@ importers:
       '@base-ui/react':
         specifier: 'catalog:'
         version: 1.3.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@convex-dev/better-auth':
+        specifier: 'catalog:'
+        version: 0.11.3(@standard-schema/spec@1.1.0)(better-auth@1.5.6(@opentelemetry/api@1.9.1)(@tanstack/react-start@1.167.5(crossws@0.4.4(srvx@0.11.13))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)))(next@15.5.14(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(convex@1.34.1(react@19.2.4))(hono@4.12.9)(react@19.2.4)(typescript@6.0.2)
       '@fontsource-variable/inter':
         specifier: 'catalog:'
         version: 5.2.8
       '@fontsource-variable/nunito':
         specifier: 'catalog:'
         version: 5.2.7
+      '@workspace/backend':
+        specifier: workspace:*
+        version: link:../backend
+      better-auth:
+        specifier: 'catalog:'
+        version: 1.5.6(@opentelemetry/api@1.9.1)(@tanstack/react-start@1.167.5(crossws@0.4.4(srvx@0.11.13))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)))(next@15.5.14(@opentelemetry/api@1.9.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       class-variance-authority:
         specifier: 'catalog:'
         version: 0.7.1
@@ -444,6 +453,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 6.0.2
+      vite:
+        specifier: 'catalog:'
+        version: 7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)
 
 packages:
 
@@ -7156,7 +7168,6 @@ snapshots:
   crossws@0.4.4(srvx@0.11.13):
     optionalDependencies:
       srvx: 0.11.13
-    optional: true
 
   css-select@5.2.2:
     dependencies:
@@ -7325,9 +7336,9 @@ snapshots:
 
   env-runner@0.1.6:
     dependencies:
-      crossws: 0.4.4(srvx@0.11.12)
+      crossws: 0.4.4(srvx@0.11.13)
       httpxy: 0.3.1
-      srvx: 0.11.12
+      srvx: 0.11.13
 
   error-ex@1.3.4:
     dependencies:
@@ -7673,7 +7684,7 @@ snapshots:
   h3@2.0.1-rc.18(crossws@0.4.4(srvx@0.11.12)):
     dependencies:
       rou3: 0.8.1
-      srvx: 0.11.12
+      srvx: 0.11.13
     optionalDependencies:
       crossws: 0.4.4(srvx@0.11.12)
 

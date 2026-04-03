@@ -14,6 +14,12 @@ import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
 import { StepNav } from "@workspace/ui/components/live/step-nav";
 import { TeacherPanel } from "@workspace/ui/components/live/teacher-panel";
 import { TimerCard } from "@workspace/ui/components/live/timer-card";
+import {
+  FASIT_TEXT,
+  STATEMENT_COLORS_HEX,
+  VOTE_DOT_COLORS,
+  VOTE_LABELS,
+} from "@workspace/ui/lib/constants";
 import { cn } from "@workspace/ui/lib/utils";
 // VoteButtons removed — teacher view doesn't vote
 import { useMutation } from "convex/react";
@@ -28,34 +34,6 @@ import { DASHBOARD_URL } from "@/lib/env";
 export const Route = createFileRoute("/liveokt/$sessionId/steg/$step")({
   component: LiveStepPage,
 });
-
-type VoteType = "sant" | "usant" | "delvis";
-
-const VOTE_DOT_COLORS: Record<VoteType, string> = {
-  sant: "bg-sant",
-  usant: "bg-usant",
-  delvis: "bg-delvis",
-};
-
-const VOTE_LABELS: Record<VoteType, string> = {
-  sant: "Sant",
-  usant: "Usant",
-  delvis: "Delvis sant",
-};
-
-const STATEMENT_COLORS = [
-  { bg: "#FFFDE7", border: "#FFE082" },
-  { bg: "#E3F1FC", border: "#90CAF9" },
-  { bg: "#FFF3E0", border: "#FFCC80" },
-  { bg: "#F3EEFF", border: "#CE93D8" },
-  { bg: "#FFEBEE", border: "#EF9A9A" },
-];
-
-const FASIT_TEXT: Record<VoteType, string> = {
-  sant: "sant",
-  usant: "usant",
-  delvis: "delvis sant",
-};
 
 function LiveStepPage() {
   const { sessionId, step: stepParam } = Route.useParams();
@@ -317,7 +295,7 @@ function LiveStepPage() {
                 const hasSomeSelected = selectedStatement !== null;
                 const isLast = i === fagprat.statements.length - 1;
                 const isUsed = usedStatements.has(i);
-                const color = STATEMENT_COLORS[i % STATEMENT_COLORS.length];
+                const color = STATEMENT_COLORS_HEX[i % STATEMENT_COLORS_HEX.length];
                 return (
                   <button
                     key={i}
