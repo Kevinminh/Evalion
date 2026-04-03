@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Search, SlidersHorizontal, Sprout, Target } from "lucide-react";
+import { ChevronDown, Search, SlidersHorizontal, Sprout, Target } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
 import { FagPratCard } from "@/components/fagprat-card";
@@ -9,6 +9,94 @@ import { fagpratQueries } from "@/lib/convex";
 export const Route = createFileRoute("/_dashboard/")({
   component: UtforskPage,
 });
+
+function CustomDropdown({
+  label,
+  value,
+  onChange,
+  placeholder,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  options: { value: string; label: string }[];
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const selected = options.find((o) => o.value === value);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, [open]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      setOpen(false);
+      buttonRef.current?.focus();
+    } else if (e.key === "ArrowDown" && !open) {
+      e.preventDefault();
+      setOpen(true);
+    }
+  };
+
+  return (
+    <div ref={ref} className="relative" onKeyDown={handleKeyDown}>
+      <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-foreground">
+        {label}
+      </label>
+      <button
+        ref={buttonRef}
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen(!open);
+        }}
+        className="flex w-full items-center justify-between rounded-lg border-[1.5px] border-border bg-card px-3 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-primary/40 focus:border-primary focus:ring-3 focus:ring-primary/20"
+      >
+        <span className={!value ? "text-muted-foreground" : ""}>{selected?.label ?? placeholder}</span>
+        <ChevronDown className="size-4 text-muted-foreground" />
+      </button>
+      {open && (
+        <div
+          role="listbox"
+          aria-label={label}
+          className="absolute top-full left-0 z-20 mt-1 w-full rounded-lg border-[1.5px] border-border bg-card py-1 shadow-lg"
+        >
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              role="option"
+              aria-selected={opt.value === value}
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange(opt.value);
+                setOpen(false);
+              }}
+              className={`w-full px-3 py-2 text-left text-sm transition-colors hover:bg-primary/5 ${
+                opt.value === value ? "font-bold text-primary" : "text-foreground"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function UtforskPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -151,41 +239,35 @@ function UtforskPage() {
 
             {/* Fag + Trinn */}
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-foreground">
-                  Fag
-                </label>
-                <select
-                  value={selectedFag}
-                  onChange={(e) => setSelectedFag(e.target.value)}
-                  className="w-full appearance-none rounded-lg border-[1.5px] border-border bg-card px-3 py-2 text-sm font-medium text-foreground outline-none transition-colors focus:border-primary focus:ring-3 focus:ring-primary/20"
-                >
-                  <option value="">Alle fag</option>
-                  <option value="Naturfag">Naturfag</option>
-                  <option value="Matematikk">Matematikk</option>
-                  <option value="Samfunnsfag">Samfunnsfag</option>
-                  <option value="Norsk">Norsk</option>
-                  <option value="Engelsk">Engelsk</option>
-                </select>
-              </div>
-              <div>
-                <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-foreground">
-                  Trinn
-                </label>
-                <select
-                  value={selectedTrinn}
-                  onChange={(e) => setSelectedTrinn(e.target.value)}
-                  className="w-full appearance-none rounded-lg border-[1.5px] border-border bg-card px-3 py-2 text-sm font-medium text-foreground outline-none transition-colors focus:border-primary focus:ring-3 focus:ring-primary/20"
-                >
-                  <option value="">Alle trinn</option>
-                  <option value="8. trinn">8. trinn</option>
-                  <option value="9. trinn">9. trinn</option>
-                  <option value="10. trinn">10. trinn</option>
-                  <option value="VG1">VG1</option>
-                  <option value="VG2">VG2</option>
-                  <option value="VG3">VG3</option>
-                </select>
-              </div>
+              <CustomDropdown
+                label="Fag"
+                value={selectedFag}
+                onChange={setSelectedFag}
+                placeholder="Alle fag"
+                options={[
+                  { value: "", label: "Alle fag" },
+                  { value: "Naturfag", label: "Naturfag" },
+                  { value: "Matematikk", label: "Matematikk" },
+                  { value: "Samfunnsfag", label: "Samfunnsfag" },
+                  { value: "Norsk", label: "Norsk" },
+                  { value: "Engelsk", label: "Engelsk" },
+                ]}
+              />
+              <CustomDropdown
+                label="Trinn"
+                value={selectedTrinn}
+                onChange={setSelectedTrinn}
+                placeholder="Alle trinn"
+                options={[
+                  { value: "", label: "Alle trinn" },
+                  { value: "8. trinn", label: "8. trinn" },
+                  { value: "9. trinn", label: "9. trinn" },
+                  { value: "10. trinn", label: "10. trinn" },
+                  { value: "VG1", label: "VG1" },
+                  { value: "VG2", label: "VG2" },
+                  { value: "VG3", label: "VG3" },
+                ]}
+              />
             </div>
           </div>
         )}

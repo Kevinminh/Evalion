@@ -135,7 +135,28 @@ function LiveoktSetupPage() {
                 Lærer-analytics
               </div>
               <div className="mb-4 flex aspect-square items-center justify-center rounded-xl border-2 border-dashed border-primary/30 bg-primary/5">
-                <span className="text-sm text-primary/60">QR-kode</span>
+                <svg className="size-20 text-primary/30" viewBox="0 0 80 80" fill="currentColor" role="img" aria-label="QR-kode plassholder">
+                  <rect x="4" y="4" width="24" height="24" rx="3" fillOpacity="0.5" />
+                  <rect x="8" y="8" width="16" height="16" rx="1" fillOpacity="0.3" />
+                  <rect x="12" y="12" width="8" height="8" rx="1" />
+                  <rect x="52" y="4" width="24" height="24" rx="3" fillOpacity="0.5" />
+                  <rect x="56" y="8" width="16" height="16" rx="1" fillOpacity="0.3" />
+                  <rect x="60" y="12" width="8" height="8" rx="1" />
+                  <rect x="4" y="52" width="24" height="24" rx="3" fillOpacity="0.5" />
+                  <rect x="8" y="56" width="16" height="16" rx="1" fillOpacity="0.3" />
+                  <rect x="12" y="60" width="8" height="8" rx="1" />
+                  <rect x="34" y="4" width="8" height="8" rx="1" fillOpacity="0.4" />
+                  <rect x="34" y="18" width="8" height="8" rx="1" fillOpacity="0.2" />
+                  <rect x="4" y="34" width="8" height="8" rx="1" fillOpacity="0.4" />
+                  <rect x="18" y="34" width="8" height="8" rx="1" fillOpacity="0.2" />
+                  <rect x="34" y="34" width="8" height="8" rx="1" fillOpacity="0.5" />
+                  <rect x="52" y="34" width="8" height="8" rx="1" fillOpacity="0.3" />
+                  <rect x="34" y="52" width="8" height="8" rx="1" fillOpacity="0.3" />
+                  <rect x="52" y="52" width="8" height="8" rx="1" fillOpacity="0.4" />
+                  <rect x="66" y="52" width="8" height="8" rx="1" fillOpacity="0.2" />
+                  <rect x="52" y="66" width="8" height="8" rx="1" fillOpacity="0.2" />
+                  <rect x="66" y="66" width="8" height="8" rx="1" fillOpacity="0.4" />
+                </svg>
               </div>
               <p className="mb-6 text-xs text-muted-foreground">
                 Se sanntidsdata og elevrespons under økten

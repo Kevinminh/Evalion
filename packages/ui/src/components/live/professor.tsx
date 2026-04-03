@@ -2,16 +2,18 @@ import { cn } from "@workspace/ui/lib/utils";
 import type { ReactNode } from "react";
 
 interface ProfessorProps {
-  size?: "xs" | "sm" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   text?: ReactNode;
   label?: string;
   animate?: boolean;
+  bordered?: boolean;
   className?: string;
 }
 
 const sizeConfig = {
   xs: "size-12",
   sm: "size-24",
+  md: "size-24",
   lg: "size-[220px]",
 };
 
@@ -20,6 +22,7 @@ export function Professor({
   text,
   label,
   animate = true,
+  bordered = false,
   className,
 }: ProfessorProps) {
   const container = sizeConfig[size];
@@ -30,7 +33,11 @@ export function Professor({
         <img
           src="/professoren.png"
           alt="Professoren"
-          className={cn("rounded-full object-cover", container)}
+          className={cn(
+            "rounded-full object-cover",
+            container,
+            bordered && "border-[3px] border-primary/20",
+          )}
         />
         {label && (
           <span className="text-sm font-medium text-muted-foreground">{label}</span>
