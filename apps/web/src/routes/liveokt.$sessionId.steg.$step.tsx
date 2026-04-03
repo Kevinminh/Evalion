@@ -129,6 +129,11 @@ function LiveStepPage() {
   };
 
   const goToStep = async (n: number) => {
+    // Reset state when returning to statement selection for a new round
+    if (n === 0) {
+      setCompletedSteps([]);
+      setSelectedStatement(null);
+    }
     // Mark current step as completed when advancing
     if (step > 0 && step < n) {
       setCompletedSteps((prev) => (prev.includes(step) ? prev : [...prev, step]));
