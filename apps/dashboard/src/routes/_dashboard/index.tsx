@@ -25,9 +25,11 @@ function CustomDropdown({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const selected = options.find((o) => o.value === value);
 
   useEffect(() => {
+    if (!open) return;
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
@@ -35,28 +37,51 @@ function CustomDropdown({
     }
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
-  }, []);
+  }, [open]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      setOpen(false);
+      buttonRef.current?.focus();
+    } else if (e.key === "ArrowDown" && !open) {
+      e.preventDefault();
+      setOpen(true);
+    }
+  };
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative" onKeyDown={handleKeyDown}>
       <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-foreground">
         {label}
       </label>
       <button
+        ref={buttonRef}
         type="button"
-        onClick={() => setOpen(!open)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen(!open);
+        }}
         className="flex w-full items-center justify-between rounded-lg border-[1.5px] border-border bg-card px-3 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-primary/40 focus:border-primary focus:ring-3 focus:ring-primary/20"
       >
         <span className={!value ? "text-muted-foreground" : ""}>{selected?.label ?? placeholder}</span>
         <ChevronDown className="size-4 text-muted-foreground" />
       </button>
       {open && (
-        <div className="absolute top-full left-0 z-20 mt-1 w-full rounded-lg border-[1.5px] border-border bg-card py-1 shadow-lg">
+        <div
+          role="listbox"
+          aria-label={label}
+          className="absolute top-full left-0 z-20 mt-1 w-full rounded-lg border-[1.5px] border-border bg-card py-1 shadow-lg"
+        >
           {options.map((opt) => (
             <button
               key={opt.value}
               type="button"
-              onClick={() => {
+              role="option"
+              aria-selected={opt.value === value}
+              onClick={(e) => {
+                e.stopPropagation();
                 onChange(opt.value);
                 setOpen(false);
               }}

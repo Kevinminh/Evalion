@@ -141,7 +141,8 @@ function TeacherLobbyPage() {
       </SessionTopBar>
 
       <div className="flex flex-1 pt-16">
-        <div className="m-4 flex w-[38%] min-w-[340px] max-w-[480px] flex-col items-center justify-center gap-4 rounded-2xl bg-card p-8 shadow-lg">
+        <div className="w-[38%] min-w-[340px] max-w-[480px] p-4">
+          <div className="flex h-full flex-col items-center justify-center gap-4 rounded-2xl bg-card p-8 shadow-lg">
           <img src="/logo.png" alt="Evalion" className="mb-2 h-16 object-contain" />
           <p className="text-sm text-muted-foreground">{window.location.host}/delta</p>
           <p className="text-sm font-semibold text-muted-foreground">
@@ -155,6 +156,7 @@ function TeacherLobbyPage() {
           <p className="mt-2 text-sm text-muted-foreground">Eller skann</p>
           <div className="rounded-xl bg-white p-3">
             <QRCodeSVG value={joinUrl} size={130} />
+          </div>
           </div>
         </div>
 

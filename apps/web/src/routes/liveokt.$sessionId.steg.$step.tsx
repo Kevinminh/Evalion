@@ -409,17 +409,13 @@ function LiveStepPage() {
         return (
           <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 pt-8">
             {statement && <FasitBadge answer={statement.fasit} />}
-            <div className="w-full max-h-[392px] overflow-hidden rounded-2xl border-[1.5px] border-blue-200 animate-[fadeInUp_0.5s_ease_0.2s_both]">
+            <div className="w-full max-h-[392px] overflow-y-auto rounded-2xl border-[1.5px] border-blue-200 animate-[fadeInUp_0.5s_ease_0.2s_both]">
               <div className="bg-gradient-to-br from-blue-100 to-blue-50 p-6">
                 <p className="text-center text-lg font-bold text-foreground">{statement?.text}</p>
               </div>
               <div className="bg-white p-6">
                 <div className="flex gap-4">
-                  <img
-                    src="/professoren.png"
-                    alt="Professoren"
-                    className="size-24 shrink-0 rounded-full border-[3px] border-primary/20 object-cover"
-                  />
+                  <Professor size="md" bordered className="shrink-0" />
                   <div>
                     <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                       Forklaring
