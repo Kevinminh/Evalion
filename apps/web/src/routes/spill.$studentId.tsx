@@ -1,5 +1,6 @@
 import { useQuery, skipToken } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { VOTE_LABELS } from "@workspace/ui/lib/constants";
 import { cn } from "@workspace/ui/lib/utils";
 import { VoteButtons } from "@workspace/ui/components/live/vote-buttons";
 import { useMutation } from "convex/react";
@@ -16,14 +17,6 @@ import type { Id } from "@/lib/convex";
 export const Route = createFileRoute("/spill/$studentId")({
   component: StudentGamePage,
 });
-
-type VoteType = "sant" | "usant" | "delvis";
-
-const VOTE_LABELS: Record<VoteType, string> = {
-  sant: "Sant",
-  usant: "Usant",
-  delvis: "Delvis sant",
-};
 
 const RATING_COLORS = [
   "bg-red-400",
