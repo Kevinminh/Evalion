@@ -47,6 +47,7 @@ export const Route = createRootRouteWithContext<{
   },
   component: RootComponent,
   notFoundComponent: NotFound,
+  errorComponent: ErrorFallback,
   shellComponent: RootDocument,
 });
 
@@ -63,6 +64,21 @@ function RootComponent() {
         <Toaster />
       </ConvexBetterAuthProvider>
     </QueryClientProvider>
+  );
+}
+
+function ErrorFallback({ error }: { error: Error }) {
+  return (
+    <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background">
+      <h1 className="text-2xl font-extrabold text-foreground">Noe gikk galt</h1>
+      <p className="text-muted-foreground">{error.message}</p>
+      <button
+        onClick={() => window.location.reload()}
+        className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+      >
+        Last inn siden på nytt
+      </button>
+    </div>
   );
 }
 

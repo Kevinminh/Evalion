@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { liveSessionQueries } from "@/lib/convex";
+import { DASHBOARD_URL } from "@/lib/env";
 
 export const Route = createFileRoute("/")({ component: App });
 
@@ -82,7 +83,7 @@ function App() {
             </div>
           </div>
           <a
-            href={import.meta.env.DEV ? "http://localhost:3001" : "https://dashboard.evalion.no"}
+            href={DASHBOARD_URL}
             className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
           >
             Gå til dashboard

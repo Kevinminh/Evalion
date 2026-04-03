@@ -8,6 +8,7 @@ import { QRCodeSVG } from "qrcode.react";
 
 import { TeacherLobbySkeleton } from "@workspace/ui/components/skeletons/teacher-lobby-skeleton";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
+import { DASHBOARD_URL } from "@/lib/env";
 import type { Id } from "@/lib/convex";
 
 export const Route = createFileRoute("/liveokt/$sessionId/")({
@@ -82,7 +83,7 @@ function TeacherLobbyPage() {
     });
   };
 
-  const dashboardUrl = import.meta.env.DEV ? "http://localhost:3001" : "https://dashboard.evalion.no";
+  const dashboardUrl = DASHBOARD_URL;
 
   const handleEnd = async () => {
     await endSessionMutation({ id: session._id });

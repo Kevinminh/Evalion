@@ -4,23 +4,23 @@ const options = [
   {
     value: "sant" as const,
     label: "Sant",
-    bg: "bg-[#4CAF50]",
-    hover: "hover:bg-[#43A047]",
-    glow: "shadow-[0_0_20px_rgba(76,175,80,0.4)]",
+    bg: "bg-sant",
+    hover: "hover:brightness-110",
+    glow: "shadow-[0_0_20px_var(--sant)/40%]",
   },
   {
     value: "usant" as const,
     label: "Usant",
-    bg: "bg-[#EF5350]",
-    hover: "hover:bg-[#E53935]",
-    glow: "shadow-[0_0_20px_rgba(239,83,80,0.4)]",
+    bg: "bg-usant",
+    hover: "hover:brightness-110",
+    glow: "shadow-[0_0_20px_var(--usant)/40%]",
   },
   {
     value: "delvis" as const,
     label: "Delvis sant",
-    bg: "bg-[#FF9800]",
-    hover: "hover:bg-[#FB8C00]",
-    glow: "shadow-[0_0_20px_rgba(255,152,0,0.4)]",
+    bg: "bg-delvis",
+    hover: "hover:brightness-110",
+    glow: "shadow-[0_0_20px_var(--delvis)/40%]",
   },
 ] as const;
 
