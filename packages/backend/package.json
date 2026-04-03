@@ -19,7 +19,8 @@
   "dependencies": {
     "@convex-dev/better-auth": "catalog:",
     "better-auth": "catalog:",
-    "convex": "catalog:"
+    "convex": "catalog:",
+    "openai": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",

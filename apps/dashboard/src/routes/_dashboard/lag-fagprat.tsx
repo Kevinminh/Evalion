@@ -2,6 +2,7 @@ import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
+import { useAction } from "convex/react";
 import { Plus, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -9,6 +10,7 @@ import { ConceptTags } from "@/components/concept-tags";
 import { ForkunnskapSelector } from "@/components/forkunnskap-selector";
 import { ReddiModal } from "@/components/reddi-modal";
 import { StatementEditor } from "@/components/statement-editor";
+import { api } from "@/lib/convex";
 
 export const Route = createFileRoute("/_dashboard/lag-fagprat")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -33,6 +35,9 @@ function LagFagPratPage() {
   const [forkunnskap, setForkunnskap] = useState<"intro" | "oppsummering" | null>(null);
   const [statements, setStatements] = useState<StatementDraft[]>([]);
   const [reddiOpen, setReddiOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
+  const generateStatements = useAction(api.ai.generateStatements);
 
   useEffect(() => {
     if (!draftParam) return;
@@ -101,12 +106,28 @@ function LagFagPratPage() {
       })),
     });
 
-  const handleReddiSubmit = (topic: string) => {
-    setReddiOpen(false);
-    navigate({
-      to: "/velg-pastander",
-      search: { draft: buildDraftJson(), statements: "", topic },
-    });
+  const handleReddiSubmit = async (topic: string) => {
+    setIsGenerating(true);
+    setGenerationError(null);
+    try {
+      const result = await generateStatements({
+        topic,
+        subject: fag,
+        level: trinn,
+        type: forkunnskap!,
+      });
+      setReddiOpen(false);
+      setIsGenerating(false);
+      navigate({
+        to: "/velg-pastander",
+        search: { draft: buildDraftJson(), statements: JSON.stringify(result), topic },
+      });
+    } catch (error) {
+      setIsGenerating(false);
+      setGenerationError(
+        error instanceof Error ? error.message : "Noe gikk galt. Prøv igjen.",
+      );
+    }
   };
 
   const canProceed = title.trim() && fag && trinn && forkunnskap;
@@ -217,7 +238,13 @@ function LagFagPratPage() {
         )}
       </div>
 
-      <ReddiModal open={reddiOpen} onClose={() => setReddiOpen(false)} onSubmit={handleReddiSubmit} />
+      <ReddiModal
+        open={reddiOpen}
+        onClose={() => setReddiOpen(false)}
+        onSubmit={handleReddiSubmit}
+        isGenerating={isGenerating}
+        generationError={generationError}
+      />
 
       {/* Manual statements */}
       <div>

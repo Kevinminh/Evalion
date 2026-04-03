@@ -100,90 +100,25 @@ function VelgPastanderPage() {
     // Invalid JSON
   }
 
-  // If no statements from params, use fallback examples
+  // Show empty state if no statements were generated
   if (allStatements.length === 0) {
-    allStatements = [
-      {
-        id: "s1",
-        text: "Drivhuseffekten er en naturlig prosess som gjør jorda beboelig.",
-        fasit: "sant",
-        explanation: "",
-      },
-      {
-        id: "s2",
-        text: "Fossile brånsler er dannet av organisk materiale over millioner av år.",
-        fasit: "sant",
-        explanation: "",
-      },
-      {
-        id: "s3",
-        text: "CO₂ er den viktigste menneskeskapte klimagassen.",
-        fasit: "sant",
-        explanation: "",
-      },
-      {
-        id: "s4",
-        text: "Fornybar energi inkluderer sol, vind og vannkraft.",
-        fasit: "sant",
-        explanation: "",
-      },
-      {
-        id: "s5",
-        text: "Parisavtalen har som mål å begrense global oppvarming til 1,5°C.",
-        fasit: "sant",
-        explanation: "",
-      },
-      {
-        id: "u1",
-        text: "Klimaendringer skyldes kun naturlige prosesser.",
-        fasit: "usant",
-        explanation: "",
-      },
-      {
-        id: "u2",
-        text: "Norge påvirker ikke klimaet fordi vi er et lite land.",
-        fasit: "usant",
-        explanation: "",
-      },
-      {
-        id: "u3",
-        text: "Drivhuseffekten er utelukkende skadelig.",
-        fasit: "usant",
-        explanation: "",
-      },
-      {
-        id: "u4",
-        text: "Fornybar energi kan erstatte all fossil energi over natten.",
-        fasit: "usant",
-        explanation: "",
-      },
-      {
-        id: "u5",
-        text: "Ozonlaget og drivhuseffekten er det samme.",
-        fasit: "usant",
-        explanation: "",
-      },
-      { id: "d1", text: "Elbiler er helt utslippsfrie.", fasit: "delvis", explanation: "" },
-      {
-        id: "d2",
-        text: "Planting av trær er den beste løsningen mot klimaendringer.",
-        fasit: "delvis",
-        explanation: "",
-      },
-      {
-        id: "d3",
-        text: "Kjernekraft er en fornybar energikilde.",
-        fasit: "delvis",
-        explanation: "",
-      },
-      { id: "d4", text: "Klimaendringer rammer alle land likt.", fasit: "delvis", explanation: "" },
-      {
-        id: "d5",
-        text: "Resirkulering alene kan løse avfallsproblemet.",
-        fasit: "delvis",
-        explanation: "",
-      },
-    ];
+    return (
+      <div className="flex flex-col items-center justify-center py-24 text-center">
+        <p className="mb-4 text-lg font-semibold text-foreground">
+          Ingen påstander ble generert
+        </p>
+        <p className="mb-6 text-sm text-muted-foreground">
+          Gå tilbake og prøv igjen med REDDI.
+        </p>
+        <button
+          onClick={() => navigate({ to: "/lag-fagprat", search: { draft: draftJson } })}
+          className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground"
+        >
+          <ArrowLeft className="size-4" />
+          Tilbake
+        </button>
+      </div>
+    );
   }
 
   const santStatements = allStatements.filter((s) => s.fasit === "sant");
