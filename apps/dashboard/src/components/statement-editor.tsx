@@ -23,23 +23,23 @@ const fasitOptions = [
   {
     value: "sant" as const,
     label: "Sant",
-    bg: "bg-[#E8F5E9]",
-    text: "text-[#4CAF50]",
-    border: "border-[#4CAF50]",
+    bg: "bg-sant-bg",
+    text: "text-sant",
+    border: "border-sant",
   },
   {
     value: "usant" as const,
     label: "Usant",
-    bg: "bg-[#FFEBEE]",
-    text: "text-[#EF5350]",
-    border: "border-[#EF5350]",
+    bg: "bg-usant-bg",
+    text: "text-usant",
+    border: "border-usant",
   },
   {
     value: "delvis" as const,
     label: "Delvis sant",
-    bg: "bg-[#FFF3E0]",
-    text: "text-[#E65100]",
-    border: "border-[#E65100]",
+    bg: "bg-delvis-bg",
+    text: "text-delvis",
+    border: "border-delvis",
   },
 ];
 
@@ -89,6 +89,7 @@ export function StatementEditor({
             {index + 1}
           </div>
           <button
+            aria-label="Dra for å sortere"
             className="cursor-grab touch-none text-muted-foreground/50 hover:text-muted-foreground active:cursor-grabbing"
             {...attributes}
             {...listeners}
@@ -98,6 +99,7 @@ export function StatementEditor({
           <button
             disabled
             title="Kommer snart"
+            aria-label="Generer med AI"
             className="rounded-lg p-1.5 text-muted-foreground/40"
           >
             <Sparkles className="size-4" />
@@ -105,6 +107,7 @@ export function StatementEditor({
         </div>
         <button
           onClick={onDelete}
+          aria-label="Slett påstand"
           className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
         >
           <Trash2 className="size-4" />
@@ -127,6 +130,7 @@ export function StatementEditor({
             <button
               disabled
               title="Kommer snart"
+              aria-label="Legg til bilde for påstand"
               className="flex size-10 shrink-0 items-center justify-center self-start rounded-lg border-2 border-dashed border-muted-foreground/30 text-muted-foreground/40"
             >
               <ImageIcon className="size-4" />
@@ -172,6 +176,7 @@ export function StatementEditor({
             <button
               disabled
               title="Kommer snart"
+              aria-label="Legg til bilde for forklaring"
               className="flex size-10 shrink-0 items-center justify-center self-start rounded-lg border-2 border-dashed border-muted-foreground/30 text-muted-foreground/40"
             >
               <ImageIcon className="size-4" />

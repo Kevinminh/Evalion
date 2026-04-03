@@ -13,12 +13,6 @@ export interface FagPratStatement {
   explanation: string;
 }
 
-export interface StatementDraft {
-  statement: string;
-  fasit: Fasit;
-  explanation: string;
-}
-
 export interface FagPratDraft {
   title: string;
   concepts: string[];

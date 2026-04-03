@@ -65,12 +65,7 @@ function LiveoktSetupPage() {
         transcriptionEnabled,
         selfEvalEnabled,
       });
-      const playUrl = import.meta.env.VITE_PLAY_URL;
-      if (!playUrl) {
-        toast.error("Spillerlenke er ikke konfigurert. Kontakt administrator.");
-        setLaunching(false);
-        return;
-      }
+      const playUrl = import.meta.env.VITE_PLAY_URL || "https://play.evalion.no";
       window.location.href = `${playUrl}/liveokt/${sessionId}`;
     } catch {
       toast.error("Kunne ikke opprette liveøkt. Prøv igjen.");

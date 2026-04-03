@@ -41,6 +41,9 @@ export function OptionCard({
         </div>
         <button
           onClick={onToggle}
+          role="switch"
+          aria-checked={enabled}
+          aria-label={title}
           className={cn(
             "relative h-6 w-11 shrink-0 rounded-full transition-colors",
             enabled ? "bg-primary" : "bg-muted-foreground/30",

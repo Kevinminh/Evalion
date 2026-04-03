@@ -3,7 +3,7 @@ import { api } from "@workspace/backend/convex/_generated/api";
 import { cn } from "@workspace/ui/lib/utils";
 import { useAction } from "convex/react";
 import { AlertTriangle, ArrowLeft, ArrowRight, RefreshCw, Sparkles } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { Fasit, FagPratType } from "@/lib/types";
 
@@ -175,7 +175,10 @@ function VelgPastanderPage() {
   }, [topic, draftSubject, draftLevel, draftType, generate]);
 
   // Generate statements on mount if we have a topic
+  const hasInitialized = useRef(false);
   useEffect(() => {
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
     if (topic) {
       handleGenerate();
     } else if (statementsJson) {
@@ -186,7 +189,7 @@ function VelgPastanderPage() {
         // Invalid JSON
       }
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [topic, statementsJson, handleGenerate]);
 
   const santStatements = allStatements.filter((s) => s.fasit === "sant");
   const usantStatements = allStatements.filter((s) => s.fasit === "usant");

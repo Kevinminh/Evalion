@@ -14,7 +14,7 @@ export function ConceptTags({ concepts, onChange, editable = true, showAiButton 
 
   const addConcept = () => {
     const trimmed = inputValue.trim();
-    if (trimmed && !concepts.includes(trimmed)) {
+    if (trimmed && !concepts.some((c) => c.toLowerCase() === trimmed.toLowerCase())) {
       onChange([...concepts, trimmed]);
       setInputValue("");
       setShowInput(false);
@@ -49,6 +49,7 @@ export function ConceptTags({ concepts, onChange, editable = true, showAiButton 
             {editable && (
               <button
                 onClick={() => removeConcept(concept)}
+                aria-label={`Fjern begrep: ${concept}`}
                 className="ml-0.5 rounded-full p-0.5 transition-colors hover:bg-primary/20"
               >
                 <X className="size-3" />

@@ -57,7 +57,7 @@ function EditFagPratPage() {
       setVisibility(fagprat.visibility);
       setStatements(toStatementsWithId(fagprat.statements));
     }
-  }, [fagprat]);
+  }, [fagprat, setStatements]);
 
   if (isPending) {
     return <FagPratDetailSkeleton />;

@@ -21,7 +21,7 @@ import {
   SidebarMenuItem,
 } from "@workspace/ui/components/sidebar";
 import { Search, FolderOpen, Clock, Plus, LogOut, Settings, HelpCircle } from "lucide-react";
-import * as React from "react";
+import type { ComponentProps } from "react";
 
 import { authClient } from "@/lib/auth-client";
 
@@ -41,7 +41,7 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
   const matchRoute = useMatchRoute();
   const navigate = useNavigate();
   const { data: session } = authClient.useSession();
