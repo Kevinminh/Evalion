@@ -9,6 +9,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
 import { Professor } from "@workspace/ui/components/live/professor";
 
+import { StudentGameSkeleton } from "@workspace/ui/components/skeletons/student-game-skeleton";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 
@@ -233,11 +234,7 @@ function StudentGamePage() {
   }, [currentStep]);
 
   if (studentLoading) {
-    return (
-      <div className="flex min-h-svh items-center justify-center bg-background">
-        <Loader2 className="size-8 animate-spin text-primary" />
-      </div>
-    );
+    return <StudentGameSkeleton />;
   }
 
   if (!student) {

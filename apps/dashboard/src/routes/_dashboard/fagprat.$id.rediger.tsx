@@ -8,6 +8,7 @@ import { useMutation } from "convex/react";
 import { Pencil, Globe, Lock, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 
+import { FagPratDetailSkeleton } from "@workspace/ui/components/skeletons/fagprat-detail-skeleton";
 import { ConceptTags } from "@/components/concept-tags";
 import { ForkunnskapSelector } from "@/components/forkunnskap-selector";
 import { StatementEditor } from "@/components/statement-editor";
@@ -55,11 +56,7 @@ function EditFagPratPage() {
   }, [fagprat]);
 
   if (isPending) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-muted-foreground">Laster FagPrat...</p>
-      </div>
-    );
+    return <FagPratDetailSkeleton />;
   }
 
   if (!fagprat) {

@@ -22,6 +22,7 @@ import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, Users, Pencil, MoreVertical, Sprout, Target, Copy, Trash2, FolderPlus } from "lucide-react";
 import { useState } from "react";
 
+import { FagPratDetailSkeleton } from "@workspace/ui/components/skeletons/fagprat-detail-skeleton";
 import { StatementTable } from "@/components/statement-table";
 import { authClient } from "@/lib/auth-client";
 import { api, fagpratQueries } from "@/lib/convex";
@@ -41,11 +42,7 @@ function FagPratPreviewPage() {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   if (isPending) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-muted-foreground">Laster FagPrat...</p>
-      </div>
-    );
+    return <FagPratDetailSkeleton />;
   }
 
   if (!fagprat) {

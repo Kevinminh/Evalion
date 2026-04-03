@@ -20,6 +20,7 @@ import { useMutation } from "convex/react";
 import { ArrowRight, Users } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import { LiveStepSkeleton } from "@workspace/ui/components/skeletons/live-step-skeleton";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 
@@ -184,11 +185,7 @@ function LiveStepPage() {
   }, [step, selectedIdx]);
 
   if (isPending) {
-    return (
-      <div className="flex min-h-svh items-center justify-center">
-        <p className="text-muted-foreground">Laster...</p>
-      </div>
-    );
+    return <LiveStepSkeleton />;
   }
 
   if (!fagprat) {

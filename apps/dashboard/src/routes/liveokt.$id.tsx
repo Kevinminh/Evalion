@@ -15,6 +15,7 @@ import { useMutation } from "convex/react";
 import { Users, Mic, CheckSquare, ArrowRight } from "lucide-react";
 import { useState } from "react";
 
+import { LiveoktSetupSkeleton } from "@workspace/ui/components/skeletons/liveokt-setup-skeleton";
 import { OptionCard } from "@/components/live/option-card";
 import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
 import { Stepper } from "@/components/live/stepper";
@@ -44,11 +45,7 @@ function LiveoktSetupPage() {
   const [cancelOpen, setCancelOpen] = useState(false);
 
   if (isPending) {
-    return (
-      <div className="flex min-h-svh items-center justify-center">
-        <p className="text-muted-foreground">Laster...</p>
-      </div>
-    );
+    return <LiveoktSetupSkeleton />;
   }
 
   if (!fagprat) {
