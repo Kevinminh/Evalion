@@ -139,6 +139,10 @@ export const updateStep = mutation({
     await ctx.db.patch(args.id, {
       currentStep: args.step,
       status: "active",
+      timerDuration: undefined,
+      timerStartedAt: undefined,
+      timerPausedAt: undefined,
+      timerRemainingAtPause: undefined,
       ...(args.statementIndex !== undefined && {
         currentStatementIndex: args.statementIndex,
       }),
