@@ -77,10 +77,10 @@ function LiveoktSetupPage() {
     <div className="min-h-svh bg-background">
       <SessionTopBar title={fagprat.title} onExit={() => setCancelOpen(true)} />
 
-      <div className="mx-auto max-w-[1100px] px-8 pt-24 pb-12">
-        <h1 className="mb-8 text-3xl font-extrabold text-foreground">Oppsett for liveøkt</h1>
+      <div className="mx-auto max-w-[1100px] px-4 pt-20 pb-12 sm:px-8 sm:pt-24">
+        <h1 className="mb-6 text-2xl font-extrabold text-foreground sm:mb-8 sm:text-3xl">Oppsett for liveøkt</h1>
 
-        <div className="grid grid-cols-[1fr_340px] gap-8">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px] lg:gap-8">
           {/* Left: Options */}
           <div className="space-y-4">
             <OptionCard
@@ -125,7 +125,7 @@ function LiveoktSetupPage() {
           </div>
 
           {/* Right: Summary panel */}
-          <div className="sticky top-24">
+          <div className="lg:sticky lg:top-24">
             <div className="rounded-2xl border-[1.5px] border-border bg-card p-6">
               {/* QR placeholder */}
               <div className="mb-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">

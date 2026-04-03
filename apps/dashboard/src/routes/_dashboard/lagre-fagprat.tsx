@@ -75,7 +75,7 @@ function LagreFagPratPage() {
   return (
     <div className="max-w-[700px]">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate({ to: "/lag-fagprat", search: { draft: "" } })}
@@ -84,7 +84,7 @@ function LagreFagPratPage() {
             <ArrowLeft className="size-4" />
             Tilbake
           </button>
-          <h1 className="text-2xl font-extrabold text-foreground">Fullfør FagPraten</h1>
+          <h1 className="text-xl font-extrabold text-foreground sm:text-2xl">Fullfør FagPraten</h1>
         </div>
         <Button onClick={handleSave} disabled={saving}>
           {saving ? "Lagrer..." : "Lagre"}
@@ -92,7 +92,7 @@ function LagreFagPratPage() {
       </div>
 
       {/* Title card */}
-      <div className="rounded-2xl border-[1.5px] border-border bg-card p-6">
+      <div className="rounded-2xl border-[1.5px] border-border bg-card p-4 sm:p-6">
         {/* Title input */}
         <div className="mb-6">
           <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -103,7 +103,7 @@ function LagreFagPratPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Gi FagPraten en tittel..."
-            className="w-full rounded-xl border-2 border-input bg-muted/30 px-4 py-3 text-xl font-extrabold text-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary focus:bg-card focus:ring-3 focus:ring-primary/20"
+            className="w-full rounded-xl border-2 border-input bg-muted/30 px-4 py-3 text-lg font-extrabold text-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary focus:bg-card focus:ring-3 focus:ring-primary/20 sm:text-xl"
           />
         </div>
 

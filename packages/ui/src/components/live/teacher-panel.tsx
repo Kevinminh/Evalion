@@ -34,19 +34,26 @@ export function TeacherPanel({ children, defaultOpen = true, footer, onOpenChang
     <>
       <button
         onClick={toggle}
-        className="fixed right-0 top-20 z-30 rounded-l-lg border border-r-0 border-border bg-card p-2 text-muted-foreground shadow-sm transition-all hover:bg-muted"
+        className="fixed right-0 top-20 z-30 hidden rounded-l-lg border border-r-0 border-border bg-card p-2 text-muted-foreground shadow-sm transition-all hover:bg-muted md:block"
         style={{ right: open ? "340px" : "0px" }}
+      >
+        {open ? <PanelRightClose className="size-4" /> : <PanelRightOpen className="size-4" />}
+      </button>
+      {/* Mobile toggle button */}
+      <button
+        onClick={toggle}
+        className="fixed right-3 bottom-16 z-30 flex size-10 items-center justify-center rounded-full border border-border bg-card shadow-md md:hidden"
       >
         {open ? <PanelRightClose className="size-4" /> : <PanelRightOpen className="size-4" />}
       </button>
       <div
         className={cn(
-          "fixed right-0 top-16 bottom-14 z-20 flex w-[340px] flex-col border-l bg-card transition-transform duration-300",
+          "fixed right-0 top-16 bottom-14 z-20 flex w-full flex-col border-l bg-card transition-transform duration-300 sm:w-[80vw] md:w-[340px]",
           open ? "translate-x-0" : "translate-x-full",
         )}
       >
-        <div className="flex-1 overflow-y-auto p-5">{children}</div>
-        {footer && <div className="shrink-0 border-t border-border p-4">{footer}</div>}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5">{children}</div>
+        {footer && <div className="shrink-0 border-t border-border p-3 sm:p-4">{footer}</div>}
       </div>
     </>
   );

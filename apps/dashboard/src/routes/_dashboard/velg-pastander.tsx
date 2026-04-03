@@ -243,13 +243,13 @@ function VelgPastanderPage() {
         Tilbake
       </button>
 
-      <h1 className="mb-2 text-3xl font-extrabold text-foreground">Velg påstander</h1>
+      <h1 className="mb-2 text-2xl font-extrabold text-foreground sm:text-3xl">Velg påstander</h1>
       <p className="mb-8 text-base text-muted-foreground">
         Velg hvilke påstander du vil inkludere i FagPraten
       </p>
 
       {/* 3-column grid */}
-      <div className="mb-24 grid grid-cols-3 gap-6">
+      <div className="mb-24 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
         <StatementColumn
           title="Sant"
           statements={santStatements}
@@ -286,7 +286,7 @@ function VelgPastanderPage() {
       </div>
 
       {/* Fixed bottom bar */}
-      <div className="fixed right-0 bottom-0 left-[220px] z-20 flex items-center justify-between border-t bg-card px-8 py-4">
+      <div className="fixed right-0 bottom-0 left-0 z-20 flex items-center justify-between border-t bg-card px-4 py-3 sm:px-8 sm:py-4 md:left-[220px]">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Sparkles className="size-4 text-primary" />
           <span className="font-semibold">Foreslått av REDDI</span>

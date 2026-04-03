@@ -71,9 +71,9 @@ function FagPratPreviewPage() {
         Tilbake
       </button>
       {/* Header */}
-      <div className="mb-1 flex items-start justify-between">
-        <h1 className="text-3xl font-extrabold text-foreground">{fagprat.title}</h1>
-        <div className="flex shrink-0 items-center gap-3">
+      <div className="mb-1 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">{fagprat.title}</h1>
+        <div className="flex shrink-0 flex-wrap items-center gap-2 sm:gap-3">
           <Button
             variant="teal"
             size="lg"
@@ -88,7 +88,7 @@ function FagPratPreviewPage() {
             (<>
               <button
                 onClick={() => navigate({ to: "/fagprat/$id/rediger", params: { id } })}
-                className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-5 py-3 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5"
+                className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-4 py-2.5 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5 sm:px-5 sm:py-3"
               >
                 <Pencil className="size-4" />
                 Endre
@@ -115,7 +115,7 @@ function FagPratPreviewPage() {
             /* Browse view: Add to collection */
             (<button
               onClick={handleDuplicate}
-              className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-5 py-3 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5"
+              className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-4 py-2.5 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5 sm:px-5 sm:py-3"
             >
               <FolderPlus className="size-4" />Legg til i min samling
                           </button>)

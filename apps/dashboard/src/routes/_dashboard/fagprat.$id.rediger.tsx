@@ -107,8 +107,8 @@ function EditFagPratPage() {
   return (
     <div className="max-w-[900px]">
       {/* Sticky header */}
-      <div className="sticky top-0 z-20 -mx-10 mb-8 flex items-center justify-between border-b bg-background px-10 py-4">
-        <h2 className="text-xl font-extrabold text-foreground">Rediger FagPrat</h2>
+      <div className="sticky top-0 z-20 -mx-4 mb-6 flex items-center justify-between border-b bg-background px-4 py-4 sm:-mx-6 sm:mb-8 md:-mx-10 md:px-10">
+        <h2 className="text-lg font-extrabold text-foreground sm:text-xl">Rediger FagPrat</h2>
         <div className="flex items-center gap-3">
           <Button variant="ghost" onClick={() => navigate({ to: "/fagprat/$id", params: { id } })}>
             Avbryt
@@ -118,7 +118,7 @@ function EditFagPratPage() {
       </div>
 
       {/* Metadata card */}
-      <div className="relative mb-8 max-w-[600px] rounded-2xl border-[1.5px] border-border bg-card p-6">
+      <div className="relative mb-8 max-w-[600px] rounded-2xl border-[1.5px] border-border bg-card p-4 sm:p-6">
         {!editing ? (
           /* Read mode */
           <>
@@ -162,7 +162,7 @@ function EditFagPratPage() {
                 className="w-full rounded-xl border-2 border-input bg-background px-4 py-2.5 text-base font-bold outline-none focus:border-primary focus:ring-3 focus:ring-primary/20"
               />
             </div>
-            <div className="mb-4 grid grid-cols-2 gap-4">
+            <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-foreground">
                   Fag

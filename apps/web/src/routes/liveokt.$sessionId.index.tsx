@@ -137,16 +137,16 @@ function TeacherLobbyPage() {
         </button>
       </SessionTopBar>
 
-      <div className="flex flex-1 pt-16">
-        <div className="w-[38%] min-w-[340px] max-w-[480px] p-4">
-          <div className="flex h-full flex-col items-center justify-center gap-4 rounded-2xl bg-card p-8 shadow-lg">
-          <img src="/logo.png" alt="Evalion" className="mb-2 h-16 object-contain" />
+      <div className="flex flex-1 flex-col pt-16 lg:flex-row">
+        <div className="w-full p-4 lg:w-[38%] lg:min-w-[340px] lg:max-w-[480px]">
+          <div className="flex h-full flex-col items-center justify-center gap-4 rounded-2xl bg-card p-6 shadow-lg sm:p-8">
+          <img src="/logo.png" alt="Evalion" className="mb-2 h-12 object-contain sm:h-16" />
           <p className="text-sm text-muted-foreground">{window.location.host}/delta</p>
           <p className="text-sm font-semibold text-muted-foreground">
             Skriv inn koden for å bli med:
           </p>
-          <div className="rounded-xl border-2 border-primary/30 bg-primary/5 px-8 py-4">
-            <span className="font-mono text-4xl font-bold tracking-[0.25em] text-primary">
+          <div className="rounded-xl border-2 border-primary/30 bg-primary/5 px-6 py-3 sm:px-8 sm:py-4">
+            <span className="font-mono text-2xl font-bold tracking-[0.25em] text-primary sm:text-4xl">
               {session.joinCode}
             </span>
           </div>
@@ -190,7 +190,7 @@ function TeacherLobbyPage() {
                 {groupedStudents.map((group, gi) => (
                   <div
                     key={gi}
-                    className="w-[180px]"
+                    className="w-full min-w-[140px] sm:w-[180px]"
                     style={{
                       animation: "groupFadeIn 0.4s ease both",
                       animationDelay: `${gi * 0.08}s`,

@@ -43,17 +43,17 @@ function MinSamlingPage() {
     <div className="max-w-[1100px]">
       {/* Header row */}
       <div className="mb-8 flex flex-wrap items-center gap-6">
-        <h1 className="text-3xl font-extrabold text-foreground">Min samling</h1>
-        <div className="ml-auto flex items-center gap-4">
+        <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">Min samling</h1>
+        <div className="ml-auto flex w-full items-center gap-4 sm:w-auto">
           {/* Search */}
-          <div className="relative">
+          <div className="relative flex-1 sm:flex-initial">
             <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
               placeholder="Søk i samlingen..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-[280px] rounded-2xl border-2 border-border bg-card py-3 pr-4 pl-12 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 hover:border-muted-foreground/30 focus:border-primary focus:ring-3 focus:ring-primary/20"
+              className="w-full rounded-2xl border-2 border-border bg-card py-3 pr-4 pl-12 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 hover:border-muted-foreground/30 focus:border-primary focus:ring-3 focus:ring-primary/20 sm:w-[280px]"
             />
           </div>
 
@@ -106,7 +106,7 @@ function MinSamlingPage() {
 
       {/* Loading state */}
       {isPending && (
-        <div className="grid auto-rows-fr grid-cols-3 gap-6">
+        <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <FagPratCardSkeleton key={i} />
           ))}
@@ -115,7 +115,7 @@ function MinSamlingPage() {
 
       {/* Flat view */}
       {!isPending && sortBy === "sist-endret" && (
-        <div className="grid auto-rows-fr grid-cols-3 gap-6">
+        <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {filtered.map((fp) => (
             <FagPratCard key={fp._id} fagprat={fp} variant="collection" />
           ))}
@@ -128,7 +128,7 @@ function MinSamlingPage() {
         Object.entries(grouped).map(([subject, items]) => (
           <div key={subject} className="mb-10">
             <h2 className="mb-6 text-2xl font-extrabold text-foreground">{subject}</h2>
-            <div className="grid auto-rows-fr grid-cols-3 gap-6">
+            <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
               {items.map((fp) => (
                 <FagPratCard key={fp._id} fagprat={fp} variant="collection" />
               ))}
