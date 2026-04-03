@@ -5,7 +5,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import { useMutation } from "convex/react";
 import { Pencil, Globe, Lock, Plus } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 import { FagPratDetailSkeleton } from "@workspace/ui/components/skeletons/fagprat-detail-skeleton";
@@ -15,7 +15,7 @@ import { ConceptTags } from "@/components/concept-tags";
 import { ForkunnskapSelector } from "@/components/forkunnskap-selector";
 import { StatementEditor } from "@/components/statement-editor";
 import { VisibilityToggle } from "@/components/visibility-toggle";
-import { SUBJECT_OPTIONS, LEVEL_OPTIONS } from "@/lib/constants";
+import { LABEL_CLASS, SUBJECT_OPTIONS, LEVEL_OPTIONS } from "@/lib/constants";
 import { fagpratQueries, api } from "@/lib/convex";
 import { useStatements, toStatementsWithId, toStatementPayload } from "@/lib/use-statements";
 import type { FagPratId, FagPratType, Visibility } from "@/lib/types";
@@ -46,9 +46,11 @@ function EditFagPratPage() {
     handleDragEnd,
   } = useStatements();
 
-  // Sync local state when data loads
+  // Sync local state only on first load or when navigating to a different fagprat
+  const initializedForId = useRef<string | null>(null);
   useEffect(() => {
-    if (fagprat) {
+    if (fagprat && initializedForId.current !== id) {
+      initializedForId.current = id;
       setTitle(fagprat.title);
       setFag(fagprat.subject);
       setTrinn(fagprat.level);
@@ -57,7 +59,7 @@ function EditFagPratPage() {
       setVisibility(fagprat.visibility);
       setStatements(toStatementsWithId(fagprat.statements));
     }
-  }, [fagprat, setStatements]);
+  }, [fagprat, id, setStatements]);
 
   if (isPending) {
     return <FagPratDetailSkeleton />;
@@ -137,7 +139,7 @@ function EditFagPratPage() {
           /* Edit mode */
           <>
             <div className="mb-4">
-              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <label className={`mb-1.5 block ${LABEL_CLASS}`}>
                 Tittel
               </label>
               <input
@@ -149,7 +151,7 @@ function EditFagPratPage() {
             </div>
             <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-foreground">
+                <label className={`mb-1.5 block ${LABEL_CLASS} text-foreground`}>
                   Fag
                 </label>
                 <select
@@ -163,7 +165,7 @@ function EditFagPratPage() {
                 </select>
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-foreground">
+                <label className={`mb-1.5 block ${LABEL_CLASS} text-foreground`}>
                   Trinn
                 </label>
                 <select
@@ -215,10 +217,10 @@ function EditFagPratPage() {
                 key={stmt.id}
                 id={stmt.id}
                 index={i}
-                statement={stmt.statement}
+                text={stmt.text}
                 fasit={stmt.fasit}
                 explanation={stmt.explanation}
-                onStatementChange={(v) => updateStatement(i, "statement", v)}
+                onTextChange={(v) => updateStatement(i, "text", v)}
                 onFasitChange={(v) => updateStatement(i, "fasit", v)}
                 onExplanationChange={(v) => updateStatement(i, "explanation", v)}
                 onDelete={() => removeStatement(i)}

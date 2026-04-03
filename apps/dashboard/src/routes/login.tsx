@@ -2,7 +2,7 @@ import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-ro
 import { LoginForm } from "@workspace/ui/components/login-form";
 import { useState } from "react";
 
-import { authClient } from "@/lib/auth-client";
+import { authClient, signInWithGoogle } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: ({ context }) => {
@@ -46,7 +46,7 @@ function LoginPage() {
   };
 
   const handleGoogleSignIn = () => {
-    authClient.signIn.social({ provider: "google", callbackURL: window.location.origin + "/" });
+    signInWithGoogle();
   };
 
   return (

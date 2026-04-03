@@ -3,54 +3,33 @@ import { CSS } from "@dnd-kit/utilities";
 import { cn } from "@workspace/ui/lib/utils";
 import { GripVertical, Trash2, Sparkles, ImageIcon } from "lucide-react";
 
+import { ComingSoonButton } from "@/components/coming-soon-button";
+import { LABEL_CLASS, TEXTAREA_CLASS } from "@/lib/constants";
+import { FASIT_OPTIONS } from "@/lib/fasit-config";
 import { getStatementColor } from "@/lib/statement-colors";
 import type { Fasit } from "@/lib/types";
 
 interface StatementEditorProps {
   id: number | string;
   index: number;
-  statement: string;
+  text: string;
   fasit: Fasit;
   explanation: string;
   colorIndex?: number;
-  onStatementChange: (value: string) => void;
+  onTextChange: (value: string) => void;
   onFasitChange: (value: Fasit) => void;
   onExplanationChange: (value: string) => void;
   onDelete: () => void;
 }
 
-const fasitOptions = [
-  {
-    value: "sant" as const,
-    label: "Sant",
-    bg: "bg-sant-bg",
-    text: "text-sant",
-    border: "border-sant",
-  },
-  {
-    value: "usant" as const,
-    label: "Usant",
-    bg: "bg-usant-bg",
-    text: "text-usant",
-    border: "border-usant",
-  },
-  {
-    value: "delvis" as const,
-    label: "Delvis sant",
-    bg: "bg-delvis-bg",
-    text: "text-delvis",
-    border: "border-delvis",
-  },
-];
-
 export function StatementEditor({
   id,
   index,
-  statement,
+  text,
   fasit,
   explanation,
   colorIndex,
-  onStatementChange,
+  onTextChange,
   onFasitChange,
   onExplanationChange,
   onDelete,
@@ -96,14 +75,7 @@ export function StatementEditor({
           >
             <GripVertical className="size-4" />
           </button>
-          <button
-            disabled
-            title="Kommer snart"
-            aria-label="Generer med AI"
-            className="rounded-lg p-1.5 text-muted-foreground/40"
-          >
-            <Sparkles className="size-4" />
-          </button>
+          <ComingSoonButton icon={<Sparkles className="size-4" />} ariaLabel="Generer med AI" />
         </div>
         <button
           onClick={onDelete}
@@ -117,34 +89,31 @@ export function StatementEditor({
       <div className="space-y-4 p-5">
         {/* Påstand */}
         <div>
-          <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <label className={`mb-1.5 block ${LABEL_CLASS}`}>
             Påstand
           </label>
           <div className="flex gap-2">
             <textarea
-              value={statement}
-              onChange={(e) => onStatementChange(e.target.value)}
+              value={text}
+              onChange={(e) => onTextChange(e.target.value)}
               placeholder="Skriv en påstand..."
-              className="min-h-16 w-full resize-none rounded-xl border-2 border-input bg-background px-4 py-3 text-base outline-none transition-colors placeholder:text-muted-foreground/60 hover:border-muted-foreground/30 focus:border-primary focus:ring-3 focus:ring-primary/20"
+              className={`min-h-16 ${TEXTAREA_CLASS}`}
             />
-            <button
-              disabled
-              title="Kommer snart"
-              aria-label="Legg til bilde for påstand"
-              className="flex size-10 shrink-0 items-center justify-center self-start rounded-lg border-2 border-dashed border-muted-foreground/30 text-muted-foreground/40"
-            >
-              <ImageIcon className="size-4" />
-            </button>
+            <ComingSoonButton
+              icon={<ImageIcon className="size-4" />}
+              ariaLabel="Legg til bilde for påstand"
+              className="flex size-10 shrink-0 items-center justify-center self-start rounded-lg border-2 border-dashed border-muted-foreground/30"
+            />
           </div>
         </div>
 
         {/* Fasit */}
         <div>
-          <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <label className={`mb-1.5 block ${LABEL_CLASS}`}>
             Fasit
           </label>
           <div className="flex gap-2">
-            {fasitOptions.map((option) => (
+            {FASIT_OPTIONS.map((option) => (
               <button
                 key={option.value}
                 onClick={() => onFasitChange(option.value)}
@@ -163,7 +132,7 @@ export function StatementEditor({
 
         {/* Forklaring */}
         <div>
-          <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <label className={`mb-1.5 block ${LABEL_CLASS}`}>
             Forklaring
           </label>
           <div className="flex gap-2">
@@ -171,16 +140,13 @@ export function StatementEditor({
               value={explanation}
               onChange={(e) => onExplanationChange(e.target.value)}
               placeholder="Forklar hvorfor svaret er riktig..."
-              className="min-h-16 w-full resize-none rounded-xl border-2 border-input bg-background px-4 py-3 text-base outline-none transition-colors placeholder:text-muted-foreground/60 hover:border-muted-foreground/30 focus:border-primary focus:ring-3 focus:ring-primary/20"
+              className={`min-h-16 ${TEXTAREA_CLASS}`}
             />
-            <button
-              disabled
-              title="Kommer snart"
-              aria-label="Legg til bilde for forklaring"
-              className="flex size-10 shrink-0 items-center justify-center self-start rounded-lg border-2 border-dashed border-muted-foreground/30 text-muted-foreground/40"
-            >
-              <ImageIcon className="size-4" />
-            </button>
+            <ComingSoonButton
+              icon={<ImageIcon className="size-4" />}
+              ariaLabel="Legg til bilde for forklaring"
+              className="flex size-10 shrink-0 items-center justify-center self-start rounded-lg border-2 border-dashed border-muted-foreground/30"
+            />
           </div>
         </div>
       </div>

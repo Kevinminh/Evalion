@@ -9,12 +9,13 @@ import { ConceptTags } from "@/components/concept-tags";
 import { NotFoundState } from "@/components/not-found-state";
 import { VisibilityToggle } from "@/components/visibility-toggle";
 import { api } from "@/lib/convex";
+import { LABEL_CLASS } from "@/lib/constants";
 import { parseDraftJson } from "@/lib/draft-utils";
 import type { Visibility } from "@/lib/types";
 
 export const Route = createFileRoute("/_dashboard/lagre-fagprat")({
   validateSearch: (search: Record<string, unknown>) => ({
-    draft: (search.draft as string) ?? "",
+    draft: typeof search.draft === "string" ? search.draft : "",
   }),
   component: LagreFagPratPage,
 });
@@ -79,7 +80,7 @@ function LagreFagPratPage() {
       <div className="rounded-2xl border-[1.5px] border-border bg-card p-4 sm:p-6">
         {/* Title input */}
         <div className="mb-6">
-          <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <label className={`mb-2 block ${LABEL_CLASS}`}>
             Tittel
           </label>
           <input

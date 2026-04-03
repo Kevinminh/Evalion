@@ -1,14 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Search, ChevronDown } from "lucide-react";
-import { useState, useRef } from "react";
+import { Search } from "lucide-react";
+import { useMemo, useState } from "react";
 
+import { CustomDropdown } from "@/components/custom-dropdown";
 import { ErrorState } from "@/components/error-state";
 import { FagPratCard } from "@/components/fagprat-card";
 import { FagPratCardSkeleton } from "@workspace/ui/components/skeletons/fagprat-card-skeleton";
 import { CARD_GRID_CLASS, SKELETON_COUNT } from "@/lib/constants";
 import { fagpratQueries } from "@/lib/convex";
-import { useClickOutside } from "@/lib/use-click-outside";
 
 export const Route = createFileRoute("/_dashboard/min-samling")({
   component: MinSamlingPage,
@@ -17,32 +17,33 @@ export const Route = createFileRoute("/_dashboard/min-samling")({
 function MinSamlingPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"sist-endret" | "fag">("sist-endret");
-  const [sortOpen, setSortOpen] = useState(false);
-  const sortRef = useRef<HTMLDivElement>(null);
-
-  useClickOutside(sortRef, () => setSortOpen(false), sortOpen);
 
   const { data: allFagPrats, isPending, isError } = useQuery(fagpratQueries.listByAuthor());
 
-  const filtered = allFagPrats
-    ? searchQuery
-      ? allFagPrats.filter(
-          (fp) =>
-            fp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            fp.subject.toLowerCase().includes(searchQuery.toLowerCase()),
-        )
-      : allFagPrats
-    : [];
+  const filtered = useMemo(() => {
+    if (!allFagPrats) return [];
+    if (!searchQuery) return allFagPrats;
+    const query = searchQuery.toLowerCase();
+    return allFagPrats.filter(
+      (fp) =>
+        fp.title.toLowerCase().includes(query) ||
+        fp.subject.toLowerCase().includes(query),
+    );
+  }, [allFagPrats, searchQuery]);
 
   // Group by subject for "fag" view
-  const grouped = filtered.reduce(
-    (acc, fp) => {
-      const key = fp.subject;
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(fp);
-      return acc;
-    },
-    {} as Record<string, typeof filtered>,
+  const grouped = useMemo(
+    () =>
+      filtered.reduce(
+        (acc, fp) => {
+          const key = fp.subject;
+          if (!acc[key]) acc[key] = [];
+          acc[key].push(fp);
+          return acc;
+        },
+        {} as Record<string, typeof filtered>,
+      ),
+    [filtered],
   );
 
   return (
@@ -64,49 +65,16 @@ function MinSamlingPage() {
           </div>
 
           {/* Sort dropdown */}
-          <div className="relative" ref={sortRef}>
-            <button
-              onClick={() => setSortOpen(!sortOpen)}
-              className={`inline-flex items-center gap-2 rounded-full border-[1.5px] bg-card px-4 py-2.5 text-sm font-semibold text-foreground transition-all ${
-                sortOpen
-                  ? "border-primary/50 ring-3 ring-primary/20"
-                  : "border-border hover:border-muted-foreground/40"
-              }`}
-            >
-              {sortBy === "sist-endret" ? "Sist endret" : "Fag"}
-              <ChevronDown className="size-4 text-muted-foreground" />
-            </button>
-            {sortOpen && (
-              <div className="absolute right-0 top-full z-10 mt-1 min-w-[140px] overflow-hidden rounded-xl border-[1.5px] border-border bg-card shadow-md">
-                <button
-                  className={`block w-full px-4 py-2.5 text-left text-sm transition-colors ${
-                    sortBy === "sist-endret"
-                      ? "bg-primary/10 font-semibold text-primary"
-                      : "text-foreground hover:bg-muted"
-                  }`}
-                  onClick={() => {
-                    setSortBy("sist-endret");
-                    setSortOpen(false);
-                  }}
-                >
-                  Sist endret
-                </button>
-                <button
-                  className={`block w-full px-4 py-2.5 text-left text-sm transition-colors ${
-                    sortBy === "fag"
-                      ? "bg-primary/10 font-semibold text-primary"
-                      : "text-foreground hover:bg-muted"
-                  }`}
-                  onClick={() => {
-                    setSortBy("fag");
-                    setSortOpen(false);
-                  }}
-                >
-                  Fag
-                </button>
-              </div>
-            )}
-          </div>
+          <CustomDropdown
+            label=""
+            value={sortBy}
+            onChange={(v) => setSortBy(v as "sist-endret" | "fag")}
+            placeholder="Sorter"
+            options={[
+              { value: "sist-endret", label: "Sist endret" },
+              { value: "fag", label: "Fag" },
+            ]}
+          />
         </div>
       </div>
 

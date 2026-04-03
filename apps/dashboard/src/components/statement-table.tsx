@@ -16,9 +16,9 @@ export function StatementTable({ statements }: { statements: FagPratStatement[] 
           Forklaring
         </span>
       </div>
-      {statements.map((statement) => (
+      {statements.map((statement, index) => (
         <div
-          key={statement.text}
+          key={index}
           className="grid grid-cols-[2fr_100px_3fr] items-center gap-4 border-b border-border/50 px-6 py-5 last:border-b-0"
         >
           <div className="text-base leading-normal text-foreground">{statement.text}</div>

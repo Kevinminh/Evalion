@@ -10,12 +10,13 @@ import { ForkunnskapSelector } from "@/components/forkunnskap-selector";
 import { ReddiModal } from "@/components/reddi-modal";
 import { StatementEditor } from "@/components/statement-editor";
 import { SUBJECT_OPTIONS, LEVEL_OPTIONS } from "@/lib/constants";
+import { parseDraftJson } from "@/lib/draft-utils";
 import { useStatements, toStatementsWithId, toStatementPayload } from "@/lib/use-statements";
 import type { FagPratType } from "@/lib/types";
 
 export const Route = createFileRoute("/_dashboard/lag-fagprat")({
   validateSearch: (search: Record<string, unknown>) => ({
-    draft: (search.draft as string) ?? "",
+    draft: typeof search.draft === "string" ? search.draft : "",
   }),
   component: LagFagPratPage,
 });
@@ -40,25 +41,15 @@ function LagFagPratPage() {
 
   useEffect(() => {
     if (!draftParam) return;
-    try {
-      const draft = JSON.parse(draftParam) as {
-        title?: string;
-        concepts?: string[];
-        subject?: string;
-        level?: string;
-        type?: FagPratType;
-        statements?: { text: string; fasit: string; explanation: string }[];
-      };
-      if (draft.title) setTitle(draft.title);
-      if (draft.concepts) setConcepts(draft.concepts);
-      if (draft.subject) setFag(draft.subject);
-      if (draft.level) setTrinn(draft.level);
-      if (draft.type) setForkunnskap(draft.type);
-      if (draft.statements) {
-        setStatements(toStatementsWithId(draft.statements));
-      }
-    } catch {
-      // Invalid JSON
+    const draft = parseDraftJson(draftParam);
+    if (!draft) return;
+    if (draft.title) setTitle(draft.title);
+    if (draft.concepts) setConcepts(draft.concepts);
+    if (draft.subject) setFag(draft.subject);
+    if (draft.level) setTrinn(draft.level);
+    if (draft.type) setForkunnskap(draft.type);
+    if (draft.statements) {
+      setStatements(toStatementsWithId(draft.statements));
     }
   }, [draftParam]);
 
@@ -193,10 +184,10 @@ function LagFagPratPage() {
                   key={stmt.id}
                   id={stmt.id}
                   index={i}
-                  statement={stmt.statement}
+                  text={stmt.text}
                   fasit={stmt.fasit}
                   explanation={stmt.explanation}
-                  onStatementChange={(v) => updateStatement(i, "statement", v)}
+                  onTextChange={(v) => updateStatement(i, "text", v)}
                   onFasitChange={(v) => updateStatement(i, "fasit", v)}
                   onExplanationChange={(v) => updateStatement(i, "explanation", v)}
                   onDelete={() => removeStatement(i)}

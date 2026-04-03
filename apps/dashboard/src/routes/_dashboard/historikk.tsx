@@ -6,20 +6,11 @@ import { SessionCardSkeleton } from "@workspace/ui/components/skeletons/session-
 import { ErrorState } from "@/components/error-state";
 import { SKELETON_COUNT } from "@/lib/constants";
 import { liveSessionQueries } from "@/lib/convex";
+import { formatDate } from "@/lib/format-date";
 
 export const Route = createFileRoute("/_dashboard/historikk")({
   component: HistorikkPage,
 });
-
-function formatDate(timestamp: number): string {
-  return new Date(timestamp).toLocaleDateString("nb-NO", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 function HistorikkPage() {
   const navigate = useNavigate();

@@ -6,17 +6,17 @@ import type { Fasit } from "@/lib/types";
 
 export interface StatementWithId {
   id: string;
-  statement: string;
+  text: string;
   fasit: Fasit;
   explanation: string;
 }
 
 function createStatement(
-  statement = "",
+  text = "",
   fasit: Fasit = "sant",
   explanation = "",
 ): StatementWithId {
-  return { id: crypto.randomUUID(), statement, fasit, explanation };
+  return { id: crypto.randomUUID(), text, fasit, explanation };
 }
 
 export function useStatements(initial: StatementWithId[] = []) {
@@ -28,7 +28,7 @@ export function useStatements(initial: StatementWithId[] = []) {
 
   const updateStatement = (
     index: number,
-    field: "statement" | "fasit" | "explanation",
+    field: "text" | "fasit" | "explanation",
     value: string,
   ) => {
     setStatements((prev) => {
@@ -65,10 +65,10 @@ export function useStatements(initial: StatementWithId[] = []) {
 
 /** Convert raw data (from API or draft JSON) into StatementWithId[] */
 export function toStatementsWithId(
-  raw: { text?: string; statement?: string; fasit: string; explanation: string }[],
+  raw: { text: string; fasit: string; explanation: string }[],
 ): StatementWithId[] {
   return raw.map((s) => createStatement(
-    s.text ?? s.statement ?? "",
+    s.text,
     (s.fasit as Fasit) ?? "sant",
     s.explanation,
   ));
@@ -79,7 +79,7 @@ export function toStatementPayload(
   statements: StatementWithId[],
 ): { text: string; fasit: Fasit; explanation: string }[] {
   return statements.map((s) => ({
-    text: s.statement,
+    text: s.text,
     fasit: s.fasit,
     explanation: s.explanation,
   }));
