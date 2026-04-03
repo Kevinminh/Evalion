@@ -23,8 +23,9 @@
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sonner": "catalog:",
+    "recharts": "catalog:",
     "shadcn": "catalog:",
+    "sonner": "catalog:",
     "tailwind-merge": "catalog:",
     "tw-animate-css": "catalog:",
     "zod": "catalog:"
