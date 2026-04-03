@@ -4,7 +4,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { VoteButtons } from "@workspace/ui/components/live/vote-buttons";
 import { useMutation } from "convex/react";
 import { Clock, Loader2, LogOut } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
 import { Professor } from "@workspace/ui/components/live/professor";
@@ -17,7 +17,9 @@ export const Route = createFileRoute("/spill/$studentId")({
   component: StudentGamePage,
 });
 
-const VOTE_LABELS: Record<string, string> = {
+type VoteType = "sant" | "usant" | "delvis";
+
+const VOTE_LABELS: Record<VoteType, string> = {
   sant: "Sant",
   usant: "Usant",
   delvis: "Delvis sant",

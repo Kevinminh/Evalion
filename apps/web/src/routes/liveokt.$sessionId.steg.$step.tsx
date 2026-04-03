@@ -18,23 +18,26 @@ import { cn } from "@workspace/ui/lib/utils";
 // VoteButtons removed — teacher view doesn't vote
 import { useMutation } from "convex/react";
 import { ArrowRight, Users } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { LiveStepSkeleton } from "@workspace/ui/components/skeletons/live-step-skeleton";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
+import { DASHBOARD_URL } from "@/lib/env";
 
 export const Route = createFileRoute("/liveokt/$sessionId/steg/$step")({
   component: LiveStepPage,
 });
 
-const VOTE_DOT_COLORS: Record<string, string> = {
+type VoteType = "sant" | "usant" | "delvis";
+
+const VOTE_DOT_COLORS: Record<VoteType, string> = {
   sant: "bg-sant",
   usant: "bg-usant",
   delvis: "bg-delvis",
 };
 
-const VOTE_LABELS: Record<string, string> = {
+const VOTE_LABELS: Record<VoteType, string> = {
   sant: "Sant",
   usant: "Usant",
   delvis: "Delvis sant",
@@ -48,7 +51,7 @@ const STATEMENT_COLORS = [
   { bg: "#FFEBEE", border: "#EF9A9A" },
 ];
 
-const FASIT_TEXT: Record<string, string> = {
+const FASIT_TEXT: Record<VoteType, string> = {
   sant: "sant",
   usant: "usant",
   delvis: "delvis sant",
@@ -122,7 +125,7 @@ function LiveStepPage() {
     return () => clearInterval(interval);
   }, [recording]);
 
-  const dashboardUrl = import.meta.env.DEV ? "http://localhost:3001" : "https://dashboard.evalion.no";
+  const dashboardUrl = DASHBOARD_URL;
 
   const handleEnd = async () => {
     await endSessionMutation({ id: typedSessionId });
@@ -200,39 +203,62 @@ function LiveStepPage() {
   const voteList = votes ?? [];
   const ratingList = ratings ?? [];
 
-  // Round-filtered votes
-  const r1Votes = voteList.filter((v) => v.round === 1);
-  const r2Votes = voteList.filter((v) => v.round === 2);
+  // Memoized vote filtering and distribution
+  const { r2Votes, activeRoundVotes, voteBars, totalVotes } = useMemo(() => {
+    const r1: typeof voteList = [];
+    const r2: typeof voteList = [];
+    const counts = { sant: 0, usant: 0, delvis: 0 };
 
-  const activeRoundVotes = step <= 2 ? r1Votes : r2Votes;
+    for (const v of voteList) {
+      if (v.round === 1) r1.push(v);
+      else if (v.round === 2) r2.push(v);
+    }
 
-  const santCount = activeRoundVotes.filter((v) => v.vote === "sant").length;
-  const usantCount = activeRoundVotes.filter((v) => v.vote === "usant").length;
-  const delvisCount = activeRoundVotes.filter((v) => v.vote === "delvis").length;
-  const totalVotes = activeRoundVotes.length;
+    const active = step <= 2 ? r1 : r2;
+    for (const v of active) counts[v.vote]++;
 
-  const voteBars = [
-    { label: "Sant", value: santCount, color: "bg-sant" },
-    { label: "Usant", value: usantCount, color: "bg-usant" },
-    { label: "Delvis", value: delvisCount, color: "bg-delvis" },
-  ];
+    return {
+      r2Votes: r2,
+      activeRoundVotes: active,
+      totalVotes: active.length,
+      voteBars: [
+        { label: "Sant", value: counts.sant, color: "bg-sant" },
+        { label: "Usant", value: counts.usant, color: "bg-usant" },
+        { label: "Delvis", value: counts.delvis, color: "bg-delvis" },
+      ],
+    };
+  }, [voteList, step]);
 
-  // Step 4+ analytics — prefer backend query when available, fallback to client-side
-  const r2CorrectCount = analytics?.correctR2 ?? (statement ? r2Votes.filter((v) => v.vote === statement.fasit).length : 0);
-  const r2Total = analytics?.totalR2 ?? r2Votes.length;
-  const changedToCorrect = analytics?.wrongToRight ?? 0;
-  const changedToIncorrect = analytics?.rightToWrong ?? 0;
+  // Memoized analytics — prefer backend query, fallback to client-side
+  const { r2CorrectCount, r2Total, changedToCorrect, changedToIncorrect, ratingDistribution, avgRating } = useMemo(() => {
+    const r2Correct = analytics?.correctR2 ?? (statement ? r2Votes.filter((v) => v.vote === statement.fasit).length : 0);
+    const r2Tot = analytics?.totalR2 ?? r2Votes.length;
 
-  // Rating distribution for step 6 — prefer backend analytics
-  const ratingDistribution = analytics?.ratingDistribution ?? [1, 2, 3, 4, 5].map((score) => ({
-    score,
-    count: ratingList.filter((r) => r.rating === score).length,
-  }));
-  const avgRating = analytics?.avgRating !== undefined && analytics.avgRating > 0
-    ? analytics.avgRating
-    : ratingList.length > 0
-      ? ratingList.reduce((sum, r) => sum + r.rating, 0) / ratingList.length
-      : undefined;
+    // Rating distribution — single-pass fallback
+    let ratDist = analytics?.ratingDistribution;
+    if (!ratDist) {
+      const buckets = [0, 0, 0, 0, 0];
+      for (const r of ratingList) {
+        if (r.rating >= 1 && r.rating <= 5) buckets[r.rating - 1]!++;
+      }
+      ratDist = [1, 2, 3, 4, 5].map((score) => ({ score, count: buckets[score - 1]! }));
+    }
+
+    const avg = analytics?.avgRating !== undefined && analytics.avgRating > 0
+      ? analytics.avgRating
+      : ratingList.length > 0
+        ? ratingList.reduce((sum, r) => sum + r.rating, 0) / ratingList.length
+        : undefined;
+
+    return {
+      r2CorrectCount: r2Correct,
+      r2Total: r2Tot,
+      changedToCorrect: analytics?.wrongToRight ?? 0,
+      changedToIncorrect: analytics?.rightToWrong ?? 0,
+      ratingDistribution: ratDist,
+      avgRating: avg,
+    };
+  }, [analytics, statement, r2Votes, ratingList]);
 
   const statementCard = (
     <div className="mx-auto max-w-2xl rounded-2xl border-[1.5px] border-blue-200 bg-blue-50 p-6">

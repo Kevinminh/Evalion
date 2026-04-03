@@ -8,7 +8,13 @@ interface RatingChartProps {
   average?: number;
 }
 
-const BAR_COLORS = ["#F44336", "#FF9800", "#FFC107", "#8BC34A", "#4CAF50"];
+const BAR_COLORS = [
+  "var(--usant)",
+  "var(--delvis)",
+  "var(--chart-4)",
+  "var(--chart-2)",
+  "var(--sant)",
+];
 
 export function RatingChart({ distribution, average }: RatingChartProps) {
   const total = distribution.reduce((sum, d) => sum + d.count, 0);

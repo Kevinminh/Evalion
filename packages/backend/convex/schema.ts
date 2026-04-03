@@ -35,6 +35,9 @@ export default defineSchema({
   })
     .index("by_author", ["authorId"])
     .index("by_visibility", ["visibility"])
+    .index("by_visibility_subject", ["visibility", "subject"])
+    .index("by_visibility_level", ["visibility", "level"])
+    .index("by_visibility_subject_level", ["visibility", "subject", "level"])
     .index("by_subject", ["subject"])
     .searchIndex("search_fagprats", {
       searchField: "title",
@@ -73,14 +76,18 @@ export default defineSchema({
     statementIndex: v.number(),
     round: v.number(),
     vote: v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis")),
-  }).index("by_session_statement", ["sessionId", "statementIndex"]),
+  })
+    .index("by_session_statement", ["sessionId", "statementIndex"])
+    .index("by_session_statement_student_round", ["sessionId", "statementIndex", "studentId", "round"]),
 
   sessionRatings: defineTable({
     sessionId: v.id("liveSessions"),
     studentId: v.id("sessionStudents"),
     statementIndex: v.number(),
     rating: v.number(),
-  }).index("by_session_statement", ["sessionId", "statementIndex"]),
+  })
+    .index("by_session_statement", ["sessionId", "statementIndex"])
+    .index("by_session_statement_student", ["sessionId", "statementIndex", "studentId"]),
 
   sessionBegrunnelser: defineTable({
     sessionId: v.id("liveSessions"),
@@ -91,5 +98,6 @@ export default defineSchema({
     highlighted: v.optional(v.boolean()),
   })
     .index("by_session_statement", ["sessionId", "statementIndex"])
+    .index("by_session_statement_student_round", ["sessionId", "statementIndex", "studentId", "round"])
     .index("by_session_student", ["sessionId", "studentId"]),
 });

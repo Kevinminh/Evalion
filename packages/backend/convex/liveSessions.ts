@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 
 import { query, mutation } from "./_generated/server";
-import { requireAuth } from "./helpers";
+import { requireAuth, requireSessionOwner, validateStatementIndex } from "./helpers";
 
 function generateJoinCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -47,20 +47,24 @@ export const listByTeacher = query({
     );
     const fagpratMap = new Map(fagpratEntries);
 
-    const studentCounts = await Promise.all(
+    // Batch-fetch all students for ended sessions and count by session
+    const allStudents = await Promise.all(
       ended.map((session) =>
         ctx.db
           .query("sessionStudents")
           .withIndex("by_session", (q) => q.eq("sessionId", session._id))
-          .collect()
-          .then((students) => students.length),
+          .collect(),
       ),
     );
+    const studentCountMap = new Map<string, number>();
+    for (let i = 0; i < ended.length; i++) {
+      studentCountMap.set(ended[i]!._id, allStudents[i]!.length);
+    }
 
-    return ended.map((session, i) => ({
+    return ended.map((session) => ({
       ...session,
       fagpratTitle: fagpratMap.get(session.fagpratId)?.title ?? "Slettet FagPrat",
-      studentCount: studentCounts[i]!,
+      studentCount: studentCountMap.get(session._id) ?? 0,
     }));
   },
 });
@@ -113,13 +117,14 @@ export const create = mutation({
         .first();
     }
 
-    // Increment usage count on the fagprat
+    // Validate fagprat exists and increment usage count
     const fagprat = await ctx.db.get(args.fagpratId);
-    if (fagprat) {
-      await ctx.db.patch(args.fagpratId, {
-        usageCount: (fagprat.usageCount ?? 0) + 1,
-      });
+    if (!fagprat) {
+      throw new Error("FagPrat not found");
     }
+    await ctx.db.patch(args.fagpratId, {
+      usageCount: (fagprat.usageCount ?? 0) + 1,
+    });
 
     return await ctx.db.insert("liveSessions", {
       ...args,
@@ -154,6 +159,7 @@ export const updateStep = mutation({
         currentStatementIndex: args.statementIndex,
       }),
     });
+    return args.id;
   },
 });
 
@@ -166,6 +172,7 @@ export const end = mutation({
       throw new Error("Not authorized");
     }
     await ctx.db.patch(args.id, { status: "ended" });
+    return args.id;
   },
 });
 
@@ -225,7 +232,20 @@ export const addStudent = mutation({
 export const removeStudent = mutation({
   args: { id: v.id("sessionStudents") },
   handler: async (ctx, args) => {
+    const student = await ctx.db.get(args.id);
+    if (!student) throw new Error("Student not found");
+
+    const identity = await ctx.auth.getUserIdentity();
+    // Allow either the session teacher or the student themselves (via leave)
+    if (identity) {
+      const session = await ctx.db.get(student.sessionId);
+      if (session && session.teacherId !== identity.subject) {
+        throw new Error("Not authorized");
+      }
+    }
+
     await ctx.db.delete(args.id);
+    return args.id;
   },
 });
 
@@ -235,6 +255,12 @@ export const createGroups = mutation({
     groupCount: v.number(),
   },
   handler: async (ctx, args) => {
+    await requireSessionOwner(ctx, args.sessionId);
+
+    if (args.groupCount < 2 || args.groupCount > 8) {
+      throw new Error("Group count must be between 2 and 8");
+    }
+
     const students = await ctx.db
       .query("sessionStudents")
       .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
@@ -282,6 +308,8 @@ export const castVote = mutation({
     vote: v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis")),
   },
   handler: async (ctx, args) => {
+    await validateStatementIndex(ctx, args.sessionId, args.statementIndex);
+
     // Verify student belongs to this session
     const student = await ctx.db.get(args.studentId);
     if (!student || student.sessionId !== args.sessionId) {
@@ -291,11 +319,12 @@ export const castVote = mutation({
     // Prevent duplicate votes for same student/statement/round
     const existing = await ctx.db
       .query("sessionVotes")
-      .withIndex("by_session_statement", (q) =>
-        q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
-      )
-      .filter((q) =>
-        q.and(q.eq(q.field("studentId"), args.studentId), q.eq(q.field("round"), args.round)),
+      .withIndex("by_session_statement_student_round", (q) =>
+        q
+          .eq("sessionId", args.sessionId)
+          .eq("statementIndex", args.statementIndex)
+          .eq("studentId", args.studentId)
+          .eq("round", args.round),
       )
       .first();
 
@@ -381,14 +410,28 @@ export const getVoteAnalytics = query({
       )
       .collect();
 
-    const round1Votes = allVotes.filter((v) => v.round === 1);
-    const round2Votes = allVotes.filter((v) => v.round === 2);
+    // Single-pass vote counting by round and type
+    const counts = {
+      1: { sant: 0, usant: 0, delvis: 0, total: 0 },
+      2: { sant: 0, usant: 0, delvis: 0, total: 0 },
+    } as Record<number, { sant: number; usant: number; delvis: number; total: number }>;
+    const round1Votes: typeof allVotes = [];
+    const round2Votes: typeof allVotes = [];
 
-    const distribution = (votes: typeof allVotes) => {
-      const sant = votes.filter((v) => v.vote === "sant").length;
-      const usant = votes.filter((v) => v.vote === "usant").length;
-      const delvis = votes.filter((v) => v.vote === "delvis").length;
-      const total = votes.length;
+    for (const vote of allVotes) {
+      if (vote.round === 1) {
+        round1Votes.push(vote);
+        counts[1]![vote.vote]++;
+        counts[1]!.total++;
+      } else if (vote.round === 2) {
+        round2Votes.push(vote);
+        counts[2]![vote.vote]++;
+        counts[2]!.total++;
+      }
+    }
+
+    const distribution = (roundCounts: { sant: number; usant: number; delvis: number; total: number }) => {
+      const { sant, usant, delvis, total } = roundCounts;
       return {
         sant,
         usant,
@@ -427,9 +470,15 @@ export const getVoteAnalytics = query({
       ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
       : 0;
 
+    // Single-pass rating distribution
+    const ratingBuckets = [0, 0, 0, 0, 0];
+    for (const r of ratings) {
+      if (r.rating >= 1 && r.rating <= 5) ratingBuckets[r.rating - 1]!++;
+    }
+
     return {
-      round1: distribution(round1Votes),
-      round2: distribution(round2Votes),
+      round1: distribution(counts[1]!),
+      round2: distribution(counts[2]!),
       fasit,
       correctR2,
       totalR2: round2Votes.length,
@@ -438,7 +487,7 @@ export const getVoteAnalytics = query({
       avgRating: Math.round(avgRating * 10) / 10,
       ratingDistribution: [1, 2, 3, 4, 5].map((score) => ({
         score,
-        count: ratings.filter((r) => r.rating === score).length,
+        count: ratingBuckets[score - 1]!,
       })),
     };
   },
@@ -472,6 +521,9 @@ export const submitBegrunnelse = mutation({
   handler: async (ctx, args) => {
     const trimmed = args.text.trim();
     if (!trimmed) throw new Error("Begrunnelse cannot be empty");
+    if (trimmed.length > 2000) throw new Error("Begrunnelse is too long (max 2000 characters)");
+
+    await validateStatementIndex(ctx, args.sessionId, args.statementIndex);
 
     // Verify student belongs to this session
     const student = await ctx.db.get(args.studentId);
@@ -481,11 +533,12 @@ export const submitBegrunnelse = mutation({
 
     const existing = await ctx.db
       .query("sessionBegrunnelser")
-      .withIndex("by_session_statement", (q) =>
-        q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
-      )
-      .filter((q) =>
-        q.and(q.eq(q.field("studentId"), args.studentId), q.eq(q.field("round"), args.round)),
+      .withIndex("by_session_statement_student_round", (q) =>
+        q
+          .eq("sessionId", args.sessionId)
+          .eq("statementIndex", args.statementIndex)
+          .eq("studentId", args.studentId)
+          .eq("round", args.round),
       )
       .first();
 
@@ -524,10 +577,10 @@ export const highlightBegrunnelse = mutation({
     highlighted: v.boolean(),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
-
     const begrunnelse = await ctx.db.get(args.id);
     if (!begrunnelse) throw new Error("Begrunnelse not found");
+
+    await requireSessionOwner(ctx, begrunnelse.sessionId);
 
     // Clear any other highlighted begrunnelse for the same statement
     if (args.highlighted) {
@@ -562,6 +615,8 @@ export const submitRating = mutation({
       throw new Error("Rating must be between 1 and 5");
     }
 
+    await validateStatementIndex(ctx, args.sessionId, args.statementIndex);
+
     // Verify student belongs to this session
     const student = await ctx.db.get(args.studentId);
     if (!student || student.sessionId !== args.sessionId) {
@@ -571,10 +626,12 @@ export const submitRating = mutation({
     // Prevent duplicate ratings
     const existing = await ctx.db
       .query("sessionRatings")
-      .withIndex("by_session_statement", (q) =>
-        q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
+      .withIndex("by_session_statement_student", (q) =>
+        q
+          .eq("sessionId", args.sessionId)
+          .eq("statementIndex", args.statementIndex)
+          .eq("studentId", args.studentId),
       )
-      .filter((q) => q.eq(q.field("studentId"), args.studentId))
       .first();
 
     if (existing) {

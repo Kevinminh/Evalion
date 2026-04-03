@@ -47,6 +47,15 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const identity = await requireAuth(ctx);
+
+    // Validate string lengths
+    if (args.title.length > 200) throw new Error("Title too long (max 200 characters)");
+    if (args.subject.length > 100) throw new Error("Subject too long (max 100 characters)");
+    if (args.level.length > 100) throw new Error("Level too long (max 100 characters)");
+    if (args.concepts.length > 20) throw new Error("Too many concepts (max 20)");
+    if (args.concepts.some((c) => c.length > 100)) throw new Error("Concept too long (max 100 characters)");
+    if (args.statements.length > 20) throw new Error("Too many statements (max 20)");
+
     return await ctx.db.insert("fagprats", {
       ...args,
       usageCount: 0,
@@ -77,8 +86,17 @@ export const update = mutation({
     if (existing.authorId !== identity.subject) {
       throw new Error("Not authorized");
     }
+    // Validate string lengths on provided fields
+    if (args.title !== undefined && args.title.length > 200) throw new Error("Title too long (max 200 characters)");
+    if (args.subject !== undefined && args.subject.length > 100) throw new Error("Subject too long (max 100 characters)");
+    if (args.level !== undefined && args.level.length > 100) throw new Error("Level too long (max 100 characters)");
+    if (args.concepts !== undefined && args.concepts.length > 20) throw new Error("Too many concepts (max 20)");
+    if (args.concepts?.some((c) => c.length > 100)) throw new Error("Concept too long (max 100 characters)");
+    if (args.statements !== undefined && args.statements.length > 20) throw new Error("Too many statements (max 20)");
+
     const { id, ...fields } = args;
     await ctx.db.patch(id, { ...fields, updatedAt: Date.now() });
+    return id;
   },
 });
 
@@ -94,6 +112,7 @@ export const remove = mutation({
       throw new Error("Not authorized");
     }
     await ctx.db.delete(args.id);
+    return args.id;
   },
 });
 
@@ -147,14 +166,37 @@ export const search = query({
         });
       return await searchQuery.collect();
     }
-    // No search text — browse with filters
-    const results = await ctx.db
-      .query("fagprats")
-      .withIndex("by_visibility", (q) => q.eq("visibility", "public"))
-      .collect();
+    // No search text — browse with filters using most specific compound index
+    let results;
+    if (args.subject && args.level) {
+      results = await ctx.db
+        .query("fagprats")
+        .withIndex("by_visibility_subject_level", (q) =>
+          q.eq("visibility", "public").eq("subject", args.subject!).eq("level", args.level!),
+        )
+        .collect();
+    } else if (args.subject) {
+      results = await ctx.db
+        .query("fagprats")
+        .withIndex("by_visibility_subject", (q) =>
+          q.eq("visibility", "public").eq("subject", args.subject!),
+        )
+        .collect();
+    } else if (args.level) {
+      results = await ctx.db
+        .query("fagprats")
+        .withIndex("by_visibility_level", (q) =>
+          q.eq("visibility", "public").eq("level", args.level!),
+        )
+        .collect();
+    } else {
+      results = await ctx.db
+        .query("fagprats")
+        .withIndex("by_visibility", (q) => q.eq("visibility", "public"))
+        .collect();
+    }
+    // Apply type filter (not in index)
     let filtered = results;
-    if (args.subject) filtered = filtered.filter((f) => f.subject === args.subject);
-    if (args.level) filtered = filtered.filter((f) => f.level === args.level);
     if (args.type) filtered = filtered.filter((f) => f.type === args.type);
     if (args.sortBy === "recent") {
       filtered.sort((a, b) => b._creationTime - a._creationTime);
