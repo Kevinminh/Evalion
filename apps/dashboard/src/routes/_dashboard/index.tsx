@@ -147,7 +147,7 @@ function UtforskPage() {
     <div className="max-w-[1100px]">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="mb-1 text-3xl font-extrabold text-foreground">Utforsk</h1>
+        <h1 className="mb-1 text-2xl font-extrabold text-foreground sm:text-3xl">Utforsk</h1>
         <p className="text-base text-muted-foreground">Finn FagPrater som andre lærere har delt</p>
       </div>
 
@@ -179,7 +179,7 @@ function UtforskPage() {
 
         {/* Filter panel */}
         {filterOpen && (
-          <div className="absolute right-0 top-full z-10 mt-2 w-[420px] rounded-2xl border-[1.5px] border-border bg-card p-5 px-6 shadow-lg">
+          <div className="absolute right-0 top-full z-10 mt-2 w-[calc(100vw-2rem)] rounded-2xl border-[1.5px] border-border bg-card p-5 px-6 shadow-lg sm:w-[420px]">
             {/* Sortering */}
             <div className="mb-5">
               <div className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground">
@@ -275,11 +275,11 @@ function UtforskPage() {
       </div>
 
       {/* Section title */}
-      <h2 className="mb-6 text-2xl font-extrabold text-foreground">Populære FagPrater</h2>
+      <h2 className="mb-4 text-xl font-extrabold text-foreground sm:mb-6 sm:text-2xl">Populære FagPrater</h2>
 
       {/* Loading state */}
       {isPending && (
-        <div className="grid auto-rows-fr grid-cols-3 gap-6">
+        <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <FagPratCardSkeleton key={i} />
           ))}
@@ -288,7 +288,7 @@ function UtforskPage() {
 
       {/* Card grid */}
       {!isPending && (
-        <div className="grid auto-rows-fr grid-cols-3 gap-6">
+        <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {filtered.map((fp) => (
             <FagPratCard key={fp._id} fagprat={fp} variant="browse" />
           ))}

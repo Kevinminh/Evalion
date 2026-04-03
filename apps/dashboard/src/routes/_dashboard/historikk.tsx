@@ -26,11 +26,11 @@ function HistorikkPage() {
   return (
     <div className="max-w-[1100px]">
       <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-foreground">Historikk</h1>
+        <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">Historikk</h1>
       </div>
 
       {isPending && (
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <SessionCardSkeleton key={i} />
           ))}
@@ -38,7 +38,7 @@ function HistorikkPage() {
       )}
 
       {!isPending && sessions && sessions.length > 0 && (
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {sessions.map((session) => (
             <button
               key={session._id}

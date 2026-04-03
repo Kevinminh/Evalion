@@ -283,9 +283,9 @@ function LiveStepPage() {
       case 0: {
         const isOdd = fagprat.statements.length % 2 !== 0;
         return (
-          <div className="flex items-start gap-10">
-            <Professor size="lg" label="Velg en påstand" className="flex-col pt-8" />
-            <div className="grid flex-1 grid-cols-2 gap-6">
+          <div className="flex flex-col items-start gap-6 lg:flex-row lg:gap-10">
+            <Professor size="lg" label="Velg en påstand" className="flex-col pt-4 lg:pt-8" />
+            <div className="grid w-full flex-1 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
               {fagprat.statements.map((s, i) => {
                 const isSelected = selectedStatement === i;
                 const hasSomeSelected = selectedStatement !== null;
@@ -699,7 +699,7 @@ function LiveStepPage() {
       </SessionTopBar>
 
       <div className="flex pt-16 pb-14">
-        <main className="flex-1 px-8 py-8 transition-[margin] duration-300" style={{ marginRight: panelOpen ? 340 : 0 }}>{renderStepContent()}</main>
+        <main className="flex-1 px-4 py-6 transition-[margin] duration-300 sm:px-8 sm:py-8 md:[margin-right:var(--panel-margin)]" style={{ "--panel-margin": panelOpen ? "340px" : "0px" } as React.CSSProperties}>{renderStepContent()}</main>
         <TeacherPanel defaultOpen={step !== 5} footer={renderPanelFooter()} onOpenChange={setPanelOpen}>
           {renderTeacherContent()}
         </TeacherPanel>

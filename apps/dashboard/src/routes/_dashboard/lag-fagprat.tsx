@@ -133,8 +133,8 @@ function LagFagPratPage() {
   return (
     <div className="max-w-[900px]">
       {/* Sticky header */}
-      <div className="sticky top-0 z-20 -mx-10 mb-8 flex items-center justify-between border-b bg-background px-10 py-4">
-        <h1 className="text-2xl font-extrabold text-foreground">Lag en FagPrat</h1>
+      <div className="sticky top-0 z-20 -mx-4 mb-6 flex items-center justify-between border-b bg-background px-4 py-4 sm:-mx-6 sm:mb-8 md:-mx-10 md:px-10">
+        <h1 className="text-xl font-extrabold text-foreground sm:text-2xl">Lag en FagPrat</h1>
         <div className="flex items-center gap-3">
           <Button variant="ghost" onClick={() => navigate({ to: "/" })}>
             Avbryt
@@ -146,20 +146,20 @@ function LagFagPratPage() {
       </div>
 
       {/* Title card */}
-      <div className="mb-6 rounded-2xl border-[1.5px] border-border bg-card p-6">
+      <div className="mb-6 rounded-2xl border-[1.5px] border-border bg-card p-4 sm:p-6">
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Gi FagPraten en tittel..."
-          className="mb-4 w-full border-none bg-transparent text-xl font-extrabold text-foreground outline-none placeholder:text-muted-foreground/40"
+          className="mb-4 w-full border-none bg-transparent text-lg font-extrabold text-foreground outline-none placeholder:text-muted-foreground/40 sm:text-xl"
         />
         <ConceptTags concepts={concepts} onChange={setConcepts} />
       </div>
 
       {/* Metadata card */}
-      <div className="mb-6 rounded-2xl border-[1.5px] border-border bg-card p-6">
-        <div className="mb-6 grid grid-cols-2 gap-4">
+      <div className="mb-6 rounded-2xl border-[1.5px] border-border bg-card p-4 sm:p-6">
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-foreground">
               Fag

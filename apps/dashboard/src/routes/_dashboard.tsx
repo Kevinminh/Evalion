@@ -20,7 +20,7 @@ function DashboardLayout() {
         <header className="flex h-12 items-center gap-2 px-4 md:hidden">
           <SidebarTrigger />
         </header>
-        <div className="py-8 px-10">
+        <div className="px-4 py-6 sm:px-6 md:px-10 md:py-8">
           <Outlet />
         </div>
       </SidebarInset>
