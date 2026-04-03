@@ -12,7 +12,8 @@ import {
 } from "@workspace/ui/components/alert-dialog";
 import { Button } from "@workspace/ui/components/button";
 import { useMutation } from "convex/react";
-import { Users, Mic, CheckSquare, ArrowRight } from "lucide-react";
+import { Users, Mic, CheckSquare, ArrowRight, Copy, Check, BarChart3 } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -42,6 +43,9 @@ function LiveoktSetupPage() {
   const [selfEvalEnabled, setSelfEvalEnabled] = useState(true);
   const [launching, setLaunching] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
+  const [launchModalOpen, setLaunchModalOpen] = useState(false);
+  const [createdSessionId, setCreatedSessionId] = useState<string | null>(null);
+  const [urlCopied, setUrlCopied] = useState(false);
 
   if (isPending) {
     return <LiveoktSetupSkeleton />;
@@ -65,12 +69,27 @@ function LiveoktSetupPage() {
         transcriptionEnabled,
         selfEvalEnabled,
       });
-      const playUrl = import.meta.env.VITE_PLAY_URL || "https://play.evalion.no";
-      window.location.href = `${playUrl}/liveokt/${sessionId}`;
+      setCreatedSessionId(sessionId);
+      setLaunchModalOpen(true);
     } catch {
       toast.error("Kunne ikke opprette liveøkt. Prøv igjen.");
       setLaunching(false);
     }
+  };
+
+  const handleGoToSession = () => {
+    const playUrl = import.meta.env.VITE_PLAY_URL || "https://play.evalion.no";
+    window.location.href = `${playUrl}/liveokt/${createdSessionId}`;
+  };
+
+  const analyticsUrl = createdSessionId
+    ? `${window.location.origin}/analytics/${createdSessionId}`
+    : "";
+
+  const handleCopyUrl = async () => {
+    await navigator.clipboard.writeText(analyticsUrl);
+    setUrlCopied(true);
+    setTimeout(() => setUrlCopied(false), 2000);
   };
 
   return (
@@ -127,37 +146,16 @@ function LiveoktSetupPage() {
           {/* Right: Summary panel */}
           <div className="lg:sticky lg:top-24">
             <div className="rounded-2xl border-[1.5px] border-border bg-card p-6">
-              {/* QR placeholder */}
+              {/* Analytics info */}
               <div className="mb-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Lærer-analytics
               </div>
-              <div className="mb-4 flex aspect-square items-center justify-center rounded-xl border-2 border-dashed border-primary/30 bg-primary/5">
-                <svg className="size-20 text-primary/30" viewBox="0 0 80 80" fill="currentColor" role="img" aria-label="QR-kode plassholder">
-                  <rect x="4" y="4" width="24" height="24" rx="3" fillOpacity="0.5" />
-                  <rect x="8" y="8" width="16" height="16" rx="1" fillOpacity="0.3" />
-                  <rect x="12" y="12" width="8" height="8" rx="1" />
-                  <rect x="52" y="4" width="24" height="24" rx="3" fillOpacity="0.5" />
-                  <rect x="56" y="8" width="16" height="16" rx="1" fillOpacity="0.3" />
-                  <rect x="60" y="12" width="8" height="8" rx="1" />
-                  <rect x="4" y="52" width="24" height="24" rx="3" fillOpacity="0.5" />
-                  <rect x="8" y="56" width="16" height="16" rx="1" fillOpacity="0.3" />
-                  <rect x="12" y="60" width="8" height="8" rx="1" />
-                  <rect x="34" y="4" width="8" height="8" rx="1" fillOpacity="0.4" />
-                  <rect x="34" y="18" width="8" height="8" rx="1" fillOpacity="0.2" />
-                  <rect x="4" y="34" width="8" height="8" rx="1" fillOpacity="0.4" />
-                  <rect x="18" y="34" width="8" height="8" rx="1" fillOpacity="0.2" />
-                  <rect x="34" y="34" width="8" height="8" rx="1" fillOpacity="0.5" />
-                  <rect x="52" y="34" width="8" height="8" rx="1" fillOpacity="0.3" />
-                  <rect x="34" y="52" width="8" height="8" rx="1" fillOpacity="0.3" />
-                  <rect x="52" y="52" width="8" height="8" rx="1" fillOpacity="0.4" />
-                  <rect x="66" y="52" width="8" height="8" rx="1" fillOpacity="0.2" />
-                  <rect x="52" y="66" width="8" height="8" rx="1" fillOpacity="0.2" />
-                  <rect x="66" y="66" width="8" height="8" rx="1" fillOpacity="0.4" />
-                </svg>
+              <div className="mb-4 flex items-center gap-3 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-4">
+                <BarChart3 className="size-8 shrink-0 text-primary/40" />
+                <p className="text-xs text-muted-foreground">
+                  QR-kode for sanntidsanalyse vises etter at lobbyen er opprettet
+                </p>
               </div>
-              <p className="mb-6 text-xs text-muted-foreground">
-                Se sanntidsdata og elevrespons under økten
-              </p>
 
               {/* Launch button */}
               <Button
@@ -173,6 +171,35 @@ function LiveoktSetupPage() {
           </div>
         </div>
       </div>
+
+      <AlertDialog open={launchModalOpen} onOpenChange={setLaunchModalOpen}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Liveøkt opprettet!</AlertDialogTitle>
+            <AlertDialogDescription>
+              Skann QR-koden for å se sanntidsanalyse på en annen enhet (f.eks. mobil eller nettbrett).
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex flex-col items-center gap-4 py-4">
+            <div className="rounded-xl border bg-white p-4">
+              <QRCodeSVG value={analyticsUrl} size={200} />
+            </div>
+            <button
+              onClick={handleCopyUrl}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted"
+            >
+              {urlCopied ? <Check className="size-3 text-sant" /> : <Copy className="size-3" />}
+              {urlCopied ? "Kopiert!" : "Kopier analytics-URL"}
+            </button>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handleGoToSession}>
+              Gå til liveøkt
+              <ArrowRight className="size-4" />
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={cancelOpen} onOpenChange={setCancelOpen}>
         <AlertDialogContent>

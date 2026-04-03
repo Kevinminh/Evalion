@@ -76,6 +76,26 @@ export const getById = query({
   },
 });
 
+export const getSessionWithFagprat = query({
+  args: { id: v.id("liveSessions") },
+  handler: async (ctx, args) => {
+    const session = await ctx.db.get(args.id);
+    if (!session) return null;
+    const fagprat = await ctx.db.get(session.fagpratId);
+    if (!fagprat) return null;
+    const students = await ctx.db
+      .query("sessionStudents")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.id))
+      .collect();
+    return {
+      ...session,
+      fagpratTitle: fagprat.title,
+      statements: fagprat.statements,
+      studentCount: students.length,
+    };
+  },
+});
+
 export const getByJoinCode = query({
   args: { joinCode: v.string() },
   handler: async (ctx, args) => {
