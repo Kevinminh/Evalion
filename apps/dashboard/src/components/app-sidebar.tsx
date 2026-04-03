@@ -21,6 +21,7 @@ import {
   SidebarMenuItem,
 } from "@workspace/ui/components/sidebar";
 import { Search, FolderOpen, Clock, Plus, LogOut, Settings, HelpCircle } from "lucide-react";
+import * as React from "react";
 
 import { authClient } from "@/lib/auth-client";
 
@@ -40,7 +41,7 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
-export function AppSidebar() {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const matchRoute = useMatchRoute();
   const navigate = useNavigate();
   const { data: session } = authClient.useSession();
@@ -59,7 +60,7 @@ export function AppSidebar() {
   const initials = getInitials(userName);
 
   return (
-    <Sidebar collapsible="none">
+    <Sidebar {...props}>
       <SidebarHeader className="items-center justify-center px-4 pt-4 pb-2">
         <img src="/logo.png" alt="Evalion" className="h-16 object-contain" />
       </SidebarHeader>
