@@ -22,8 +22,8 @@ import { Route as DashboardLagFagpratRouteImport } from './routes/_dashboard/lag
 import { Route as DashboardHistorikkRouteImport } from './routes/_dashboard/historikk'
 import { Route as AuthedPrivateRouteImport } from './routes/_authed/private'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as AuthedAnalyticsIdRouteImport } from './routes/_authed/analytics.$id'
 import { Route as AuthedLiveoktIdRouteImport } from './routes/_authed/liveokt.$id'
+import { Route as AuthedAnalyticsIdRouteImport } from './routes/_authed/analytics.$id'
 import { Route as DashboardFagpratIdIndexRouteImport } from './routes/_dashboard/fagprat.$id.index'
 import { Route as DashboardFagpratIdRedigerRouteImport } from './routes/_dashboard/fagprat.$id.rediger'
 
@@ -90,14 +90,14 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthedAnalyticsIdRoute = AuthedAnalyticsIdRouteImport.update({
-  id: '/analytics/$id',
-  path: '/analytics/$id',
-  getParentRoute: () => AuthedRoute,
-} as any)
 const AuthedLiveoktIdRoute = AuthedLiveoktIdRouteImport.update({
   id: '/liveokt/$id',
   path: '/liveokt/$id',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAnalyticsIdRoute = AuthedAnalyticsIdRouteImport.update({
+  id: '/analytics/$id',
+  path: '/analytics/$id',
   getParentRoute: () => AuthedRoute,
 } as any)
 const DashboardFagpratIdIndexRoute = DashboardFagpratIdIndexRouteImport.update({
@@ -324,18 +324,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authed/analytics/$id': {
-      id: '/_authed/analytics/$id'
-      path: '/analytics/$id'
-      fullPath: '/analytics/$id'
-      preLoaderRoute: typeof AuthedAnalyticsIdRouteImport
-      parentRoute: typeof AuthedRoute
-    }
     '/_authed/liveokt/$id': {
       id: '/_authed/liveokt/$id'
       path: '/liveokt/$id'
       fullPath: '/liveokt/$id'
       preLoaderRoute: typeof AuthedLiveoktIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/analytics/$id': {
+      id: '/_authed/analytics/$id'
+      path: '/analytics/$id'
+      fullPath: '/analytics/$id'
+      preLoaderRoute: typeof AuthedAnalyticsIdRouteImport
       parentRoute: typeof AuthedRoute
     }
     '/_dashboard/fagprat/$id/': {
@@ -356,14 +356,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthedRouteChildren {
-  AuthedAnalyticsIdRoute: typeof AuthedAnalyticsIdRoute
   AuthedPrivateRoute: typeof AuthedPrivateRoute
+  AuthedAnalyticsIdRoute: typeof AuthedAnalyticsIdRoute
   AuthedLiveoktIdRoute: typeof AuthedLiveoktIdRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
-  AuthedAnalyticsIdRoute: AuthedAnalyticsIdRoute,
   AuthedPrivateRoute: AuthedPrivateRoute,
+  AuthedAnalyticsIdRoute: AuthedAnalyticsIdRoute,
   AuthedLiveoktIdRoute: AuthedLiveoktIdRoute,
 }
 
