@@ -1,6 +1,6 @@
-import type { FagPratStatement } from "@/lib/types";
+import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
 
-import { FasitBadge } from "./fasit-badge";
+import type { FagPratStatement } from "@/lib/types";
 
 export function StatementTable({ statements }: { statements: FagPratStatement[] }) {
   return (

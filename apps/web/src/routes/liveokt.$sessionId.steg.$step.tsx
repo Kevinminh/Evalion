@@ -1,21 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { BackButton } from "@workspace/ui/components/live/back-button";
-import { BegrunnelseCard } from "@workspace/ui/components/live/begrunnelse-card";
-import { BegrunnelseNav } from "@workspace/ui/components/live/begrunnelse-nav";
-import { DistributionChart } from "@workspace/ui/components/live/distribution-chart";
-import { EndringerCard } from "@workspace/ui/components/live/endringer-card";
-import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
-import { PanelTabs } from "@workspace/ui/components/live/panel-tabs";
+import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { isValidConvexId } from "@workspace/ui/lib/convex-id";
+import { RouteErrorBoundary } from "@workspace/ui/components/route-error-boundary";
 import { Professor } from "@workspace/ui/components/live/professor";
-import { RatingChart } from "@workspace/ui/components/live/rating-chart";
 import { RecordButton } from "@workspace/ui/components/live/record-button";
 import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
 import { StepNav } from "@workspace/ui/components/live/step-nav";
 import { TeacherPanel } from "@workspace/ui/components/live/teacher-panel";
-import { TimerCard } from "@workspace/ui/components/live/timer-card";
 import {
-  FASIT_TEXT,
   STATEMENT_COLORS_HEX,
   VOTE_DOT_COLORS,
   VOTE_LABELS,
@@ -23,16 +15,32 @@ import {
 import { cn } from "@workspace/ui/lib/utils";
 // VoteButtons removed — teacher view doesn't vote
 import { useMutation } from "convex/react";
-import { ArrowRight, Users } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { LiveStepSkeleton } from "@workspace/ui/components/skeletons/live-step-skeleton";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 import { DASHBOARD_URL } from "@/lib/env";
+import { COUNTDOWN_STEP_MS, COUNTDOWN_TOTAL_MS } from "@/lib/timings";
+import { Step1Main, Step1Panel } from "./-liveokt/step-1-vote-in-progress";
+import { Step2Main, Step2Panel } from "./-liveokt/step-2-group-discussion";
+import { Step3Main, Step3Panel } from "./-liveokt/step-3-revote";
+import { Step4Main, Step4Panel } from "./-liveokt/step-4-reveal";
+import { Step5Main, Step5Panel } from "./-liveokt/step-5-distribution";
+import { Step6Main, Step6Panel } from "./-liveokt/step-6-rating-summary";
 
 export const Route = createFileRoute("/liveokt/$sessionId/steg/$step")({
+  beforeLoad: ({ params }) => {
+    if (!isValidConvexId(params.sessionId)) {
+      throw notFound();
+    }
+    if (!/^\d+$/.test(params.step)) {
+      throw notFound();
+    }
+  },
   component: LiveStepPage,
+  errorComponent: RouteErrorBoundary,
 });
 
 function LiveStepPage() {
@@ -145,12 +153,12 @@ function LiveStepPage() {
     setCountdownNumber(3);
     setCountdownDone(false);
 
-    const t1 = setTimeout(() => setCountdownNumber(2), 600);
-    const t2 = setTimeout(() => setCountdownNumber(1), 1200);
+    const t1 = setTimeout(() => setCountdownNumber(2), COUNTDOWN_STEP_MS);
+    const t2 = setTimeout(() => setCountdownNumber(1), COUNTDOWN_STEP_MS * 2);
     const t3 = setTimeout(() => {
       setShowCountdown(false);
       setCountdownDone(true);
-    }, 1800);
+    }, COUNTDOWN_TOTAL_MS);
 
     return () => {
       clearTimeout(t1);
@@ -303,7 +311,7 @@ function LiveStepPage() {
                     onClick={() => {
                       if (isUsed) return;
                       setSelectedStatement(i);
-                      setTimeout(() => goToStep(1), 600);
+                      setTimeout(() => goToStep(1), COUNTDOWN_STEP_MS);
                     }}
                     style={{
                       backgroundColor: color.bg,
@@ -333,112 +341,43 @@ function LiveStepPage() {
 
       case 1:
         return (
-          <div className="flex flex-col items-center gap-8 pt-4">
-            <div className="flex w-full items-center justify-between">
-              <BackButton onClick={() => goToStep(0)} />
-              <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-                <Users className="size-4" />
-                {activeRoundVotes.length}/{studentList.length} har stemt
-              </div>
-            </div>
-            {statementCard}
-            <Professor
-              size="sm"
-              text="Stem uten å avsløre for de andre, og skriv gjerne ned hva du tenker. Hvor sikker er du?"
-            />
-          </div>
+          <Step1Main
+            statementCard={statementCard}
+            studentList={studentList}
+            activeRoundVotes={activeRoundVotes}
+            onBack={() => goToStep(0)}
+          />
         );
 
       case 2:
-        return (
-          <div className="flex flex-col items-center gap-6 pt-4">
-            {statementCard}
-            <Professor
-              size="sm"
-              text="Diskuter med læringspartneren din. Forklar hva du tenker og lytt til hva den andre mener."
-            />
-          </div>
-        );
+        return <Step2Main statementCard={statementCard} />;
 
       case 3:
         return (
-          <div className="flex flex-col items-center gap-8 pt-4">
-            <div className="flex w-full items-center justify-between">
-              <BackButton onClick={() => goToStep(0)} />
-              <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-                <Users className="size-4" />
-                {activeRoundVotes.length}/{studentList.length} har stemt
-              </div>
-            </div>
-            {statementCard}
-            <Professor size="sm" text="Har du endret mening etter diskusjonen? Stem på nytt!" />
-          </div>
+          <Step3Main
+            statementCard={statementCard}
+            studentList={studentList}
+            activeRoundVotes={activeRoundVotes}
+            onBack={() => goToStep(0)}
+          />
         );
 
-      case 4: {
+      case 4:
         return (
-          <>
-            {showCountdown && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
-                <span
-                  key={countdownNumber}
-                  className="text-[160px] font-extrabold text-white animate-[countdown-pop_0.8s_ease_both]"
-                >
-                  {countdownNumber}
-                </span>
-              </div>
-            )}
-            <div className="flex flex-col items-center gap-6 pt-8">
-              {countdownDone && statement && <FasitBadge answer={statement.fasit} animated />}
-              {statementCard}
-              {countdownDone && statement && (
-                <Professor
-                  size="sm"
-                  text={
-                    <>
-                      Hvorfor er denne påstanden <strong>{FASIT_TEXT[statement.fasit]}</strong>?
-                    </>
-                  }
-                />
-              )}
-            </div>
-          </>
+          <Step4Main
+            statementCard={statementCard}
+            statement={statement}
+            showCountdown={showCountdown}
+            countdownNumber={countdownNumber}
+            countdownDone={countdownDone}
+          />
         );
-      }
 
       case 5:
-        return (
-          <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 pt-8">
-            {statement && <FasitBadge answer={statement.fasit} />}
-            <div className="w-full max-h-[392px] overflow-y-auto rounded-2xl border-[1.5px] border-blue-200 animate-[fadeInUp_0.5s_ease_0.2s_both]">
-              <div className="bg-gradient-to-br from-blue-100 to-blue-50 p-6">
-                <p className="text-center text-lg font-bold text-foreground">{statement?.text}</p>
-              </div>
-              <div className="bg-white p-6">
-                <div className="flex gap-4">
-                  <Professor size="md" bordered className="shrink-0" />
-                  <div>
-                    <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Forklaring
-                    </div>
-                    <p className="text-sm leading-relaxed text-foreground/80">
-                      {statement?.explanation}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
+        return <Step5Main statement={statement} />;
 
       case 6:
-        return (
-          <div className="flex flex-col items-center gap-8 pt-8">
-            {statement && <FasitBadge answer={statement.fasit} />}
-            {statementCard}
-            <Professor size="sm" text="Vurder fra 1 til 5 hvor godt du forstår påstanden nå." />
-          </div>
-        );
+        return <Step6Main statementCard={statementCard} statement={statement} />;
 
       default:
         return null;
@@ -452,191 +391,87 @@ function LiveStepPage() {
 
       case 1:
         return (
-          <div className="space-y-4">
-            <TimerCard
-              duration={session?.timerDuration}
-              startedAt={session?.timerStartedAt}
-              pausedAt={session?.timerPausedAt}
-              remainingAtPause={session?.timerRemainingAtPause}
-              onStart={(d) => startTimerMutation({ id: typedSessionId, duration: d })}
-              onPause={() => pauseTimerMutation({ id: typedSessionId })}
-              onStop={() => stopTimerMutation({ id: typedSessionId })}
-            />
-            <div className="h-px bg-border" />
-            {studentVoteList}
-            <div className="h-px bg-border" />
-            <DistributionChart bars={voteBars} total={totalVotes} />
-          </div>
+          <Step1Panel
+            studentVoteList={studentVoteList}
+            voteBars={voteBars}
+            totalVotes={totalVotes}
+            timerDuration={session?.timerDuration}
+            timerStartedAt={session?.timerStartedAt}
+            timerPausedAt={session?.timerPausedAt}
+            timerRemainingAtPause={session?.timerRemainingAtPause}
+            onTimerStart={(d) => startTimerMutation({ id: typedSessionId, duration: d })}
+            onTimerPause={() => pauseTimerMutation({ id: typedSessionId })}
+            onTimerStop={() => stopTimerMutation({ id: typedSessionId })}
+          />
         );
 
-      case 2: {
-        const begrunnelseTab = panelTab === "default" || panelTab === "begrunnelser";
+      case 2:
         return (
-          <PanelTabs
-            tabs={[
-              { key: "begrunnelser", label: "Begrunnelser" },
-              { key: "stemmefordeling", label: "Stemmefordeling" },
-            ]}
-            activeTab={begrunnelseTab ? "begrunnelser" : "stemmefordeling"}
-            onTabChange={setPanelTab}
-          >
-            {begrunnelseTab ? (
-              <div className="space-y-4">
-                <TimerCard
-              duration={session?.timerDuration}
-              startedAt={session?.timerStartedAt}
-              pausedAt={session?.timerPausedAt}
-              remainingAtPause={session?.timerRemainingAtPause}
-              onStart={(d) => startTimerMutation({ id: typedSessionId, duration: d })}
-              onPause={() => pauseTimerMutation({ id: typedSessionId })}
-              onStop={() => stopTimerMutation({ id: typedSessionId })}
-            />
-                {!begrunnelser || begrunnelser.length === 0 ? (
-                  <p className="text-xs italic text-muted-foreground">Ingen begrunnelser ennå</p>
-                ) : (
-                  <>
-                    <BegrunnelseNav
-                      current={begrunnelseIdx + 1}
-                      total={begrunnelser.length}
-                      onPrev={() => setBegrunnelseIdx((i) => Math.max(0, i - 1))}
-                      onNext={() => setBegrunnelseIdx((i) => Math.min(begrunnelser.length - 1, i + 1))}
-                    />
-                    {(() => {
-                      const b = begrunnelser[begrunnelseIdx];
-                      if (!b) return null;
-                      const studentName = studentList.find((s) => s._id === b.studentId)?.name;
-                      return (
-                        <div className="space-y-2">
-                          <BegrunnelseCard text={b.text} studentName={studentName} />
-                          <button
-                            onClick={() => highlightBegrunnelseMutation({ id: b._id, highlighted: !b.highlighted })}
-                            className={cn(
-                              "w-full rounded-lg px-3 py-2 text-xs font-bold transition-all",
-                              b.highlighted
-                                ? "bg-primary text-primary-foreground"
-                                : "border border-border text-muted-foreground hover:bg-primary/10 hover:text-primary",
-                            )}
-                          >
-                            {b.highlighted ? "Fremhevet" : "Fremhev"}
-                          </button>
-                        </div>
-                      );
-                    })()}
-                  </>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {studentVoteList}
-                <div className="h-px bg-border" />
-                <DistributionChart bars={voteBars} total={totalVotes} />
-              </div>
-            )}
-          </PanelTabs>
+          <Step2Panel
+            panelTab={panelTab}
+            onPanelTabChange={setPanelTab}
+            begrunnelser={begrunnelser}
+            begrunnelseIdx={begrunnelseIdx}
+            setBegrunnelseIdx={setBegrunnelseIdx}
+            studentList={studentList}
+            onHighlight={(b) =>
+              highlightBegrunnelseMutation({ id: b._id, highlighted: !b.highlighted })
+            }
+            studentVoteList={studentVoteList}
+            voteBars={voteBars}
+            totalVotes={totalVotes}
+            timerDuration={session?.timerDuration}
+            timerStartedAt={session?.timerStartedAt}
+            timerPausedAt={session?.timerPausedAt}
+            timerRemainingAtPause={session?.timerRemainingAtPause}
+            onTimerStart={(d) => startTimerMutation({ id: typedSessionId, duration: d })}
+            onTimerPause={() => pauseTimerMutation({ id: typedSessionId })}
+            onTimerStop={() => stopTimerMutation({ id: typedSessionId })}
+          />
         );
-      }
 
       case 3:
         return (
-          <div className="space-y-4">
-            <TimerCard
-              duration={session?.timerDuration}
-              startedAt={session?.timerStartedAt}
-              pausedAt={session?.timerPausedAt}
-              remainingAtPause={session?.timerRemainingAtPause}
-              onStart={(d) => startTimerMutation({ id: typedSessionId, duration: d })}
-              onPause={() => pauseTimerMutation({ id: typedSessionId })}
-              onStop={() => stopTimerMutation({ id: typedSessionId })}
-            />
-            <div className="h-px bg-border" />
-            {studentVoteList}
-            <div className="h-px bg-border" />
-            <DistributionChart bars={voteBars} total={totalVotes} />
-          </div>
+          <Step3Panel
+            studentVoteList={studentVoteList}
+            voteBars={voteBars}
+            totalVotes={totalVotes}
+            timerDuration={session?.timerDuration}
+            timerStartedAt={session?.timerStartedAt}
+            timerPausedAt={session?.timerPausedAt}
+            timerRemainingAtPause={session?.timerRemainingAtPause}
+            onTimerStart={(d) => startTimerMutation({ id: typedSessionId, duration: d })}
+            onTimerPause={() => pauseTimerMutation({ id: typedSessionId })}
+            onTimerStop={() => stopTimerMutation({ id: typedSessionId })}
+          />
         );
 
-      case 4: {
-        const endringerTab = panelTab === "default" || panelTab === "endringer";
+      case 4:
         return (
-          <PanelTabs
-            tabs={[
-              { key: "endringer", label: "Endringer" },
-              { key: "stemmefordeling", label: "Stemmefordeling" },
-            ]}
-            activeTab={endringerTab ? "endringer" : "stemmefordeling"}
-            onTabChange={setPanelTab}
-          >
-            {endringerTab ? (
-              <EndringerCard
-                correctCount={r2CorrectCount}
-                totalVotes={r2Total}
-                changedToCorrect={changedToCorrect}
-                changedToIncorrect={changedToIncorrect}
-              />
-            ) : (
-              <div className="space-y-4">
-                <DistributionChart
-                  bars={[
-                    {
-                      label: "Sant",
-                      value: r2Votes.filter((v) => v.vote === "sant").length,
-                      color: "bg-sant",
-                    },
-                    {
-                      label: "Usant",
-                      value: r2Votes.filter((v) => v.vote === "usant").length,
-                      color: "bg-usant",
-                    },
-                    {
-                      label: "Delvis",
-                      value: r2Votes.filter((v) => v.vote === "delvis").length,
-                      color: "bg-delvis",
-                    },
-                  ]}
-                  total={r2Total}
-                />
-              </div>
-            )}
-          </PanelTabs>
+          <Step4Panel
+            panelTab={panelTab}
+            onPanelTabChange={setPanelTab}
+            r2CorrectCount={r2CorrectCount}
+            r2Total={r2Total}
+            changedToCorrect={changedToCorrect}
+            changedToIncorrect={changedToIncorrect}
+            r2Votes={r2Votes}
+          />
         );
-      }
 
-      case 5: {
-        const correctCount = r2Votes.filter((v) => statement && v.vote === statement.fasit).length;
-        const highlightedBegrunnelse = begrunnelser?.find((b) => b.highlighted);
-        const highlightedStudent = highlightedBegrunnelse
-          ? studentList.find((s) => s._id === highlightedBegrunnelse.studentId)
-          : null;
+      case 5:
         return (
-          <div className="space-y-4">
-            <div className="rounded-lg bg-sant/10 p-3">
-              <div className="text-xs font-bold uppercase tracking-wider text-sant">
-                Svarte riktig
-              </div>
-              <p className="text-lg font-extrabold text-sant">
-                {correctCount}/{r2Total}
-              </p>
-            </div>
-            {highlightedBegrunnelse ? (
-              <div className="rounded-lg border-l-[3px] border-l-primary/30 bg-primary/5 p-4">
-                <div className="mb-1 text-xs font-bold uppercase tracking-wider text-primary/60">
-                  Fremhevet begrunnelse
-                </div>
-                <BegrunnelseCard text={highlightedBegrunnelse.text} studentName={highlightedStudent?.name} />
-              </div>
-            ) : (
-              <div className="rounded-lg border-l-[3px] border-l-primary/30 bg-primary/5 p-4">
-                <p className="text-xs italic text-muted-foreground">
-                  Ingen fremhevet begrunnelse ennå
-                </p>
-              </div>
-            )}
-          </div>
+          <Step5Panel
+            statement={statement}
+            r2Votes={r2Votes}
+            r2Total={r2Total}
+            begrunnelser={begrunnelser}
+            studentList={studentList}
+          />
         );
-      }
 
       case 6:
-        return <RatingChart distribution={ratingDistribution} average={avgRating} />;
+        return <Step6Panel ratingDistribution={ratingDistribution} avgRating={avgRating} />;
 
       default:
         return null;

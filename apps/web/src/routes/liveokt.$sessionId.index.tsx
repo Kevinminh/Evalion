@@ -1,42 +1,28 @@
 import { useQuery, skipToken } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { isValidConvexId } from "@workspace/ui/lib/convex-id";
 import { cn } from "@workspace/ui/lib/utils";
+import { RouteErrorBoundary } from "@workspace/ui/components/route-error-boundary";
 import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
 import { useMutation } from "convex/react";
 import { Users, X } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
 import { TeacherLobbySkeleton } from "@workspace/ui/components/skeletons/teacher-lobby-skeleton";
+import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import { DASHBOARD_URL } from "@/lib/env";
 import type { Id } from "@/lib/convex";
 
 export const Route = createFileRoute("/liveokt/$sessionId/")({
+  beforeLoad: ({ params }) => {
+    if (!isValidConvexId(params.sessionId)) {
+      throw notFound();
+    }
+  },
   component: TeacherLobbyPage,
+  errorComponent: RouteErrorBoundary,
 });
-
-function WaitingDots() {
-  return (
-    <span className="ml-1 inline-flex gap-1">
-      {[0, 1, 2].map((i) => (
-        <span
-          key={i}
-          className="size-2.5 rounded-full bg-primary/40"
-          style={{
-            animation: "dotPulse 1.4s ease-in-out infinite both",
-            animationDelay: `${i * 0.16}s`,
-          }}
-        />
-      ))}
-      <style>{`
-        @keyframes dotPulse {
-          0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
-          40% { opacity: 1; transform: scale(1.2); }
-        }
-      `}</style>
-    </span>
-  );
-}
 
 function TeacherLobbyPage() {
   const { sessionId } = Route.useParams();

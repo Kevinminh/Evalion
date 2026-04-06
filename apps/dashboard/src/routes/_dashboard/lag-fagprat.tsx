@@ -2,22 +2,29 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
+import { parseDraftJson } from "@workspace/ui/lib/draft-utils";
+import {
+  toStatementPayload,
+  toStatementsWithId,
+  useStatements,
+} from "@workspace/ui/hooks/use-statements";
 import { Plus, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
+import { z } from "zod";
 
 import { ConceptTags } from "@/components/concept-tags";
 import { ForkunnskapSelector } from "@/components/forkunnskap-selector";
 import { ReddiModal } from "@/components/reddi-modal";
 import { StatementEditor } from "@/components/statement-editor";
 import { SUBJECT_OPTIONS, LEVEL_OPTIONS } from "@/lib/constants";
-import { parseDraftJson } from "@/lib/draft-utils";
-import { useStatements, toStatementsWithId, toStatementPayload } from "@/lib/use-statements";
 import type { FagPratType } from "@/lib/types";
 
+const searchSchema = z.object({
+  draft: z.string().catch(""),
+});
+
 export const Route = createFileRoute("/_dashboard/lag-fagprat")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    draft: typeof search.draft === "string" ? search.draft : "",
-  }),
+  validateSearch: searchSchema,
   component: LagFagPratPage,
 });
 

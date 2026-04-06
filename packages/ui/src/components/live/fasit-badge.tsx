@@ -1,19 +1,20 @@
+import type { Fasit } from "@workspace/ui/lib/types";
 import { cn } from "@workspace/ui/lib/utils";
 
-const FASIT_CONFIG = {
+const FASIT_CONFIG: Record<Fasit, { label: string; bg: string }> = {
   sant: { label: "SANT", bg: "bg-sant" },
   usant: { label: "USANT", bg: "bg-usant" },
   delvis: { label: "DELVIS SANT", bg: "bg-delvis" },
-} as const;
+};
 
 interface FasitBadgeProps {
-  answer: "sant" | "usant" | "delvis";
+  fasit: Fasit;
   animated?: boolean;
   className?: string;
 }
 
-export function FasitBadge({ answer, animated = false, className }: FasitBadgeProps) {
-  const { label, bg } = FASIT_CONFIG[answer];
+export function FasitBadge({ fasit, animated = false, className }: FasitBadgeProps) {
+  const { label, bg } = FASIT_CONFIG[fasit];
 
   return (
     <span

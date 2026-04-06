@@ -1,20 +1,23 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { api } from "@workspace/backend/convex/_generated/api";
+import { parseDraftJson } from "@workspace/ui/lib/draft-utils";
 import { cn } from "@workspace/ui/lib/utils";
 import { useAction } from "convex/react";
 import { AlertTriangle, ArrowLeft, ArrowRight, RefreshCw, Sparkles } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { z } from "zod";
 
-import { parseDraftJson } from "@/lib/draft-utils";
 import { FASIT_COLUMN_CONFIG } from "@/lib/fasit-config";
 import type { Fasit, FagPratType } from "@/lib/types";
 
+const searchSchema = z.object({
+  statements: z.string().catch(""),
+  draft: z.string().catch(""),
+  topic: z.string().catch(""),
+});
+
 export const Route = createFileRoute("/_dashboard/velg-pastander")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    statements: typeof search.statements === "string" ? search.statements : "",
-    draft: typeof search.draft === "string" ? search.draft : "",
-    topic: typeof search.topic === "string" ? search.topic : "",
-  }),
+  validateSearch: searchSchema,
   component: VelgPastanderPage,
 });
 
@@ -142,8 +145,13 @@ function VelgPastanderPage() {
   const draftLevel = parsedDraft?.level ?? "";
   const draftType: FagPratType = parsedDraft?.type ?? "intro";
 
+  // Guard against stale responses when the user triggers generation
+  // multiple times in quick succession.
+  const requestIdRef = useRef(0);
+
   const handleGenerate = useCallback(async () => {
     if (!topic) return;
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     setError(null);
     setAllStatements([]);
@@ -155,11 +163,15 @@ function VelgPastanderPage() {
         level: draftLevel,
         type: draftType,
       });
+      if (requestIdRef.current !== requestId) return;
       setAllStatements(result);
     } catch (e) {
+      if (requestIdRef.current !== requestId) return;
       setError(e instanceof Error ? e.message : "Noe gikk galt. Prøv igjen.");
     } finally {
-      setLoading(false);
+      if (requestIdRef.current === requestId) {
+        setLoading(false);
+      }
     }
   }, [topic, draftSubject, draftLevel, draftType, generate]);
 

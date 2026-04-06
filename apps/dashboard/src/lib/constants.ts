@@ -1,4 +1,10 @@
-export { LEVEL_OPTIONS, SUBJECT_OPTIONS } from "@workspace/ui/lib/constants";
+export {
+  LEVEL_OPTIONS,
+  SUBJECT_OPTIONS,
+  DEFAULT_GROUP_COUNT,
+  MIN_GROUP_COUNT,
+  MAX_GROUP_COUNT,
+} from "@workspace/ui/lib/constants";
 
 /** Standard 3-column responsive card grid */
 export const CARD_GRID_CLASS =
@@ -13,8 +19,3 @@ export const LABEL_CLASS = "text-xs font-bold uppercase tracking-wider text-mute
 /** Shared textarea base style (compose with cn() and add min-h as needed) */
 export const TEXTAREA_CLASS =
   "w-full resize-none rounded-xl border-2 border-input bg-background px-4 py-3 text-base outline-none transition-colors placeholder:text-muted-foreground/60 hover:border-muted-foreground/30 focus:border-primary focus:ring-3 focus:ring-primary/20";
-
-/** Group count bounds for live sessions */
-export const DEFAULT_GROUP_COUNT = 4;
-export const MIN_GROUP_COUNT = 2;
-export const MAX_GROUP_COUNT = 8;

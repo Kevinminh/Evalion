@@ -1,129 +1,39 @@
 import { useQuery, skipToken } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 import { VOTE_LABELS } from "@workspace/ui/lib/constants";
+import { isValidConvexId } from "@workspace/ui/lib/convex-id";
 import { cn } from "@workspace/ui/lib/utils";
 import { VoteButtons } from "@workspace/ui/components/live/vote-buttons";
 import { useMutation } from "convex/react";
-import { Clock, Loader2, LogOut } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Loader2, LogOut } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
 import { Professor } from "@workspace/ui/components/live/professor";
+import { RouteErrorBoundary } from "@workspace/ui/components/route-error-boundary";
+import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 
 import { StudentGameSkeleton } from "@workspace/ui/components/skeletons/student-game-skeleton";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
+import { COUNTDOWN_STEP_MS, COUNTDOWN_TOTAL_MS } from "@/lib/timings";
+
+import { BegrunnelsePanel } from "./-spill/begrunnelse-panel";
+import { CountdownOverlay } from "./-spill/countdown-overlay";
+import { RatingPanel } from "./-spill/rating-panel";
+import { StatementCard } from "./-spill/statement-card";
+import { StudentAvatar } from "./-spill/student-avatar";
+import { StudentTimer } from "./-spill/student-timer";
 
 export const Route = createFileRoute("/spill/$studentId")({
+  beforeLoad: ({ params }) => {
+    if (!isValidConvexId(params.studentId)) {
+      throw notFound();
+    }
+  },
   component: StudentGamePage,
+  errorComponent: RouteErrorBoundary,
 });
-
-const RATING_COLORS = [
-  "bg-red-400",
-  "bg-orange-400",
-  "bg-yellow-400",
-  "bg-lime-400",
-  "bg-green-400",
-];
-
-function WaitingDots() {
-  return (
-    <span className="ml-1 inline-flex gap-1">
-      {[0, 1, 2].map((i) => (
-        <span
-          key={i}
-          className="size-2.5 rounded-full bg-primary/40"
-          style={{
-            animation: "dotPulse 1.4s ease-in-out infinite both",
-            animationDelay: `${i * 0.16}s`,
-          }}
-        />
-      ))}
-      <style>{`
-        @keyframes dotPulse {
-          0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
-          40% { opacity: 1; transform: scale(1.2); }
-        }
-      `}</style>
-    </span>
-  );
-}
-
-function StudentTimer({
-  timerDuration,
-  timerStartedAt,
-  timerPausedAt,
-  timerRemainingAtPause,
-}: {
-  timerDuration?: number;
-  timerStartedAt?: number;
-  timerPausedAt?: number;
-  timerRemainingAtPause?: number;
-}) {
-  const [remaining, setRemaining] = useState(0);
-  const [expired, setExpired] = useState(false);
-
-  const calcRemaining = useCallback(() => {
-    if (timerPausedAt && timerRemainingAtPause !== undefined) {
-      return Math.max(0, Math.floor(timerRemainingAtPause));
-    }
-    if (timerStartedAt && timerDuration !== undefined) {
-      return Math.max(0, Math.floor(timerDuration - (Date.now() - timerStartedAt) / 1000));
-    }
-    return 0;
-  }, [timerDuration, timerStartedAt, timerPausedAt, timerRemainingAtPause]);
-
-  const isActive = timerStartedAt !== undefined && timerStartedAt !== null;
-  const isPaused = isActive && timerPausedAt !== undefined && timerPausedAt !== null;
-  const isRunning = isActive && !isPaused;
-
-  useEffect(() => {
-    if (!isActive) {
-      setExpired(false);
-      return;
-    }
-    setRemaining(calcRemaining());
-    if (isRunning) {
-      const interval = setInterval(() => {
-        const r = calcRemaining();
-        setRemaining(r);
-        if (r <= 0) setExpired(true);
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [isActive, isRunning, calcRemaining]);
-
-  useEffect(() => {
-    if (!expired) return;
-    const timeout = setTimeout(() => setExpired(false), 3000);
-    return () => clearTimeout(timeout);
-  }, [expired]);
-
-  if (!isActive) return null;
-
-  if (expired && remaining <= 0) {
-    return (
-      <div className="flex items-center gap-2 rounded-full bg-destructive/10 px-4 py-1.5">
-        <Clock className="size-4 text-destructive" />
-        <span className="text-sm font-bold text-destructive">Tiden er ute!</span>
-      </div>
-    );
-  }
-
-  if (remaining <= 0) return null;
-
-  const minutes = Math.floor(remaining / 60);
-  const seconds = remaining % 60;
-
-  return (
-    <div className={cn("flex items-center gap-2 rounded-full px-4 py-1.5", remaining <= 10 ? "bg-destructive/10" : "bg-primary/10")}>
-      <Clock className={cn("size-4", remaining <= 10 ? "text-destructive" : "text-primary")} />
-      <span className={cn("font-mono text-sm font-bold tabular-nums", remaining <= 10 ? "text-destructive" : "text-primary")}>
-        {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
-      </span>
-    </div>
-  );
-}
 
 function StudentGamePage() {
   const { studentId } = Route.useParams();
@@ -181,16 +91,52 @@ function StudentGamePage() {
   const countdownTriggered = useRef(false);
   const prevStep = useRef<number | undefined>(undefined);
 
-  // Reset vote/rating sent state when step changes
+  // Reset vote/rating sent state when step changes. NOTE: we intentionally
+  // do NOT clear `begrunnelseText` here — the draft is keyed by statement
+  // and persisted to localStorage below, so it survives step advances.
   useEffect(() => {
     if (session?.currentStep !== prevStep.current) {
       setVoteSent(false);
       setRatingSent(false);
       setBegrunnelseSent(false);
-      setBegrunnelseText("");
       prevStep.current = session?.currentStep;
     }
   }, [session?.currentStep]);
+
+  // Persist begrunnelse drafts to localStorage, keyed by statement.
+  // If the teacher advances the step mid-type, the draft is restored
+  // when the student returns to the same statement.
+  const draftKey =
+    student?.sessionId && typedStudentId
+      ? `begrunnelse:${student.sessionId}:${typedStudentId}:${statementIndex}`
+      : null;
+
+  useEffect(() => {
+    if (!draftKey) return;
+    try {
+      const saved = localStorage.getItem(draftKey);
+      setBegrunnelseText(saved ?? "");
+    } catch {
+      setBegrunnelseText("");
+    }
+    // Reload whenever the key changes (new statement) — we don't depend on
+    // begrunnelseText to avoid a feedback loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftKey]);
+
+  useEffect(() => {
+    if (!draftKey) return;
+    try {
+      if (begrunnelseText) {
+        localStorage.setItem(draftKey, begrunnelseText);
+      } else {
+        localStorage.removeItem(draftKey);
+      }
+    } catch {
+      // localStorage unavailable (private mode, quota) — fall back to
+      // in-memory only.
+    }
+  }, [draftKey, begrunnelseText]);
 
   // Check if student already voted this round
   const currentStep = session?.currentStep ?? -1;
@@ -214,12 +160,12 @@ function StudentGamePage() {
     setCountdownNumber(3);
     setCountdownDone(false);
 
-    const t1 = setTimeout(() => setCountdownNumber(2), 600);
-    const t2 = setTimeout(() => setCountdownNumber(1), 1200);
+    const t1 = setTimeout(() => setCountdownNumber(2), COUNTDOWN_STEP_MS);
+    const t2 = setTimeout(() => setCountdownNumber(1), COUNTDOWN_STEP_MS * 2);
     const t3 = setTimeout(() => {
       setShowCountdown(false);
       setCountdownDone(true);
-    }, 1800);
+    }, COUNTDOWN_TOTAL_MS);
 
     return () => {
       clearTimeout(t1);
@@ -245,14 +191,7 @@ function StudentGamePage() {
   if (!session) {
     return (
       <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background px-6">
-        <div
-          className={cn(
-            "flex size-16 items-center justify-center rounded-full text-2xl font-bold text-white",
-            student.avatarColor,
-          )}
-        >
-          {student.name[0]}
-        </div>
+        <StudentAvatar name={student.name} avatarColor={student.avatarColor} />
         <h1 className="text-xl font-extrabold text-foreground">Hei, {student.name}!</h1>
         <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="size-4 animate-spin" />
@@ -293,12 +232,32 @@ function StudentGamePage() {
     navigate({ to: "/" });
   };
 
+  const handleSubmitBegrunnelse = async (text: string) => {
+    await submitBegrunnelseMutation({
+      sessionId: session._id,
+      studentId: typedStudentId,
+      statementIndex,
+      round: 1,
+      text,
+    });
+  };
+
+  const handleRate = async (n: number) => {
+    setRatingSent(true);
+    try {
+      await submitRatingMutation({
+        sessionId: session._id,
+        studentId: typedStudentId,
+        statementIndex,
+        rating: n,
+      });
+    } catch {
+      setRatingSent(false);
+    }
+  };
+
   // Statement card reusable for student
-  const studentStatementCard = statement && (
-    <div className="mx-auto w-full max-w-md rounded-2xl border-[1.5px] border-blue-200 bg-blue-50 p-5">
-      <p className="text-center text-base font-bold text-foreground">{statement.text}</p>
-    </div>
-  );
+  const studentStatementCard = statement && <StatementCard statement={statement} />;
 
   // Render based on session state
   const renderContent = () => {
@@ -306,14 +265,7 @@ function StudentGamePage() {
     if (session.status === "lobby") {
       return (
         <div className="flex flex-col items-center gap-4">
-          <div
-            className={cn(
-              "flex size-16 items-center justify-center rounded-full text-2xl font-bold text-white",
-              student.avatarColor,
-            )}
-          >
-            {student.name[0]}
-          </div>
+          <StudentAvatar name={student.name} avatarColor={student.avatarColor} />
           <h1 className="text-xl font-extrabold text-foreground">Hei, {student.name}!</h1>
           <div className="flex items-center text-muted-foreground">
             Venter på at læreren starter
@@ -424,47 +376,14 @@ function StudentGamePage() {
               </div>
             )}
             {/* Begrunnelse input */}
-            <div className="w-full max-w-md">
-              <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Din begrunnelse
-              </p>
-              {begrunnelseSent ? (
-                <div className="rounded-xl bg-primary/10 px-6 py-3">
-                  <p className="text-sm font-bold text-primary">Begrunnelse sendt!</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <textarea
-                    value={begrunnelseText}
-                    onChange={(e) => setBegrunnelseText(e.target.value)}
-                    placeholder="Skriv hva du tenker om påstanden..."
-                    className="w-full rounded-xl border-2 border-input bg-card px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary focus:ring-3 focus:ring-primary/20"
-                    rows={3}
-                  />
-                  <button
-                    onClick={async () => {
-                      if (!begrunnelseText.trim()) return;
-                      setBegrunnelseSent(true);
-                      try {
-                        await submitBegrunnelseMutation({
-                          sessionId: session._id,
-                          studentId: typedStudentId,
-                          statementIndex,
-                          round: 1,
-                          text: begrunnelseText.trim(),
-                        });
-                      } catch {
-                        setBegrunnelseSent(false);
-                      }
-                    }}
-                    disabled={!begrunnelseText.trim()}
-                    className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground transition-all disabled:opacity-50"
-                  >
-                    Send inn
-                  </button>
-                </div>
-              )}
-            </div>
+            <BegrunnelsePanel
+              begrunnelseText={begrunnelseText}
+              setBegrunnelseText={setBegrunnelseText}
+              begrunnelseSent={begrunnelseSent}
+              setBegrunnelseSent={setBegrunnelseSent}
+              onSubmit={handleSubmitBegrunnelse}
+              draftKey={draftKey}
+            />
           </div>
         );
 
@@ -499,22 +418,13 @@ function StudentGamePage() {
       case 4: {
         return (
           <>
-            {showCountdown && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
-                <span
-                  key={countdownNumber}
-                  className="text-[160px] font-extrabold text-white animate-[countdown-pop_0.8s_ease_both]"
-                >
-                  {countdownNumber}
-                </span>
-              </div>
-            )}
+            <CountdownOverlay visible={showCountdown} number={countdownNumber} />
             <div className="flex w-full flex-col items-center gap-6">
               <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                 Fasit
               </h2>
               {countdownDone && statement && (
-                <FasitBadge answer={statement.fasit} animated />
+                <FasitBadge fasit={statement.fasit} animated />
               )}
               {studentStatementCard}
             </div>
@@ -529,7 +439,7 @@ function StudentGamePage() {
             <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
               Forklaring
             </h2>
-            {statement && <FasitBadge answer={statement.fasit} />}
+            {statement && <FasitBadge fasit={statement.fasit} />}
             <div className="w-full max-w-md max-h-[392px] overflow-y-auto rounded-2xl border-[1.5px] border-blue-200">
               <div className="bg-gradient-to-br from-blue-100 to-blue-50 p-5">
                 <p className="text-center text-base font-bold text-foreground">
@@ -560,44 +470,13 @@ function StudentGamePage() {
             <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
               Egenvurdering
             </h2>
-            {statement && <FasitBadge answer={statement.fasit} />}
+            {statement && <FasitBadge fasit={statement.fasit} />}
             {studentStatementCard}
             <Professor
               size="sm"
               text="Vurder fra 1 til 5 hvor godt du forstår påstanden nå."
             />
-            {ratingSent ? (
-              <div className="rounded-xl bg-primary/10 px-6 py-3">
-                <p className="text-sm font-bold text-primary">Takk!</p>
-              </div>
-            ) : (
-              <div className="flex justify-center gap-3">
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <button
-                    key={n}
-                    onClick={async () => {
-                      setRatingSent(true);
-                      try {
-                        await submitRatingMutation({
-                          sessionId: session._id,
-                          studentId: typedStudentId,
-                          statementIndex,
-                          rating: n,
-                        });
-                      } catch {
-                        setRatingSent(false);
-                      }
-                    }}
-                    className={cn(
-                      "rounded-xl px-5 py-3 text-lg font-bold text-white transition-all active:scale-95",
-                      RATING_COLORS[n - 1],
-                    )}
-                  >
-                    {n}
-                  </button>
-                ))}
-              </div>
-            )}
+            <RatingPanel ratingSent={ratingSent} onRate={handleRate} />
           </div>
         );
 
@@ -616,14 +495,7 @@ function StudentGamePage() {
       {/* Student header */}
       <div className="fixed top-0 right-0 left-0 z-40 flex items-center justify-between border-b bg-card px-4 py-2">
         <div className="flex items-center gap-2">
-          <div
-            className={cn(
-              "flex size-8 items-center justify-center rounded-full text-sm font-bold text-white",
-              student.avatarColor,
-            )}
-          >
-            {student.name[0]}
-          </div>
+          <StudentAvatar name={student.name} avatarColor={student.avatarColor} size="sm" />
           <span className="text-sm font-bold text-foreground">{student.name}</span>
         </div>
         <button

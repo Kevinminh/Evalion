@@ -136,3 +136,10 @@ export const LEVEL_OPTIONS = [
   { value: "VG2", label: "VG2" },
   { value: "VG3", label: "VG3" },
 ] as const;
+
+// ── Live session group bounds ───────────────────────────────────────────────
+// Backend mirrors these limits in packages/backend/convex/liveSessions.ts
+// (see create, createGroups — hard-coded to match).
+export const DEFAULT_GROUP_COUNT = 4;
+export const MIN_GROUP_COUNT = 2;
+export const MAX_GROUP_COUNT = 8;

@@ -1,24 +1,25 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { RouteErrorBoundary } from "@workspace/ui/components/route-error-boundary";
 import { Skeleton } from "@workspace/ui/components/skeleton";
-import { EndringerCard } from "@workspace/ui/components/live/endringer-card";
-import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
 import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@workspace/ui/components/tabs";
 import { cn } from "@workspace/ui/lib/utils";
 import { QRCodeSVG } from "qrcode.react";
-import { Users, Hash, Activity, Copy, Check } from "lucide-react";
+import { Users, Hash, Activity } from "lucide-react";
 import { useState } from "react";
 
+import { CopyUrlButton } from "@/components/analytics/copy-url-button";
+import { OverviewCard } from "@/components/analytics/overview-card";
+import { StatementAnalytics } from "@/components/analytics/statement-analytics";
 import { ErrorState } from "@/components/error-state";
 import { NotFoundState } from "@/components/not-found-state";
-import { VoteChart } from "@/components/analytics/vote-chart";
-import { AnalyticsRatingChart } from "@/components/analytics/rating-chart";
 import { liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 
 export const Route = createFileRoute("/_authed/analytics/$id")({
   component: AnalyticsPage,
+  errorComponent: RouteErrorBoundary,
 });
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
@@ -125,120 +126,6 @@ function AnalyticsPage() {
             </TabsContent>
           ))}
         </Tabs>
-      </div>
-    </div>
-  );
-}
-
-function OverviewCard({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-2xl border-[1.5px] border-border bg-card p-4">
-      <div className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-        {icon}
-        {label}
-      </div>
-      <div className="text-xl font-extrabold text-foreground">{value}</div>
-    </div>
-  );
-}
-
-function CopyUrlButton({ url }: { url: string }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <button
-      onClick={handleCopy}
-      className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted"
-    >
-      {copied ? <Check className="size-3 text-sant" /> : <Copy className="size-3" />}
-      {copied ? "Kopiert!" : "Kopier URL"}
-    </button>
-  );
-}
-
-function StatementAnalytics({
-  sessionId,
-  statementIndex,
-  statementText,
-  fasit,
-}: {
-  sessionId: Id<"liveSessions">;
-  statementIndex: number;
-  statementText: string;
-  fasit: "sant" | "usant" | "delvis";
-}) {
-  const { data: analytics, isPending } = useQuery(
-    liveSessionQueries.getVoteAnalytics(sessionId, statementIndex),
-  );
-
-  if (isPending || !analytics) {
-    return (
-      <div className="space-y-4">
-        <Skeleton className="h-8 w-full" />
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Skeleton className="h-64" />
-          <Skeleton className="h-64" />
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Statement header */}
-      <div className="rounded-2xl border-[1.5px] border-border bg-card p-5">
-        <p className="mb-3 text-base font-semibold text-foreground">{statementText}</p>
-        <FasitBadge answer={fasit} className="text-sm px-4 py-1.5" />
-      </div>
-
-      {/* Vote distributions side by side */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div className="rounded-2xl border-[1.5px] border-border bg-card p-5">
-          <VoteChart data={analytics.round1} label="Runde 1 — Individuelle svar" />
-        </div>
-        <div className="rounded-2xl border-[1.5px] border-border bg-card p-5">
-          <VoteChart data={analytics.round2} label="Runde 2 — Etter diskusjon" />
-        </div>
-      </div>
-
-      {/* Changes + Rating */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div className="rounded-2xl border-[1.5px] border-border bg-card p-5">
-          <div className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Endringer
-          </div>
-          <EndringerCard
-            correctCount={analytics.correctR2}
-            totalVotes={analytics.totalR2}
-            changedToCorrect={analytics.wrongToRight}
-            changedToIncorrect={analytics.rightToWrong}
-          />
-        </div>
-        {analytics.ratingDistribution.some((d) => d.count > 0) && (
-          <div className="rounded-2xl border-[1.5px] border-border bg-card p-5">
-            <div className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Egenvurdering
-            </div>
-            <AnalyticsRatingChart
-              distribution={analytics.ratingDistribution}
-              average={analytics.avgRating}
-            />
-          </div>
-        )}
       </div>
     </div>
   );

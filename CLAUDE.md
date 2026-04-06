@@ -109,3 +109,10 @@ Dashboard additionally uses:
 - **Linting**: oxlint with TypeScript, React, react-perf, jsx-a11y, TanStack Router/Query plugins.
 - **Styling**: Tailwind CSS 4 utility-first. CSS variables defined in `packages/ui/src/styles/globals.css` using oklch color space. Dark mode via `.dark` class with variable overrides.
 - **Git hooks**: husky + lint-staged runs on pre-commit.
+
+### Naming
+
+- **Code identifiers** (variables, functions, types, props, file names) are in **English**.
+- **UI strings** (labels, messages, button text, toasts) are in **Norwegian**.
+- **Domain terms** — `fagprat`, `fasit`, `begrunnelse`, `liveokt`, `sant`/`usant`/`delvis`, `trinn`, `påstand` — are **canonical Norwegian vocabulary** and stay in Norwegian even inside code. They have no good English equivalent and translating them loses meaning.
+- **Routes** use the Norwegian verb for the action (`/lag-fagprat`, `/velg-pastander`, `/min-samling`). This is intentional and matches the URL structure exposed to teachers.

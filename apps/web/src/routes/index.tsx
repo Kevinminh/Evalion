@@ -23,21 +23,26 @@ function App() {
   // Live query for the entered code — only enabled when user submits
   const [submittedCode, setSubmittedCode] = useState("");
   const { data: foundSession, isFetching } = useQuery({
-    ...liveSessionQueries.getByJoinCode(submittedCode.toUpperCase()),
+    ...liveSessionQueries.getByJoinCode(submittedCode),
     enabled: submittedCode.length === 6,
   });
+
+  // Strip anything that isn't alphanumeric so pasted codes with spaces,
+  // dashes, or invisible characters get normalized to just the code.
+  const sanitizeCode = (raw: string) =>
+    raw.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 6);
 
   // Handle the result of the lookup
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    const trimmed = code.trim().toUpperCase();
-    if (trimmed.length !== 6) {
-      setError("Koden må være 6 tegn");
+    const cleaned = sanitizeCode(code);
+    if (!/^[A-Z0-9]{6}$/.test(cleaned)) {
+      setError("Koden må være 6 tegn (bokstaver og tall)");
       return;
     }
     setChecking(true);
-    setSubmittedCode(trimmed);
+    setSubmittedCode(cleaned);
   };
 
   // React to query result via useEffect (not in render body)
@@ -110,7 +115,7 @@ function App() {
             maxLength={6}
             value={code}
             onChange={(e) => {
-              setCode(e.target.value.toUpperCase());
+              setCode(sanitizeCode(e.target.value));
               setError("");
             }}
           />

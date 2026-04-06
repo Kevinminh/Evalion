@@ -1,22 +1,25 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
+import { parseDraftJson } from "@workspace/ui/lib/draft-utils";
 import { useMutation } from "convex/react";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import { ConceptTags } from "@/components/concept-tags";
 import { NotFoundState } from "@/components/not-found-state";
 import { VisibilityToggle } from "@/components/visibility-toggle";
 import { api } from "@/lib/convex";
 import { LABEL_CLASS } from "@/lib/constants";
-import { parseDraftJson } from "@/lib/draft-utils";
 import type { Visibility } from "@/lib/types";
 
+const searchSchema = z.object({
+  draft: z.string().catch(""),
+});
+
 export const Route = createFileRoute("/_dashboard/lagre-fagprat")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    draft: typeof search.draft === "string" ? search.draft : "",
-  }),
+  validateSearch: searchSchema,
   component: LagreFagPratPage,
 });
 

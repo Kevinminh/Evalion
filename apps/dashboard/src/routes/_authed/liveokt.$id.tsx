@@ -1,34 +1,28 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogAction,
-  AlertDialogCancel,
-} from "@workspace/ui/components/alert-dialog";
 import { Button } from "@workspace/ui/components/button";
+import { ConfirmDialog } from "@workspace/ui/components/confirm-dialog";
+import { RouteErrorBoundary } from "@workspace/ui/components/route-error-boundary";
+import { LiveoktSetupSkeleton } from "@workspace/ui/components/skeletons/liveokt-setup-skeleton";
+import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
 import { useMutation } from "convex/react";
-import { Users, Mic, CheckSquare, ArrowRight, Copy, Check, BarChart3 } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
+import { Users, Mic, CheckSquare, ArrowRight, BarChart3 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { LiveoktSetupSkeleton } from "@workspace/ui/components/skeletons/liveokt-setup-skeleton";
 import { ErrorState } from "@/components/error-state";
 import { NotFoundState } from "@/components/not-found-state";
+import { LaunchModal } from "@/components/live/launch-modal";
 import { OptionCard } from "@/components/live/option-card";
-import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
 import { Stepper } from "@/components/live/stepper";
 import { DEFAULT_GROUP_COUNT, MIN_GROUP_COUNT, MAX_GROUP_COUNT } from "@/lib/constants";
 import { fagpratQueries, api } from "@/lib/convex";
+import { PLAY_URL } from "@/lib/env";
 import type { FagPratId } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/liveokt/$id")({
   component: LiveoktSetupPage,
+  errorComponent: RouteErrorBoundary,
 });
 
 function LiveoktSetupPage() {
@@ -45,7 +39,6 @@ function LiveoktSetupPage() {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [launchModalOpen, setLaunchModalOpen] = useState(false);
   const [createdSessionId, setCreatedSessionId] = useState<string | null>(null);
-  const [urlCopied, setUrlCopied] = useState(false);
 
   if (isPending) {
     return <LiveoktSetupSkeleton />;
@@ -78,19 +71,12 @@ function LiveoktSetupPage() {
   };
 
   const handleGoToSession = () => {
-    const playUrl = import.meta.env.VITE_PLAY_URL || "https://play.evalion.no";
-    window.location.href = `${playUrl}/liveokt/${createdSessionId}`;
+    window.location.href = `${PLAY_URL}/liveokt/${createdSessionId}`;
   };
 
   const analyticsUrl = createdSessionId
     ? `${window.location.origin}/analytics/${createdSessionId}`
     : "";
-
-  const handleCopyUrl = async () => {
-    await navigator.clipboard.writeText(analyticsUrl);
-    setUrlCopied(true);
-    setTimeout(() => setUrlCopied(false), 2000);
-  };
 
   return (
     <div className="min-h-svh bg-background">
@@ -172,51 +158,22 @@ function LiveoktSetupPage() {
         </div>
       </div>
 
-      <AlertDialog open={launchModalOpen} onOpenChange={setLaunchModalOpen}>
-        <AlertDialogContent className="max-w-md">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Liveøkt opprettet!</AlertDialogTitle>
-            <AlertDialogDescription>
-              Skann QR-koden for å se sanntidsanalyse på en annen enhet (f.eks. mobil eller nettbrett).
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="flex flex-col items-center gap-4 py-4">
-            <div className="rounded-xl border bg-white p-4">
-              <QRCodeSVG value={analyticsUrl} size={200} />
-            </div>
-            <button
-              onClick={handleCopyUrl}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted"
-            >
-              {urlCopied ? <Check className="size-3 text-sant" /> : <Copy className="size-3" />}
-              {urlCopied ? "Kopiert!" : "Kopier analytics-URL"}
-            </button>
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={handleGoToSession}>
-              Gå til liveøkt
-              <ArrowRight className="size-4" />
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <LaunchModal
+        open={launchModalOpen}
+        onOpenChange={setLaunchModalOpen}
+        analyticsUrl={analyticsUrl}
+        onGoToSession={handleGoToSession}
+      />
 
-      <AlertDialog open={cancelOpen} onOpenChange={setCancelOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Er du sikker på at du vil avbryte?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Oppsettet for liveøkten vil ikke bli lagret hvis du avbryter nå.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Nei, fortsett oppsettet</AlertDialogCancel>
-            <AlertDialogAction onClick={() => navigate({ to: "/min-samling" })}>
-              Ja, avbryt
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDialog
+        open={cancelOpen}
+        onOpenChange={setCancelOpen}
+        title="Er du sikker på at du vil avbryte?"
+        description="Oppsettet for liveøkten vil ikke bli lagret hvis du avbryter nå."
+        cancelLabel="Nei, fortsett oppsettet"
+        confirmLabel="Ja, avbryt"
+        onConfirm={() => navigate({ to: "/min-samling" })}
+      />
     </div>
   );
 }
