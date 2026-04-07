@@ -7,6 +7,7 @@ import { VoteButtons } from "@workspace/ui/components/live/vote-buttons";
 import { useMutation } from "convex/react";
 import { Loader2, LogOut } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
 import { Professor } from "@workspace/ui/components/live/professor";
@@ -224,22 +225,31 @@ function StudentGamePage() {
       });
     } catch {
       setVoteSent(false);
+      toast.error("Stemmen ble ikke sendt. Prøv igjen.");
     }
   };
 
   const handleLeave = async () => {
-    await removeStudentMutation({ id: typedStudentId });
-    navigate({ to: "/" });
+    try {
+      await removeStudentMutation({ id: typedStudentId });
+      navigate({ to: "/" });
+    } catch {
+      toast.error("Kunne ikke forlate spillet. Prøv igjen.");
+    }
   };
 
   const handleSubmitBegrunnelse = async (text: string) => {
-    await submitBegrunnelseMutation({
-      sessionId: session._id,
-      studentId: typedStudentId,
-      statementIndex,
-      round: 1,
-      text,
-    });
+    try {
+      await submitBegrunnelseMutation({
+        sessionId: session._id,
+        studentId: typedStudentId,
+        statementIndex,
+        round: 1,
+        text,
+      });
+    } catch {
+      toast.error("Begrunnelsen ble ikke sendt. Prøv igjen.");
+    }
   };
 
   const handleRate = async (n: number) => {
@@ -253,6 +263,7 @@ function StudentGamePage() {
       });
     } catch {
       setRatingSent(false);
+      toast.error("Vurderingen ble ikke sendt. Prøv igjen.");
     }
   };
 
@@ -367,7 +378,7 @@ function StudentGamePage() {
                           m.avatarColor,
                         )}
                       >
-                        {m.name[0]}
+                        {m.name?.[0]?.toUpperCase() ?? "?"}
                       </div>
                       <span className="text-sm font-medium text-foreground">{m.name}</span>
                     </div>

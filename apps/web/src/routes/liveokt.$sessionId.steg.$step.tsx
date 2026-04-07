@@ -17,6 +17,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { useMutation } from "convex/react";
 import { ArrowRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { LiveStepSkeleton } from "@workspace/ui/components/skeletons/live-step-skeleton";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
@@ -114,8 +115,12 @@ function LiveStepPage() {
   const dashboardUrl = DASHBOARD_URL;
 
   const handleEnd = async () => {
-    await endSessionMutation({ id: typedSessionId });
-    window.location.href = dashboardUrl;
+    try {
+      await endSessionMutation({ id: typedSessionId });
+      window.location.href = dashboardUrl;
+    } catch {
+      toast.error("Kunne ikke avslutte økten. Prøv igjen.");
+    }
   };
 
   const goToStep = async (n: number) => {
@@ -128,15 +133,19 @@ function LiveStepPage() {
     if (step > 0 && step < n) {
       setCompletedSteps((prev) => (prev.includes(step) ? prev : [...prev, step]));
     }
-    await updateStepMutation({
-      id: typedSessionId,
-      step: n,
-      ...(n === 0 ? {} : { statementIndex: selectedIdx }),
-    });
-    await navigate({
-      to: "/liveokt/$sessionId/steg/$step",
-      params: { sessionId, step: String(n) },
-    });
+    try {
+      await updateStepMutation({
+        id: typedSessionId,
+        step: n,
+        ...(n === 0 ? {} : { statementIndex: selectedIdx }),
+      });
+      await navigate({
+        to: "/liveokt/$sessionId/steg/$step",
+        params: { sessionId, step: String(n) },
+      });
+    } catch {
+      toast.error("Kunne ikke bytte steg. Prøv igjen.");
+    }
   };
 
   // Step 4 countdown effect
@@ -181,6 +190,14 @@ function LiveStepPage() {
     return (
       <div className="flex min-h-svh items-center justify-center">
         <p className="text-muted-foreground">FagPrat ikke funnet.</p>
+      </div>
+    );
+  }
+
+  if (step > 0 && !fagprat.statements[selectedIdx]) {
+    return (
+      <div className="flex min-h-svh items-center justify-center">
+        <p className="text-muted-foreground">Påstanden ble ikke funnet.</p>
       </div>
     );
   }

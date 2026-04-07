@@ -7,6 +7,8 @@ import { AlertTriangle, ArrowLeft, ArrowRight, RefreshCw, Sparkles } from "lucid
 import { useCallback, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 
+import { SkeletonColumn } from "@/components/velg-pastander/skeleton-column";
+import { StatementColumn } from "@/components/velg-pastander/statement-column";
 import { FASIT_COLUMN_CONFIG } from "@/lib/fasit-config";
 import type { Fasit, FagPratType } from "@/lib/types";
 
@@ -26,107 +28,6 @@ interface Statement {
   text: string;
   fasit: Fasit;
   explanation: string;
-}
-
-function SkeletonColumn({ title, headerBg, headerText, borderTopColor }: {
-  title: string;
-  headerBg: string;
-  headerText: string;
-  borderTopColor: string;
-}) {
-  return (
-    <div
-      className={cn(
-        "flex flex-col rounded-2xl border-[1.5px] border-border bg-card p-4",
-        "border-t-4",
-        borderTopColor,
-      )}
-    >
-      <div
-        className={cn(
-          "mb-4 rounded-xl px-4 py-3 text-center text-sm font-extrabold uppercase tracking-wider",
-          headerBg,
-          headerText,
-        )}
-      >
-        {title}
-      </div>
-      <div className="space-y-3">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-16 rounded-xl border-2 border-border bg-muted/30 p-4">
-            <div className="mb-2 h-3 w-4/5 animate-pulse rounded bg-muted" />
-            <div className="h-3 w-3/5 animate-pulse rounded bg-muted" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function StatementColumn({
-  title,
-  statements,
-  selected,
-  onToggle,
-  headerBg,
-  headerText,
-  selectedBorder,
-  selectedGlow,
-  borderTopColor,
-}: {
-  title: string;
-  statements: Statement[];
-  selected: Set<string>;
-  onToggle: (id: string) => void;
-  headerBg: string;
-  headerText: string;
-  selectedBorder: string;
-  selectedGlow: string;
-  borderTopColor: string;
-}) {
-  return (
-    <div
-      className={cn(
-        "flex flex-col rounded-2xl border-[1.5px] border-border bg-card p-4",
-        "border-t-4",
-        borderTopColor,
-      )}
-    >
-      <div
-        className={cn(
-          "mb-4 rounded-xl px-4 py-3 text-center text-sm font-extrabold uppercase tracking-wider",
-          headerBg,
-          headerText,
-        )}
-      >
-        {title}
-      </div>
-      <div className="space-y-3">
-        {statements.map((stmt) => {
-          const isSelected = selected.has(stmt.id);
-          return (
-            <button
-              key={stmt.id}
-              onClick={() => onToggle(stmt.id)}
-              className={cn(
-                "w-full rounded-xl border-2 p-4 text-left text-sm leading-relaxed transition-all",
-                isSelected
-                  ? `${selectedBorder} ${selectedGlow} bg-card`
-                  : "border-border bg-muted/30 hover:border-muted-foreground/30 hover:bg-muted/60",
-              )}
-            >
-              {stmt.text}
-            </button>
-          );
-        })}
-        {statements.length === 0 && (
-          <p className="py-6 text-center text-sm text-muted-foreground">
-            Ingen påstander i denne kategorien
-          </p>
-        )}
-      </div>
-    </div>
-  );
 }
 
 function VelgPastanderPage() {
@@ -186,7 +87,7 @@ function VelgPastanderPage() {
       try {
         setAllStatements(JSON.parse(statementsJson) as Statement[]);
       } catch {
-        // Invalid JSON
+        setError("Kunne ikke laste påstander");
       }
     }
   }, [topic, statementsJson, handleGenerate]);

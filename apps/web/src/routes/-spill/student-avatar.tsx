@@ -20,7 +20,7 @@ export function StudentAvatar({
         avatarColor,
       )}
     >
-      {name[0]}
+      {name?.[0]?.toUpperCase() ?? "?"}
     </div>
   );
 }

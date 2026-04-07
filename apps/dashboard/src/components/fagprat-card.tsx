@@ -28,14 +28,19 @@ export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
   const duplicateFagPrat = useMutation(api.fagprats.duplicate);
   const removeFagPrat = useMutation(api.fagprats.remove);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [duplicating, setDuplicating] = useState(false);
 
   const handleDuplicate = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (duplicating) return;
+    setDuplicating(true);
     try {
       const newId = await duplicateFagPrat({ id: fagprat._id });
       navigate({ to: "/fagprat/$id", params: { id: newId } });
     } catch {
       toast.error("Kunne ikke duplisere FagPraten. Prøv igjen.");
+    } finally {
+      setDuplicating(false);
     }
   };
 
@@ -97,6 +102,7 @@ export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
             Start liveøkt
           </Button>
           <button
+            aria-label="Rediger"
             className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border-2 border-primary/30 bg-card text-primary transition-all hover:border-primary/60 hover:bg-primary/5"
             onClick={(e) => {
               e.stopPropagation();
@@ -109,15 +115,16 @@ export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
           {/* Mer dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger
+              aria-label="Flere valg"
               className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border-2 border-border text-muted-foreground transition-all hover:border-muted-foreground/50 hover:bg-muted"
               onClick={(e) => e.stopPropagation()}
             >
               <MoreVertical className="size-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" sideOffset={4}>
-              <DropdownMenuItem onClick={handleDuplicate}>
+              <DropdownMenuItem onClick={handleDuplicate} disabled={duplicating}>
                 <Copy className="size-4" />
-                Dupliser
+                {duplicating ? "Dupliserer..." : "Dupliser"}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem

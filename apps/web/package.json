@@ -28,6 +28,7 @@
     "qrcode.react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "sonner": "catalog:",
     "tailwindcss": "catalog:",
     "vite-tsconfig-paths": "catalog:"
   },

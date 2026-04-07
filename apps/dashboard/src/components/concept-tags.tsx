@@ -60,7 +60,7 @@ export function ConceptTags({ concepts, onChange, editable = true, showAiButton 
         ))}
         {editable && !showInput && (
           <button
-            onClick={() => setShowInput(true)}
+            onClick={() => { setInputValue(""); setShowInput(true); }}
             className="inline-flex items-center gap-1.5 rounded-full border-2 border-dashed border-primary/30 px-3 py-1 text-sm font-medium text-primary/60 transition-colors hover:border-primary/50 hover:text-primary"
           >
             <Plus className="size-3.5" />
@@ -78,6 +78,7 @@ export function ConceptTags({ concepts, onChange, editable = true, showAiButton 
                 if (e.key === "Escape") setShowInput(false);
               }}
               placeholder="Skriv begrep..."
+              maxLength={100}
               className="w-32 rounded-full border-2 border-primary/30 bg-transparent px-3 py-1 text-sm outline-none focus:border-primary"
               autoFocus
             />

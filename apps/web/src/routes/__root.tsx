@@ -3,7 +3,6 @@ import { ConvexQueryClient } from "@convex-dev/react-query";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   HeadContent,
-  Link,
   Outlet,
   Scripts,
   createRootRouteWithContext,
@@ -15,6 +14,7 @@ import { authClient } from "@/lib/auth-client";
 import { getToken } from "@/lib/auth-server";
 
 import appCss from "@workspace/ui/globals.css?url";
+import { RootErrorFallback, RootNotFound } from "@workspace/ui/components/root-fallbacks";
 import { Toaster } from "@workspace/ui/components/sonner";
 
 const getAuth = createServerFn({ method: "GET" }).handler(async () => {
@@ -36,7 +36,9 @@ export const Route = createRootRouteWithContext<{
   beforeLoad: async (ctx) => {
     const token = await getAuth();
 
-    ctx.context.convexQueryClient.serverHttpClient?.setAuth(token ?? undefined);
+    if (token) {
+      ctx.context.convexQueryClient.serverHttpClient?.setAuth(token);
+    }
 
     return {
       isAuthenticated: !!token,
@@ -44,8 +46,8 @@ export const Route = createRootRouteWithContext<{
     };
   },
   component: RootComponent,
-  notFoundComponent: NotFound,
-  errorComponent: ErrorFallback,
+  notFoundComponent: RootNotFound,
+  errorComponent: RootErrorFallback,
   shellComponent: RootDocument,
 });
 
@@ -65,36 +67,9 @@ function RootComponent() {
   );
 }
 
-function ErrorFallback({ error }: { error: Error }) {
-  return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background">
-      <h1 className="text-2xl font-extrabold text-foreground">Noe gikk galt</h1>
-      <p className="text-muted-foreground">{error.message}</p>
-      <button
-        onClick={() => window.location.reload()}
-        className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-      >
-        Last inn siden på nytt
-      </button>
-    </div>
-  );
-}
-
-function NotFound() {
-  return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background">
-      <h1 className="text-4xl font-extrabold text-foreground">404</h1>
-      <p className="text-muted-foreground">Siden ble ikke funnet</p>
-      <Link to="/" className="text-sm font-semibold text-primary hover:underline">
-        Tilbake til forsiden
-      </Link>
-    </div>
-  );
-}
-
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="nb">
       <head>
         <HeadContent />
       </head>
