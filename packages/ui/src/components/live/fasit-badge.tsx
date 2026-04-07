@@ -19,7 +19,7 @@ export function FasitBadge({ fasit, animated = false, className }: FasitBadgePro
   return (
     <span
       className={cn(
-        "inline-block rounded-full px-8 py-2.5 text-lg font-extrabold uppercase text-white",
+        "inline-block rounded-full px-4 py-1 text-xs font-bold uppercase text-white",
         bg,
         animated && "animate-[badge-bounce_0.6s_cubic-bezier(0.34,1.56,0.64,1)_both]",
         className,
