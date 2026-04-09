@@ -1,17 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { RouteErrorBoundary } from "@workspace/ui/components/route-error-boundary";
 import { Skeleton } from "@workspace/ui/components/skeleton";
-import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@workspace/ui/components/tabs";
 import { cn } from "@workspace/ui/lib/utils";
-import { QRCodeSVG } from "qrcode.react";
-import { Users, Hash, Activity } from "lucide-react";
 import { useState } from "react";
 
-import { CopyUrlButton } from "@/components/analytics/copy-url-button";
-import { OverviewCard } from "@/components/analytics/overview-card";
-import { StatementAnalytics } from "@/components/analytics/statement-analytics";
+import { RoundAnalytics } from "@/components/analytics/round-analytics";
+import { ResultatTab } from "@/components/analytics/resultat-tab";
 import { ErrorState } from "@/components/error-state";
 import { NotFoundState } from "@/components/not-found-state";
 import { liveSessionQueries } from "@/lib/convex";
@@ -22,110 +17,158 @@ export const Route = createFileRoute("/_authed/analytics/$id")({
   errorComponent: RouteErrorBoundary,
 });
 
-const STATUS_LABELS: Record<string, { label: string; className: string }> = {
-  lobby: { label: "Lobby", className: "bg-amber-100 text-amber-800" },
-  active: { label: "Aktiv", className: "bg-green-100 text-green-800" },
-  ended: { label: "Avsluttet", className: "bg-muted text-muted-foreground" },
+type TabId = "runde1" | "runde2" | "resultat";
+
+const TABS: { id: TabId; label: string }[] = [
+  { id: "runde1", label: "Runde 1" },
+  { id: "runde2", label: "Runde 2" },
+  { id: "resultat", label: "Resultat" },
+];
+
+const BADGE_LABELS: Record<TabId, string> = {
+  runde1: "Første stemmerunde",
+  runde2: "Andre stemmerunde",
+  resultat: "Resultat",
 };
 
 function AnalyticsPage() {
   const { id } = Route.useParams();
-  const navigate = useNavigate();
   const sessionId = id as Id<"liveSessions">;
 
   const {
     data: session,
-    isPending,
-    isError,
+    isPending: sessionPending,
+    isError: sessionError,
   } = useQuery(liveSessionQueries.getSessionWithFagprat(sessionId));
 
+  const [activeTab, setActiveTab] = useState<TabId>("runde1");
   const [selectedStatement, setSelectedStatement] = useState(0);
 
-  if (isPending) {
-    return <AnalyticsSkeleton />;
-  }
+  // Fetch analytics for the selected statement (always called — sessionId is from route params)
+  const { data: analytics } = useQuery(
+    liveSessionQueries.getVoteAnalytics(sessionId, selectedStatement),
+  );
 
-  if (isError) {
-    return <ErrorState className="flex min-h-svh items-center justify-center" />;
-  }
+  if (sessionPending) return <AnalyticsSkeleton />;
+  if (sessionError) return <ErrorState className="flex min-h-svh items-center justify-center" />;
+  if (!session) return <NotFoundState className="flex min-h-svh items-center justify-center" />;
 
-  if (!session) {
-    return <NotFoundState className="flex min-h-svh items-center justify-center" />;
-  }
+  const statementText = session.statements[selectedStatement]?.text ?? "";
+  const fasit = session.statements[selectedStatement]?.fasit ?? "sant";
+  const totalStudents = session.studentCount;
+  const sessionActive = session.status === "active";
 
-  const statusConfig = STATUS_LABELS[session.status] ?? STATUS_LABELS.ended!;
-  const analyticsUrl = `${window.location.origin}/analytics/${id}`;
+  // Calculate total wrong from R1 for the wrongToRight fraction
+  const totalWrongR1 = analytics
+    ? analytics.students.filter((s) => s.round1 && !s.round1.correct).length
+    : 0;
 
   return (
-    <div className="min-h-svh bg-background">
-      <SessionTopBar
-        title={session.fagpratTitle}
-        onExit={() => navigate({ to: "/historikk" })}
-      />
-
-      <div className="mx-auto max-w-[1100px] px-4 pt-20 pb-12 sm:px-8 sm:pt-24">
-        {/* Overview strip */}
-        <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <OverviewCard
-            icon={<Hash className="size-4 text-muted-foreground" />}
-            label="Kode"
-            value={session.joinCode}
-          />
-          <OverviewCard
-            icon={<Users className="size-4 text-muted-foreground" />}
-            label="Elever"
-            value={String(session.studentCount)}
-          />
-          <div className="rounded-2xl border-[1.5px] border-border bg-card p-4">
-            <div className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Activity className="size-4" />
-              Status
-            </div>
-            <span
-              className={cn(
-                "inline-block rounded-full px-2.5 py-0.5 text-xs font-bold",
-                statusConfig.className,
-              )}
-            >
-              {statusConfig.label}
-            </span>
+    <div className="flex min-h-svh flex-col bg-neutral-100">
+      {/* Header */}
+      <div className="sticky top-0 z-40 border-b border-neutral-200 bg-white px-4 pb-2.5 pt-3">
+        <div className="mx-auto flex max-w-lg items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <img src="/fagprat-logo.png" alt="FagPrat" className="h-5 object-contain" />
+            <div className="h-3.5 w-px bg-neutral-300" />
+            <span className="text-xs font-bold text-foreground">Live-statistikk</span>
           </div>
-          <div className="rounded-2xl border-[1.5px] border-border bg-card p-4">
-            <div className="mb-2 text-xs text-muted-foreground">Del analytics</div>
-            <div className="flex items-center gap-3">
-              <QRCodeSVG value={analyticsUrl} size={64} className="shrink-0 rounded" />
-              <CopyUrlButton url={analyticsUrl} />
-            </div>
-          </div>
+          <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+            {BADGE_LABELS[activeTab]}
+          </span>
         </div>
 
-        {/* Statement tabs */}
-        <Tabs
-          defaultValue={0}
-          value={selectedStatement}
-          onValueChange={(val) => setSelectedStatement(val as number)}
-        >
-          <div className="mb-6 overflow-x-auto">
-            <TabsList className="w-full flex-wrap sm:flex-nowrap">
-              {session.statements.map((_, i) => (
-                <TabsTrigger key={i} value={i}>
-                  Påstand {i + 1}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+        {/* Statement selector (if multiple) */}
+        {session.statements.length > 1 && (
+          <div className="mx-auto mt-2 flex max-w-lg gap-1.5 overflow-x-auto">
+            {session.statements.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setSelectedStatement(i)}
+                className={cn(
+                  "shrink-0 rounded-full px-3 py-1 text-[11px] font-bold transition-all",
+                  selectedStatement === i
+                    ? "bg-primary text-white"
+                    : "bg-neutral-100 text-muted-foreground hover:bg-neutral-200",
+                )}
+              >
+                Påstand {i + 1}
+              </button>
+            ))}
           </div>
+        )}
+      </div>
 
-          {session.statements.map((statement, i) => (
-            <TabsContent key={i} value={i}>
-              <StatementAnalytics
-                sessionId={sessionId}
-                statementIndex={i}
-                statementText={statement.text}
-                fasit={statement.fasit}
+      {/* Tab bar */}
+      <div className="flex justify-center gap-2 bg-neutral-100 px-4 py-3">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              "rounded-full px-5 py-2 text-[13px] font-bold transition-all",
+              activeTab === tab.id
+                ? "bg-primary text-white"
+                : "border-[1.5px] border-neutral-200 bg-white text-muted-foreground hover:border-neutral-300",
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      <div className="mx-auto w-full max-w-lg flex-1 px-4 pb-8">
+        {!analytics ? (
+          <div className="flex flex-col gap-4 pt-4">
+            <Skeleton className="h-64 rounded-2xl" />
+            <Skeleton className="h-48 rounded-2xl" />
+          </div>
+        ) : (
+          <>
+            {activeTab === "runde1" && (
+              <RoundAnalytics
+                round={1}
+                distribution={analytics.round1}
+                confidence={analytics.confidence1}
+                fasit={fasit}
+                statementText={statementText}
+                totalStudents={totalStudents}
+                sessionActive={sessionActive}
+                students={analytics.students}
               />
-            </TabsContent>
-          ))}
-        </Tabs>
+            )}
+
+            {activeTab === "runde2" && (
+              <RoundAnalytics
+                round={2}
+                distribution={analytics.round2}
+                confidence={analytics.confidence2}
+                prevConfidence={analytics.confidence1}
+                prevDistribution={analytics.round1}
+                fasit={fasit}
+                statementText={statementText}
+                totalStudents={totalStudents}
+                sessionActive={sessionActive}
+                students={analytics.students}
+                wrongToRight={analytics.wrongToRight}
+                totalWrong={totalWrongR1}
+              />
+            )}
+
+            {activeTab === "resultat" && (
+              <ResultatTab
+                round1={analytics.round1}
+                round2={analytics.round2}
+                fasit={fasit}
+                statementText={statementText}
+                avgRating={analytics.avgRating}
+                ratingDistribution={analytics.ratingDistribution}
+                students={analytics.students}
+              />
+            )}
+          </>
+        )}
       </div>
     </div>
   );
@@ -133,21 +176,18 @@ function AnalyticsPage() {
 
 function AnalyticsSkeleton() {
   return (
-    <div className="min-h-svh bg-background">
-      <div className="fixed top-0 right-0 left-0 z-40 flex h-14 items-center justify-between border-b bg-card px-3 sm:h-16 sm:px-6">
-        <Skeleton className="h-8 w-32" />
+    <div className="flex min-h-svh flex-col bg-neutral-100">
+      <div className="border-b border-neutral-200 bg-white px-4 py-3">
+        <Skeleton className="mx-auto h-6 w-48" />
       </div>
-      <div className="mx-auto max-w-[1100px] px-4 pt-20 pb-12 sm:px-8 sm:pt-24">
-        <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 rounded-2xl" />
-          ))}
-        </div>
-        <Skeleton className="mb-6 h-10 w-full rounded-xl" />
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Skeleton className="h-64 rounded-2xl" />
-          <Skeleton className="h-64 rounded-2xl" />
-        </div>
+      <div className="flex justify-center gap-2 px-4 py-3">
+        <Skeleton className="h-9 w-24 rounded-full" />
+        <Skeleton className="h-9 w-24 rounded-full" />
+        <Skeleton className="h-9 w-24 rounded-full" />
+      </div>
+      <div className="mx-auto w-full max-w-lg px-4">
+        <Skeleton className="h-64 rounded-2xl" />
+        <Skeleton className="mt-4 h-48 rounded-2xl" />
       </div>
     </div>
   );

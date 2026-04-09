@@ -76,6 +76,7 @@ export default defineSchema({
     statementIndex: v.number(),
     round: v.number(),
     vote: v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis")),
+    confidence: v.optional(v.number()),
   })
     .index("by_session_statement", ["sessionId", "statementIndex"])
     .index("by_session_statement_student_round", ["sessionId", "statementIndex", "studentId", "round"]),

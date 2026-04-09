@@ -326,6 +326,7 @@ export const castVote = mutation({
     statementIndex: v.number(),
     round: v.number(),
     vote: v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis")),
+    confidence: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     await validateStatementIndex(ctx, args.sessionId, args.statementIndex);
@@ -430,7 +431,7 @@ export const getVoteAnalytics = query({
       )
       .collect();
 
-    // Single-pass vote counting by round and type
+    // Single-pass vote counting by round and type + confidence
     const counts = {
       1: { sant: 0, usant: 0, delvis: 0, total: 0 },
       2: { sant: 0, usant: 0, delvis: 0, total: 0 },
@@ -438,15 +439,25 @@ export const getVoteAnalytics = query({
     const round1Votes: typeof allVotes = [];
     const round2Votes: typeof allVotes = [];
 
+    // Confidence tracking per round
+    const confData = {
+      1: { sum: 0, count: 0, buckets: [0, 0, 0, 0, 0], byVote: { sant: { sum: 0, count: 0 }, usant: { sum: 0, count: 0 }, delvis: { sum: 0, count: 0 } } },
+      2: { sum: 0, count: 0, buckets: [0, 0, 0, 0, 0], byVote: { sant: { sum: 0, count: 0 }, usant: { sum: 0, count: 0 }, delvis: { sum: 0, count: 0 } } },
+    } as Record<number, { sum: number; count: number; buckets: number[]; byVote: Record<string, { sum: number; count: number }> }>;
+
     for (const vote of allVotes) {
-      if (vote.round === 1) {
-        round1Votes.push(vote);
-        counts[1]![vote.vote]++;
-        counts[1]!.total++;
-      } else if (vote.round === 2) {
-        round2Votes.push(vote);
-        counts[2]![vote.vote]++;
-        counts[2]!.total++;
+      const r = vote.round === 1 ? 1 : vote.round === 2 ? 2 : 0;
+      if (r === 0) continue;
+      if (r === 1) round1Votes.push(vote);
+      else round2Votes.push(vote);
+      counts[r]![vote.vote]++;
+      counts[r]!.total++;
+      if (vote.confidence != null && vote.confidence >= 1 && vote.confidence <= 5) {
+        confData[r]!.sum += vote.confidence;
+        confData[r]!.count++;
+        confData[r]!.buckets[vote.confidence - 1]!++;
+        confData[r]!.byVote[vote.vote]!.sum += vote.confidence;
+        confData[r]!.byVote[vote.vote]!.count++;
       }
     }
 
@@ -463,21 +474,63 @@ export const getVoteAnalytics = query({
       };
     };
 
+    const confidenceAnalytics = (rd: number) => {
+      const d = confData[rd]!;
+      return {
+        avgConfidence: d.count ? Math.round((d.sum / d.count) * 10) / 10 : 0,
+        confidenceDistribution: [1, 2, 3, 4, 5].map((level) => ({
+          level,
+          count: d.buckets[level - 1]!,
+        })),
+        confidenceByVote: {
+          sant: d.byVote.sant!.count ? Math.round((d.byVote.sant!.sum / d.byVote.sant!.count) * 10) / 10 : 0,
+          usant: d.byVote.usant!.count ? Math.round((d.byVote.usant!.sum / d.byVote.usant!.count) * 10) / 10 : 0,
+          delvis: d.byVote.delvis!.count ? Math.round((d.byVote.delvis!.sum / d.byVote.delvis!.count) * 10) / 10 : 0,
+        },
+      };
+    };
+
     // R1 vs R2 changes
-    const r1ByStudent = new Map(round1Votes.map((v) => [v.studentId, v.vote]));
-    const r2ByStudent = new Map(round2Votes.map((v) => [v.studentId, v.vote]));
+    const r1ByStudent = new Map(round1Votes.map((v) => [v.studentId, v]));
+    const r2ByStudent = new Map(round2Votes.map((v) => [v.studentId, v]));
     let correctR2 = 0;
     let wrongToRight = 0;
     let rightToWrong = 0;
 
-    for (const [studentId, r2Vote] of r2ByStudent) {
-      const r1Vote = r1ByStudent.get(studentId);
-      const r2Correct = r2Vote === fasit;
-      const r1Correct = r1Vote === fasit;
+    for (const [studentId, r2VoteDoc] of r2ByStudent) {
+      const r1VoteDoc = r1ByStudent.get(studentId);
+      const r2Correct = r2VoteDoc.vote === fasit;
+      const r1Correct = r1VoteDoc?.vote === fasit;
       if (r2Correct) correctR2++;
-      if (r1Vote && !r1Correct && r2Correct) wrongToRight++;
-      if (r1Vote && r1Correct && !r2Correct) rightToWrong++;
+      if (r1VoteDoc && !r1Correct && r2Correct) wrongToRight++;
+      if (r1VoteDoc && r1Correct && !r2Correct) rightToWrong++;
     }
+
+    // Student matrix data — per-student vote/confidence/correctness for both rounds
+    const allStudents = await ctx.db
+      .query("sessionStudents")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
+      .collect();
+    const begrunnelser = await ctx.db
+      .query("sessionBegrunnelser")
+      .withIndex("by_session_statement", (q) =>
+        q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
+      )
+      .collect();
+    const begrunnelseByStudent = new Map(begrunnelser.map((b) => [`${b.studentId}:${b.round}`, b.text]));
+
+    const studentData = allStudents.map((s) => {
+      const r1 = r1ByStudent.get(s._id);
+      const r2 = r2ByStudent.get(s._id);
+      return {
+        studentId: s._id,
+        name: s.name,
+        avatarColor: s.avatarColor,
+        round1: r1 ? { vote: r1.vote, confidence: r1.confidence ?? null, correct: r1.vote === fasit } : null,
+        round2: r2 ? { vote: r2.vote, confidence: r2.confidence ?? null, correct: r2.vote === fasit } : null,
+        begrunnelseR1: begrunnelseByStudent.get(`${s._id}:1`) ?? null,
+      };
+    });
 
     // Ratings
     const ratings = await ctx.db
@@ -486,6 +539,7 @@ export const getVoteAnalytics = query({
         q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
       )
       .collect();
+    const ratingByStudent = new Map(ratings.map((r) => [r.studentId, r.rating]));
     const avgRating = ratings.length
       ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
       : 0;
@@ -496,9 +550,17 @@ export const getVoteAnalytics = query({
       if (r.rating >= 1 && r.rating <= 5) ratingBuckets[r.rating - 1]!++;
     }
 
+    // Enrich student data with ratings
+    const studentDataWithRatings = studentData.map((s) => ({
+      ...s,
+      rating: ratingByStudent.get(s.studentId) ?? null,
+    }));
+
     return {
       round1: distribution(counts[1]!),
       round2: distribution(counts[2]!),
+      confidence1: confidenceAnalytics(1),
+      confidence2: confidenceAnalytics(2),
       fasit,
       correctR2,
       totalR2: round2Votes.length,
@@ -509,6 +571,7 @@ export const getVoteAnalytics = query({
         score,
         count: ratingBuckets[score - 1]!,
       })),
+      students: studentDataWithRatings,
     };
   },
 });
