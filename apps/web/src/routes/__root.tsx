@@ -9,13 +9,15 @@ import {
   useRouteContext,
 } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
+import { RootErrorFallback, RootNotFound } from "@workspace/ui/components/root-fallbacks";
+import { Toaster } from "@workspace/ui/components/sonner";
+import { useConvex, useConvexAuth } from "convex/react";
+import { useEffect } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { getToken } from "@/lib/auth-server";
 
 import appCss from "@workspace/ui/globals.css?url";
-import { RootErrorFallback, RootNotFound } from "@workspace/ui/components/root-fallbacks";
-import { Toaster } from "@workspace/ui/components/sonner";
 
 const getAuth = createServerFn({ method: "GET" }).handler(async () => {
   return await getToken();
@@ -60,11 +62,29 @@ function RootComponent() {
         authClient={authClient}
         initialToken={context.token}
       >
+        <ClearAuthForGuests />
         <Outlet />
         <Toaster />
       </ConvexBetterAuthProvider>
     </QueryClientProvider>
   );
+}
+
+/**
+ * Workaround: ConvexProviderWithAuth never calls clearAuth() for users who were
+ * never authenticated. With expectAuth: true the Convex client blocks all queries
+ * until setAuth/clearAuth is called. This component bridges the gap for guest
+ * users (students joining via code) by calling clearAuth() explicitly.
+ */
+function ClearAuthForGuests() {
+  const { isLoading, isAuthenticated } = useConvexAuth();
+  const client = useConvex();
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      client.clearAuth();
+    }
+  }, [isLoading, isAuthenticated, client]);
+  return null;
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {

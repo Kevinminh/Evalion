@@ -10,7 +10,9 @@ export function getRouter() {
   }
 
   const convexUrl = import.meta.env?.VITE_CONVEX_URL ?? process.env.VITE_CONVEX_URL!;
-  const convexQueryClient = new ConvexQueryClient(convexUrl);
+  const convexQueryClient = new ConvexQueryClient(convexUrl, {
+    expectAuth: true,
+  });
 
   const queryClient = new QueryClient({
     defaultOptions: {
