@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lærerstatistikk – FagPrat</title>
+  <link rel="stylesheet" href="../tokens.css">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-family-body);
+      background: #E8E0F0;
+      padding: var(--space-6) var(--space-4);
+      min-height: 100vh;
+    }
+    .page-title {
+      font-size: var(--text-2xl); font-weight: var(--font-extrabold);
+      color: var(--color-primary-700); margin-bottom: var(--space-4);
+      text-align: center;
+    }
+
+    /* ── External tabs ── */
+    .external-tabs { display: flex; justify-content: center; gap: var(--space-2); margin-bottom: var(--space-4); }
+    .ext-tab {
+      padding: var(--space-2) var(--space-5); font-size: 13px; font-weight: var(--font-bold);
+      color: var(--color-text-tertiary); background: var(--color-neutral-0);
+      border: 1.5px solid var(--color-neutral-200); border-radius: var(--radius-full); cursor: pointer; transition: all 0.15s;
+    }
+    .ext-tab:hover { color: var(--color-text-secondary); border-color: var(--color-neutral-300); }
+    .ext-tab.active { color: white; background: var(--color-primary-500); border-color: var(--color-primary-500); }
+
+    /* ══════════════════════════════════════
+       iPHONE FRAME
+       ══════════════════════════════════════ */
+    .phone-wrapper { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); }
+    .phone-label { font-size: var(--text-xs); font-weight: var(--font-bold); text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-neutral-500); }
+    .iphone-frame { position: relative; width: 546px; height: 909px; }
+    .iphone-frame-img { display: block; width: 100%; height: 100%; object-fit: fill; position: relative; z-index: 2; pointer-events: none; }
+    .iphone-screen {
+      position: absolute; top: 5.1%; left: 10.3%; width: 79.4%; height: 88.6%;
+      overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column;
+      background: var(--color-bg-primary); border-radius: 38px; z-index: 1;
+    }
+    .iphone-screen::-webkit-scrollbar { width: 0; }
+    .iphone-screen { scrollbar-width: none; }
+
+    /* ══════════════════════════════════════
+       APP HEADER
+       ══════════════════════════════════════ */
+    .app-header {
+      position: sticky; top: 0; z-index: 10;
+      background: var(--color-neutral-0); border-bottom: 1.5px solid var(--color-neutral-200);
+      padding: 52px 24px 10px; flex-shrink: 0;
+    }
+    .app-header-row { display: flex; align-items: center; justify-content: space-between; }
+    .app-header-left { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    .app-logo { height: 20px; object-fit: contain; flex-shrink: 0; }
+    .app-divider { width: 1px; height: 14px; background: var(--color-neutral-300); flex-shrink: 0; }
+    .app-title { font-size: 12px; font-weight: var(--font-bold); color: var(--color-text-primary); white-space: nowrap; flex-shrink: 0; }
+    .app-badge { font-size: 11px; font-weight: var(--font-semibold); color: var(--color-text-tertiary); background: var(--color-neutral-100); padding: 3px 10px; border-radius: var(--radius-full); white-space: nowrap; flex-shrink: 0; }
+
+    /* ══════════════════════════════════════
+       SHARED
+       ══════════════════════════════════════ */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .content-scroll { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+
+    /* ── Statement (inside chart card) ── */
+    .stmt-inner { background: linear-gradient(135deg, #F0EBFA, #E8E0F4); border-radius: 12px; padding: 10px 12px; text-align: center; margin: 0 14px; }
+    .stmt-label { font-size: 9px; font-weight: var(--font-extrabold); text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-primary-400); margin-bottom: 4px; }
+    .stmt-text { font-size: 12px; font-weight: var(--font-semibold); font-style: italic; line-height: 1.45; color: var(--color-primary-700); }
+    .chart-sublabel { font-size: 10px; font-weight: var(--font-semibold); color: var(--color-text-tertiary); padding: 12px 14px 0; }
+
+    /* ── Section card ── */
+    .section-card { background: var(--color-neutral-0); border-radius: 16px; border: 1px solid var(--color-neutral-200); overflow: hidden; }
+    .section-header { padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; }
+    .section-title { font-size: 11px; font-weight: var(--font-extrabold); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+    .section-body { padding: 0 14px 14px; }
+
+    /* ── Status bar ── */
+    .status-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; margin-top: 8px; }
+    .status-count { font-size: 12px; font-weight: var(--font-bold); color: var(--color-text-secondary); }
+    .status-count strong { font-weight: var(--font-extrabold); color: var(--color-text-primary); }
+    .status-active-btn { font-size: 9px; font-weight: var(--font-extrabold); text-transform: uppercase; letter-spacing: 0.05em; color: white; background: var(--color-sant); padding: 5px 12px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 5px; }
+    .status-dot { width: 6px; height: 6px; background: white; border-radius: 50%; animation: pulse-dot 1.5s infinite; }
+    @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    /* ══════════════════════════════════════
+       COMBINED CHART: Votes + Confidence
+       ══════════════════════════════════════ */
+    .combined-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-bottom: 1px solid var(--color-neutral-100);
+    }
+    .conf-summary {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .conf-summary-label { font-size: 11px; font-weight: var(--font-semibold); color: var(--color-text-tertiary); }
+    .conf-summary-value { font-size: 18px; font-weight: var(--font-extrabold); color: var(--color-secondary-500); font-family: var(--font-family-mono); }
+    .dual-dist { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 14px 4px; }
+    .dual-dist-col { display: flex; flex-direction: column; gap: 6px; }
+    .dual-dist-title { font-size: 11px; font-weight: var(--font-bold); color: var(--color-text-secondary); text-align: center; text-transform: uppercase; letter-spacing: 0.4px; }
+    .dual-dist .col-chart { gap: 6px; }
+    .dual-dist .col-track { height: 60px; }
+    .dual-dist .col-count { font-size: 10px; }
+    .dual-dist .col-label { font-size: 10px; }
+    .dual-dist .col-pct { font-size: 9px; }
+    .conf-breakdown { display: flex; flex-direction: row; flex-wrap: wrap; gap: 32px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--color-neutral-100); justify-content: center; align-items: center; }
+    .conf-breakdown-row { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: var(--font-semibold); gap: 10px; }
+    .conf-breakdown-label { color: var(--color-text-secondary); }
+    .conf-breakdown-value { font-family: var(--font-family-mono); font-weight: var(--font-bold); color: var(--color-text-primary); }
+    .conf-toggle-btn {
+      width: 32px; height: 32px; border-radius: 10px; border: 1.5px solid var(--color-neutral-200);
+      background: var(--color-neutral-0); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.15s; flex-shrink: 0;
+    }
+    .conf-toggle-btn:hover { background: var(--color-neutral-100); }
+    .conf-toggle-btn.active { background: var(--color-primary-50); border-color: var(--color-primary-300); }
+    .conf-toggle-btn svg { width: 16px; height: 16px; color: var(--color-text-tertiary); }
+    .conf-toggle-btn.active svg { color: var(--color-primary-500); }
+
+    /* Column chart */
+    .col-chart { display: flex; align-items: flex-end; justify-content: center; gap: 16px; padding: 14px 10px 6px; }
+    .col-item { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; max-width: 110px; }
+    .col-count { font-size: 12px; font-weight: var(--font-semibold); color: var(--color-text-tertiary); }
+    .col-item.col-correct .col-count { font-weight: var(--font-extrabold); color: #b8860b; }
+    .col-track { width: 100%; height: 100px; background: var(--color-neutral-100); border-radius: 8px; position: relative; display: flex; align-items: flex-end; overflow: hidden; }
+    .col-fill { width: 100%; border-radius: 0 0 8px 8px; display: flex; align-items: center; justify-content: center; min-height: 20px; transition: height 0.4s ease; }
+    .col-fill-sant { background: var(--color-neutral-300); }
+    .col-fill-delvis { background: var(--color-delvis); }
+    .col-fill-usant { background: var(--color-neutral-300); }
+    .col-pct { font-size: 12px; font-weight: var(--font-semibold); color: var(--color-text-tertiary); }
+    .col-fill-delvis .col-pct { font-weight: var(--font-extrabold); color: white; }
+    .col-label { font-size: 11px; font-weight: var(--font-semibold); color: var(--color-text-tertiary); margin-top: 4px; }
+    .col-item.col-correct .col-label { font-weight: var(--font-extrabold); color: #b8860b; }
+
+    /* Confidence detail (toggle) */
+    .conf-detail { display: none; padding: 10px 14px 4px; border-top: 1px solid var(--color-neutral-100); }
+    .conf-detail.show { display: block; }
+    .circles-row { display: flex; justify-content: center; gap: 20px; }
+    .circle-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .circle-dot {
+      width: 30px; height: 30px; border-radius: var(--radius-full);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: var(--font-extrabold);
+      background: transparent; border: 2.5px solid;
+    }
+    .circle-dot-1 { border-color: #EF5350; color: #EF5350; }
+    .circle-dot-2 { border-color: #FF9800; color: #FF9800; }
+    .circle-dot-3 { border-color: #FDD835; color: #b8a000; }
+    .circle-dot-4 { border-color: #66BB6A; color: #66BB6A; }
+    .circle-dot-5 { border-color: #2E7D32; color: #2E7D32; }
+    .circle-count { font-size: 14px; font-weight: var(--font-extrabold); color: var(--color-text-primary); }
+
+    /* ══════════════════════════════════════
+       2×2 MATRIX
+       ══════════════════════════════════════ */
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 4px 0;
+    }
+    .matrix-cell {
+      border-radius: 14px;
+      padding: 12px 10px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 2px;
+    }
+    .matrix-cell:hover { opacity: 0.85; }
+    .matrix-cell.selected {
+      border-color: var(--color-primary-500);
+      box-shadow: 0 0 0 2px rgba(108, 63, 197, 0.2);
+    }
+    .matrix-icon { font-size: 18px; margin-bottom: 2px; }
+    .matrix-label { font-size: 11px; font-weight: var(--font-bold); line-height: 1.3; }
+    .matrix-sublabel { font-size: 9px; font-weight: var(--font-semibold); opacity: 0.7; }
+    .matrix-count { font-size: 22px; font-weight: var(--font-extrabold); line-height: 1; margin-top: 2px; }
+
+    /* Cell colors */
+    .cell-green { background: #E8F5E9; }
+    .cell-green .matrix-label, .cell-green .matrix-count { color: #1B5E20; }
+    .cell-green .matrix-sublabel { color: #2E7D32; }
+
+    .cell-blue { background: #E3F2FD; }
+    .cell-blue .matrix-label, .cell-blue .matrix-count { color: #0D47A1; }
+    .cell-blue .matrix-sublabel { color: #1565C0; }
+
+    .cell-red { background: #FFEBEE; }
+    .cell-red .matrix-label, .cell-red .matrix-count { color: #B71C1C; }
+    .cell-red .matrix-sublabel { color: #C62828; }
+
+    .cell-orange { background: #FFE0B2; }
+    .cell-orange .matrix-label, .cell-orange .matrix-count { color: #E65100; }
+    .cell-orange .matrix-sublabel { color: #EF6C00; }
+
+    .cell-yellow { background: #FFF3C4; }
+    .cell-yellow .matrix-label, .cell-yellow .matrix-count { color: #7B6100; }
+    .cell-yellow .matrix-sublabel { color: #9E7D00; }
+
+    /* Student list below matrix */
+    .matrix-students {
+      border-top: 1px solid var(--color-neutral-100);
+      padding: 8px 0 0;
+      display: none;
+    }
+    .matrix-students.show { display: block; }
+    .matrix-students-header {
+      font-size: 10px; font-weight: var(--font-extrabold); text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--color-text-tertiary); padding: 4px 0 8px;
+    }
+
+    /* ── Student row ── */
+    .student-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid var(--color-neutral-100);
+    }
+    .student-row:last-child { border-bottom: none; }
+    .student-info { flex: 1; min-width: 0; }
+    .student-name { font-size: 13px; font-weight: var(--font-bold); color: var(--color-text-primary); }
+    .student-reason { font-size: 11px; color: var(--color-text-tertiary); line-height: 1.5; margin-top: 2px; }
+    .student-meta { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .vote-badge { font-size: 10px; font-weight: var(--font-extrabold); color: white; padding: 2px 9px; border-radius: var(--radius-full); white-space: nowrap; }
+    .vote-sant { background: var(--color-sant); }
+    .vote-delvis { background: var(--color-delvis); }
+    .vote-usant { background: var(--color-usant); }
+    .conf-circle {
+      width: 24px; height: 24px; border-radius: var(--radius-full);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: var(--font-extrabold); flex-shrink: 0;
+      background: transparent; border: 2.5px solid;
+    }
+    .conf-circle.cc-1 { border-color: #EF5350; color: #EF5350; }
+    .conf-circle.cc-2 { border-color: #FF9800; color: #FF9800; }
+    .conf-circle.cc-3 { border-color: #FDD835; color: #b8a000; }
+    .conf-circle.cc-4 { border-color: #66BB6A; color: #66BB6A; }
+    .conf-circle.cc-5 { border-color: #2E7D32; color: #2E7D32; }
+
+    /* ══════════════════════════════════════
+       RUNDE 2
+       ══════════════════════════════════════ */
+    .big-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 0; }
+    .big-stat-number { font-size: 40px; font-weight: var(--font-extrabold); color: var(--color-text-primary); line-height: 1; }
+    .big-stat-label { font-size: 12px; font-weight: var(--font-semibold); color: var(--color-text-tertiary); text-align: center; }
+
+    .change-stats { display: flex; flex-direction: column; gap: 6px; padding: 6px 0; }
+    .change-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 12px; background: var(--color-neutral-50, #FAFAFA); }
+    .change-icon { font-size: 14px; flex-shrink: 0; width: 20px; text-align: center; }
+    .change-text { font-size: 12px; font-weight: var(--font-semibold); color: var(--color-text-primary); flex: 1; }
+    .change-count-num { font-size: 14px; font-weight: var(--font-extrabold); color: var(--color-text-secondary); }
+
+    .student-list-card { background: var(--color-neutral-0); border-radius: 16px; border: 1px solid var(--color-neutral-200); overflow: hidden; }
+    .student-list-header { padding: 10px 14px; border-bottom: 1px solid var(--color-neutral-100); }
+    .student-list-title { font-size: 11px; font-weight: var(--font-extrabold); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+    .student-list { padding: 4px 14px; display: flex; flex-direction: column; }
+    .vote-transition { display: flex; align-items: center; gap: 4px; }
+    .vote-arrow { font-size: 10px; color: var(--color-text-tertiary); }
+    .changed-tag { font-size: 8px; font-weight: var(--font-extrabold); text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-primary-600); background: var(--color-primary-100); padding: 2px 7px; border-radius: var(--radius-full); }
+    .self-assess-circle { width: 28px; height: 28px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: var(--font-extrabold); flex-shrink: 0; background: transparent; border: 2.5px solid; }
+    .self-assess-circle.circle-1 { border-color: #EF5350; color: #EF5350; }
+    .self-assess-circle.circle-2 { border-color: #FF9800; color: #FF9800; }
+    .self-assess-circle.circle-3 { border-color: #FDD835; color: #b8a000; }
+    .self-assess-circle.circle-4 { border-color: #66BB6A; color: #66BB6A; }
+    .self-assess-circle.circle-5 { border-color: #2E7D32; color: #2E7D32; }
+
+    /* ── Feil-til-riktig sub-stat ── */
+    .sub-stat {
+      display: flex; align-items: center; gap: 6px; justify-content: center;
+      padding: 6px 10px; margin-top: 4px; border-radius: 10px;
+      background: #E8F5E9;
+    }
+    .sub-stat-fraction { font-size: 16px; font-weight: var(--font-extrabold); color: #2E7D32; }
+    .sub-stat-text { font-size: 11px; font-weight: var(--font-semibold); color: #388E3C; }
+
+    /* ── Chart change delta ── */
+    .col-delta {
+      font-size: 10px; font-weight: var(--font-bold); margin-top: 2px;
+      display: flex; align-items: center; gap: 2px;
+    }
+    .col-delta.delta-neutral { color: var(--color-text-secondary); }
+    .col-delta.delta-up-correct { color: #2E7D32; }
+    .col-delta.delta-down-correct { color: #C62828; }
+
+    /* ── Confidence change ── */
+    .conf-change {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .conf-change-from { font-size: 16px; font-weight: var(--font-bold); color: var(--color-text-tertiary); }
+    .conf-change-arrow { font-size: 12px; color: var(--color-text-tertiary); }
+    .conf-change-to { font-size: 18px; font-weight: var(--font-extrabold); color: var(--color-secondary-500); font-family: var(--font-family-mono); }
+    .conf-change-delta { font-size: 12px; font-weight: var(--font-bold); color: #2E7D32; background: #E8F5E9; padding: 2px 8px; border-radius: var(--radius-full); }
+
+    /* ── Round toggle buttons ── */
+    .round-toggles { display: flex; flex-direction: column; gap: 12px; }
+    .round-toggle-row { display: flex; gap: 10px; }
+    .round-toggle-btn {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 12px 14px; border-radius: 14px;
+      background: var(--color-neutral-0); border: 1.5px solid var(--color-neutral-200);
+      font-size: 12px; font-weight: var(--font-bold); color: var(--color-text-primary);
+      cursor: pointer; transition: all 0.15s; font-family: inherit; text-align: center;
+    }
+    .round-toggle-btn:hover { background: var(--color-neutral-100); }
+    .round-toggle-btn.active { background: var(--color-primary-50); border-color: var(--color-primary-500); color: var(--color-primary-700); }
+    .round-panel { display: none; }
+    .round-panel.show { display: block; }
+    .round-panel > .content-scroll { padding: 0; gap: 14px; }
+    .round-panel .stmt-inner, .round-panel .status-bar { display: none; }
+    .round-panel .section-card > .chart-sublabel:first-child,
+    .round-panel .section-card > .chart-sublabel { padding-top: 14px; }
+
+    .footer-bar { padding: 10px 14px; text-align: center; font-size: 11px; font-weight: var(--font-semibold); color: var(--color-text-tertiary); border-radius: 16px; border: 1px solid var(--color-neutral-200); background: var(--color-neutral-50, #FAFAFA); }
+    .footer-bar strong { font-weight: var(--font-extrabold); color: var(--color-text-secondary); }
+  </style>
+</head>
+<body>
+
+  <h1 class="page-title">Statistikk – Lærerpanel</h1>
+  <div class="external-tabs">
+    <div class="ext-tab active" data-tab="runde1">Runde 1</div>
+    <div class="ext-tab" data-tab="runde2">Runde 2</div>
+    <div class="ext-tab" data-tab="resultat">Resultat</div>
+  </div>
+
+  <div class="phone-wrapper">
+    <div class="phone-label">iPhone (mobil)</div>
+    <div class="iphone-frame">
+      <img src="../../Logoer og professoren/Iphone.png" alt="" class="iphone-frame-img">
+      <div class="iphone-screen">
+
+        <!-- APP HEADER -->
+        <div class="app-header">
+          <div class="app-header-row">
+            <div class="app-header-left">
+              <img src="../../Logoer og professoren/FagPrat - logo.png" alt="FagPrat" class="app-logo">
+              <div class="app-divider"></div>
+              <span class="app-title">Live-statistikk</span>
+            </div>
+            <span class="app-badge" id="app-badge">Første stemmerunde</span>
+          </div>
+        </div>
+
+        <!-- ═══ TAB 1: RUNDE 1 ═══ -->
+        <div class="tab-content active" id="tab-runde1">
+          <div class="content-scroll">
+
+            <!-- Combined: statement + votes + confidence -->
+            <div class="section-card">
+              <div class="stmt-inner" style="margin-top: 14px;">
+                <div class="stmt-text">«Oppdagelsen av ild økte menneskenes sjanser til å overleve fordi man kunne steke maten.»</div>
+              </div>
+              <div class="status-bar">
+                <span class="status-count"><strong>25</strong> av 25 elever har stemt</span>
+                <div class="status-active-btn"><span class="status-dot"></span> Avstemning aktiv</div>
+              </div>
+              <div class="chart-sublabel" style="padding-top: 6px;">Stemmefordeling</div>
+              <div class="section-body">
+                <div class="col-chart">
+                  <div class="col-item">
+                    <span class="col-count">9 stk</span>
+                    <div class="col-track"><div class="col-fill col-fill-sant" style="height: 42%;"><span class="col-pct">36%</span></div></div>
+                    <span class="col-label">Sant</span>
+                  </div>
+                  <div class="col-item col-correct">
+                    <span class="col-count">10 stk</span>
+                    <div class="col-track"><div class="col-fill col-fill-delvis" style="height: 48%;"><span class="col-pct">40%</span></div></div>
+                    <span class="col-label">Delvis sant</span>
+                  </div>
+                  <div class="col-item">
+                    <span class="col-count">6 stk</span>
+                    <div class="col-track"><div class="col-fill col-fill-usant" style="height: 30%;"><span class="col-pct">24%</span></div></div>
+                    <span class="col-label">Usant</span>
+                  </div>
+                </div>
+              </div>
+              <div class="combined-header">
+                <div class="conf-summary">
+                  <span class="conf-summary-label">Gjennomsnittlig sikkerhet:</span>
+                  <span class="conf-summary-value">3.2</span>
+                </div>
+                <div class="conf-toggle-btn" onclick="toggleConfDetail(this)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="6" width="4" height="15" rx="1"/><rect x="17" y="2" width="4" height="19" rx="1"/></svg>
+                </div>
+              </div>
+              <!-- Confidence detail (hidden by default, toggle with icon) -->
+              <div class="conf-detail" id="conf-detail-r1">
+                <div class="circles-row">
+                  <div class="circle-item"><div class="circle-dot circle-dot-1">1</div><span class="circle-count">3 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-2">2</div><span class="circle-count">6 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-3">3</div><span class="circle-count">8 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-4">4</div><span class="circle-count">5 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-5">5</div><span class="circle-count">3 stk</span></div>
+                </div>
+                <div class="conf-breakdown">
+                  <div class="conf-breakdown-row"><span class="conf-breakdown-label">Sant:</span><span class="conf-breakdown-value">3,4</span></div>
+                  <div class="conf-breakdown-row"><span class="conf-breakdown-label">Delvis sant:</span><span class="conf-breakdown-value">2,6</span></div>
+                  <div class="conf-breakdown-row"><span class="conf-breakdown-label">Usant:</span><span class="conf-breakdown-value">3,2</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2×2 Matrix categorization -->
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">Elevkategorisering</span>
+              </div>
+              <div class="section-body">
+                <div class="matrix-grid">
+                  <div class="matrix-cell cell-green" data-cat="rh" onclick="selectCategory(this, 'r1')">
+                    <div class="matrix-label">Riktig - Høy sikkerhet (4-5)</div>
+                    <div class="matrix-count">4</div>
+                  </div>
+                  <div class="matrix-cell cell-yellow" data-cat="rl" onclick="selectCategory(this, 'r1')">
+                    <div class="matrix-label">Riktig - Lav sikkerhet (1-3)</div>
+                    <div class="matrix-count">6</div>
+                  </div>
+                  <div class="matrix-cell cell-red" data-cat="fh" onclick="selectCategory(this, 'r1')">
+                    <div class="matrix-label">Feil - Høy sikkerhet (4-5)</div>
+                    <div class="matrix-count">5</div>
+                  </div>
+                  <div class="matrix-cell cell-orange" data-cat="fl" onclick="selectCategory(this, 'r1')">
+                    <div class="matrix-label">Feil - Lav sikkerhet (1-3)</div>
+                    <div class="matrix-count">10</div>
+                  </div>
+                </div>
+
+                <!-- Student list for selected category -->
+                <div class="matrix-students" id="matrix-students-r1">
+                  <div class="matrix-students-header" id="matrix-students-title-r1"></div>
+                  <div id="matrix-students-list-r1"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ TAB 2: RUNDE 2 ═══ -->
+        <div class="tab-content" id="tab-runde2">
+          <div class="content-scroll">
+            <!-- Combined chart R2 -->
+            <div class="section-card">
+              <div class="stmt-inner" style="margin-top: 14px;">
+                <div class="stmt-text">«Oppdagelsen av ild økte menneskenes sjanser til å overleve fordi man kunne steke maten.»</div>
+              </div>
+              <div class="status-bar">
+                <span class="status-count"><strong>25</strong> av 25 elever har stemt</span>
+                <div class="status-active-btn" style="background: var(--color-neutral-500);">Runde 2 fullført</div>
+              </div>
+              <div class="chart-sublabel" style="padding-top: 6px;">Stemmefordeling</div>
+              <div class="section-body">
+                <div class="col-chart">
+                  <div class="col-item">
+                    <span class="col-count">5 stk</span>
+                    <div class="col-track"><div class="col-fill col-fill-sant" style="height: 25%;"><span class="col-pct">20%</span></div></div>
+                    <span class="col-label">Sant</span>
+                    <span class="col-delta delta-neutral">−4 stk (−16%)</span>
+                  </div>
+                  <div class="col-item col-correct">
+                    <span class="col-count">16 stk</span>
+                    <div class="col-track"><div class="col-fill col-fill-delvis" style="height: 75%;"><span class="col-pct">64%</span></div></div>
+                    <span class="col-label">Delvis sant</span>
+                    <span class="col-delta delta-up-correct">+6 stk (+24%)</span>
+                  </div>
+                  <div class="col-item">
+                    <span class="col-count">4 stk</span>
+                    <div class="col-track"><div class="col-fill col-fill-usant" style="height: 20%;"><span class="col-pct">16%</span></div></div>
+                    <span class="col-label">Usant</span>
+                    <span class="col-delta delta-neutral">−2 stk (−8%)</span>
+                  </div>
+                </div>
+              </div>
+              <div class="combined-header">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <span class="conf-summary-label">Gjennomsnittlig sikkerhet:</span>
+                  <div class="conf-change">
+                    <span class="conf-change-from">3.2</span>
+                    <span class="conf-change-arrow">→</span>
+                    <span class="conf-change-to">3.6</span>
+                    <span class="conf-change-delta">+0.4</span>
+                  </div>
+                </div>
+                <div class="conf-toggle-btn" onclick="toggleConfDetail(this)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="6" width="4" height="15" rx="1"/><rect x="17" y="2" width="4" height="19" rx="1"/></svg>
+                </div>
+              </div>
+              <div class="conf-detail" id="conf-detail-r2">
+                <div class="circles-row">
+                  <div class="circle-item"><div class="circle-dot circle-dot-1">1</div><span class="circle-count">1 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-2">2</div><span class="circle-count">4 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-3">3</div><span class="circle-count">7 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-4">4</div><span class="circle-count">8 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-5">5</div><span class="circle-count">5 stk</span></div>
+                </div>
+                <div class="conf-breakdown">
+                  <div class="conf-breakdown-row"><span class="conf-breakdown-label">Sant:</span><span class="conf-breakdown-value">3,8</span></div>
+                  <div class="conf-breakdown-row"><span class="conf-breakdown-label">Delvis sant:</span><span class="conf-breakdown-value">3,5</span></div>
+                  <div class="conf-breakdown-row"><span class="conf-breakdown-label">Usant:</span><span class="conf-breakdown-value">3,4</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Endring i standpunkt -->
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">Endring i standpunkt</span>
+              </div>
+              <div class="section-body">
+                <div class="big-stat">
+                  <div class="big-stat-number">56%</div>
+                  <div class="big-stat-label">14 av 25 elever endret standpunkt</div>
+                </div>
+                <div class="sub-stat">
+                  <span class="sub-stat-fraction">8/15</span>
+                  <span class="sub-stat-text">endret fra feil til riktig svar (53 %)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2×2 Matrix categorization R2 -->
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">Elevkategorisering</span>
+              </div>
+              <div class="section-body">
+                <div class="matrix-grid">
+                  <div class="matrix-cell cell-green" data-cat="r2_til_riktig" onclick="selectCategory(this, 'r2')">
+                    <div class="matrix-label">Endret til riktig</div>
+                    <div class="matrix-count">8</div>
+                  </div>
+                  <div class="matrix-cell cell-red" data-cat="r2_fra_riktig" onclick="selectCategory(this, 'r2')">
+                    <div class="matrix-label">Endret fra riktig til feil</div>
+                    <div class="matrix-count">2</div>
+                  </div>
+                  <div class="matrix-cell cell-orange" data-cat="r2_fortsatt_feil" onclick="selectCategory(this, 'r2')">
+                    <div class="matrix-label">Endret, fortsatt feil</div>
+                    <div class="matrix-count">4</div>
+                  </div>
+                  <div class="matrix-cell cell-yellow" data-cat="r2_uendret" onclick="selectCategory(this, 'r2')">
+                    <div class="matrix-label">Uendret</div>
+                    <div class="matrix-count">11</div>
+                  </div>
+                </div>
+                <div class="matrix-students" id="matrix-students-r2">
+                  <div class="matrix-students-header" id="matrix-students-title-r2"></div>
+                  <div id="matrix-students-list-r2"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ TAB 3: RESULTAT ═══ -->
+        <div class="tab-content" id="tab-resultat">
+          <div class="content-scroll">
+
+            <!-- Påstand + Egenvurdering -->
+            <div class="section-card">
+              <div class="stmt-inner" style="margin-top: 14px;">
+                <div class="stmt-text">«Oppdagelsen av ild økte menneskenes sjanser til å overleve fordi man kunne steke maten.»</div>
+              </div>
+              <div class="chart-sublabel" style="padding-top: 20px;">Stemmefordeling</div>
+              <div class="dual-dist">
+                <div class="dual-dist-col">
+                  <div class="dual-dist-title">Runde 1</div>
+                  <div class="col-chart">
+                    <div class="col-item">
+                      <span class="col-count">9 stk</span>
+                      <div class="col-track"><div class="col-fill col-fill-sant" style="height: 42%;"><span class="col-pct">36%</span></div></div>
+                      <span class="col-label">Sant</span>
+                    </div>
+                    <div class="col-item col-correct">
+                      <span class="col-count">10 stk</span>
+                      <div class="col-track"><div class="col-fill col-fill-delvis" style="height: 48%;"><span class="col-pct">40%</span></div></div>
+                      <span class="col-label">Delvis</span>
+                    </div>
+                    <div class="col-item">
+                      <span class="col-count">6 stk</span>
+                      <div class="col-track"><div class="col-fill col-fill-usant" style="height: 30%;"><span class="col-pct">24%</span></div></div>
+                      <span class="col-label">Usant</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="dual-dist-col">
+                  <div class="dual-dist-title">Runde 2</div>
+                  <div class="col-chart">
+                    <div class="col-item">
+                      <span class="col-count">5 stk</span>
+                      <div class="col-track"><div class="col-fill col-fill-sant" style="height: 25%;"><span class="col-pct">20%</span></div></div>
+                      <span class="col-label">Sant</span>
+                    </div>
+                    <div class="col-item col-correct">
+                      <span class="col-count">16 stk</span>
+                      <div class="col-track"><div class="col-fill col-fill-delvis" style="height: 75%;"><span class="col-pct">64%</span></div></div>
+                      <span class="col-label">Delvis</span>
+                    </div>
+                    <div class="col-item">
+                      <span class="col-count">4 stk</span>
+                      <div class="col-track"><div class="col-fill col-fill-usant" style="height: 20%;"><span class="col-pct">16%</span></div></div>
+                      <span class="col-label">Usant</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="combined-header" style="border-bottom: none;">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <span class="conf-summary-label">Gjennomsnittlig forståelse:</span>
+                  <span class="conf-summary-value" style="font-size: 22px;">3.8</span>
+                </div>
+                <div class="conf-toggle-btn" onclick="toggleConfDetail(this)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="6" width="4" height="15" rx="1"/><rect x="17" y="2" width="4" height="19" rx="1"/></svg>
+                </div>
+              </div>
+              <div class="conf-detail" id="conf-detail-res">
+                <div class="circles-row">
+                  <div class="circle-item"><div class="circle-dot circle-dot-1">1</div><span class="circle-count">1 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-2">2</div><span class="circle-count">3 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-3">3</div><span class="circle-count">7 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-4">4</div><span class="circle-count">9 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-5">5</div><span class="circle-count">5 stk</span></div>
+                </div>
+                <div class="conf-breakdown">
+                  <div class="conf-breakdown-row"><span class="conf-breakdown-label">Riktig svar:</span><span class="conf-breakdown-value">4,1</span></div>
+                  <div class="conf-breakdown-row"><span class="conf-breakdown-label">Feil svar:</span><span class="conf-breakdown-value">2,9</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Round toggle buttons (side by side, mutually exclusive) -->
+            <div class="round-toggles">
+              <div class="round-toggle-row">
+                <button class="round-toggle-btn" data-round="r1" onclick="selectRound(this)">Første stemmerunde</button>
+                <button class="round-toggle-btn" data-round="r2" onclick="selectRound(this)">Andre stemmerunde</button>
+              </div>
+              <div class="round-panel" id="round-panel"></div>
+            </div>
+
+            <div class="student-list-card" style="display: none;">
+              <div class="student-list-header"><span class="student-list-title">Alle elever</span></div>
+              <div class="student-list">
+                <div class="student-row"><div class="student-info"><div class="student-name">Nora</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-delvis">Delvis</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-5">5</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Henrik</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-delvis">Delvis</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-5">5</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Oskar</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-5">5</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Leah</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-usant">Usant</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-5">5</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Oliver</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-4">4</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Lars</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-delvis">Delvis</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-4">4</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Sofie</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-delvis">Delvis</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-4">4</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Ingrid</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-4">4</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Sara</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-4">4</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Mia</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-delvis">Delvis</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-4">4</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Amina</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-delvis">Delvis</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-4">4</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Frida</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-4">4</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Emil</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-3">3</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Thea</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-delvis">Delvis</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-3">3</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Liam</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-usant">Usant</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-3">3</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Filip</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-3">3</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Jonas</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-delvis">Delvis</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-3">3</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Vilde</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-usant">Usant</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-3">3</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Elias</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-delvis">Delvis</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-3">3</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Isak</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-delvis">Delvis</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-3">3</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Markus</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-usant">Usant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-3">3</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Sebastian</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-usant">Usant</span></div><div class="self-assess-circle circle-2">2</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Erik</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-usant">Usant</span><span class="vote-arrow">→</span><span class="vote-badge vote-usant">Usant</span></div><div class="self-assess-circle circle-2">2</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Maja</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-2">2</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Aksel</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-usant">Usant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-1">1</div></div></div>
+              </div>
+            </div>          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Student data for matrix categories
+    // Fasit = delvis_sant → Riktig = "Delvis", Feil = "Sant" or "Usant"
+    // Høy sikkerhet = 4-5, Lav sikkerhet = 1-3
+    var categories = {
+      rh: [ // Riktig + Høy (4-5)
+        { name: 'Nora', vote: 'delvis', conf: 5, reason: 'Ild ga mer enn bare steking, det handlet om varme og trygghet fra rovdyr' },
+        { name: 'Lars', vote: 'delvis', conf: 4, reason: 'Ild var viktig, men det var mer enn bare steking som økte overlevelse' },
+        { name: 'Henrik', vote: 'delvis', conf: 4, reason: 'Delvis fordi ild hadde mange bruksområder, ikke bare matlaging' },
+        { name: 'Amina', vote: 'delvis', conf: 5 }
+      ],
+      rl: [ // Riktig + Lav (1-3)
+        { name: 'Sofie', vote: 'delvis', conf: 3, reason: 'Tror det er delvis sant fordi det handlet om mer enn mat' },
+        { name: 'Thea', vote: 'delvis', conf: 3, reason: 'Vet ikke helt, men tror det er delvis riktig' },
+        { name: 'Mia', vote: 'delvis', conf: 2, reason: 'Usikker, men tror det er mer enn bare steking' },
+        { name: 'Elias', vote: 'delvis', conf: 2 },
+        { name: 'Isak', vote: 'delvis', conf: 2 },
+        { name: 'Jonas', vote: 'delvis', conf: 1 }
+      ],
+      fh: [ // Feil + Høy (4-5)
+        { name: 'Oliver', vote: 'sant', conf: 5, reason: 'Ild var 100% viktigst fordi man kunne tilberede mat og det ga mer energi' },
+        { name: 'Ingrid', vote: 'sant', conf: 4, reason: 'Steking av mat var det viktigste med ild, det er bevist' },
+        { name: 'Erik', vote: 'usant', conf: 5 },
+        { name: 'Sebastian', vote: 'sant', conf: 4, reason: 'Sant fordi steking ga mer næring og energi' },
+        { name: 'Markus', vote: 'usant', conf: 4, reason: 'Usant fordi ild var farlig og skapte branner' }
+      ],
+      fl: [ // Feil + Lav (1-3)
+        { name: 'Emil', vote: 'sant', conf: 2, reason: 'Tror det er sant, men er litt usikker' },
+        { name: 'Filip', vote: 'sant', conf: 3, reason: 'Vet ikke helt, men gjettet sant' },
+        { name: 'Liam', vote: 'usant', conf: 2, reason: 'Tror ild ikke hjalp med overlevelse i det hele tatt' },
+        { name: 'Aksel', vote: 'usant', conf: 3, reason: 'Usikker men tror ild ikke var så viktig' },
+        { name: 'Oskar', vote: 'sant', conf: 2, reason: 'Ild hjalp sikkert litt, men det var ikke hovedgrunnen' },
+        { name: 'Frida', vote: 'sant', conf: 3 },
+        { name: 'Sara', vote: 'sant', conf: 2 },
+        { name: 'Leah', vote: 'usant', conf: 3 },
+        { name: 'Maja', vote: 'sant', conf: 1 },
+        { name: 'Vilde', vote: 'usant', conf: 1 }
+      ]
+    };
+
+    // Runde 2 data – categorized by standpunkt change
+    // Endret til riktig: was wrong R1, now correct (delvis) R2
+    categories.r2_til_riktig = [
+      { name: 'Oskar', vote1: 'sant', vote2: 'delvis', conf: 5 },
+      { name: 'Leah', vote1: 'usant', vote2: 'delvis', conf: 5 },
+      { name: 'Oliver', vote1: 'sant', vote2: 'delvis', conf: 4 },
+      { name: 'Ingrid', vote1: 'sant', vote2: 'delvis', conf: 4 },
+      { name: 'Sara', vote1: 'sant', vote2: 'delvis', conf: 3 },
+      { name: 'Emil', vote1: 'sant', vote2: 'delvis', conf: 3 },
+      { name: 'Liam', vote1: 'usant', vote2: 'delvis', conf: 2 },
+      { name: 'Filip', vote1: 'sant', vote2: 'delvis', conf: 2 }
+    ];
+    // Endret fra riktig til feil: was correct R1, now wrong R2
+    categories.r2_fra_riktig = [
+      { name: 'Elias', vote1: 'delvis', vote2: 'usant', conf: 2 },
+      { name: 'Isak', vote1: 'delvis', vote2: 'usant', conf: 2 }
+    ];
+    // Endret, men fortsatt feil: was wrong R1, changed but still wrong R2
+    categories.r2_fortsatt_feil = [
+      { name: 'Sebastian', vote1: 'sant', vote2: 'usant', conf: 3 },
+      { name: 'Markus', vote1: 'usant', vote2: 'sant', conf: 3 },
+      { name: 'Aksel', vote1: 'usant', vote2: 'sant', conf: 2 },
+      { name: 'Vilde', vote1: 'usant', vote2: 'sant', conf: 1 }
+    ];
+    // Uendret: same vote R1 and R2
+    categories.r2_uendret = [
+      { name: 'Nora', vote1: 'delvis', vote2: 'delvis', conf: 5 },
+      { name: 'Henrik', vote1: 'delvis', vote2: 'delvis', conf: 5 },
+      { name: 'Lars', vote1: 'delvis', vote2: 'delvis', conf: 4 },
+      { name: 'Sofie', vote1: 'delvis', vote2: 'delvis', conf: 4 },
+      { name: 'Frida', vote1: 'sant', vote2: 'sant', conf: 4 },
+      { name: 'Maja', vote1: 'sant', vote2: 'sant', conf: 4 },
+      { name: 'Erik', vote1: 'usant', vote2: 'usant', conf: 5 },
+      { name: 'Mia', vote1: 'delvis', vote2: 'delvis', conf: 3 },
+      { name: 'Amina', vote1: 'delvis', vote2: 'delvis', conf: 3 },
+      { name: 'Thea', vote1: 'delvis', vote2: 'delvis', conf: 2 },
+      { name: 'Jonas', vote1: 'delvis', vote2: 'delvis', conf: 1 }
+    ];
+
+    var catTitles = {
+      rh: 'Riktig - Høy sikkerhet',
+      rl: 'Riktig - Lav sikkerhet',
+      fh: 'Feil - Høy sikkerhet',
+      fl: 'Feil - Lav sikkerhet',
+      r2_til_riktig: 'Endret til riktig',
+      r2_fra_riktig: 'Endret fra riktig til feil',
+      r2_fortsatt_feil: 'Endret, fortsatt feil',
+      r2_uendret: 'Uendret'
+    };
+
+    var voteLabels = { sant: 'Sant', delvis: 'Delvis', usant: 'Usant' };
+
+    function selectCategory(cell, tabId) {
+      var card = cell.closest('.section-card');
+      var allCells = card.querySelectorAll('.matrix-cell');
+      var studentsEl = card.querySelector('.matrix-students');
+      var titleEl = card.querySelector('[id^="matrix-students-title"]');
+      var listEl = card.querySelector('[id^="matrix-students-list"]');
+      var cat = cell.dataset.cat;
+
+      // Toggle: if already selected, deselect
+      if (cell.classList.contains('selected')) {
+        cell.classList.remove('selected');
+        studentsEl.classList.remove('show');
+        return;
+      }
+
+      allCells.forEach(function(c) { c.classList.remove('selected'); });
+      cell.classList.add('selected');
+
+      // Render students
+      var students = categories[cat] || [];
+      var isR2 = cat.indexOf('r2_') === 0;
+      titleEl.textContent = catTitles[cat] + ' (' + students.length + ')';
+      listEl.innerHTML = '';
+      students.forEach(function(s) {
+        var row = document.createElement('div');
+        row.className = 'student-row';
+        var reasonHtml = s.reason ? '<div class="student-reason">' + s.reason + '</div>' : '';
+        var metaHtml;
+        if (isR2) {
+          // Show vote transition: vote1 → vote2 + confidence
+          metaHtml = '<div class="student-meta"><div class="vote-transition">' +
+            '<span class="vote-badge vote-' + s.vote1 + '">' + voteLabels[s.vote1] + '</span>' +
+            '<span class="vote-arrow">→</span>' +
+            '<span class="vote-badge vote-' + s.vote2 + '">' + voteLabels[s.vote2] + '</span>' +
+            '</div><div class="conf-circle cc-' + s.conf + '">' + s.conf + '</div></div>';
+        } else {
+          metaHtml = '<div class="student-meta"><span class="vote-badge vote-' + s.vote + '">' + voteLabels[s.vote] + '</span>' +
+            '<div class="conf-circle cc-' + s.conf + '">' + s.conf + '</div></div>';
+        }
+        row.innerHTML = '<div class="student-info"><div class="student-name">' + s.name + '</div>' + reasonHtml + '</div>' + metaHtml;
+        listEl.appendChild(row);
+      });
+      studentsEl.classList.add('show');
+    }
+
+    // Round selector (Resultat tab) — mutually exclusive
+    function selectRound(btn) {
+      var key = btn.dataset.round;
+      var panel = document.getElementById('round-panel');
+      var btns = document.querySelectorAll('.round-toggle-btn');
+      var alreadyActive = btn.classList.contains('active');
+
+      btns.forEach(function(b) { b.classList.remove('active'); });
+      panel.classList.remove('show');
+      panel.innerHTML = '';
+
+      if (alreadyActive) return; // toggle off
+
+      btn.classList.add('active');
+      var sourceTab = document.getElementById('tab-' + (key === 'r1' ? 'runde1' : 'runde2'));
+      var sourceContent = sourceTab.querySelector('.content-scroll');
+      panel.innerHTML = '<div class="content-scroll">' + sourceContent.innerHTML + '</div>';
+      panel.classList.add('show');
+    }
+
+    // Confidence detail toggle
+    function toggleConfDetail(btn) {
+      var card = btn.closest('.section-card');
+      var detail = card.querySelector('.conf-detail');
+      btn.classList.toggle('active');
+      detail.classList.toggle('show');
+    }
+
+    // Badge labels per tab
+    var badgeLabels = { runde1: 'Første stemmerunde', runde2: 'Andre stemmerunde', resultat: 'Egenvurdering' };
+
+    function activateTab(name) {
+      var tab = document.querySelector('.ext-tab[data-tab="' + name + '"]');
+      if (!tab) return;
+      document.querySelectorAll('.ext-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+      tab.classList.add('active');
+      var target = document.getElementById('tab-' + name);
+      if (target) target.classList.add('active');
+      document.getElementById('app-badge').textContent = badgeLabels[name] || '';
+      var screen = document.querySelector('.iphone-screen');
+      if (screen) screen.scrollTop = 0;
+    }
+    document.querySelectorAll('.ext-tab').forEach(function(tab) {
+      tab.addEventListener('click', function() { activateTab(tab.dataset.tab); });
+    });
+    // External control via location.hash (for demo embed)
+    function applyHashTab() {
+      var h = (location.hash || '').replace('#','');
+      if (h === 'runde1' || h === 'runde2' || h === 'resultat') activateTab(h);
+    }
+    window.addEventListener('hashchange', applyHashTab);
+    applyHashTab();
+  </script>
+
+</body>
+</html>
