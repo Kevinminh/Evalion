@@ -93,6 +93,22 @@ export const FASIT_COLUMN_CONFIG: Record<
   },
 };
 
+// ── Student vote buttons (3D style for student game) ───────────────────────
+export const STUDENT_VOTE_OPTIONS = [
+  { value: "sant" as const, label: "Sant", bg: "bg-sant", shadow: "shadow-[0_4px_0_#2E7D32]" },
+  { value: "delvis" as const, label: "Delvis sant", bg: "bg-delvis", shadow: "shadow-[0_4px_0_#E65100]" },
+  { value: "usant" as const, label: "Usant", bg: "bg-usant", shadow: "shadow-[0_4px_0_#B71C1C]" },
+] as const;
+
+// ── Confidence / rating circle colors (1-5 scale) ─────────────────────────
+export const LEVEL_CIRCLE_COLORS: Record<number, { border: string; text: string }> = {
+  1: { border: "border-red-500", text: "text-red-500" },
+  2: { border: "border-orange-500", text: "text-orange-500" },
+  3: { border: "border-yellow-500", text: "text-yellow-600" },
+  4: { border: "border-green-400", text: "text-green-500" },
+  5: { border: "border-green-700", text: "text-green-700" },
+};
+
 // ── Statement colors ────────────────────────────────────────────────────────
 export const STATEMENT_COLORS = [
   { name: "yellow", bg: "bg-yellow-100", border: "border-yellow-300", text: "text-yellow-700" },

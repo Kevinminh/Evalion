@@ -1,30 +1,26 @@
 import { useQuery, skipToken } from "@tanstack/react-query";
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
-import { VOTE_LABELS } from "@workspace/ui/lib/constants";
 import { isValidConvexId } from "@workspace/ui/lib/convex-id";
-import { cn } from "@workspace/ui/lib/utils";
-import { VoteButtons } from "@workspace/ui/components/live/vote-buttons";
+import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 import { useMutation } from "convex/react";
-import { Loader2, LogOut } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
-import { Professor } from "@workspace/ui/components/live/professor";
 import { RouteErrorBoundary } from "@workspace/ui/components/route-error-boundary";
-import { WaitingDots } from "@workspace/ui/components/waiting-dots";
-
 import { StudentGameSkeleton } from "@workspace/ui/components/skeletons/student-game-skeleton";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 import { COUNTDOWN_STEP_MS, COUNTDOWN_TOTAL_MS } from "@/lib/timings";
 
-import { BegrunnelsePanel } from "./-spill/begrunnelse-panel";
-import { CountdownOverlay } from "./-spill/countdown-overlay";
-import { RatingPanel } from "./-spill/rating-panel";
-import { StatementCard } from "./-spill/statement-card";
 import { StudentAvatar } from "./-spill/student-avatar";
-import { StudentTimer } from "./-spill/student-timer";
+import { StudentTopbar } from "./-spill/student-topbar";
+import { Step0Waiting } from "./-spill/step-0-waiting";
+import { Step1Vote } from "./-spill/step-1-vote";
+import { Step2Discussion } from "./-spill/step-2-discussion";
+import { Step3Revote } from "./-spill/step-3-revote";
+import { Step4Reveal } from "./-spill/step-4-reveal";
+import { Step5Explanation } from "./-spill/step-5-explanation";
+import { Step6Rating } from "./-spill/step-6-rating";
 
 export const Route = createFileRoute("/spill/$studentId")({
   beforeLoad: ({ params }) => {
@@ -47,7 +43,7 @@ function StudentGamePage() {
   );
 
   // Fetch session
-  const { data: session, isPending: sessionLoading } = useQuery(
+  const { data: session } = useQuery(
     student?.sessionId
       ? liveSessionQueries.getById(student.sessionId)
       : { queryKey: ["session", "none"], queryFn: skipToken },
@@ -80,10 +76,8 @@ function StudentGamePage() {
   const submitBegrunnelseMutation = useMutation(api.liveSessions.submitBegrunnelse);
   const removeStudentMutation = useMutation(api.liveSessions.removeStudent);
 
-  const [voteSent, setVoteSent] = useState(false);
   const [ratingSent, setRatingSent] = useState(false);
   const [begrunnelseText, setBegrunnelseText] = useState("");
-  const [begrunnelseSent, setBegrunnelseSent] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
   const [countdownNumber, setCountdownNumber] = useState(3);
@@ -92,21 +86,15 @@ function StudentGamePage() {
   const countdownTriggered = useRef(false);
   const prevStep = useRef<number | undefined>(undefined);
 
-  // Reset vote/rating sent state when step changes. NOTE: we intentionally
-  // do NOT clear `begrunnelseText` here — the draft is keyed by statement
-  // and persisted to localStorage below, so it survives step advances.
+  // Reset state when step changes
   useEffect(() => {
     if (session?.currentStep !== prevStep.current) {
-      setVoteSent(false);
       setRatingSent(false);
-      setBegrunnelseSent(false);
       prevStep.current = session?.currentStep;
     }
   }, [session?.currentStep]);
 
-  // Persist begrunnelse drafts to localStorage, keyed by statement.
-  // If the teacher advances the step mid-type, the draft is restored
-  // when the student returns to the same statement.
+  // Persist begrunnelse drafts to localStorage
   const draftKey =
     student?.sessionId && typedStudentId
       ? `begrunnelse:${student.sessionId}:${typedStudentId}:${statementIndex}`
@@ -120,9 +108,6 @@ function StudentGamePage() {
     } catch {
       setBegrunnelseText("");
     }
-    // Reload whenever the key changes (new statement) — we don't depend on
-    // begrunnelseText to avoid a feedback loop.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draftKey]);
 
   useEffect(() => {
@@ -134,8 +119,7 @@ function StudentGamePage() {
         localStorage.removeItem(draftKey);
       }
     } catch {
-      // localStorage unavailable (private mode, quota) — fall back to
-      // in-memory only.
+      // localStorage unavailable
     }
   }, [draftKey, begrunnelseText]);
 
@@ -145,7 +129,7 @@ function StudentGamePage() {
   const existingVote = votes?.find(
     (v) => v.studentId === typedStudentId && v.round === round,
   );
-  const hasVoted = !!existingVote || voteSent;
+  const hasVoted = !!existingVote;
 
   // Step 4 countdown
   useEffect(() => {
@@ -195,7 +179,7 @@ function StudentGamePage() {
         <StudentAvatar name={student.name} avatarColor={student.avatarColor} />
         <h1 className="text-xl font-extrabold text-foreground">Hei, {student.name}!</h1>
         <div className="flex items-center gap-2 text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" />
+          <span className="size-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           Kobler til økten...
         </div>
       </div>
@@ -212,23 +196,6 @@ function StudentGamePage() {
         ) ?? []
       : [];
 
-  const handleVote = async (value: "sant" | "usant" | "delvis") => {
-    if (hasVoted) return;
-    setVoteSent(true);
-    try {
-      await castVoteMutation({
-        sessionId: session._id,
-        studentId: typedStudentId,
-        statementIndex,
-        round,
-        vote: value,
-      });
-    } catch {
-      setVoteSent(false);
-      toast.error("Stemmen ble ikke sendt. Prøv igjen.");
-    }
-  };
-
   const handleLeave = async () => {
     try {
       await removeStudentMutation({ id: typedStudentId });
@@ -238,45 +205,18 @@ function StudentGamePage() {
     }
   };
 
-  const handleSubmitBegrunnelse = async (text: string) => {
-    try {
-      await submitBegrunnelseMutation({
-        sessionId: session._id,
-        studentId: typedStudentId,
-        statementIndex,
-        round: 1,
-        text,
-      });
-    } catch {
-      toast.error("Begrunnelsen ble ikke sendt. Prøv igjen.");
-    }
-  };
-
-  const handleRate = async (n: number) => {
-    setRatingSent(true);
-    try {
-      await submitRatingMutation({
-        sessionId: session._id,
-        studentId: typedStudentId,
-        statementIndex,
-        rating: n,
-      });
-    } catch {
-      setRatingSent(false);
-      toast.error("Vurderingen ble ikke sendt. Prøv igjen.");
-    }
-  };
-
-  // Statement card reusable for student
-  const studentStatementCard = statement && <StatementCard statement={statement} />;
-
-  // Render based on session state
   const renderContent = () => {
     // Waiting in lobby
     if (session.status === "lobby") {
       return (
-        <div className="flex flex-col items-center gap-4">
-          <StudentAvatar name={student.name} avatarColor={student.avatarColor} />
+        <div className="flex flex-col items-center gap-6 py-8">
+          <div className="size-28 overflow-hidden rounded-full border-4 border-primary/20">
+            <img
+              src="/professoren.png"
+              alt="Professoren"
+              className="size-full animate-[gentle-bounce_3s_ease-in-out_infinite] object-cover"
+            />
+          </div>
           <h1 className="text-xl font-extrabold text-foreground">Hei, {student.name}!</h1>
           <div className="flex items-center text-muted-foreground">
             Venter på at læreren starter
@@ -289,12 +229,12 @@ function StudentGamePage() {
     // Game ended
     if (session.status === "ended") {
       return (
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-4 py-8">
           <h1 className="text-xl font-extrabold text-foreground">Økten er avsluttet</h1>
           <p className="text-muted-foreground">Takk for at du deltok!</p>
           <button
             onClick={() => navigate({ to: "/" })}
-            className="mt-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground transition-all hover:-translate-y-px"
+            className="mt-2 rounded-2xl bg-primary px-8 py-3 text-sm font-bold text-white shadow-[0_4px_0_var(--color-primary-700,theme(colors.purple.700))] transition-all active:translate-y-0.5"
           >
             Gå til forsiden
           </button>
@@ -304,191 +244,112 @@ function StudentGamePage() {
 
     // Active game — render based on currentStep
     switch (currentStep) {
-      // Step 0: Teacher selecting a statement
       case 0:
-        return (
-          <div className="flex flex-col items-center gap-4">
-            <h2 className="text-lg font-bold text-foreground">Læreren velger en påstand</h2>
-            <div className="flex items-center text-muted-foreground">
-              Venter
-              <WaitingDots />
-            </div>
-          </div>
-        );
+        return <Step0Waiting statements={fagprat?.statements} />;
 
-      // Step 1: First vote
       case 1:
+        if (!statement) return null;
         return (
-          <div className="flex w-full flex-col items-center gap-6">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-              1. stemmerunde
-            </h2>
-            <StudentTimer
-              timerDuration={session.timerDuration}
-              timerStartedAt={session.timerStartedAt}
-              timerPausedAt={session.timerPausedAt}
-              timerRemainingAtPause={session.timerRemainingAtPause}
-            />
-            {studentStatementCard}
-            <Professor size="sm" text="Stem uten å avsløre hva du tenker..." />
-            {hasVoted ? (
-              <div className="rounded-xl bg-primary/10 px-6 py-3">
-                <p className="text-sm font-bold text-primary">
-                  Sendt! {existingVote ? VOTE_LABELS[existingVote.vote] : ""}
-                </p>
-              </div>
-            ) : (
-              <VoteButtons selected={null} onVote={handleVote} />
-            )}
-          </div>
+          <Step1Vote
+            statement={statement}
+            hasVoted={hasVoted}
+            begrunnelseText={begrunnelseText}
+            setBegrunnelseText={setBegrunnelseText}
+            onSubmit={async ({ vote, confidence, begrunnelse }) => {
+              await castVoteMutation({
+                sessionId: session._id,
+                studentId: typedStudentId,
+                statementIndex,
+                round: 1,
+                vote,
+                confidence,
+              });
+              if (begrunnelse.trim()) {
+                await submitBegrunnelseMutation({
+                  sessionId: session._id,
+                  studentId: typedStudentId,
+                  statementIndex,
+                  round: 1,
+                  text: begrunnelse.trim(),
+                });
+                if (draftKey) {
+                  try { localStorage.removeItem(draftKey); } catch { /* noop */ }
+                }
+              }
+            }}
+          />
         );
 
-      // Step 2: Discussion
       case 2:
+        if (!statement) return null;
         return (
-          <div className="flex w-full flex-col items-center gap-6">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-              Diskusjon
-            </h2>
-            <StudentTimer
-              timerDuration={session.timerDuration}
-              timerStartedAt={session.timerStartedAt}
-              timerPausedAt={session.timerPausedAt}
-              timerRemainingAtPause={session.timerRemainingAtPause}
-            />
-            {studentStatementCard}
-            <Professor
-              size="sm"
-              text="Diskuter med læringspartneren din. Hva tenker dere?"
-            />
-            {groupMembers.length > 0 && (
-              <div className="w-full max-w-md">
-                <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Din gruppe
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {groupMembers.map((m) => (
-                    <div
-                      key={m._id}
-                      className="flex items-center gap-2 rounded-lg bg-card px-3 py-1.5 shadow-xs"
-                    >
-                      <div
-                        className={cn(
-                          "flex size-6 items-center justify-center rounded-full text-xs font-bold text-white",
-                          m.avatarColor,
-                        )}
-                      >
-                        {m.name?.[0]?.toUpperCase() ?? "?"}
-                      </div>
-                      <span className="text-sm font-medium text-foreground">{m.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {/* Begrunnelse input */}
-            <BegrunnelsePanel
-              begrunnelseText={begrunnelseText}
-              setBegrunnelseText={setBegrunnelseText}
-              begrunnelseSent={begrunnelseSent}
-              setBegrunnelseSent={setBegrunnelseSent}
-              onSubmit={handleSubmitBegrunnelse}
-              draftKey={draftKey}
-            />
-          </div>
+          <Step2Discussion
+            statement={statement}
+            groupMembers={groupMembers}
+            transcriptionEnabled={session.transcriptionEnabled}
+          />
         );
 
-      // Step 3: Second vote
       case 3:
+        if (!statement) return null;
         return (
-          <div className="flex w-full flex-col items-center gap-6">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-              2. stemmerunde
-            </h2>
-            <StudentTimer
-              timerDuration={session.timerDuration}
-              timerStartedAt={session.timerStartedAt}
-              timerPausedAt={session.timerPausedAt}
-              timerRemainingAtPause={session.timerRemainingAtPause}
-            />
-            {studentStatementCard}
-            <Professor size="sm" text="Har du endret mening? Stem på nytt!" />
-            {hasVoted ? (
-              <div className="rounded-xl bg-primary/10 px-6 py-3">
-                <p className="text-sm font-bold text-primary">
-                  Sendt! {existingVote ? VOTE_LABELS[existingVote.vote] : ""}
-                </p>
-              </div>
-            ) : (
-              <VoteButtons selected={null} onVote={handleVote} />
-            )}
-          </div>
+          <Step3Revote
+            statement={statement}
+            hasVoted={hasVoted}
+            onSubmit={async ({ vote, confidence }) => {
+              await castVoteMutation({
+                sessionId: session._id,
+                studentId: typedStudentId,
+                statementIndex,
+                round: 2,
+                vote,
+                confidence,
+              });
+            }}
+          />
         );
 
-      // Step 4: Answer reveal
-      case 4: {
+      case 4:
+        if (!statement) return null;
         return (
-          <>
-            <CountdownOverlay visible={showCountdown} number={countdownNumber} />
-            <div className="flex w-full flex-col items-center gap-6">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-                Fasit
-              </h2>
-              {countdownDone && statement && (
-                <FasitBadge fasit={statement.fasit} animated />
-              )}
-              {studentStatementCard}
-            </div>
-          </>
+          <Step4Reveal
+            statement={statement as { text: string; fasit: "sant" | "usant" | "delvis" }}
+            showCountdown={showCountdown}
+            countdownNumber={countdownNumber}
+            countdownDone={countdownDone}
+            transcriptionEnabled={session.transcriptionEnabled}
+          />
         );
-      }
 
-      // Step 5: Explanation
       case 5:
+        if (!statement) return null;
         return (
-          <div className="flex w-full flex-col items-center gap-4">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-              Forklaring
-            </h2>
-            {statement && <FasitBadge fasit={statement.fasit} />}
-            <div className="w-full max-w-md max-h-[392px] overflow-y-auto rounded-2xl border-[1.5px] border-blue-200">
-              <div className="bg-gradient-to-br from-blue-100 to-blue-50 p-5">
-                <p className="text-center text-base font-bold text-foreground">
-                  {statement?.text}
-                </p>
-              </div>
-              <div className="bg-white p-5">
-                <div className="flex gap-3">
-                  <Professor size="xs" className="shrink-0" />
-                  <div>
-                    <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Forklaring
-                    </div>
-                    <p className="text-sm leading-relaxed text-foreground/80">
-                      {statement?.explanation}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <Step5Explanation
+            statement={statement as { text: string; fasit: "sant" | "usant" | "delvis"; explanation: string }}
+          />
         );
 
-      // Step 6: Self evaluation
       case 6:
+        if (!statement) return null;
         return (
-          <div className="flex w-full flex-col items-center gap-6">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-              Egenvurdering
-            </h2>
-            {statement && <FasitBadge fasit={statement.fasit} />}
-            {studentStatementCard}
-            <Professor
-              size="sm"
-              text="Vurder fra 1 til 5 hvor godt du forstår påstanden nå."
-            />
-            <RatingPanel ratingSent={ratingSent} onRate={handleRate} />
-          </div>
+          <Step6Rating
+            statement={statement as { text: string; fasit: "sant" | "usant" | "delvis" }}
+            ratingSent={ratingSent}
+            onRate={async (n) => {
+              setRatingSent(true);
+              try {
+                await submitRatingMutation({
+                  sessionId: session._id,
+                  studentId: typedStudentId,
+                  statementIndex,
+                  rating: n,
+                });
+              } catch {
+                setRatingSent(false);
+                toast.error("Vurderingen ble ikke sendt. Prøv igjen.");
+              }
+            }}
+          />
         );
 
       default:
@@ -503,20 +364,13 @@ function StudentGamePage() {
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-background px-6 py-8">
-      {/* Student header */}
-      <div className="fixed top-0 right-0 left-0 z-40 flex items-center justify-between border-b bg-card px-4 py-2">
-        <div className="flex items-center gap-2">
-          <StudentAvatar name={student.name} avatarColor={student.avatarColor} size="sm" />
-          <span className="text-sm font-bold text-foreground">{student.name}</span>
-        </div>
-        <button
-          onClick={() => setShowLeaveConfirm(true)}
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-        >
-          <LogOut className="size-3.5" />
-          Forlat spill
-        </button>
-      </div>
+      {/* Topbar */}
+      <StudentTopbar
+        studentName={student.name}
+        fagpratTitle={fagprat?.title}
+        currentStep={session.status === "active" ? currentStep : undefined}
+        stepLabel={session.status === "lobby" ? "Lobby" : undefined}
+      />
 
       {/* Main content area */}
       <div className="flex w-full max-w-md flex-col items-center pt-8">
