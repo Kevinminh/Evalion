@@ -30,7 +30,10 @@ function App() {
   // Strip anything that isn't alphanumeric so pasted codes with spaces,
   // dashes, or invisible characters get normalized to just the code.
   const sanitizeCode = (raw: string) =>
-    raw.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 6);
+    raw
+      .replace(/[^a-zA-Z0-9]/g, "")
+      .toUpperCase()
+      .slice(0, 6);
 
   // Handle the result of the lookup
   const handleSubmit = (e: React.FormEvent) => {

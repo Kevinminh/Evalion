@@ -3,8 +3,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { JoinSessionSkeleton } from "@workspace/ui/components/skeletons/join-session-skeleton";
-import { ArrowLeft, Loader2, UserPlus } from "lucide-react";
 import { useMutation } from "convex/react";
+import { ArrowLeft, Loader2, UserPlus } from "lucide-react";
 import { useState } from "react";
 
 import { api, liveSessionQueries } from "@/lib/convex";
@@ -58,7 +58,7 @@ function DeltaPage() {
         sessionId: session._id,
         name: trimmed,
       });
-      navigate({
+      await navigate({
         to: "/spill/$studentId",
         params: { studentId: studentId as string },
       });
