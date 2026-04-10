@@ -370,6 +370,7 @@ function StudentGamePage() {
         fagpratTitle={fagprat?.title}
         currentStep={session.status === "active" ? currentStep : undefined}
         stepLabel={session.status === "lobby" ? "Lobby" : undefined}
+        onLeave={() => setShowLeaveConfirm(true)}
       />
 
       {/* Main content area */}

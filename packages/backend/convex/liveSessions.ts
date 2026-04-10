@@ -196,6 +196,59 @@ export const end = mutation({
   },
 });
 
+export const remove = mutation({
+  args: { id: v.id("liveSessions") },
+  handler: async (ctx, args) => {
+    const identity = await requireAuth(ctx);
+    const session = await ctx.db.get(args.id);
+    if (!session) {
+      throw new Error("Session not found");
+    }
+    if (session.teacherId !== identity.subject) {
+      throw new Error("Not authorized");
+    }
+    if (session.status !== "ended") {
+      throw new Error("Only ended sessions can be deleted");
+    }
+
+    // Cascade-delete all related child records
+    const students = await ctx.db
+      .query("sessionStudents")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.id))
+      .collect();
+    for (const student of students) {
+      await ctx.db.delete(student._id);
+    }
+
+    const votes = await ctx.db
+      .query("sessionVotes")
+      .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
+      .collect();
+    for (const vote of votes) {
+      await ctx.db.delete(vote._id);
+    }
+
+    const ratings = await ctx.db
+      .query("sessionRatings")
+      .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
+      .collect();
+    for (const rating of ratings) {
+      await ctx.db.delete(rating._id);
+    }
+
+    const begrunnelser = await ctx.db
+      .query("sessionBegrunnelser")
+      .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
+      .collect();
+    for (const begrunnelse of begrunnelser) {
+      await ctx.db.delete(begrunnelse._id);
+    }
+
+    await ctx.db.delete(args.id);
+    return args.id;
+  },
+});
+
 // ── Student queries & mutations ──
 
 export const listStudents = query({
