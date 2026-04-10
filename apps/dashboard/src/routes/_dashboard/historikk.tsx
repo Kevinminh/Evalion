@@ -6,7 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { SessionCardSkeleton } from "@workspace/ui/components/skeletons/session-card-skeleton";
-import { DeleteSessionDialog } from "@/components/delete-session-dialog";
+import { DeleteFagPratDialog } from "@/components/delete-fagprat-dialog";
 import { ErrorState } from "@/components/error-state";
 import { SKELETON_COUNT } from "@/lib/constants";
 import { api, liveSessionQueries } from "@/lib/convex";
@@ -113,12 +113,13 @@ function HistorikkPage() {
         </p>
       )}
 
-      <DeleteSessionDialog
+      <DeleteFagPratDialog
         open={deleteSession !== null}
         onOpenChange={(open) => {
           if (!open) setDeleteSession(null);
         }}
         title={deleteSession?.title ?? ""}
+        description={`Denne handlingen kan ikke angres. Liveøkten \u201C${deleteSession?.title ?? ""}\u201D og all tilhørende data vil bli permanent slettet.`}
         onConfirm={handleDelete}
       />
     </div>

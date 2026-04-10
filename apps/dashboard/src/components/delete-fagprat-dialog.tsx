@@ -16,6 +16,7 @@ interface DeleteFagPratDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
+  description?: string;
   onConfirm: () => void | Promise<void>;
   stopPropagation?: boolean;
 }
@@ -24,6 +25,7 @@ export function DeleteFagPratDialog({
   open,
   onOpenChange,
   title,
+  description,
   onConfirm,
   stopPropagation = false,
 }: DeleteFagPratDialogProps) {
@@ -46,8 +48,8 @@ export function DeleteFagPratDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Er du sikker?</AlertDialogTitle>
           <AlertDialogDescription>
-            Denne handlingen kan ikke angres. FagPraten &ldquo;{title}&rdquo; vil bli
-            permanent slettet.
+            {description ??
+              `Denne handlingen kan ikke angres. FagPraten \u201C${title}\u201D vil bli permanent slettet.`}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
