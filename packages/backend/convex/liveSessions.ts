@@ -196,6 +196,33 @@ export const end = mutation({
   },
 });
 
+export const remove = mutation({
+  args: { id: v.id("liveSessions") },
+  handler: async (ctx, args) => {
+    const session = await requireSessionOwner(ctx, args.id);
+    if (session.status !== "ended") {
+      throw new Error("Only ended sessions can be deleted");
+    }
+
+    const [students, votes, ratings, begrunnelser] = await Promise.all([
+      ctx.db.query("sessionStudents").withIndex("by_session", (q) => q.eq("sessionId", args.id)).collect(),
+      ctx.db.query("sessionVotes").withIndex("by_session_statement", (q) => q.eq("sessionId", args.id)).collect(),
+      ctx.db.query("sessionRatings").withIndex("by_session_statement", (q) => q.eq("sessionId", args.id)).collect(),
+      ctx.db.query("sessionBegrunnelser").withIndex("by_session_statement", (q) => q.eq("sessionId", args.id)).collect(),
+    ]);
+
+    await Promise.all([
+      ...students.map((s) => ctx.db.delete(s._id)),
+      ...votes.map((v) => ctx.db.delete(v._id)),
+      ...ratings.map((r) => ctx.db.delete(r._id)),
+      ...begrunnelser.map((b) => ctx.db.delete(b._id)),
+    ]);
+
+    await ctx.db.delete(args.id);
+    return args.id;
+  },
+});
+
 // ── Student queries & mutations ──
 
 export const listStudents = query({
