@@ -1,0 +1,2401 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lærerstatistikk – FagPrat</title>
+  <link rel="stylesheet" href="../tokens.css">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-family-body);
+      background: #E8E0F0;
+      padding: var(--space-6) var(--space-4);
+      min-height: 100vh;
+    }
+    .page-title {
+      font-size: var(--text-2xl); font-weight: var(--font-extrabold);
+      color: var(--color-primary-700); margin-bottom: var(--space-4);
+      text-align: center;
+    }
+
+    /* ── External tabs ── */
+    .external-tabs { display: flex; justify-content: center; gap: var(--space-2); margin-bottom: var(--space-4); }
+    .ext-tab {
+      padding: var(--space-2) var(--space-5); font-size: 13px; font-weight: var(--font-bold);
+      color: var(--color-text-tertiary); background: var(--color-neutral-0);
+      border: 1.5px solid var(--color-neutral-200); border-radius: var(--radius-full); cursor: pointer; transition: all 0.15s;
+    }
+    .ext-tab:hover { color: var(--color-text-secondary); border-color: var(--color-neutral-300); }
+    .ext-tab.active { color: white; background: var(--color-primary-500); border-color: var(--color-primary-500); }
+
+    /* ══════════════════════════════════════
+       iPHONE FRAME
+       ══════════════════════════════════════ */
+    .phone-wrapper { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); }
+    .phone-label { font-size: var(--text-xs); font-weight: var(--font-bold); text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-neutral-500); }
+    .iphone-frame { position: relative; width: 546px; height: 909px; }
+    .iphone-frame-img { display: block; width: 100%; height: 100%; object-fit: fill; position: relative; z-index: 2; pointer-events: none; }
+    .iphone-screen {
+      position: absolute; top: 5.1%; left: 10.3%; width: 79.4%; height: 88.6%;
+      overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column;
+      background: var(--color-bg-primary); border-radius: 38px; z-index: 1;
+    }
+    .iphone-screen::-webkit-scrollbar { width: 0; }
+    .iphone-screen { scrollbar-width: none; }
+
+    /* ══════════════════════════════════════
+       APP HEADER
+       ══════════════════════════════════════ */
+    .app-header {
+      position: sticky; top: 0; z-index: 10;
+      background: var(--color-neutral-0); border-bottom: 1.5px solid var(--color-neutral-200);
+      padding: 52px 24px 10px; flex-shrink: 0;
+    }
+    .app-header-row { display: flex; align-items: center; justify-content: space-between; }
+    .app-header-left { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    .app-logo { height: 20px; object-fit: contain; flex-shrink: 0; }
+    .app-divider { width: 1px; height: 14px; background: var(--color-neutral-300); flex-shrink: 0; }
+    .app-title { font-size: 12px; font-weight: var(--font-bold); color: var(--color-text-primary); white-space: nowrap; flex-shrink: 0; }
+    .app-badge { font-size: 11px; font-weight: var(--font-semibold); color: var(--color-text-tertiary); background: var(--color-neutral-100); padding: 3px 10px; border-radius: var(--radius-full); white-space: nowrap; flex-shrink: 0; }
+
+    /* ══════════════════════════════════════
+       SHARED
+       ══════════════════════════════════════ */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .content-scroll { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+
+    /* ── Statement (inside chart card) ── */
+    .stmt-inner { background: linear-gradient(135deg, #F0EBFA, #E8E0F4); border-radius: 12px; padding: 10px 12px; text-align: center; margin: 0 14px; transition: background 0.3s; }
+    .stmt-inner.stmt-yellow { background: linear-gradient(135deg, #FFFDE7, #FFF8C4); }
+    .stmt-inner.stmt-yellow .stmt-text { color: #8D6E00; }
+    .stmt-inner.stmt-blue { background: linear-gradient(135deg, #E3F1FC, #D0E8FA); }
+    .stmt-inner.stmt-blue .stmt-text { color: #2C5F8A; }
+    .stmt-inner.stmt-orange { background: linear-gradient(135deg, #FFF3E0, #FFE8CC); }
+    .stmt-inner.stmt-orange .stmt-text { color: #B35C00; }
+    .stmt-inner.stmt-purple { background: linear-gradient(135deg, #F3EEFF, #E8E0F4); }
+    .stmt-inner.stmt-purple .stmt-text { color: #6A1B9A; }
+    .stmt-label { font-size: 9px; font-weight: var(--font-extrabold); text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-primary-400); margin-bottom: 4px; }
+    .stmt-text { font-size: 12px; font-weight: var(--font-semibold); font-style: italic; line-height: 1.45; color: var(--color-primary-700); }
+    .chart-sublabel { font-size: 10px; font-weight: var(--font-semibold); color: var(--color-text-tertiary); padding: 12px 14px 0; }
+
+    /* ── Section card ── */
+    .section-card { background: var(--color-neutral-0); border-radius: 16px; border: 1px solid var(--color-neutral-200); overflow: hidden; }
+    .section-header { padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; }
+    .section-title { font-size: 11px; font-weight: var(--font-extrabold); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+    .section-body { padding: 0 14px 14px; }
+
+    /* ── Status bar ── */
+    .status-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; margin-top: 8px; }
+    .status-count { font-size: 12px; font-weight: var(--font-bold); color: var(--color-text-secondary); }
+    .status-count strong { font-weight: var(--font-extrabold); color: var(--color-text-primary); }
+    .status-active-btn { font-size: 9px; font-weight: var(--font-extrabold); text-transform: uppercase; letter-spacing: 0.05em; color: white; background: var(--color-sant); padding: 5px 12px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 5px; }
+    .status-dot { width: 6px; height: 6px; background: white; border-radius: 50%; animation: pulse-dot 1.5s infinite; }
+    @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    /* ══════════════════════════════════════
+       COMBINED CHART: Votes + Confidence
+       ══════════════════════════════════════ */
+    .combined-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-bottom: 1px solid var(--color-neutral-100);
+      min-height: 52px;
+      contain: layout;
+    }
+    .conf-summary {
+      display: flex; align-items: center; gap: 6px;
+      min-height: 28px;
+    }
+    .conf-summary-label { font-size: 11px; font-weight: var(--font-semibold); color: var(--color-text-tertiary); line-height: 1.4; }
+    .conf-summary-value { font-size: 18px; font-weight: var(--font-extrabold); color: var(--color-secondary-500); font-family: var(--font-family-mono); display: inline-flex; align-items: center; gap: 5px; line-height: 1.2; min-height: 24px; }
+    /* R2: fra → til med endring-badge */
+    .conf-from { color: var(--color-text-tertiary); font-weight: var(--font-semibold); }
+    .conf-arrow { color: var(--color-text-tertiary); font-weight: var(--font-semibold); font-size: 14px; }
+    .conf-to { color: var(--color-secondary-500); }
+    .conf-delta {
+      font-size: 11px;
+      font-weight: var(--font-bold);
+      font-family: var(--font-family-mono);
+      padding: 2px 6px;
+      border-radius: 6px;
+      color: var(--color-text-secondary);
+      background: var(--color-neutral-100);
+    }
+    .conf-delta.hidden { display: none; }
+    /* R2: endring i prosent under søylene (nøytral, ingen farge) */
+    .col-item .col-delta {
+      font-size: 10px;
+      font-weight: var(--font-semibold);
+      color: var(--color-text-tertiary);
+      font-family: var(--font-family-mono);
+      margin-top: 2px;
+      min-height: 14px;
+      line-height: 1.2;
+    }
+    .col-item .col-delta.hidden { visibility: hidden; }
+    /* Steg 3: skjul R1→R2 sammenligning (vises kun på steg 4+) */
+    #tab-runde2:not(.show-r1-comparison) .conf-from,
+    #tab-runde2:not(.show-r1-comparison) .conf-arrow,
+    #tab-runde2:not(.show-r1-comparison) .conf-delta,
+    #tab-runde2:not(.show-r1-comparison) .col-item .col-delta {
+      display: none !important;
+    }
+    .dual-dist { display: flex; flex-direction: column; gap: 16px; padding: 10px 14px 4px; }
+    .dual-dist-col { display: flex; flex-direction: column; gap: 6px; }
+    .dual-dist-title { font-size: 11px; font-weight: var(--font-bold); color: var(--color-text-secondary); text-align: center; text-transform: uppercase; letter-spacing: 0.4px; }
+    .dual-dist .col-chart { gap: 6px; }
+    .dual-dist .col-track { height: 60px; }
+    .dual-dist .col-count { font-size: 10px; }
+    .dual-dist .col-label { font-size: 10px; }
+    .dual-dist .col-pct { font-size: 9px; }
+    .conf-breakdown { display: flex; flex-direction: row; flex-wrap: wrap; gap: 32px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--color-neutral-100); justify-content: center; align-items: center; }
+    .conf-breakdown-row { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: var(--font-semibold); gap: 10px; }
+    .conf-breakdown-label { color: var(--color-text-secondary); }
+    .conf-breakdown-value { font-family: var(--font-family-mono); font-weight: var(--font-bold); color: var(--color-text-primary); }
+    .conf-toggle-btn {
+      width: 32px; height: 32px; border-radius: 10px; border: 1.5px solid var(--color-neutral-200);
+      background: var(--color-neutral-0); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.15s; flex-shrink: 0;
+    }
+    .conf-toggle-btn:hover { background: var(--color-neutral-100); }
+    .conf-toggle-btn.active { background: var(--color-primary-50); border-color: var(--color-primary-300); }
+    .conf-toggle-btn svg { width: 16px; height: 16px; color: var(--color-text-tertiary); }
+    .conf-toggle-btn.active svg { color: var(--color-primary-500); }
+
+    /* Column chart */
+    .col-chart { display: flex; align-items: flex-end; justify-content: center; gap: 16px; padding: 14px 10px 6px; }
+    .col-item { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; max-width: 110px; }
+    .col-count { font-size: 12px; font-weight: var(--font-semibold); color: var(--color-text-tertiary); }
+    .col-track { width: 100%; height: 100px; background: var(--color-neutral-100); border-radius: 8px; position: relative; display: flex; align-items: flex-end; overflow: visible; }
+    .col-fill { width: 100%; border-radius: 0 0 8px 8px; display: flex; align-items: center; justify-content: center; min-height: 2px; transition: height 0.4s ease; position: relative; }
+    .col-fill-sant { background: var(--color-neutral-300); }
+    .col-fill-delvis { background: var(--color-neutral-300); }
+    .col-fill-usant { background: var(--color-neutral-300); }
+    .col-pct { font-size: 12px; font-weight: var(--font-semibold); color: white; white-space: nowrap; }
+    .col-pct.col-pct-outside { position: absolute; top: -16px; left: 50%; transform: translateX(-50%); color: var(--color-text-tertiary); }
+    .col-label { font-size: 11px; font-weight: var(--font-semibold); color: var(--color-text-tertiary); margin-top: 4px; }
+    /* Dynamic correct-answer highlighting */
+    .col-item.col-correct .col-count { font-weight: var(--font-extrabold); }
+    .col-item.col-correct .col-label { font-weight: var(--font-extrabold); }
+    .col-item.col-correct .col-pct { font-weight: var(--font-extrabold); }
+    .col-item.col-correct .col-pct.col-pct-outside { font-weight: var(--font-extrabold); }
+    .col-item.col-correct-sant .col-count, .col-item.col-correct-sant .col-label { color: #2E7D32; }
+    .col-item.col-correct-sant .col-pct.col-pct-outside { color: #2E7D32; }
+    .col-item.col-correct-sant .col-fill { background: #66BB6A; }
+    .col-item.col-correct-delvis .col-count, .col-item.col-correct-delvis .col-label { color: #b8860b; }
+    .col-item.col-correct-delvis .col-pct.col-pct-outside { color: #b8860b; }
+    .col-item.col-correct-delvis .col-fill { background: var(--color-delvis); }
+    .col-item.col-correct-usant .col-count, .col-item.col-correct-usant .col-label { color: #C62828; }
+    .col-item.col-correct-usant .col-pct.col-pct-outside { color: #C62828; }
+    .col-item.col-correct-usant .col-fill { background: #EF5350; }
+
+    /* Confidence detail (toggle) */
+    .conf-detail { display: none; padding: 10px 14px 4px; border-top: 1px solid var(--color-neutral-100); }
+    .conf-detail.show { display: block; }
+    .circles-row { display: flex; justify-content: center; gap: 20px; }
+    .circle-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .circle-dot {
+      width: 30px; height: 30px; border-radius: var(--radius-full);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: var(--font-extrabold);
+      background: transparent; border: 2.5px solid;
+    }
+    .circle-dot-1 { border-color: #EF5350; color: #EF5350; }
+    .circle-dot-2 { border-color: #FF9800; color: #FF9800; }
+    .circle-dot-3 { border-color: #FDD835; color: #b8a000; }
+    .circle-dot-4 { border-color: #66BB6A; color: #66BB6A; }
+    .circle-dot-5 { border-color: #2E7D32; color: #2E7D32; }
+    .circle-count { font-size: 14px; font-weight: var(--font-extrabold); color: var(--color-text-primary); }
+
+    /* ══════════════════════════════════════
+       2×2 MATRIX (table layout for R1)
+       ══════════════════════════════════════ */
+    .matrix-table {
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 0 auto;
+    }
+    .matrix-table th {
+      font-size: 12px;
+      font-weight: var(--font-bold);
+      color: var(--color-text-secondary);
+      letter-spacing: 0.01em;
+      padding: 0 8px 10px;
+      text-align: center;
+    }
+    .matrix-table .matrix-row-label {
+      font-size: 12px;
+      font-weight: var(--font-bold);
+      color: var(--color-text-secondary);
+      padding-right: 14px;
+      text-align: right;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    .matrix-table td.matrix-td {
+      padding: 4px 6px;
+    }
+    .matrix-cell {
+      border-radius: 12px;
+      padding: 10px 28px;
+      cursor: pointer;
+      border: 2px solid var(--color-neutral-200);
+      background: var(--color-neutral-0);
+      transition: all 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1px;
+    }
+    .matrix-cell:hover { opacity: 0.85; }
+    .matrix-count { font-size: 16px; font-weight: var(--font-extrabold); line-height: 1.2; color: var(--color-text-primary); }
+    .matrix-sublabel { font-size: 9px; font-weight: var(--font-semibold); color: var(--color-text-tertiary); }
+
+    /* R2 grid (stays as grid) */
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 4px 0;
+    }
+    .matrix-grid .matrix-cell {
+      padding: 12px 10px;
+      border-radius: 14px;
+      gap: 2px;
+    }
+    .matrix-label { font-size: 11px; font-weight: var(--font-bold); line-height: 1.3; color: var(--color-text-secondary); }
+
+    /* Selected state — purple highlight */
+    .matrix-cell.selected {
+      background: var(--color-primary-100);
+      border-color: var(--color-primary-400);
+      box-shadow: 0 0 0 2px rgba(108, 63, 197, 0.15);
+    }
+    .matrix-cell.selected .matrix-label { color: var(--color-primary-700); }
+    .matrix-cell.selected .matrix-count { color: var(--color-primary-600); }
+    .matrix-cell.selected .matrix-sublabel { color: var(--color-primary-500); }
+
+    /* Hint text above matrix */
+    .matrix-hint {
+      font-size: 10px;
+      color: var(--color-text-tertiary);
+      text-align: center;
+      margin-bottom: 8px;
+      font-style: italic;
+    }
+
+    /* Boks som viser hvor mange som har endret mening */
+    .endret-mening-box {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--color-primary-100);
+      border-radius: 14px;
+      margin-bottom: 10px;
+    }
+    .endret-mening-count {
+      font-family: var(--font-family-mono);
+      font-size: 20px;
+      font-weight: var(--font-extrabold);
+      color: var(--color-secondary-500);
+      line-height: 1;
+    }
+    .endret-mening-label {
+      font-size: 12px;
+      font-weight: var(--font-semibold);
+      color: var(--color-text-secondary);
+      line-height: 1.35;
+    }
+    .endret-mening-pct {
+      color: var(--color-text-tertiary);
+    }
+
+    /* Student list below matrix */
+    .matrix-students {
+      border-top: 1px solid var(--color-neutral-100);
+      padding: 8px 0 0;
+      display: none;
+    }
+    .matrix-students.show { display: block; }
+    .matrix-students-header {
+      font-size: 10px; font-weight: var(--font-extrabold); text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--color-text-tertiary); padding: 4px 0 8px;
+    }
+
+    /* ── Student row ── */
+    .student-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid var(--color-neutral-100);
+    }
+    .student-row:last-child { border-bottom: none; }
+    .student-info { flex: 1; min-width: 0; }
+    .student-name { font-size: 13px; font-weight: var(--font-bold); color: var(--color-text-primary); }
+    .student-reason { font-size: 11px; color: var(--color-text-tertiary); line-height: 1.5; margin-top: 2px; }
+    .student-row.has-reason { cursor: pointer; }
+    .student-row.has-reason:active { opacity: 0.7; }
+    .student-row.highlighted { background: var(--color-primary-50); border-radius: 10px; margin: 0 -6px; padding: 8px 6px; }
+    .student-meta { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .vote-badge { font-size: 10px; font-weight: var(--font-extrabold); color: white; padding: 2px 9px; border-radius: var(--radius-full); white-space: nowrap; }
+    .vote-sant { background: var(--color-sant); }
+    .vote-delvis { background: var(--color-delvis); }
+    .vote-usant { background: var(--color-usant); }
+    .conf-circle {
+      width: 24px; height: 24px; border-radius: var(--radius-full);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: var(--font-extrabold); flex-shrink: 0;
+      background: transparent; border: 2.5px solid;
+    }
+    .conf-circle.cc-1 { border-color: #EF5350; color: #EF5350; }
+    .conf-circle.cc-2 { border-color: #FF9800; color: #FF9800; }
+    .conf-circle.cc-3 { border-color: #FDD835; color: #b8a000; }
+    .conf-circle.cc-4 { border-color: #66BB6A; color: #66BB6A; }
+    .conf-circle.cc-5 { border-color: #2E7D32; color: #2E7D32; }
+
+    /* ══════════════════════════════════════
+       RUNDE 2
+       ══════════════════════════════════════ */
+    .big-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 0; }
+    .big-stat-number { font-size: 40px; font-weight: var(--font-extrabold); color: var(--color-text-primary); line-height: 1; }
+    .big-stat-label { font-size: 12px; font-weight: var(--font-semibold); color: var(--color-text-tertiary); text-align: center; }
+
+    .change-stats { display: flex; flex-direction: column; gap: 6px; padding: 6px 0; }
+    .change-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 12px; background: var(--color-neutral-50, #FAFAFA); }
+    .change-icon { font-size: 14px; flex-shrink: 0; width: 20px; text-align: center; }
+    .change-text { font-size: 12px; font-weight: var(--font-semibold); color: var(--color-text-primary); flex: 1; }
+    .change-count-num { font-size: 14px; font-weight: var(--font-extrabold); color: var(--color-text-secondary); }
+
+    .student-list-card { background: var(--color-neutral-0); border-radius: 16px; border: 1px solid var(--color-neutral-200); overflow: hidden; }
+    .student-list-header { padding: 10px 14px; border-bottom: 1px solid var(--color-neutral-100); }
+    .student-list-title { font-size: 11px; font-weight: var(--font-extrabold); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+    .student-list { padding: 4px 14px; display: flex; flex-direction: column; }
+    .vote-transition { display: flex; align-items: center; gap: 4px; }
+    .vote-arrow { font-size: 10px; color: var(--color-text-tertiary); }
+    .changed-tag { font-size: 8px; font-weight: var(--font-extrabold); text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-primary-600); background: var(--color-primary-100); padding: 2px 7px; border-radius: var(--radius-full); }
+    .self-assess-circle { width: 28px; height: 28px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: var(--font-extrabold); flex-shrink: 0; background: transparent; border: 2.5px solid; }
+    .self-assess-circle.circle-1 { border-color: #EF5350; color: #EF5350; }
+    .self-assess-circle.circle-2 { border-color: #FF9800; color: #FF9800; }
+    .self-assess-circle.circle-3 { border-color: #FDD835; color: #b8a000; }
+    .self-assess-circle.circle-4 { border-color: #66BB6A; color: #66BB6A; }
+    .self-assess-circle.circle-5 { border-color: #2E7D32; color: #2E7D32; }
+
+    /* ── Feil-til-riktig sub-stat ── */
+    .sub-stat {
+      display: flex; align-items: center; gap: 6px; justify-content: center;
+      padding: 6px 10px; margin-top: 4px; border-radius: 10px;
+      background: #E8F5E9;
+    }
+    .sub-stat-fraction { font-size: 16px; font-weight: var(--font-extrabold); color: #2E7D32; }
+    .sub-stat-text { font-size: 11px; font-weight: var(--font-semibold); color: #388E3C; }
+
+    /* ── Chart change delta ── */
+    .col-delta {
+      font-size: 10px; font-weight: var(--font-bold); margin-top: 2px;
+      display: flex; align-items: center; gap: 2px;
+    }
+    .col-delta.delta-neutral { color: var(--color-text-secondary); }
+    .col-delta.delta-up-correct { color: #2E7D32; }
+    .col-delta.delta-down-correct { color: #C62828; }
+
+    /* ── Confidence change ── */
+    .conf-change {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .conf-change-from { font-size: 16px; font-weight: var(--font-bold); color: var(--color-text-tertiary); }
+    .conf-change-arrow { font-size: 12px; color: var(--color-text-tertiary); }
+    .conf-change-to { font-size: 18px; font-weight: var(--font-extrabold); color: var(--color-secondary-500); font-family: var(--font-family-mono); }
+    .conf-change-delta { font-size: 12px; font-weight: var(--font-bold); color: #2E7D32; background: #E8F5E9; padding: 2px 8px; border-radius: var(--radius-full); }
+
+    /* ── Round toggle buttons ── */
+    .round-toggles { display: flex; flex-direction: column; gap: 12px; }
+    .round-toggle-row { display: flex; gap: 10px; }
+    .round-toggle-btn {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 12px 14px; border-radius: 14px;
+      background: var(--color-neutral-0); border: 1.5px solid var(--color-neutral-200);
+      font-size: 12px; font-weight: var(--font-bold); color: var(--color-text-primary);
+      cursor: pointer; transition: all 0.15s; font-family: inherit; text-align: center;
+    }
+    .round-toggle-btn:hover { background: var(--color-neutral-100); }
+    .round-toggle-btn.active { background: var(--color-primary-50); border-color: var(--color-primary-500); color: var(--color-primary-700); }
+    .round-panel { display: none; }
+    .round-panel.show { display: block; }
+    .round-panel > .content-scroll { padding: 0; gap: 14px; }
+    .round-panel .stmt-inner, .round-panel .status-bar { display: none; }
+    .round-panel .section-card > .chart-sublabel:first-child,
+    .round-panel .section-card > .chart-sublabel { padding-top: 14px; }
+
+    .footer-bar { padding: 10px 14px; text-align: center; font-size: 11px; font-weight: var(--font-semibold); color: var(--color-text-tertiary); border-radius: 16px; border: 1px solid var(--color-neutral-200); background: var(--color-neutral-50, #FAFAFA); }
+    .footer-bar strong { font-weight: var(--font-extrabold); color: var(--color-text-secondary); }
+
+    /* Waiting state before timer starts */
+    .stats-content { display: none; }
+    .stats-content.visible { display: block; }
+    .stats-waiting {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 14px; padding: 32px 20px 40px;
+    }
+    .stats-waiting.hidden { display: none; }
+    .stats-waiting-professor {
+      width: 100px; height: 100px;
+      border-radius: 50%; object-fit: cover;
+      border: 3px solid #E8E0F0;
+      background: #F5F2F0;
+    }
+    .stats-waiting-text {
+      font-size: 13px; font-weight: 700;
+      color: #8A7A6F; text-align: center;
+    }
+    .stats-waiting-dots {
+      display: flex; gap: 6px;
+    }
+    .stats-waiting-dots span {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #B0A090;
+      animation: statsDotPulse 1.4s ease-in-out infinite;
+    }
+    .stats-waiting-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .stats-waiting-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes statsDotPulse {
+      0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+      40% { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="page-title">Statistikk – Lærerpanel</h1>
+  <div class="external-tabs">
+    <div class="ext-tab active" data-tab="runde1">Runde 1</div>
+    <div class="ext-tab" data-tab="runde2">Runde 2</div>
+    <div class="ext-tab" data-tab="resultat">Resultat</div>
+  </div>
+
+  <div class="phone-wrapper">
+    <div class="phone-label">iPhone (mobil)</div>
+    <div class="iphone-frame">
+      <img src="../assets/Iphone.png" alt="" class="iphone-frame-img">
+      <div class="iphone-screen">
+
+        <!-- APP HEADER -->
+        <div class="app-header">
+          <div class="app-header-row">
+            <div class="app-header-left">
+              <img src="../assets/FagPrat - logo.png" alt="FagPrat" class="app-logo">
+              <div class="app-divider"></div>
+              <span class="app-title">Live-statistikk</span>
+            </div>
+            <span class="app-badge" id="app-badge">Første stemmerunde</span>
+          </div>
+        </div>
+
+        <!-- ═══ TAB 1: RUNDE 1 ═══ -->
+        <div class="tab-content active" id="tab-runde1">
+          <div class="content-scroll">
+
+            <!-- Combined: statement + votes + confidence -->
+            <div class="section-card">
+              <div class="stmt-inner" style="margin-top: 14px;">
+                <div class="stmt-text">«Oppdagelsen av ild økte menneskenes sjanser til å overleve fordi man kunne steke maten.»</div>
+              </div>
+              <div class="stats-waiting" id="stats-waiting-r1">
+                <img src="../assets/Professoren.png" alt="Professoren" class="stats-waiting-professor">
+                <div class="stats-waiting-text">Venter på at stemmerunden skal åpne . . .</div>
+                <div class="stats-waiting-dots"><span></span><span></span><span></span></div>
+              </div>
+              <div class="stats-content" id="stats-content-r1">
+              <div class="status-bar">
+                <span class="status-count"><strong>22</strong> av 22 elever har stemt</span>
+                <div class="status-active-btn"><span class="status-dot"></span> Avstemning aktiv</div>
+              </div>
+              <div class="chart-sublabel" style="padding-top: 6px;">Stemmefordeling</div>
+              <div class="section-body">
+                <div class="col-chart">
+                  <div class="col-item">
+                    <span class="col-count">9 stk</span>
+                    <div class="col-track"><div class="col-fill col-fill-sant" style="height: 36%;"><span class="col-pct">36%</span></div></div>
+                    <span class="col-label">Sant</span>
+                  </div>
+                  <div class="col-item">
+                    <span class="col-count">10 stk</span>
+                    <div class="col-track"><div class="col-fill col-fill-delvis" style="height: 40%;"><span class="col-pct">40%</span></div></div>
+                    <span class="col-label">Delvis sant</span>
+                  </div>
+                  <div class="col-item">
+                    <span class="col-count">6 stk</span>
+                    <div class="col-track"><div class="col-fill col-fill-usant" style="height: 24%;"><span class="col-pct">24%</span></div></div>
+                    <span class="col-label">Usant</span>
+                  </div>
+                </div>
+              </div>
+              <div class="combined-header">
+                <div class="conf-summary">
+                  <span class="conf-summary-label">Gjennomsnittlig sikkerhet:</span>
+                  <span class="conf-summary-value">3.2</span>
+                </div>
+                <div class="conf-toggle-btn" onclick="toggleConfDetail(this)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="6" width="4" height="15" rx="1"/><rect x="17" y="2" width="4" height="19" rx="1"/></svg>
+                </div>
+              </div>
+              <!-- Confidence detail (hidden by default, toggle with icon) -->
+              <div class="conf-detail" id="conf-detail-r1">
+                <div class="circles-row">
+                  <div class="circle-item"><div class="circle-dot circle-dot-1">1</div><span class="circle-count">3 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-2">2</div><span class="circle-count">6 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-3">3</div><span class="circle-count">8 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-4">4</div><span class="circle-count">5 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-5">5</div><span class="circle-count">3 stk</span></div>
+                </div>
+                <div class="conf-breakdown">
+                  <div class="conf-breakdown-row"><span class="conf-breakdown-label">Sant:</span><span class="conf-breakdown-value">3,4</span></div>
+                  <div class="conf-breakdown-row"><span class="conf-breakdown-label">Delvis sant:</span><span class="conf-breakdown-value">2,6</span></div>
+                  <div class="conf-breakdown-row"><span class="conf-breakdown-label">Usant:</span><span class="conf-breakdown-value">3,2</span></div>
+                </div>
+              </div>
+              </div><!-- /stats-content-r1 -->
+            </div>
+
+            <!-- 2×2 Matrix categorization -->
+            <div class="section-card stats-content-matrix" id="stats-matrix-r1" style="display:none;">
+              <div class="section-header">
+                <span class="section-title">Elevkategorisering</span>
+              </div>
+              <div class="section-body">
+                <table class="matrix-table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Riktig standpunkt</th>
+                      <th>Feil standpunkt</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="matrix-row-label">Høy sikkerhet (4-5)</td>
+                      <td class="matrix-td">
+                        <div class="matrix-cell" data-cat="rh" onclick="selectCategory(this, 'r1')">
+                          <div class="matrix-count">4 stk</div>
+                        </div>
+                      </td>
+                      <td class="matrix-td">
+                        <div class="matrix-cell" data-cat="fh" onclick="selectCategory(this, 'r1')">
+                          <div class="matrix-count">4 stk</div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="matrix-row-label">Lav sikkerhet (1-3)</td>
+                      <td class="matrix-td">
+                        <div class="matrix-cell" data-cat="rl" onclick="selectCategory(this, 'r1')">
+                          <div class="matrix-count">5 stk</div>
+                        </div>
+                      </td>
+                      <td class="matrix-td">
+                        <div class="matrix-cell" data-cat="fl" onclick="selectCategory(this, 'r1')">
+                          <div class="matrix-count">8 stk</div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- Student list for selected category -->
+                <div class="matrix-students" id="matrix-students-r1">
+                  <div class="matrix-students-header" id="matrix-students-title-r1"></div>
+                  <div id="matrix-students-list-r1"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ TAB 2: RUNDE 2 ═══ -->
+        <div class="tab-content" id="tab-runde2">
+          <div class="content-scroll">
+            <!-- Combined chart R2 -->
+            <div class="section-card">
+              <div class="stmt-inner" style="margin-top: 14px;">
+                <div class="stmt-text r2-stmt-text">«Klimaendringene rammer fattige land hardest.»</div>
+              </div>
+              <div class="stats-waiting" id="stats-waiting-r2">
+                <img src="../assets/Professoren.png" alt="Professoren" class="stats-waiting-professor">
+                <div class="stats-waiting-text">Venter på at stemmerunden skal åpne . . .</div>
+                <div class="stats-waiting-dots"><span></span><span></span><span></span></div>
+              </div>
+              <div class="stats-content" id="stats-content-r2">
+              <div class="status-bar">
+                <span class="status-count"><strong>0</strong> av 22 elever har stemt</span>
+                <div class="status-active-btn"><span class="status-dot"></span> Avstemning pågår</div>
+              </div>
+              <div class="chart-sublabel" style="padding-top: 6px;">Stemmefordeling</div>
+              <div class="section-body">
+                <div class="col-chart">
+                  <div class="col-item">
+                    <span class="col-count">0 stk</span>
+                    <div class="col-track"><div class="col-fill col-fill-sant" style="height: 0%;"><span class="col-pct">0%</span></div></div>
+                    <span class="col-label">Sant</span>
+                    <span class="col-delta" aria-hidden="true"></span>
+                  </div>
+                  <div class="col-item">
+                    <span class="col-count">0 stk</span>
+                    <div class="col-track"><div class="col-fill col-fill-delvis" style="height: 0%;"><span class="col-pct">0%</span></div></div>
+                    <span class="col-label">Delvis sant</span>
+                    <span class="col-delta" aria-hidden="true"></span>
+                  </div>
+                  <div class="col-item">
+                    <span class="col-count">0 stk</span>
+                    <div class="col-track"><div class="col-fill col-fill-usant" style="height: 0%;"><span class="col-pct">0%</span></div></div>
+                    <span class="col-label">Usant</span>
+                    <span class="col-delta" aria-hidden="true"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="combined-header">
+                <div class="conf-summary">
+                  <span class="conf-summary-label">Gjennomsnittlig sikkerhet:</span>
+                  <span class="conf-summary-value">
+                    <span class="conf-from">–</span>
+                    <span class="conf-arrow" aria-hidden="true">→</span>
+                    <span class="conf-to">0,0</span>
+                    <span class="conf-delta" aria-hidden="true"></span>
+                  </span>
+                </div>
+                <div class="conf-toggle-btn" onclick="toggleConfDetail(this)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="6" width="4" height="15" rx="1"/><rect x="17" y="2" width="4" height="19" rx="1"/></svg>
+                </div>
+              </div>
+              <div class="conf-detail" id="conf-detail-r2">
+                <div class="circles-row">
+                  <div class="circle-item"><div class="circle-dot circle-dot-1">1</div><span class="circle-count">0 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-2">2</div><span class="circle-count">0 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-3">3</div><span class="circle-count">0 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-4">4</div><span class="circle-count">0 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-5">5</div><span class="circle-count">0 stk</span></div>
+                </div>
+                <div class="conf-breakdown">
+                  <div class="conf-breakdown-row"><span class="conf-breakdown-label">Sant:</span><span class="conf-breakdown-value">–</span></div>
+                  <div class="conf-breakdown-row"><span class="conf-breakdown-label">Delvis sant:</span><span class="conf-breakdown-value">–</span></div>
+                  <div class="conf-breakdown-row"><span class="conf-breakdown-label">Usant:</span><span class="conf-breakdown-value">–</span></div>
+                </div>
+              </div>
+              </div><!-- /stats-content-r2 -->
+            </div>
+
+            <!-- 2×2 Matrix categorization R2 -->
+            <div class="section-card stats-content-matrix" id="stats-matrix-r2" style="display:none;">
+              <div class="section-header">
+                <span class="section-title">Endringer</span>
+              </div>
+              <div class="section-body">
+                <div class="endret-mening-box" id="endret-mening-box-r2">
+                  <span class="endret-mening-count" id="endret-mening-count-r2">0/0</span>
+                  <span class="endret-mening-label"><span id="endret-mening-text-r2">har endret mening</span> <span class="endret-mening-pct" id="endret-mening-pct-r2">(0 %)</span></span>
+                </div>
+                <div class="matrix-grid">
+                  <div class="matrix-cell cell-green-dark" data-cat="r2_til_riktig" onclick="selectCategory(this, 'r2')">
+                    <div class="matrix-label">Endret til riktig</div>
+                    <div class="matrix-count">0 stk</div>
+                  </div>
+                  <div class="matrix-cell cell-red-dark" data-cat="r2_fra_riktig" onclick="selectCategory(this, 'r2')">
+                    <div class="matrix-label">Endret fra riktig til feil</div>
+                    <div class="matrix-count">0 stk</div>
+                  </div>
+                  <div class="matrix-cell cell-red" data-cat="r2_fortsatt_feil" onclick="selectCategory(this, 'r2')">
+                    <div class="matrix-label">Endret, fortsatt feil</div>
+                    <div class="matrix-count">0 stk</div>
+                  </div>
+                  <div class="matrix-cell cell-yellow" data-cat="r2_uendret" onclick="selectCategory(this, 'r2')">
+                    <div class="matrix-label">Uendret</div>
+                    <div class="matrix-count">0 stk</div>
+                  </div>
+                </div>
+                <div class="matrix-students" id="matrix-students-r2">
+                  <div class="matrix-students-header" id="matrix-students-title-r2"></div>
+                  <div id="matrix-students-list-r2"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ TAB 3: RESULTAT ═══ -->
+        <div class="tab-content" id="tab-resultat">
+          <div class="content-scroll">
+
+            <!-- Påstand + Egenvurdering -->
+            <div class="section-card">
+              <div class="stmt-inner" style="margin-top: 14px;">
+                <div class="stmt-text res-stmt-text">«Oppdagelsen av ild økte menneskenes sjanser til å overleve fordi man kunne steke maten.»</div>
+              </div>
+              <div class="combined-header" style="border-bottom: none; padding-top: 16px;">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <span class="conf-summary-label">Gjennomsnittlig forståelse:</span>
+                  <span class="conf-summary-value res-avg-value" style="font-size: 22px;">–</span>
+                </div>
+                <div class="conf-toggle-btn" onclick="toggleConfDetail(this)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="6" width="4" height="15" rx="1"/><rect x="17" y="2" width="4" height="19" rx="1"/></svg>
+                </div>
+              </div>
+              <div class="conf-detail" id="conf-detail-res">
+                <div class="circles-row">
+                  <div class="circle-item"><div class="circle-dot circle-dot-1">1</div><span class="circle-count">0 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-2">2</div><span class="circle-count">0 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-3">3</div><span class="circle-count">0 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-4">4</div><span class="circle-count">0 stk</span></div>
+                  <div class="circle-item"><div class="circle-dot circle-dot-5">5</div><span class="circle-count">0 stk</span></div>
+                </div>
+                <div class="conf-breakdown">
+                  <div class="conf-breakdown-row"><span class="conf-breakdown-label">Riktig svar:</span><span class="conf-breakdown-value res-breakdown-correct">–</span></div>
+                  <div class="conf-breakdown-row"><span class="conf-breakdown-label">Feil svar:</span><span class="conf-breakdown-value res-breakdown-wrong">–</span></div>
+                </div>
+              </div>
+              <div class="chart-sublabel" style="padding-top: 20px;">Stemmefordeling</div>
+              <div class="dual-dist" id="res-dual-dist">
+                <div class="dual-dist-col">
+                  <div class="dual-dist-title">Runde 1</div>
+                  <div class="col-chart">
+                    <div class="col-item">
+                      <span class="col-count">0 stk</span>
+                      <div class="col-track"><div class="col-fill col-fill-sant" style="height: 0;"><span class="col-pct">0%</span></div></div>
+                      <span class="col-label">Sant</span>
+                    </div>
+                    <div class="col-item">
+                      <span class="col-count">0 stk</span>
+                      <div class="col-track"><div class="col-fill col-fill-delvis" style="height: 0;"><span class="col-pct">0%</span></div></div>
+                      <span class="col-label">Delvis</span>
+                    </div>
+                    <div class="col-item">
+                      <span class="col-count">0 stk</span>
+                      <div class="col-track"><div class="col-fill col-fill-usant" style="height: 0;"><span class="col-pct">0%</span></div></div>
+                      <span class="col-label">Usant</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="dual-dist-col">
+                  <div class="dual-dist-title">Runde 2</div>
+                  <div class="col-chart">
+                    <div class="col-item">
+                      <span class="col-count">0 stk</span>
+                      <div class="col-track"><div class="col-fill col-fill-sant" style="height: 0;"><span class="col-pct">0%</span></div></div>
+                      <span class="col-label">Sant</span>
+                    </div>
+                    <div class="col-item">
+                      <span class="col-count">0 stk</span>
+                      <div class="col-track"><div class="col-fill col-fill-delvis" style="height: 0;"><span class="col-pct">0%</span></div></div>
+                      <span class="col-label">Delvis</span>
+                    </div>
+                    <div class="col-item">
+                      <span class="col-count">0 stk</span>
+                      <div class="col-track"><div class="col-fill col-fill-usant" style="height: 0;"><span class="col-pct">0%</span></div></div>
+                      <span class="col-label">Usant</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="student-list-card" style="display: none;">
+              <div class="student-list-header"><span class="student-list-title">Alle elever</span></div>
+              <div class="student-list">
+                <div class="student-row"><div class="student-info"><div class="student-name">Aksel</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-5">5</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Frida</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-5">5</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Ingrid</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-5">5</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Lars</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-5">5</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Leah</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-delvis">Delvis</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-5">5</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Liam</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-5">5</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Mia</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-5">5</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Oliver</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-usant">Usant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-5">5</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Oskar</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-5">5</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Sebastian</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-delvis">Delvis</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-5">5</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Vilde</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-5">5</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Amina</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-4">4</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Elias</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-4">4</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Emil</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-usant">Usant</span><span class="vote-arrow">→</span><span class="vote-badge vote-usant">Usant</span></div><div class="self-assess-circle circle-4">4</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Erik</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-4">4</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Nora</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-4">4</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Sofie</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-4">4</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Thea</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-4">4</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Filip</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-usant">Usant</span><span class="vote-arrow">→</span><span class="vote-badge vote-delvis">Delvis</span></div><div class="self-assess-circle circle-3">3</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Henrik</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-delvis">Delvis</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-3">3</div></div></div>
+                <div class="student-row"><div class="student-info"><div class="student-name">Isak</div></div><div class="student-meta"><div class="vote-transition"><span class="vote-badge vote-sant">Sant</span><span class="vote-arrow">→</span><span class="vote-badge vote-sant">Sant</span></div><div class="self-assess-circle circle-3">3</div></div></div>
+              </div>
+            </div>          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ═══ Per-statement Runde 1 data for all 4 statements ═══
+    // 21 students (Markus excluded — he's the iPad user)
+    // Fasit per statement: 0=sant, 1=usant, 2=usant, 3=sant
+    // ~40-60% of students leave a reason
+
+    var stmtData = {
+      // ── Påstand 1 (blå): "Klimaendringene rammer fattige land hardest." → fasit: sant ──
+      0: {
+        fasit: 'sant',
+        rh: [
+          { name: 'Nora', vote: 'sant', conf: 4, reason: 'De har ikke like mye penger til å fikse ting hvis noe skjer.' },
+          { name: 'Lars', vote: 'sant', conf: 5, reason: 'Rike land klarer seg bedre, mens fattige land får større problemer når det blir ekstremvær.' },
+          { name: 'Thea', vote: 'sant', conf: 4 },
+          { name: 'Mia', vote: 'sant', conf: 4, reason: 'Hvis det blir tørke eller flom så er det verre der.' },
+          { name: 'Erik', vote: 'sant', conf: 4 },
+          { name: 'Ingrid', vote: 'sant', conf: 4, reason: 'De har mindre ressurser til å takle det.' },
+          { name: 'Liam', vote: 'sant', conf: 4 },
+          { name: 'Aksel', vote: 'sant', conf: 4 },
+          { name: 'Oskar', vote: 'sant', conf: 5 },
+          { name: 'Frida', vote: 'sant', conf: 5, reason: 'Det blir større konsekvenser der.' },
+          { name: 'Vilde', vote: 'sant', conf: 5 }
+        ],
+        rl: [
+          { name: 'Amina', vote: 'sant', conf: 3, reason: 'De har mindre hjelp og sånt.' },
+          { name: 'Sofie', vote: 'sant', conf: 3 },
+          { name: 'Elias', vote: 'sant', conf: 3 },
+          { name: 'Isak', vote: 'sant', conf: 2, reason: 'Jeg er ikke helt sikker, men tror det er varmere der.' }
+        ],
+        fh: [
+          { name: 'Oliver', vote: 'usant', conf: 5, reason: 'Jeg tror klimaendringer rammer alle ganske likt.' },
+          { name: 'Leah', vote: 'delvis', conf: 5 }
+        ],
+        fl: [
+          { name: 'Henrik', vote: 'delvis', conf: 3 },
+          { name: 'Sebastian', vote: 'delvis', conf: 3 },
+          { name: 'Emil', vote: 'usant', conf: 3 },
+          { name: 'Filip', vote: 'usant', conf: 2, reason: 'Jeg vet ikke helt, men tror det handler mest om vær.' }
+        ]
+      },
+
+      // ── Påstand 2 (oransje): "El-biler er helt utslippsfrie." → fasit: usant ──
+      1: {
+        fasit: 'usant',
+        rh: [
+          { name: 'Erik', vote: 'usant', conf: 5 },
+          { name: 'Oskar', vote: 'usant', conf: 5 },
+          { name: 'Frida', vote: 'usant', conf: 5, reason: 'Det er utslipp når de lages.' },
+          { name: 'Leah', vote: 'usant', conf: 5 },
+          { name: 'Vilde', vote: 'usant', conf: 5 }
+        ],
+        rl: [
+          { name: 'Ingrid', vote: 'usant', conf: 3 }
+        ],
+        fh: [
+          { name: 'Nora', vote: 'sant', conf: 4, reason: 'De slipper ikke ut noe når man kjører.' },
+          { name: 'Amina', vote: 'sant', conf: 5, reason: 'Jeg tenker elbiler er mye bedre enn bensinbiler, så da virker det som null utslipp.' },
+          { name: 'Sofie', vote: 'sant', conf: 4, reason: 'De har ikke eksos så da er det null utslipp.' },
+          { name: 'Elias', vote: 'sant', conf: 5, reason: 'De går på strøm, men det kan jo være utslipp et annet sted.' },
+          { name: 'Oliver', vote: 'sant', conf: 5, reason: 'Elbiler er utslippsfrie fordi de ikke har eksos.' },
+          { name: 'Emil', vote: 'sant', conf: 5, reason: 'De er helt utslippsfrie.' },
+          { name: 'Filip', vote: 'sant', conf: 4, reason: 'Ingen eksos = ingen utslipp.' },
+          { name: 'Aksel', vote: 'sant', conf: 4 }
+        ],
+        fl: [
+          { name: 'Lars', vote: 'delvis', conf: 3, reason: 'Det er ikke utslipp når man kjører, men kanskje når de lages.' },
+          { name: 'Henrik', vote: 'sant', conf: 3 },
+          { name: 'Thea', vote: 'delvis', conf: 3 },
+          { name: 'Mia', vote: 'delvis', conf: 3, reason: 'Ikke når man kjører, men kanskje ellers.' },
+          { name: 'Isak', vote: 'sant', conf: 2, reason: 'De går på strøm så jeg tror det er null.' },
+          { name: 'Sebastian', vote: 'delvis', conf: 3 },
+          { name: 'Liam', vote: 'delvis', conf: 3, reason: 'Strømmen og batteriet gir utslipp.' }
+        ]
+      },
+
+      // ── Påstand 3 (lilla): "Alle FNs bærekraftsmål handler om klima og miljø." → fasit: usant ──
+      2: {
+        fasit: 'usant',
+        rh: [
+          { name: 'Lars', vote: 'usant', conf: 4, reason: 'Noen handler om fattigdom og skole også.' },
+          { name: 'Erik', vote: 'usant', conf: 4 },
+          { name: 'Aksel', vote: 'usant', conf: 5, reason: 'Mange av målene handler om fattigdom, helse og utdanning, ikke bare klima.' }
+        ],
+        rl: [
+          { name: 'Thea', vote: 'usant', conf: 3 },
+          { name: 'Mia', vote: 'usant', conf: 3, reason: 'Jeg tror noen av målene handler om helse, utdanning og å stoppe fattigdom.' },
+          { name: 'Elias', vote: 'usant', conf: 3 },
+          { name: 'Ingrid', vote: 'usant', conf: 3, reason: 'Er ikke noe med skole og sånt også?' },
+          { name: 'Sebastian', vote: 'usant', conf: 2 },
+          { name: 'Filip', vote: 'usant', conf: 3 },
+          { name: 'Liam', vote: 'usant', conf: 2 }
+        ],
+        fh: [
+          { name: 'Oliver', vote: 'sant', conf: 4, reason: 'Det handler om å redde jorda og miljøet.' }
+        ],
+        fl: [
+          { name: 'Nora', vote: 'delvis', conf: 2, reason: 'Jeg tror ikke alle handler om miljø.' },
+          { name: 'Henrik', vote: 'delvis', conf: 2, reason: 'Jeg tror de fleste handler om klima, men er ikke helt sikker.' },
+          { name: 'Amina', vote: 'sant', conf: 2, reason: 'Vi snakker mest om klima, så jeg trodde det var det.' },
+          { name: 'Sofie', vote: 'sant', conf: 2 },
+          { name: 'Isak', vote: 'sant', conf: 1 },
+          { name: 'Emil', vote: 'sant', conf: 1 },
+          { name: 'Oskar', vote: 'sant', conf: 1 },
+          { name: 'Frida', vote: 'sant', conf: 2, reason: 'Kanskje det handler om mer enn bare miljø.' },
+          { name: 'Leah', vote: 'sant', conf: 1 },
+          { name: 'Vilde', vote: 'sant', conf: 3, reason: 'Jeg forbinder bærekraft mest med klima og miljø.' }
+        ]
+      },
+
+      // ── Påstand 4 (gul): "Fornybar energi kan erstatte fossil energi og løse klimaproblemet." → fasit: delvis ──
+      3: {
+        fasit: 'delvis',
+        rh: [
+          { name: 'Lars', vote: 'delvis', conf: 4, reason: 'Det hjelper mye, men ikke alt.' },
+          { name: 'Mia', vote: 'delvis', conf: 4, reason: 'Vi må gjøre mer enn bare energi.' },
+          { name: 'Ingrid', vote: 'delvis', conf: 4, reason: 'Fornybar energi hjelper med strøm, men vi må også endre transport, industri og hvordan vi lever.' }
+        ],
+        rl: [
+          { name: 'Nora', vote: 'delvis', conf: 3 },
+          { name: 'Amina', vote: 'delvis', conf: 2 },
+          { name: 'Sofie', vote: 'delvis', conf: 3, reason: 'Det er ikke bare strøm som forurenser, så det løser ikke alt.' },
+          { name: 'Thea', vote: 'delvis', conf: 3 },
+          { name: 'Elias', vote: 'delvis', conf: 3, reason: 'Jeg er ikke helt sikker på hvor mye det hjelper.' },
+          { name: 'Erik', vote: 'delvis', conf: 3 }
+        ],
+        fh: [
+          { name: 'Oliver', vote: 'sant', conf: 5, reason: 'Hvis vi bare bytter til fornybar så løser det seg.' },
+          { name: 'Aksel', vote: 'sant', conf: 4, reason: 'Hvis strømmen blir fornybar, forsvinner utslippene.' },
+          { name: 'Vilde', vote: 'sant', conf: 5, reason: 'Hvis alle bruker fornybar så stopper utslipp.' }
+        ],
+        fl: [
+          { name: 'Henrik', vote: 'sant', conf: 3 },
+          { name: 'Isak', vote: 'usant', conf: 1, reason: 'Jeg er ikke helt sikker egentlig.' },
+          { name: 'Sebastian', vote: 'sant', conf: 2 },
+          { name: 'Emil', vote: 'sant', conf: 3 },
+          { name: 'Filip', vote: 'sant', conf: 3 },
+          { name: 'Liam', vote: 'usant', conf: 2, reason: 'Det er en del av løsningen.' },
+          { name: 'Oskar', vote: 'usant', conf: 2 },
+          { name: 'Frida', vote: 'usant', conf: 2, reason: 'Det er kanskje ikke nok alene.' },
+          { name: 'Leah', vote: 'usant', conf: 1 }
+        ]
+      }
+    };
+
+    // Active statement data (default: statement 0)
+    var categories = stmtData[0];
+
+    // ── Runde 2 per-statement data ──
+    // Each student has: name, vote (R2 vote), conf (R2 confidence), reason (optional R2 reason)
+    // Categories: r2_til_riktig, r2_fra_riktig, r2_fortsatt_feil, r2_uendret
+    // fasit for R2 is same as R1
+
+    // Statement 0: "Klimaendringene rammer fattige land hardest" — fasit: sant
+    stmtData[0].r2_til_riktig = [
+      { name: 'Henrik', vote: 'sant', conf: 3, reason: '' },
+      { name: 'Oliver', vote: 'sant', conf: 4, reason: 'Skjønte at fattige land ikke har ressurser til å beskytte seg' },
+      { name: 'Sebastian', vote: 'sant', conf: 3, reason: '' }
+    ];
+    stmtData[0].r2_fra_riktig = [
+    ];
+    stmtData[0].r2_fortsatt_feil = [
+      { name: 'Filip', vote: 'delvis', conf: 2, reason: '' }
+    ];
+    stmtData[0].r2_uendret = [
+      { name: 'Nora', vote: 'sant', conf: 4, reason: '' },
+      { name: 'Lars', vote: 'sant', conf: 5, reason: '' },
+      { name: 'Amina', vote: 'sant', conf: 4, reason: '' },
+      { name: 'Sofie', vote: 'sant', conf: 4, reason: '' },
+      { name: 'Thea', vote: 'sant', conf: 4, reason: '' },
+      { name: 'Mia', vote: 'sant', conf: 5, reason: '' },
+      { name: 'Elias', vote: 'sant', conf: 4, reason: '' },
+      { name: 'Isak', vote: 'sant', conf: 3, reason: '' },
+      { name: 'Erik', vote: 'sant', conf: 4, reason: '' },
+      { name: 'Ingrid', vote: 'sant', conf: 5, reason: '' },
+      { name: 'Emil', vote: 'usant', conf: 3, reason: '' },
+      { name: 'Liam', vote: 'sant', conf: 4, reason: '' },
+      { name: 'Aksel', vote: 'sant', conf: 5, reason: '' },
+      { name: 'Oskar', vote: 'sant', conf: 5, reason: '' },
+      { name: 'Frida', vote: 'sant', conf: 4, reason: '' },
+      { name: 'Leah', vote: 'delvis', conf: 3, reason: '' },
+      { name: 'Vilde', vote: 'sant', conf: 5, reason: '' }
+    ];
+
+    // Statement 1: "El-biler er helt utslippsfrie" — fasit: usant
+    stmtData[1].r2_til_riktig = [
+      { name: 'Lars', vote: 'usant', conf: 4, reason: 'Skjønte at produksjon og strøm også gir utslipp' },
+      { name: 'Amina', vote: 'usant', conf: 3, reason: '' },
+      { name: 'Thea', vote: 'usant', conf: 2, reason: '' },
+      { name: 'Mia', vote: 'usant', conf: 3, reason: '' },
+      { name: 'Elias', vote: 'usant', conf: 5, reason: '' },
+      { name: 'Liam', vote: 'usant', conf: 4, reason: '' }
+    ];
+    stmtData[1].r2_fra_riktig = [
+      { name: 'Erik', vote: 'delvis', conf: 4, reason: 'Jeg tenker at det ikke er utslipp når man kjører, så kanskje det er litt riktig likevel.' },
+      { name: 'Ingrid', vote: 'sant', conf: 4, reason: 'Jeg tror egentlig det er null utslipp siden det er strøm.' }
+    ];
+    stmtData[1].r2_fortsatt_feil = [
+      { name: 'Filip', vote: 'delvis', conf: 3, reason: '' }
+    ];
+    stmtData[1].r2_uendret = [
+      { name: 'Nora', vote: 'sant', conf: 3, reason: '' },
+      { name: 'Henrik', vote: 'sant', conf: 3, reason: '' },
+      { name: 'Sofie', vote: 'sant', conf: 4, reason: '' },
+      { name: 'Isak', vote: 'sant', conf: 1, reason: '' },
+      { name: 'Oliver', vote: 'sant', conf: 3, reason: '' },
+      { name: 'Sebastian', vote: 'delvis', conf: 2, reason: '' },
+      { name: 'Emil', vote: 'sant', conf: 5, reason: '' },
+      { name: 'Aksel', vote: 'sant', conf: 5, reason: '' },
+      { name: 'Oskar', vote: 'usant', conf: 4, reason: '' },
+      { name: 'Frida', vote: 'usant', conf: 4, reason: '' },
+      { name: 'Leah', vote: 'usant', conf: 5, reason: '' },
+      { name: 'Vilde', vote: 'usant', conf: 5, reason: '' }
+    ];
+
+    // Statement 2: "Alle FNs bærekraftsmål handler om klima og miljø" — fasit: usant
+    stmtData[2].r2_til_riktig = [
+      { name: 'Nora', vote: 'usant', conf: 3, reason: '' },
+      { name: 'Amina', vote: 'usant', conf: 3, reason: '' },
+      { name: 'Sofie', vote: 'usant', conf: 3, reason: '' },
+      { name: 'Emil', vote: 'usant', conf: 4, reason: '' },
+      { name: 'Oskar', vote: 'usant', conf: 5, reason: '' }
+    ];
+    stmtData[2].r2_fra_riktig = [
+    ];
+    stmtData[2].r2_fortsatt_feil = [
+      { name: 'Henrik', vote: 'sant', conf: 2, reason: '' },
+      { name: 'Isak', vote: 'delvis', conf: 2, reason: '' }
+    ];
+    stmtData[2].r2_uendret = [
+      { name: 'Lars', vote: 'usant', conf: 4, reason: '' },
+      { name: 'Thea', vote: 'usant', conf: 3, reason: '' },
+      { name: 'Mia', vote: 'usant', conf: 3, reason: '' },
+      { name: 'Elias', vote: 'usant', conf: 3, reason: '' },
+      { name: 'Oliver', vote: 'sant', conf: 4, reason: '' },
+      { name: 'Erik', vote: 'usant', conf: 4, reason: '' },
+      { name: 'Ingrid', vote: 'usant', conf: 4, reason: '' },
+      { name: 'Sebastian', vote: 'usant', conf: 3, reason: '' },
+      { name: 'Filip', vote: 'usant', conf: 4, reason: '' },
+      { name: 'Liam', vote: 'usant', conf: 4, reason: '' },
+      { name: 'Aksel', vote: 'usant', conf: 5, reason: '' },
+      { name: 'Frida', vote: 'sant', conf: 5, reason: '' },
+      { name: 'Leah', vote: 'sant', conf: 2, reason: '' },
+      { name: 'Vilde', vote: 'sant', conf: 4, reason: '' }
+    ];
+
+    // Statement 3: "Fornybar energi kan erstatte fossil energi og løse klimaproblemet" — fasit: delvis
+    stmtData[3].r2_til_riktig = [
+      { name: 'Liam', vote: 'delvis', conf: 4, reason: '' },
+      { name: 'Oskar', vote: 'delvis', conf: 4, reason: '' }
+    ];
+    stmtData[3].r2_fra_riktig = [
+      { name: 'Nora', vote: 'sant', conf: 3, reason: '' },
+      { name: 'Thea', vote: 'usant', conf: 3, reason: '' },
+      { name: 'Elias', vote: 'usant', conf: 3, reason: '' },
+      { name: 'Erik', vote: 'sant', conf: 3, reason: '' }
+    ];
+    stmtData[3].r2_fortsatt_feil = [
+      { name: 'Henrik', vote: 'usant', conf: 3, reason: '' },
+      { name: 'Isak', vote: 'sant', conf: 1, reason: '' }
+    ];
+    stmtData[3].r2_uendret = [
+      { name: 'Lars', vote: 'delvis', conf: 4, reason: '' },
+      { name: 'Amina', vote: 'delvis', conf: 2, reason: '' },
+      { name: 'Sofie', vote: 'delvis', conf: 3, reason: '' },
+      { name: 'Mia', vote: 'delvis', conf: 4, reason: '' },
+      { name: 'Oliver', vote: 'sant', conf: 5, reason: '' },
+      { name: 'Ingrid', vote: 'delvis', conf: 4, reason: '' },
+      { name: 'Sebastian', vote: 'sant', conf: 2, reason: '' },
+      { name: 'Emil', vote: 'sant', conf: 3, reason: '' },
+      { name: 'Filip', vote: 'sant', conf: 3, reason: '' },
+      { name: 'Aksel', vote: 'sant', conf: 4, reason: '' },
+      { name: 'Frida', vote: 'usant', conf: 5, reason: '' },
+      { name: 'Leah', vote: 'usant', conf: 2, reason: '' },
+      { name: 'Vilde', vote: 'sant', conf: 5, reason: '' }
+    ];
+
+    var catTitles = {
+      rh: 'Riktig - Høy sikkerhet',
+      rl: 'Riktig - Lav sikkerhet',
+      fh: 'Feil - Høy sikkerhet',
+      fl: 'Feil - Lav sikkerhet',
+      r2_til_riktig: 'Endret til riktig',
+      r2_fra_riktig: 'Endret fra riktig til feil',
+      r2_fortsatt_feil: 'Endret, fortsatt feil',
+      r2_uendret: 'Uendret'
+    };
+
+    var voteLabels = { sant: 'Sant', delvis: 'Delvis', usant: 'Usant' };
+
+    function selectCategory(cell, tabId) {
+      var card = cell.closest('.section-card');
+      var allCells = card.querySelectorAll('.matrix-cell');
+      var studentsEl = card.querySelector('.matrix-students');
+      var titleEl = card.querySelector('[id^="matrix-students-title"]');
+      var listEl = card.querySelector('[id^="matrix-students-list"]');
+      var cat = cell.dataset.cat;
+
+      // Toggle: if already selected, deselect
+      if (cell.classList.contains('selected')) {
+        cell.classList.remove('selected');
+        studentsEl.classList.remove('show');
+        return;
+      }
+
+      allCells.forEach(function(c) { c.classList.remove('selected'); });
+      cell.classList.add('selected');
+
+      // Render students — only show revealed ones
+      var students = categories[cat] || [];
+      var isR2 = cat.indexOf('r2_') === 0;
+      var filtered = students;
+      var revNames = [];
+      if (isR2 && window._getRevealedNamesR2) {
+        revNames = window._getRevealedNamesR2();
+        filtered = students.filter(function(s) { return revNames.indexOf(s.name) >= 0; });
+      } else if (!isR2 && window._getRevealedNames) {
+        revNames = window._getRevealedNames();
+        filtered = students.filter(function(s) { return revNames.indexOf(s.name) >= 0; });
+      }
+      // Sort: by confidence desc, then by reveal order (newest first)
+      filtered.sort(function(a, b) {
+        if (!isR2) {
+          // R1: has reason first, then conf desc
+          var aReason = a.reason ? 1 : 0;
+          var bReason = b.reason ? 1 : 0;
+          if (bReason !== aReason) return bReason - aReason;
+        }
+        if (b.conf !== a.conf) return b.conf - a.conf;
+        var aIdx = revNames.indexOf(a.name);
+        var bIdx = revNames.indexOf(b.name);
+        return bIdx - aIdx;
+      });
+
+      // Build R1 vote lookup for R2 transition display
+      var r1VoteMap = {};
+      if (isR2) {
+        var stmtIdx = window._currentStmtIdxR2 != null ? window._currentStmtIdxR2 : (window._currentStmtIdx || 0);
+        var data = stmtData[stmtIdx];
+        if (data) {
+          ['rh', 'rl', 'fh', 'fl'].forEach(function(rCat) {
+            (data[rCat] || []).forEach(function(st) {
+              r1VoteMap[st.name] = st.vote;
+            });
+          });
+        }
+      }
+      var isChangedCat = (cat === 'r2_til_riktig' || cat === 'r2_fra_riktig' || cat === 'r2_fortsatt_feil');
+
+      titleEl.textContent = catTitles[cat] + ' (' + filtered.length + ')';
+      listEl.innerHTML = '';
+      filtered.forEach(function(s) {
+        var row = document.createElement('div');
+        row.className = 'student-row';
+        var reasonHtml = '';
+        var metaHtml;
+        if (isR2) {
+          // R2: no reason shown; for changed categories show prev → new vote
+          if (isChangedCat) {
+            var prevVote = r1VoteMap[s.name] || s.vote;
+            metaHtml = '<div class="student-meta">' +
+              '<div class="vote-transition">' +
+              '<span class="vote-badge vote-' + prevVote + '">' + voteLabels[prevVote] + '</span>' +
+              '<span class="vote-arrow">→</span>' +
+              '<span class="vote-badge vote-' + s.vote + '">' + voteLabels[s.vote] + '</span>' +
+              '</div>' +
+              '<div class="conf-circle cc-' + s.conf + '">' + s.conf + '</div></div>';
+          } else {
+            // Uendret: just show current vote + confidence
+            metaHtml = '<div class="student-meta"><span class="vote-badge vote-' + s.vote + '">' + voteLabels[s.vote] + '</span>' +
+              '<div class="conf-circle cc-' + s.conf + '">' + s.conf + '</div></div>';
+          }
+        } else {
+          // R1: show vote + confidence + reason
+          reasonHtml = s.reason ? '<div class="student-reason">' + s.reason + '</div>' : '';
+          metaHtml = '<div class="student-meta"><span class="vote-badge vote-' + s.vote + '">' + voteLabels[s.vote] + '</span>' +
+            '<div class="conf-circle cc-' + s.conf + '">' + s.conf + '</div></div>';
+        }
+        row.innerHTML = '<div class="student-info"><div class="student-name">' + s.name + '</div>' + reasonHtml + '</div>' + metaHtml;
+
+        // Make R1 rows with reasons clickable for highlighting
+        if (!isR2 && s.reason) {
+          row.classList.add('has-reason');
+          row.addEventListener('click', function() {
+            row.classList.toggle('highlighted');
+            window.parent.postMessage({
+              type: 'fagprat-highlight-reason',
+              vote: s.vote,
+              reason: s.reason,
+              highlighted: row.classList.contains('highlighted')
+            }, '*');
+          });
+        }
+
+        listEl.appendChild(row);
+      });
+      studentsEl.classList.add('show');
+    }
+
+    // Round selector (Resultat tab) — mutually exclusive
+    function selectRound(btn) {
+      var key = btn.dataset.round;
+      var panel = document.getElementById('round-panel');
+      var btns = document.querySelectorAll('.round-toggle-btn');
+      var alreadyActive = btn.classList.contains('active');
+
+      btns.forEach(function(b) { b.classList.remove('active'); });
+      panel.classList.remove('show');
+      panel.innerHTML = '';
+
+      if (alreadyActive) return; // toggle off
+
+      btn.classList.add('active');
+      var sourceTab = document.getElementById('tab-' + (key === 'r1' ? 'runde1' : 'runde2'));
+      var sourceContent = sourceTab.querySelector('.content-scroll');
+      panel.innerHTML = '<div class="content-scroll">' + sourceContent.innerHTML + '</div>';
+      panel.classList.add('show');
+    }
+
+    // Confidence detail toggle
+    function toggleConfDetail(btn) {
+      var card = btn.closest('.section-card');
+      var detail = card.querySelector('.conf-detail');
+      btn.classList.toggle('active');
+      detail.classList.toggle('show');
+    }
+
+    // Badge labels per tab
+    var badgeLabels = { runde1: 'Første stemmerunde', runde2: 'Andre stemmerunde', resultat: 'Egenvurdering' };
+
+    function activateTab(name) {
+      var target = document.getElementById('tab-' + name);
+      if (!target) return;
+      document.querySelectorAll('.ext-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+      var tab = document.querySelector('.ext-tab[data-tab="' + name + '"]');
+      if (tab) tab.classList.add('active');
+      target.classList.add('active');
+      var badge = document.getElementById('app-badge');
+      if (badge) badge.textContent = badgeLabels[name] || '';
+      var screen = document.querySelector('.iphone-screen');
+      if (screen) screen.scrollTop = 0;
+    }
+    document.querySelectorAll('.ext-tab').forEach(function(tab) {
+      tab.addEventListener('click', function() { activateTab(tab.dataset.tab); });
+    });
+    // External control via location.hash (for demo embed)
+    function applyHashTab() {
+      var h = (location.hash || '').replace('#','');
+      if (h === 'runde1' || h === 'runde2' || h === 'resultat') activateTab(h);
+    }
+    window.addEventListener('hashchange', applyHashTab);
+    applyHashTab();
+
+    // Listen for tab switch messages from parent (demo orchestrator)
+    window.addEventListener('message', function(e) {
+      if (!e.data) return;
+      if (e.data.type === 'fagprat-switch-tab') {
+        activateTab(e.data.tab);
+        // Re-broadcast resultat data when switching to resultat tab
+        if (e.data.tab === 'resultat' && window._refreshResultat) {
+          window._refreshResultat();
+        }
+      }
+      if (e.data.type === 'fagprat-steg-num') {
+        // Vis R1→R2 sammenligning kun på steg 4 eller senere
+        var r2Tab = document.getElementById('tab-runde2');
+        if (r2Tab) {
+          r2Tab.classList.toggle('show-r1-comparison', e.data.num >= 4);
+        }
+      }
+      if (e.data.type === 'fagprat-request-resultat') {
+        // Teacher panel (steg6) is requesting resultat data
+        if (window._refreshResultat) window._refreshResultat();
+      }
+      if (e.data.type === 'fagprat-unhighlight-reason') {
+        // Remove .highlighted from matching student row on phone
+        var rows = document.querySelectorAll('.student-row.highlighted');
+        rows.forEach(function(row) {
+          var reasonEl = row.querySelector('.student-reason');
+          if (reasonEl && reasonEl.textContent === e.data.reason) {
+            row.classList.remove('highlighted');
+          }
+        });
+      }
+    });
+
+    // When embedded in an iframe (demo), strip outer chrome but keep the phone frame
+    if (window.parent !== window) {
+      document.querySelectorAll('.external-tabs, .page-title, .phone-label').forEach(function(el) { el.remove(); });
+      var embedStyle = document.createElement('style');
+      embedStyle.textContent = [
+        'html,body{background:transparent !important;background-color:transparent !important;padding:0 !important;margin:0 !important;min-height:0 !important;overflow:hidden !important;}',
+        '.phone-wrapper{gap:0 !important;padding:0 !important;margin:0 !important;height:100% !important;justify-content:center !important;}',
+        '.iphone-frame{margin:0 auto !important;}',
+        '.external-tabs,.page-title,.phone-label{display:none !important;}'
+      ].join('');
+      document.head.appendChild(embedStyle);
+    }
+
+    // ═══ Live trickle-in for Runde 1 (when embedded in demo) ═══
+    (function() {
+      var classTotal = 22; // 21 auto + Markus
+      var currentStmtIdx = 0;
+      var currentFasit = 'sant';
+      var autoStudents = [];
+      var autoTotal = 0;
+      var shuffled = [];
+
+      // Build auto-student list from current statement data
+      function buildAutoStudents(idx) {
+        var data = stmtData[idx];
+        if (!data) return;
+        currentStmtIdx = idx;
+        window._currentStmtIdx = idx;
+        currentFasit = data.fasit;
+        categories = data; // update global categories for selectCategory()
+        autoStudents = [];
+        ['rh', 'rl', 'fh', 'fl'].forEach(function(cat) {
+          (data[cat] || []).forEach(function(s) {
+            autoStudents.push({ name: s.name, vote: s.vote, conf: s.conf, cat: cat, reason: s.reason || '' });
+          });
+        });
+        autoTotal = autoStudents.length;
+        // Deterministic shuffle using simple seed per statement
+        var order = [];
+        for (var i = 0; i < autoTotal; i++) order.push(i);
+        // Fisher-Yates with seeded pseudo-random (deterministic per statement)
+        var seed = (idx + 1) * 7919;
+        function nextRand() { seed = (seed * 16807 + 11) % 2147483647; return seed / 2147483647; }
+        for (var j = autoTotal - 1; j > 0; j--) {
+          var k = Math.floor(nextRand() * (j + 1));
+          var tmp = order[j]; order[j] = order[k]; order[k] = tmp;
+        }
+        var rawShuffled = order.map(function(i) { return autoStudents[i]; });
+        // Students without reasons tend to arrive first, longer reasons later
+        // But add significant jitter so groups overlap naturally (some type fast)
+        rawShuffled.forEach(function(s) {
+          var len = s.reason ? s.reason.length : 0;
+          // Compress reason length into a smaller range (0-3 tiers)
+          // then add large jitter so there's real mixing between tiers
+          var tier = len === 0 ? 0 : len <= 35 ? 1 : len <= 50 ? 2 : 3;
+          var jitter = nextRand() * 4; // 0-4 random offset
+          s._arrivalScore = tier * 2 + jitter;
+        });
+        rawShuffled.sort(function(a, b) { return a._arrivalScore - b._arrivalScore; });
+        shuffled = rawShuffled;
+      }
+
+      buildAutoStudents(0); // default
+
+      var timerTotal = 0;
+      var revealedCount = 0;
+      var autoRevealed = 0;
+      var studentVote = null;
+      var studentInserted = false;
+
+      // DOM references for Runde 1
+      var tab = document.getElementById('tab-runde1');
+      if (!tab) return;
+      var stmtTextEl = tab.querySelector('.stmt-text');
+      var waitingEl = document.getElementById('stats-waiting-r1');
+      var statsContentEl = document.getElementById('stats-content-r1');
+      var statsMatrixEl = document.getElementById('stats-matrix-r1');
+      var colItems = tab.querySelectorAll('.col-item');
+      var statusCount = tab.querySelector('.status-count');
+      var statusBtn = tab.querySelector('.status-active-btn');
+      var confValue = tab.querySelector('.conf-summary-value');
+      var confDetail = tab.querySelector('#conf-detail-r1');
+      var matrixCells = tab.querySelectorAll('.matrix-cell');
+
+      var sequence = shuffled.slice();
+
+      // Expose revealed student names for selectCategory filtering
+      window._getRevealedNames = function() {
+        var names = [];
+        for (var i = 0; i < revealedCount && i < sequence.length; i++) {
+          if (sequence[i].name) names.push(sequence[i].name);
+        }
+        // Also include iPad student name if voted
+        if (studentVote && studentVote.name) names.push(studentVote.name);
+        return names;
+      };
+
+      function showWaiting() {
+        waitingEl.classList.remove('hidden');
+        statsContentEl.classList.remove('visible');
+        statsMatrixEl.style.display = 'none';
+      }
+
+      function showStats() {
+        waitingEl.classList.add('hidden');
+        statsContentEl.classList.add('visible');
+        statsMatrixEl.style.display = '';
+      }
+
+      function computeAndRender() {
+        var subset = sequence.slice(0, revealedCount);
+        var count = subset.length;
+
+        var sant = 0, delvis = 0, usant = 0;
+        var totalConf = 0;
+        var confDist = [0, 0, 0, 0, 0];
+        var confByVote = { sant: { sum: 0, n: 0 }, delvis: { sum: 0, n: 0 }, usant: { sum: 0, n: 0 } };
+        var matCounts = { rh: 0, rl: 0, fh: 0, fl: 0 };
+
+        subset.forEach(function(s) {
+          if (s.vote === 'sant') sant++;
+          else if (s.vote === 'delvis') delvis++;
+          else usant++;
+          totalConf += s.conf;
+          confDist[s.conf - 1]++;
+          confByVote[s.vote].sum += s.conf;
+          confByVote[s.vote].n++;
+          matCounts[s.cat]++;
+        });
+
+        // Helper: position pct label inside or above bar
+        function setPctPos(colItem, pct) {
+          var pctEl = colItem.querySelector('.col-pct');
+          if (pct < 20) { pctEl.classList.add('col-pct-outside'); }
+          else { pctEl.classList.remove('col-pct-outside'); }
+        }
+
+        if (count > 0) {
+          var pSant = Math.round(sant / count * 100);
+          var pDelvis = Math.round(delvis / count * 100);
+          var pUsant = Math.round(usant / count * 100);
+          colItems[0].querySelector('.col-count').textContent = sant + ' stk';
+          colItems[0].querySelector('.col-fill').style.height = pSant + '%';
+          colItems[0].querySelector('.col-pct').textContent = pSant + '%';
+          setPctPos(colItems[0], pSant);
+
+          colItems[1].querySelector('.col-count').textContent = delvis + ' stk';
+          colItems[1].querySelector('.col-fill').style.height = pDelvis + '%';
+          colItems[1].querySelector('.col-pct').textContent = pDelvis + '%';
+          setPctPos(colItems[1], pDelvis);
+
+          colItems[2].querySelector('.col-count').textContent = usant + ' stk';
+          colItems[2].querySelector('.col-fill').style.height = pUsant + '%';
+          colItems[2].querySelector('.col-pct').textContent = pUsant + '%';
+          setPctPos(colItems[2], pUsant);
+        } else {
+          colItems.forEach(function(ci) {
+            ci.querySelector('.col-count').textContent = '0 stk';
+            ci.querySelector('.col-fill').style.height = '0%';
+            ci.querySelector('.col-pct').textContent = '0%';
+            setPctPos(ci, 0);
+          });
+        }
+
+        // Highlight correct answer column based on fasit
+        var fasitMap = { sant: 0, delvis: 1, usant: 2 };
+        var correctIdx = fasitMap[currentFasit];
+        colItems.forEach(function(ci, idx) {
+          ci.classList.remove('col-correct', 'col-correct-sant', 'col-correct-delvis', 'col-correct-usant');
+          if (idx === correctIdx) {
+            ci.classList.add('col-correct', 'col-correct-' + currentFasit);
+          }
+        });
+
+        statusCount.innerHTML = '<strong>' + count + '</strong> av ' + classTotal + ' elever har stemt';
+
+        var avgConf = count > 0 ? (totalConf / count).toFixed(1) : '0.0';
+        confValue.textContent = avgConf.replace('.', ',');
+
+        var circles = confDetail.querySelectorAll('.circle-count');
+        for (var i = 0; i < 5; i++) {
+          circles[i].textContent = confDist[i] + ' stk';
+        }
+        var breakdownRows = confDetail.querySelectorAll('.conf-breakdown-value');
+        var votes = ['sant', 'delvis', 'usant'];
+        for (var j = 0; j < 3; j++) {
+          var cv = confByVote[votes[j]];
+          breakdownRows[j].textContent = cv.n > 0 ? (cv.sum / cv.n).toFixed(1).replace('.', ',') : '–';
+        }
+
+        matrixCells.forEach(function(cell) {
+          cell.querySelector('.matrix-count').textContent = matCounts[cell.dataset.cat] + ' stk';
+        });
+
+        // Auto-refresh open student list if a category is selected
+        var selectedCell = tab.querySelector('.matrix-cell.selected');
+        if (selectedCell) {
+          // Temporarily deselect so selectCategory doesn't toggle off
+          selectedCell.classList.remove('selected');
+          selectCategory(selectedCell, 'r1');
+        }
+
+        // Save R1 final stats globally so R2 can reference them
+        window._r1FinalStats = {
+          count: count,
+          classTotal: classTotal,
+          avgTotal: count > 0 ? totalConf / count : 0,
+          counts: { sant: sant, delvis: delvis, usant: usant },
+          fasit: currentFasit
+        };
+
+        // Store R1 revealed subset globally for Resultat tab
+        window._r1RevealedData = subset.slice();
+        if (window._refreshResultat) window._refreshResultat();
+
+        // Broadcast full stats + reasons to parent (for teacher panel sync)
+        // Only send when stats are actually visible (not in waiting state)
+        if (window.parent !== window && statsContentEl.classList.contains('visible')) {
+          var reasons = [];
+          subset.forEach(function(s) { if (s.reason) reasons.push({ vote: s.vote, reason: s.reason }); });
+          var avgSant = confByVote.sant.n > 0 ? confByVote.sant.sum / confByVote.sant.n : 0;
+          var avgDelvis = confByVote.delvis.n > 0 ? confByVote.delvis.sum / confByVote.delvis.n : 0;
+          var avgUsant = confByVote.usant.n > 0 ? confByVote.usant.sum / confByVote.usant.n : 0;
+          window.parent.postMessage({
+            type: 'fagprat-reasons-update',
+            reasons: reasons,
+            stats: {
+              counts: { sant: sant, delvis: delvis, usant: usant },
+              pcts: {
+                sant: count > 0 ? Math.round(sant / count * 100) : 0,
+                delvis: count > 0 ? Math.round(delvis / count * 100) : 0,
+                usant: count > 0 ? Math.round(usant / count * 100) : 0
+              },
+              avgTotal: count > 0 ? totalConf / count : 0,
+              avgSant: avgSant,
+              avgDelvis: avgDelvis,
+              avgUsant: avgUsant
+            }
+          }, '*');
+        }
+      }
+
+      function resetToZero() {
+        revealedCount = 0;
+        autoRevealed = 0;
+        studentVote = null;
+        studentInserted = false;
+        sequence = shuffled.slice();
+        computeAndRender();
+        statusBtn.innerHTML = '<span class="status-dot"></span> Avstemning pågår';
+        statusBtn.style.background = '';
+        statusBtn.style.color = '';
+      }
+
+      function showFinished() {
+        showStats(); // ensure stats are visible (may have been hidden by reset)
+        revealedCount = sequence.length;
+        computeAndRender();
+        statusBtn.innerHTML = 'Runde 1 avsluttet';
+        statusBtn.style.background = '#555';
+        statusBtn.style.color = '#fff';
+      }
+
+      function syncRevealCount(newAutoTarget) {
+        if (newAutoTarget <= autoRevealed) return;
+        var added = newAutoTarget - autoRevealed;
+        autoRevealed = newAutoTarget;
+        revealedCount += added;
+        computeAndRender();
+      }
+
+      // Statement index lookup by text (first few chars)
+      var stmtTexts = [
+        'Klimaendringene rammer',
+        'El-biler er helt',
+        'Alle FNs bærekraftsmål',
+        'Fornybar energi kan'
+      ];
+
+      window.addEventListener('message', function(e) {
+        if (!e.data) return;
+
+        // Statement selected — switch dataset + update text
+        if (e.data.type === 'fagprat-statement') {
+          var idx = -1;
+          if (typeof e.data.index === 'number') {
+            idx = e.data.index;
+          } else {
+            // Match by text prefix
+            for (var si = 0; si < stmtTexts.length; si++) {
+              if (e.data.text && e.data.text.indexOf(stmtTexts[si]) === 0) { idx = si; break; }
+            }
+          }
+          if (idx >= 0 && stmtData[idx]) {
+            buildAutoStudents(idx);
+            sequence = shuffled.slice();
+            revealedCount = 0;
+            autoRevealed = 0;
+            studentVote = null;
+            studentInserted = false;
+            if (stmtTextEl) stmtTextEl.textContent = '«' + e.data.text + '»';
+            // Apply statement color to card
+            var stmtInner = tab.querySelector('.stmt-inner');
+            if (stmtInner && e.data.color) {
+              stmtInner.className = 'stmt-inner stmt-' + e.data.color;
+            }
+            showWaiting(); // show professor + waiting text, hide stats
+            computeAndRender();
+          }
+          return;
+        }
+
+        if (e.data.type === 'fagprat-timer') {
+          if (e.data.action === 'start') {
+            timerTotal = e.data.remaining || 60;
+            resetToZero();
+            showStats(); // timer started — reveal stats sections
+          }
+          else if (e.data.action === 'tick') {
+            var remaining = e.data.remaining || 0;
+            var elapsed = timerTotal - remaining;
+            var progress = elapsed / timerTotal;
+            var eased = progress < 0.1 ? progress * 2
+                      : progress < 0.8 ? 0.2 + (progress - 0.1) * (0.7 / 0.7)
+                      : 0.9 + (progress - 0.8) * (0.1 / 0.2);
+            var target = Math.min(Math.round(eased * autoTotal), autoTotal);
+            syncRevealCount(target);
+          }
+          else if (e.data.action === 'finish') {
+            showFinished();
+          }
+          else if (e.data.action === 'stop') {
+            // Freeze current state — keep showing whatever is revealed
+            statusBtn.innerHTML = 'Avstemning stoppet';
+            statusBtn.style.background = '#555';
+            statusBtn.style.color = '#fff';
+          }
+          else if (e.data.action === 'reset') {
+            resetToZero();
+            showWaiting();
+          }
+        }
+
+        // Parent requests fresh stats broadcast (e.g. when steg2 just loaded)
+        // Force broadcast regardless of visibility — steg2 needs current data
+        // Only respond when R1 tab is active (R2 has its own handler)
+        if (e.data.type === 'fagprat-request-stats') {
+          var r2TabCheck = document.getElementById('tab-runde2');
+          if (r2TabCheck && r2TabCheck.classList.contains('active')) { /* skip — R2 handles it */ }
+          else {
+          computeAndRender();
+          // Also force-send stats even if stats panel is hidden (waiting state)
+          if (window.parent !== window) {
+            var subset = sequence.slice(0, revealedCount);
+            var count = subset.length;
+            var sant = 0, delvis = 0, usant = 0, totalConf = 0;
+            var confByVoteF = { sant: {sum:0,n:0}, delvis: {sum:0,n:0}, usant: {sum:0,n:0} };
+            var reasons = [];
+            subset.forEach(function(s) {
+              if (s.vote === 'sant') sant++; else if (s.vote === 'delvis') delvis++; else usant++;
+              totalConf += s.conf;
+              confByVoteF[s.vote].sum += s.conf;
+              confByVoteF[s.vote].n++;
+              if (s.reason) reasons.push({ vote: s.vote, reason: s.reason });
+            });
+            var avgSant = confByVoteF.sant.n > 0 ? confByVoteF.sant.sum / confByVoteF.sant.n : 0;
+            var avgDelvis = confByVoteF.delvis.n > 0 ? confByVoteF.delvis.sum / confByVoteF.delvis.n : 0;
+            var avgUsant = confByVoteF.usant.n > 0 ? confByVoteF.usant.sum / confByVoteF.usant.n : 0;
+            window.parent.postMessage({
+              type: 'fagprat-reasons-update',
+              reasons: reasons,
+              stats: {
+                counts: { sant: sant, delvis: delvis, usant: usant },
+                pcts: {
+                  sant: count > 0 ? Math.round(sant / count * 100) : 0,
+                  delvis: count > 0 ? Math.round(delvis / count * 100) : 0,
+                  usant: count > 0 ? Math.round(usant / count * 100) : 0
+                },
+                avgTotal: count > 0 ? totalConf / count : 0,
+                avgSant: avgSant, avgDelvis: avgDelvis, avgUsant: avgUsant
+              }
+            }, '*');
+          }
+          } // end else (R1 active)
+        }
+
+        // Student (Markus) voted from iPad — use current fasit
+        if (e.data.type === 'fagprat-student-vote') {
+          if (studentInserted) return;
+          var v = e.data.vote;
+          var c = e.data.conf;
+          var isCorrect = (v === currentFasit);
+          var isHigh = (c >= 4);
+          var cat = isCorrect ? (isHigh ? 'rh' : 'rl') : (isHigh ? 'fh' : 'fl');
+          studentVote = { name: 'Markus', vote: v, conf: c, cat: cat, reason: e.data.reason || '' };
+          studentInserted = true;
+          window._markusR1Vote = v; // expose R1 vote for R2 categorization
+          // Add to categories so selectCategory shows Markus in the student list
+          if (!categories[cat]) categories[cat] = [];
+          categories[cat].push(studentVote);
+          var insertPos = revealedCount + Math.floor(Math.random() * 2);
+          insertPos = Math.min(insertPos, sequence.length);
+          sequence.splice(insertPos, 0, studentVote);
+          // Immediately reveal one more (the student's vote appears on next tick or now)
+          revealedCount++;
+          computeAndRender();
+        }
+      });
+    })();
+
+    // ══════════════════════════════════════════════
+    //  RUNDE 2 – Live trickle-in IIFE
+    // ══════════════════════════════════════════════
+    (function() {
+      var classTotal = 22;
+      var currentStmtIdx = 0;
+      var currentFasit = 'sant';
+      var r2Students = [];
+      var r2Total = 0;
+      var r2Shuffled = [];
+
+      function buildR2Students(idx) {
+        var data = stmtData[idx];
+        if (!data) return;
+        currentStmtIdx = idx;
+        window._currentStmtIdxR2 = idx;
+        currentFasit = data.fasit;
+        // Update global categories with R2 data for selectCategory()
+        categories.r2_til_riktig = data.r2_til_riktig || [];
+        categories.r2_fra_riktig = data.r2_fra_riktig || [];
+        categories.r2_fortsatt_feil = data.r2_fortsatt_feil || [];
+        categories.r2_uendret = data.r2_uendret || [];
+        r2Students = [];
+        ['r2_til_riktig', 'r2_fra_riktig', 'r2_fortsatt_feil', 'r2_uendret'].forEach(function(cat) {
+          (data[cat] || []).forEach(function(s) {
+            r2Students.push({ name: s.name, vote: s.vote, conf: s.conf, cat: cat, reason: s.reason || '' });
+          });
+        });
+        r2Total = r2Students.length;
+        // Deterministic shuffle with different seed than R1
+        var order = [];
+        for (var i = 0; i < r2Total; i++) order.push(i);
+        var seed = (idx + 1) * 13337;
+        function nextRand() { seed = (seed * 16807 + 11) % 2147483647; return seed / 2147483647; }
+        for (var j = r2Total - 1; j > 0; j--) {
+          var k = Math.floor(nextRand() * (j + 1));
+          var tmp = order[j]; order[j] = order[k]; order[k] = tmp;
+        }
+        var rawShuffled = order.map(function(i) { return r2Students[i]; });
+        // Arrival order: no reason first, longer reasons later, with jitter
+        rawShuffled.forEach(function(s) {
+          var len = s.reason ? s.reason.length : 0;
+          var tier = len === 0 ? 0 : len <= 35 ? 1 : len <= 50 ? 2 : 3;
+          var jitter = nextRand() * 4;
+          s._arrivalScore = tier * 2 + jitter;
+        });
+        rawShuffled.sort(function(a, b) { return a._arrivalScore - b._arrivalScore; });
+        r2Shuffled = rawShuffled;
+      }
+
+      buildR2Students(0);
+
+      var timerTotal = 0;
+      var revealedCount = 0;
+      var autoRevealed = 0;
+      var studentVote = null;
+      var studentInserted = false;
+
+      // DOM references for Runde 2
+      var tab = document.getElementById('tab-runde2');
+      if (!tab) return;
+      var stmtTextEl = tab.querySelector('.r2-stmt-text');
+      var waitingEl = document.getElementById('stats-waiting-r2');
+      var statsContentEl = document.getElementById('stats-content-r2');
+      var statsMatrixEl = document.getElementById('stats-matrix-r2');
+      var colItems = tab.querySelectorAll('.col-item');
+
+      // Helper: position pct label inside or above bar
+      function setPctPos(colItem, pct) {
+        var pctEl = colItem.querySelector('.col-pct');
+        if (pct < 20) { pctEl.classList.add('col-pct-outside'); }
+        else { pctEl.classList.remove('col-pct-outside'); }
+      }
+      var statusCount = tab.querySelector('.status-count');
+      var statusBtn = tab.querySelector('.status-active-btn');
+      var confValue = tab.querySelector('.conf-summary-value');
+      var confDetail = document.getElementById('conf-detail-r2');
+      var matrixCells = statsMatrixEl.querySelectorAll('.matrix-cell');
+
+      var sequence = r2Shuffled.slice();
+
+      // Expose R2 revealed names
+      window._getRevealedNamesR2 = function() {
+        var names = [];
+        for (var i = 0; i < revealedCount && i < sequence.length; i++) {
+          if (sequence[i].name) names.push(sequence[i].name);
+        }
+        if (studentVote && studentVote.name) names.push(studentVote.name);
+        return names;
+      };
+
+      function showWaiting() {
+        waitingEl.classList.remove('hidden');
+        statsContentEl.classList.remove('visible');
+        statsMatrixEl.style.display = 'none';
+      }
+
+      function showStats() {
+        waitingEl.classList.add('hidden');
+        statsContentEl.classList.add('visible');
+        statsMatrixEl.style.display = '';
+      }
+
+      function computeAndRender() {
+        var subset = sequence.slice(0, revealedCount);
+        var count = subset.length;
+
+        var sant = 0, delvis = 0, usant = 0;
+        var totalConf = 0;
+        var confDist = [0, 0, 0, 0, 0];
+        var confByVote = { sant: { sum: 0, n: 0 }, delvis: { sum: 0, n: 0 }, usant: { sum: 0, n: 0 } };
+        var matCounts = { r2_til_riktig: 0, r2_fra_riktig: 0, r2_fortsatt_feil: 0, r2_uendret: 0 };
+
+        subset.forEach(function(s) {
+          if (s.vote === 'sant') sant++;
+          else if (s.vote === 'delvis') delvis++;
+          else usant++;
+          totalConf += s.conf;
+          confDist[s.conf - 1]++;
+          confByVote[s.vote].sum += s.conf;
+          confByVote[s.vote].n++;
+          matCounts[s.cat]++;
+        });
+
+        // R1 sammenligningstall (for endring i % og sikkerhet)
+        var r1Stats = window._r1FinalStats || {};
+        var r1Counts = r1Stats.counts || {};
+        var r1Total = r1Stats.count || 0;
+        var r1PctSant   = r1Total > 0 ? Math.round((r1Counts.sant   || 0) / r1Total * 100) : null;
+        var r1PctDelvis = r1Total > 0 ? Math.round((r1Counts.delvis || 0) / r1Total * 100) : null;
+        var r1PctUsant  = r1Total > 0 ? Math.round((r1Counts.usant  || 0) / r1Total * 100) : null;
+
+        function renderDelta(colItem, r2Pct, r1Pct) {
+          var d = colItem.querySelector('.col-delta');
+          if (!d) return;
+          if (r1Pct === null || typeof r1Pct !== 'number') {
+            d.textContent = '';
+            d.classList.add('hidden');
+            return;
+          }
+          var diff = r2Pct - r1Pct;
+          if (diff === 0) {
+            d.textContent = '0 %';
+            d.classList.remove('hidden');
+            return;
+          }
+          var arrow = diff > 0 ? '↑' : '↓';
+          d.textContent = arrow + ' ' + Math.abs(diff) + ' %';
+          d.classList.remove('hidden');
+        }
+
+        if (count > 0) {
+          var pSant = Math.round(sant / count * 100);
+          var pDelvis = Math.round(delvis / count * 100);
+          var pUsant = Math.round(usant / count * 100);
+          colItems[0].querySelector('.col-count').textContent = sant + ' stk';
+          colItems[0].querySelector('.col-fill').style.height = pSant + '%';
+          colItems[0].querySelector('.col-pct').textContent = pSant + '%';
+          setPctPos(colItems[0], pSant);
+          renderDelta(colItems[0], pSant, r1PctSant);
+
+          colItems[1].querySelector('.col-count').textContent = delvis + ' stk';
+          colItems[1].querySelector('.col-fill').style.height = pDelvis + '%';
+          colItems[1].querySelector('.col-pct').textContent = pDelvis + '%';
+          setPctPos(colItems[1], pDelvis);
+          renderDelta(colItems[1], pDelvis, r1PctDelvis);
+
+          colItems[2].querySelector('.col-count').textContent = usant + ' stk';
+          colItems[2].querySelector('.col-fill').style.height = pUsant + '%';
+          colItems[2].querySelector('.col-pct').textContent = pUsant + '%';
+          setPctPos(colItems[2], pUsant);
+          renderDelta(colItems[2], pUsant, r1PctUsant);
+        } else {
+          colItems.forEach(function(ci) {
+            ci.querySelector('.col-count').textContent = '0 stk';
+            ci.querySelector('.col-fill').style.height = '0%';
+            ci.querySelector('.col-pct').textContent = '0%';
+            setPctPos(ci, 0);
+            var d = ci.querySelector('.col-delta');
+            if (d) { d.textContent = ''; d.classList.add('hidden'); }
+          });
+        }
+
+        // Highlight correct answer column
+        var fasitMap = { sant: 0, delvis: 1, usant: 2 };
+        var correctIdx = fasitMap[currentFasit];
+        colItems.forEach(function(ci, idx) {
+          ci.classList.remove('col-correct', 'col-correct-sant', 'col-correct-delvis', 'col-correct-usant');
+          if (idx === correctIdx) {
+            ci.classList.add('col-correct', 'col-correct-' + currentFasit);
+          }
+        });
+
+        statusCount.innerHTML = '<strong>' + count + '</strong> av ' + classTotal + ' elever har stemt';
+
+        // Oppdater "Gjennomsnittlig sikkerhet" med R1 → R2 endring
+        var r2AvgConfNum = count > 0 ? (totalConf / count) : 0;
+        var r1AvgConfNum = r1Stats.avgTotal || 0;
+        var toEl    = confValue.querySelector('.conf-to');
+        var fromEl  = confValue.querySelector('.conf-from');
+        var arrowEl = confValue.querySelector('.conf-arrow');
+        var deltaEl = confValue.querySelector('.conf-delta');
+        if (toEl) toEl.textContent = r2AvgConfNum.toFixed(1).replace('.', ',');
+        if (fromEl && arrowEl && deltaEl) {
+          if (r1AvgConfNum > 0) {
+            fromEl.textContent = r1AvgConfNum.toFixed(1).replace('.', ',');
+            var delta = r2AvgConfNum - r1AvgConfNum;
+            var dSign = delta > 0 ? '+' : (delta < 0 ? '−' : '±');
+            deltaEl.textContent = dSign + Math.abs(delta).toFixed(1).replace('.', ',');
+            fromEl.style.display = '';
+            arrowEl.style.display = '';
+            deltaEl.classList.remove('hidden');
+          } else {
+            // Ingen R1-data – vis bare R2-verdien
+            fromEl.style.display = 'none';
+            arrowEl.style.display = 'none';
+            deltaEl.classList.add('hidden');
+          }
+        }
+
+        var circles = confDetail.querySelectorAll('.circle-count');
+        for (var i = 0; i < 5; i++) {
+          circles[i].textContent = confDist[i] + ' stk';
+        }
+        var breakdownRows = confDetail.querySelectorAll('.conf-breakdown-value');
+        var votes = ['sant', 'delvis', 'usant'];
+        for (var j = 0; j < 3; j++) {
+          var cv = confByVote[votes[j]];
+          breakdownRows[j].textContent = cv.n > 0 ? (cv.sum / cv.n).toFixed(1).replace('.', ',') : '–';
+        }
+
+        matrixCells.forEach(function(cell) {
+          cell.querySelector('.matrix-count').textContent = matCounts[cell.dataset.cat] + ' stk';
+        });
+
+        // Oppdater "Endret mening"-boksen over matrisen
+        var totalChangedR2 = (matCounts.r2_til_riktig || 0) + (matCounts.r2_fra_riktig || 0) + (matCounts.r2_fortsatt_feil || 0);
+        var endretCountEl = document.getElementById('endret-mening-count-r2');
+        var endretPctEl = document.getElementById('endret-mening-pct-r2');
+        if (endretCountEl) endretCountEl.textContent = totalChangedR2 + '/' + count;
+        if (endretPctEl) {
+          var pct = count > 0 ? Math.round(totalChangedR2 / count * 100) : 0;
+          endretPctEl.textContent = '(' + pct + ' %)';
+        }
+
+        // Auto-refresh open student list
+        var selectedCell = statsMatrixEl.querySelector('.matrix-cell.selected');
+        if (selectedCell) {
+          selectedCell.classList.remove('selected');
+          selectCategory(selectedCell, 'r2');
+        }
+
+        // Store R2 revealed subset globally for Resultat tab
+        window._r2RevealedData = subset.slice();
+        if (window._refreshResultat) window._refreshResultat();
+
+        // Broadcast full stats + reasons to parent (for teacher panel sync)
+        if (window.parent !== window && statsContentEl.classList.contains('visible')) {
+          var reasons = [];
+          subset.forEach(function(s) { if (s.reason) reasons.push({ vote: s.vote, reason: s.reason }); });
+          var avgSant = confByVote.sant.n > 0 ? confByVote.sant.sum / confByVote.sant.n : 0;
+          var avgDelvis = confByVote.delvis.n > 0 ? confByVote.delvis.sum / confByVote.delvis.n : 0;
+          var avgUsant = confByVote.usant.n > 0 ? confByVote.usant.sum / confByVote.usant.n : 0;
+          // Count correct answers based on fasit
+          var correctCount = 0;
+          var correctConfSum = 0, correctConfN = 0, wrongConfSum = 0, wrongConfN = 0;
+          subset.forEach(function(s) {
+            if (s.vote === currentFasit) { correctCount++; correctConfSum += s.conf; correctConfN++; }
+            else { wrongConfSum += s.conf; wrongConfN++; }
+          });
+          // Count how many were wrong in R1 but correct in R2
+          var tilRiktigCount = matCounts.r2_til_riktig || 0;
+          var fraRiktigCount = matCounts.r2_fra_riktig || 0;
+          var fortsattFeilCount = matCounts.r2_fortsatt_feil || 0;
+          // Totalt antall som endret svar (matcher telefonens matrise)
+          var totalChanged = tilRiktigCount + fraRiktigCount + fortsattFeilCount;
+          // R1 stats for comparison
+          var r1 = window._r1FinalStats || {};
+          // Count how many were wrong in R1 (to calculate % of wrong who changed)
+          var r1WrongCount = r1.count ? (r1.count - (r1.counts[r1.fasit] || 0)) : 0;
+          window.parent.postMessage({
+            type: 'fagprat-reasons-update',
+            reasons: reasons,
+            stats: {
+              counts: { sant: sant, delvis: delvis, usant: usant },
+              pcts: {
+                sant: count > 0 ? Math.round(sant / count * 100) : 0,
+                delvis: count > 0 ? Math.round(delvis / count * 100) : 0,
+                usant: count > 0 ? Math.round(usant / count * 100) : 0
+              },
+              avgTotal: count > 0 ? totalConf / count : 0,
+              avgSant: avgSant,
+              avgDelvis: avgDelvis,
+              avgUsant: avgUsant
+            },
+            r1Stats: r1.counts ? { counts: r1.counts, avgTotal: r1.avgTotal || 0 } : null,
+            changes: {
+              count: count,
+              classTotal: classTotal,
+              correctCount: correctCount,
+              correctPct: count > 0 ? Math.round(correctCount / count * 100) : 0,
+              tilRiktig: tilRiktigCount,
+              fraRiktig: fraRiktigCount,
+              fortsattFeil: fortsattFeilCount,
+              totalChanged: totalChanged,
+              r1WrongCount: r1WrongCount,
+              tilRiktigPct: totalChanged > 0 ? Math.round(tilRiktigCount / totalChanged * 100) : 0,
+              r2AvgConf: count > 0 ? totalConf / count : 0,
+              r1AvgConf: r1.avgTotal || 0,
+              confDist: confDist.slice(),
+              r2AvgConfCorrect: correctConfN > 0 ? correctConfSum / correctConfN : 0,
+              r2AvgConfWrong: wrongConfN > 0 ? wrongConfSum / wrongConfN : 0,
+              fasit: currentFasit
+            }
+          }, '*');
+        }
+      }
+
+      function resetToZero() {
+        revealedCount = 0;
+        autoRevealed = 0;
+        studentVote = null;
+        studentInserted = false;
+        sequence = r2Shuffled.slice();
+        computeAndRender();
+        statusBtn.innerHTML = '<span class="status-dot"></span> Avstemning pågår';
+        statusBtn.style.background = '';
+        statusBtn.style.color = '';
+      }
+
+      function showFinished() {
+        showStats(); // ensure stats are visible (may have been hidden by reset)
+        revealedCount = sequence.length;
+        computeAndRender();
+        statusBtn.innerHTML = 'Runde 2 avsluttet';
+        statusBtn.style.background = '#555';
+        statusBtn.style.color = '#fff';
+      }
+
+      function syncRevealCount(newAutoTarget) {
+        if (newAutoTarget <= autoRevealed) return;
+        var added = newAutoTarget - autoRevealed;
+        autoRevealed = newAutoTarget;
+        revealedCount += added;
+        computeAndRender();
+      }
+
+      window.addEventListener('message', function(e) {
+        if (!e.data) return;
+
+        // Statement selected — rebuild R2 data + show waiting
+        if (e.data.type === 'fagprat-statement') {
+          var idx = typeof e.data.index === 'number' ? e.data.index : -1;
+          if (idx >= 0 && stmtData[idx]) {
+            buildR2Students(idx);
+            sequence = r2Shuffled.slice();
+            revealedCount = 0;
+            autoRevealed = 0;
+            studentVote = null;
+            studentInserted = false;
+            if (stmtTextEl) stmtTextEl.textContent = '«' + e.data.text + '»';
+            // Apply statement color to card
+            var stmtInner = tab.querySelector('.stmt-inner');
+            if (stmtInner && e.data.color) {
+              stmtInner.className = 'stmt-inner stmt-' + e.data.color;
+            }
+            showWaiting();
+            computeAndRender();
+          }
+          return;
+        }
+
+        // Timer events — only respond when Runde 2 tab is active
+        if (e.data.type === 'fagprat-timer') {
+          var r2Tab = document.getElementById('tab-runde2');
+          if (!r2Tab || !r2Tab.classList.contains('active')) return;
+
+          if (e.data.action === 'start') {
+            timerTotal = e.data.remaining || 60;
+            resetToZero();
+            showStats();
+          }
+          else if (e.data.action === 'tick') {
+            var remaining = e.data.remaining || 0;
+            var elapsed = timerTotal - remaining;
+            var progress = elapsed / timerTotal;
+            var eased = progress < 0.1 ? progress * 2
+                      : progress < 0.8 ? 0.2 + (progress - 0.1) * (0.7 / 0.7)
+                      : 0.9 + (progress - 0.8) * (0.1 / 0.2);
+            var target = Math.min(Math.round(eased * r2Total), r2Total);
+            syncRevealCount(target);
+          }
+          else if (e.data.action === 'finish') {
+            showFinished();
+          }
+          else if (e.data.action === 'stop') {
+            // Freeze current state — keep showing whatever is revealed
+            statusBtn.innerHTML = 'Avstemning stoppet';
+            statusBtn.style.background = '#555';
+            statusBtn.style.color = '#fff';
+          }
+          else if (e.data.action === 'reset') {
+            resetToZero();
+            showWaiting();
+          }
+        }
+
+        // Parent requests fresh stats broadcast (e.g. when steg2 just loaded)
+        if (e.data.type === 'fagprat-request-stats') {
+          var r2Tab = document.getElementById('tab-runde2');
+          if (r2Tab && r2Tab.classList.contains('active')) {
+            computeAndRender();
+            // Force-send stats even if stats panel is hidden
+            if (window.parent !== window) {
+              var subset = sequence.slice(0, revealedCount);
+              var count = subset.length;
+              var sant = 0, delvis = 0, usant = 0, totalConf = 0;
+              var confByVoteF = { sant: {sum:0,n:0}, delvis: {sum:0,n:0}, usant: {sum:0,n:0} };
+              var reasons = [];
+              subset.forEach(function(s) {
+                if (s.vote === 'sant') sant++; else if (s.vote === 'delvis') delvis++; else usant++;
+                totalConf += s.conf;
+                confByVoteF[s.vote].sum += s.conf;
+                confByVoteF[s.vote].n++;
+                if (s.reason) reasons.push({ vote: s.vote, reason: s.reason });
+              });
+              var avgSant = confByVoteF.sant.n > 0 ? confByVoteF.sant.sum / confByVoteF.sant.n : 0;
+              var avgDelvis = confByVoteF.delvis.n > 0 ? confByVoteF.delvis.sum / confByVoteF.delvis.n : 0;
+              var avgUsant = confByVoteF.usant.n > 0 ? confByVoteF.usant.sum / confByVoteF.usant.n : 0;
+              // Compute change stats
+              var correctCountF = 0, cConfSum = 0, cConfN = 0, wConfSum = 0, wConfN = 0;
+              var confDistF = [0, 0, 0, 0, 0];
+              var matCountsF = { r2_til_riktig: 0, r2_fra_riktig: 0, r2_fortsatt_feil: 0, r2_uendret: 0 };
+              subset.forEach(function(s) {
+                if (s.vote === currentFasit) { correctCountF++; cConfSum += s.conf; cConfN++; }
+                else { wConfSum += s.conf; wConfN++; }
+                confDistF[s.conf - 1]++;
+                matCountsF[s.cat]++;
+              });
+              var r1F = window._r1FinalStats || {};
+              var r1WrongF = r1F.count ? (r1F.count - (r1F.counts[r1F.fasit] || 0)) : 0;
+              var totalChangedF = (matCountsF.r2_til_riktig || 0) + (matCountsF.r2_fra_riktig || 0) + (matCountsF.r2_fortsatt_feil || 0);
+              window.parent.postMessage({
+                type: 'fagprat-reasons-update',
+                reasons: reasons,
+                stats: {
+                  counts: { sant: sant, delvis: delvis, usant: usant },
+                  pcts: {
+                    sant: count > 0 ? Math.round(sant / count * 100) : 0,
+                    delvis: count > 0 ? Math.round(delvis / count * 100) : 0,
+                    usant: count > 0 ? Math.round(usant / count * 100) : 0
+                  },
+                  avgTotal: count > 0 ? totalConf / count : 0,
+                  avgSant: avgSant, avgDelvis: avgDelvis, avgUsant: avgUsant
+                },
+                r1Stats: r1F.counts ? { counts: r1F.counts, avgTotal: r1F.avgTotal || 0 } : null,
+                changes: {
+                  count: count,
+                  classTotal: classTotal,
+                  correctCount: correctCountF,
+                  correctPct: count > 0 ? Math.round(correctCountF / count * 100) : 0,
+                  tilRiktig: matCountsF.r2_til_riktig,
+                  fraRiktig: matCountsF.r2_fra_riktig,
+                  fortsattFeil: matCountsF.r2_fortsatt_feil,
+                  totalChanged: totalChangedF,
+                  r1WrongCount: r1WrongF,
+                  tilRiktigPct: totalChangedF > 0 ? Math.round(matCountsF.r2_til_riktig / totalChangedF * 100) : 0,
+                  r2AvgConf: count > 0 ? totalConf / count : 0,
+                  r1AvgConf: r1F.avgTotal || 0,
+                  confDist: confDistF.slice(),
+                  r2AvgConfCorrect: cConfN > 0 ? cConfSum / cConfN : 0,
+                  r2AvgConfWrong: wConfN > 0 ? wConfSum / wConfN : 0,
+                  fasit: currentFasit
+                }
+              }, '*');
+            }
+          }
+        }
+
+        // Student (Markus) voted from iPad in R2
+        if (e.data.type === 'fagprat-student-vote') {
+          var r2Tab = document.getElementById('tab-runde2');
+          if (!r2Tab || !r2Tab.classList.contains('active')) return;
+          if (studentInserted) return;
+          var v = e.data.vote;
+          var c = e.data.conf;
+          // For R2, categorize based on what Markus voted in R1 vs R2
+          var r1Vote = window._markusR1Vote;
+          var isCorrect = (v === currentFasit);
+          var wasCorrect = (r1Vote === currentFasit);
+          var sameVote = (v === r1Vote);
+          var cat;
+          if (sameVote) {
+            cat = 'r2_uendret';
+          } else if (!wasCorrect && isCorrect) {
+            cat = 'r2_til_riktig';
+          } else if (wasCorrect && !isCorrect) {
+            cat = 'r2_fra_riktig';
+          } else {
+            cat = 'r2_fortsatt_feil';
+          }
+          studentVote = { name: 'Markus', vote: v, conf: c, cat: cat, reason: e.data.reason || '' };
+          studentInserted = true;
+          // Add to categories so selectCategory shows Markus in the student list
+          if (!categories[cat]) categories[cat] = [];
+          categories[cat].push(studentVote);
+          var insertPos = revealedCount + Math.floor(Math.random() * 2);
+          insertPos = Math.min(insertPos, sequence.length);
+          sequence.splice(insertPos, 0, studentVote);
+          revealedCount++;
+          computeAndRender();
+        }
+      });
+    })();
+
+    // ═══ Resultat tab: dynamic update from revealed R1/R2 data ═══
+    (function() {
+      var resDualDist = document.getElementById('res-dual-dist');
+      var resStmtText = document.querySelector('.res-stmt-text');
+      var resAvgValue = document.querySelector('.res-avg-value');
+      var resConfDetail = document.getElementById('conf-detail-res');
+      var resBreakdownCorrect = document.querySelector('.res-breakdown-correct');
+      var resBreakdownWrong = document.querySelector('.res-breakdown-wrong');
+      if (!resDualDist) return;
+
+      var currentFasit = stmtData[0] ? stmtData[0].fasit : 'sant';
+
+      function computeFullStats(arr) {
+        var sant = 0, delvis = 0, usant = 0, totalConf = 0;
+        arr.forEach(function(s) {
+          if (s.vote === 'sant') sant++;
+          else if (s.vote === 'delvis') delvis++;
+          else usant++;
+          totalConf += s.conf;
+        });
+        var total = arr.length;
+        return {
+          sant: sant, delvis: delvis, usant: usant, total: total,
+          pSant: total > 0 ? Math.round(sant / total * 100) : 0,
+          pDelvis: total > 0 ? Math.round(delvis / total * 100) : 0,
+          pUsant: total > 0 ? Math.round(usant / total * 100) : 0,
+          avgConf: total > 0 ? (totalConf / total).toFixed(1).replace('.', ',') : '–'
+        };
+      }
+
+      function refreshResultat() {
+        var r1Data = window._r1RevealedData || [];
+        var r2Data = window._r2RevealedData || [];
+        var fasit = currentFasit;
+
+        var r1 = computeFullStats(r1Data);
+        var r2 = computeFullStats(r2Data);
+
+        // Use R2 average confidence as "forståelse", include iPad user's EV if submitted
+        var confDist = [0, 0, 0, 0, 0];
+        var totalConf = 0;
+        var correctConfSum = 0, correctConfN = 0, wrongConfSum = 0, wrongConfN = 0;
+        r2Data.forEach(function(s) {
+          if (s.conf >= 1 && s.conf <= 5) confDist[s.conf - 1]++;
+          totalConf += s.conf;
+          if (s.vote === fasit) { correctConfSum += s.conf; correctConfN++; }
+          else { wrongConfSum += s.conf; wrongConfN++; }
+        });
+
+        var evCount = r2Data.length;
+        var evTotal = totalConf;
+        if (ipadEvScore) {
+          evCount++;
+          evTotal += ipadEvScore;
+          confDist[ipadEvScore - 1]++;
+        }
+
+        if (resAvgValue) {
+          resAvgValue.textContent = evCount > 0 ? (evTotal / evCount).toFixed(1).replace('.', ',') : '–';
+        }
+
+        if (resConfDetail) {
+          var circles = resConfDetail.querySelectorAll('.circle-count');
+          for (var i = 0; i < 5; i++) {
+            if (circles[i]) circles[i].textContent = confDist[i] + ' stk';
+          }
+          if (resBreakdownCorrect) resBreakdownCorrect.textContent = correctConfN > 0 ? (correctConfSum / correctConfN).toFixed(1).replace('.', ',') : '–';
+          if (resBreakdownWrong) resBreakdownWrong.textContent = wrongConfN > 0 ? (wrongConfSum / wrongConfN).toFixed(1).replace('.', ',') : '–';
+        }
+
+        // Update dual distribution chart
+        var cols = resDualDist.querySelectorAll('.dual-dist-col');
+        var datasets = [r1, r2];
+        cols.forEach(function(col, ci) {
+          var d = datasets[ci];
+          var items = col.querySelectorAll('.col-item');
+          var counts = [d.sant, d.delvis, d.usant];
+          var pcts = [d.pSant, d.pDelvis, d.pUsant];
+          var voteNames = ['sant', 'delvis', 'usant'];
+
+          items.forEach(function(item, ii) {
+            item.querySelector('.col-count').textContent = counts[ii] + ' stk';
+            item.querySelector('.col-fill').style.height = pcts[ii] + '%';
+            item.querySelector('.col-pct').textContent = pcts[ii] + '%';
+            // Position pct label inside or above bar
+            var pctEl = item.querySelector('.col-pct');
+            if (pcts[ii] < 20) { pctEl.classList.add('col-pct-outside'); }
+            else { pctEl.classList.remove('col-pct-outside'); }
+            item.classList.remove('col-correct', 'col-correct-sant', 'col-correct-delvis', 'col-correct-usant');
+            if (voteNames[ii] === fasit) {
+              item.classList.add('col-correct', 'col-correct-' + fasit);
+            }
+          });
+        });
+
+        // Broadcast resultat data to teacher panel (steg4/steg6)
+        // Include iPad user's EV score if submitted
+        if (window.parent !== window) {
+          window.parent.postMessage({
+            type: 'fagprat-resultat-update',
+            r1Stats: { counts: { sant: r1.sant, delvis: r1.delvis, usant: r1.usant } },
+            r2Stats: { counts: { sant: r2.sant, delvis: r2.delvis, usant: r2.usant } },
+            avgConf: evCount > 0 ? evTotal / evCount : 0,
+            confDist: confDist,
+            r2AvgConfCorrect: correctConfN > 0 ? correctConfSum / correctConfN : 0,
+            r2AvgConfWrong: wrongConfN > 0 ? wrongConfSum / wrongConfN : 0,
+            fasit: fasit
+          }, '*');
+        }
+      }
+
+      // ── iPad user's self-assessment (EV) score ──
+      var ipadEvScore = null;
+
+      // Expose so R1/R2 IIFEs can trigger refresh
+      window._refreshResultat = refreshResultat;
+
+      // Listen for iPad user's EV submission
+      window.addEventListener('message', function(e) {
+        if (!e.data) return;
+        if (e.data.type === 'fagprat-student-ev' && e.data.score) {
+          ipadEvScore = e.data.score;
+          refreshResultat();
+        }
+      });
+
+      // Listen for statement change to update fasit and statement text
+      var stmtTexts = ['Klimaendringene rammer', 'El-biler er helt', 'Alle FNs bærekraftsmål', 'Fornybar energi kan'];
+      window.addEventListener('message', function(e) {
+        if (!e.data || e.data.type !== 'fagprat-statement') return;
+        var idx = typeof e.data.index === 'number' ? e.data.index : -1;
+        if (idx < 0) {
+          for (var i = 0; i < stmtTexts.length; i++) {
+            if (e.data.text && e.data.text.indexOf(stmtTexts[i]) === 0) { idx = i; break; }
+          }
+        }
+        if (idx >= 0 && stmtData[idx]) {
+          currentFasit = stmtData[idx].fasit;
+          if (resStmtText && e.data.text) resStmtText.textContent = '«' + e.data.text + '»';
+          // Clear revealed data on statement change (new rounds start fresh)
+          window._r1RevealedData = [];
+          window._r2RevealedData = [];
+          ipadEvScore = null;
+          refreshResultat();
+          // Apply statement color to Resultat card
+          var resTab = document.getElementById('tab-resultat');
+          var resInner = resTab ? resTab.querySelector('.stmt-inner') : null;
+          if (resInner && e.data.color) {
+            resInner.className = 'stmt-inner stmt-' + e.data.color;
+          }
+        }
+      });
+
+      // No initial data — starts empty, fills as R1/R2 reveal students
+    })();
+  </script>
+
+</body>
+</html>
