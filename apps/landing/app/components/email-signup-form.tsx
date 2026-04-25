@@ -1,0 +1,64 @@
+"use client";
+
+import { useMutation } from "convex/react";
+import { useState } from "react";
+
+import { api } from "@workspace/backend/convex/_generated/api";
+
+export function EmailSignupForm({ source }: { source?: string }) {
+  const subscribe = useMutation(api.emailSubscribers.subscribeToLaunch);
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    const data = new FormData(e.currentTarget);
+    const email = (data.get("email") as string)?.trim();
+    if (!email) return;
+    setSubmitting(true);
+    try {
+      await subscribe({ email, source });
+      setDone(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Noe gikk galt. Prøv igjen.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (done) {
+    return (
+      <p className="rounded-[var(--co-lab-radius-full)] bg-[var(--color-sage-light)] px-5 py-3 text-center text-sm font-semibold text-[var(--color-sage-dark)]">
+        ✅ Takk! Vi gir deg beskjed når CO-LAB er klart.
+      </p>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <input
+        type="email"
+        name="email"
+        required
+        disabled={submitting}
+        placeholder="din@epost.no"
+        aria-label="E-postadresse"
+        className="flex-1 rounded-full border border-[var(--color-cl-border)] bg-white px-5 py-3 text-sm text-[var(--color-ink)] outline-none transition focus:border-[var(--color-cl-purple)] focus:ring-2 focus:ring-[var(--color-cl-purple)]/30"
+      />
+      <button
+        type="submit"
+        disabled={submitting}
+        className="rounded-full bg-[var(--color-cl-purple)] px-6 py-3 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-[var(--color-sage-dark)] disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {submitting ? "Sender …" : "Meld interesse →"}
+      </button>
+      {error && (
+        <p className="text-sm text-red-700" role="alert">
+          {error}
+        </p>
+      )}
+    </form>
+  );
+}

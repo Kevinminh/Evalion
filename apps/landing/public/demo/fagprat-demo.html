@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="UTF-8">
+<title>FagPrat – Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Nunito', system-ui, sans-serif;
+    background: #DDD3E8;
+    zoom: 0.73;
+    color: #2A1810;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+  body.embedded { background: transparent; }
+  body.embedded .demo-bar { display: none !important; }
+  body.embedded .stage { padding-top: 16px; }
+  body.embedded .device-label { color: #FDFAF6; }
+
+  /* ── Top control bar ── */
+  .demo-bar {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    gap: 16px; padding: 18px 28px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1.5px solid rgba(0,0,0,0.12);
+    position: relative;
+  }
+  .demo-bar-center {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .demo-logo {
+    height: 64px; object-fit: contain;
+  }
+  .demo-badge {
+    background: #1A1A1A; color: white; font-size: 16px;
+    padding: 6px 18px; border-radius: 8px; font-weight: 900;
+    letter-spacing: 0.5px;
+  }
+  .demo-bar .controls {
+    position: absolute; right: 28px; top: 50%; transform: translateY(-50%);
+    display: flex; gap: 10px; align-items: center;
+  }
+  .demo-bar button {
+    font-family: inherit; font-weight: 800; font-size: 15px;
+    padding: 12px 24px; border-radius: 14px;
+    border: none; cursor: pointer; transition: transform 0.1s;
+  }
+  .demo-bar button:hover:not(:disabled):not(.btn-lobby) { transform: translateY(-1px); }
+  .demo-bar button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-prev { background: #fff; color: #2A1810; border: 1.5px solid #E5DDD5 !important; display: none; }
+  .btn-next { background: #6C3FC5; color: #fff; display: none; }
+  .btn-restart { display: none; }
+  .step-indicator { display: none; }
+  .btn-lobby {
+    position: absolute; left: 28px; top: 50%; transform: translateY(-50%);
+    background: #2A1810; color: #fff; border: none;
+    font-family: inherit; font-weight: 800; font-size: 13px;
+    padding: 8px 16px; border-radius: 10px; cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn-lobby:hover { opacity: 0.85; }
+
+  /* Restart button overlaid on TV top-bar (replaces hidden "Avslutt") */
+  .tv-restart-btn {
+    display: none !important;
+    position: absolute;
+    top: 17px; right: 25px;
+    z-index: 10;
+    align-items: center; gap: 6px;
+    height: 30px;
+    padding: 0 16px;
+    background: #EF5350; color: white;
+    border: none; border-radius: 999px;
+    font-family: 'Nunito', system-ui, sans-serif;
+    font-size: 11.2px; font-weight: 700;
+    line-height: 1;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .tv-restart-btn:hover { background: #D32F2F; }
+  .tv-restart-btn svg { width: 16px; height: 16px; }
+
+  /* ── Stage layout ── */
+  .stage {
+    display: flex; align-items: stretch; justify-content: center;
+    gap: 30px; padding: 32px 0 0 30px;
+    width: 100%; max-width: 100%;
+  }
+  .device-col { display: flex; flex-direction: column; align-items: center; }
+  .device-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 19px;
+  }
+  .device-label {
+    font-size: 16px; font-weight: 800; color: #5A4A3F;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-top: -5px;
+  }
+
+  /* ── Push toggle for iPad / Phone ── */
+  .view-toggle {
+    display: flex;
+    background: #E5DDD5;
+    border-radius: 14px;
+    padding: 3px;
+    gap: 0;
+    margin-top: -9px;
+    margin-bottom: 5px;
+  }
+  .view-toggle-btn {
+    font-family: inherit;
+    font-size: 16px; font-weight: 800;
+    color: #5A4A3F;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .view-toggle-btn:hover:not(.active):not(:disabled) { background: #EDE8E0; }
+  .view-toggle-btn.active {
+    background: #1C1A17;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(28,26,23,0.3);
+    cursor: default;
+  }
+  .view-toggle-btn:disabled:not(.active) { opacity: 0.4; cursor: not-allowed; }
+
+  /* ════════════ TV (Lærervisning) ════════════ */
+  .tv {
+    width: 1040px;
+    position: relative;
+  }
+  .tv-frame-img {
+    display: block;
+    width: 1034px;
+    height: 582px;
+    object-fit: fill;
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+    filter: drop-shadow(0 14px 32px rgba(0, 0, 0, 0.35));
+  }
+  .tv-frame-wrap {
+    position: relative;
+    width: 100%;
+    height: 590px;
+  }
+  .tv-screen {
+    position: absolute;
+    top: 1%;
+    left: 0.6%;
+    width: 98.8%;
+    height: 97%;
+    overflow: hidden;
+    z-index: 1;
+    background: #fff;
+  }
+  .tv-screen iframe {
+    position: absolute; top: 0; left: 0;
+    width: 1280px; height: 720px;
+    border: none; display: block;
+    transform: scale(0.798);
+    transform-origin: top left;
+  }
+  .tv-screen iframe.back { z-index: 0; visibility: hidden; }
+  .tv-screen iframe.front { z-index: 1; visibility: visible; }
+  /* ════════════ iPad (rendres inni elev-iframe) ════════════ */
+  .ipad-holder {
+    width: 661px;
+    height: 503px;
+    overflow: visible;
+    position: relative;
+    background: transparent;
+  }
+  .ipad-holder iframe {
+    position: absolute; top: 0; left: 0;
+    width: 760px; height: 580px;
+    border: none; display: block;
+    transform: scale(0.866);
+    transform-origin: top left;
+    background: transparent;
+    filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.28));
+  }
+  .ipad-holder iframe.back { z-index: 0; visibility: hidden; }
+  .ipad-holder iframe.front { z-index: 1; visibility: visible; }
+  /* Match vertical position of TV device-label: iPad device-col pushes its label
+     to the bottom via auto margin so it aligns with TV label */
+  .ipad-col { justify-content: flex-start; width: 661px; min-width: 661px; }
+  .ipad-phone-wrap { position: relative; margin-top: 28px; }
+
+  /* ════════════ Phone overlay (on iPad area) ════════════ */
+  .phone-overlay {
+    position: absolute;
+    top: -56px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    width: 422px;
+    overflow: visible;
+    border-radius: 0;
+    display: none;
+  }
+  .phone-overlay.visible { display: block; }
+  .phone-overlay iframe {
+    width: 600px; height: 1000px;
+    border: none; display: block;
+    transform: scale(0.705);
+    transform-origin: top left;
+    filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.3));
+  }
+
+  .info-line {
+    text-align: center; font-size: 13px; color: #5A4A3F;
+    padding: 6px 28px 0;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="demo-bar">
+  <button class="btn-lobby" id="btn-lobby">Lobby</button>
+  <div class="demo-bar-center">
+    <img src="assets/CO-LAB (Hoved).jpg" alt="CO-LAB" class="demo-logo">
+    <span class="demo-badge">DEMO</span>
+  </div>
+  <div class="controls">
+    <span class="step-indicator" id="step-indicator">Lobby</span>
+    <button class="btn-prev" id="btn-prev">← Forrige</button>
+    <button class="btn-next" id="btn-next">Neste →</button>
+    <button class="btn-restart" id="btn-restart-old" style="display:none">↻ Start på nytt</button>
+  </div>
+</div>
+
+
+<div class="stage">
+
+  <!-- ════════════ TV (Lærervisning) ════════════ -->
+  <div class="device-col">
+    <div class="device-header">
+      <div class="device-label">Lærervisning (TV)</div>
+    </div>
+    <div class="tv">
+      <div class="tv-frame-wrap">
+        <img src="assets/TV-skjerm.png" alt="" class="tv-frame-img">
+        <div class="tv-screen">
+          <iframe id="iframe-laptop-a" class="front" src="fagprat-lobby.html"></iframe>
+          <iframe id="iframe-laptop-b" class="back" src="fagprat-lobby.html"></iframe>
+          <button class="tv-restart-btn" id="btn-restart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            Start på nytt
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ iPad (Elev) ════════════ -->
+  <div class="device-col ipad-col">
+    <div class="device-header">
+      <div class="view-toggle">
+        <button class="view-toggle-btn active" id="btn-view-ipad">Elevvisning (iPad)</button>
+        <button class="view-toggle-btn" id="btn-view-phone" disabled>Live-statistikk for lærer</button>
+      </div>
+    </div>
+    <div class="ipad-phone-wrap">
+      <div class="ipad-holder">
+        <iframe id="iframe-ipad-a" class="front" src="Elevvisning/demo-lobby-elev.html"></iframe>
+        <iframe id="iframe-ipad-b" class="back" src="Elevvisning/demo-lobby-elev.html"></iframe>
+      </div>
+      <div class="phone-overlay" id="phone-overlay">
+        <iframe id="iframe-phone" src="Statistikk/statistikk.html#runde1"></iframe>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Embedded mode: hide top bar when loaded in iframe with #embedded or ?embedded=1 ──
+if (/[?&]embedded=1/.test(location.search) || location.hash === '#embedded') {
+  document.body.classList.add('embedded');
+}
+// ════════════════ STEG-konfig ════════════════
+const STEG = [
+  { num: 0, navn: 'Lobby',                      laptop: 'fagprat-steg0.html', elev: 'Elevvisning/demo-steg0-elev.html' },
+  { num: 1, navn: '1. Første stemmerunde',      laptop: 'fagprat-steg1.html', elev: 'Elevvisning/demo-steg1-elev.html' },
+  { num: 2, navn: '2. Diskusjon',               laptop: 'fagprat-steg2.html', elev: 'Elevvisning/demo-steg2-elev.html' },
+  { num: 3, navn: '3. Andre stemmerunde',       laptop: 'fagprat-steg3.html', elev: 'Elevvisning/demo-steg3-elev.html' },
+  { num: 4, navn: '4. Vise fasit',              laptop: 'fagprat-steg4.html', elev: 'Elevvisning/demo-steg4-elev.html' },
+  { num: 5, navn: '5. Professorens forklaring', laptop: 'fagprat-steg5.html', elev: 'Elevvisning/demo-steg5-elev.html' },
+  { num: 6, navn: '6. Egenvurdering',           laptop: 'fagprat-steg6.html', elev: 'Elevvisning/demo-steg6-elev.html' }
+];
+const NUM_PASTANDER = 4;
+
+const state = {
+  pastandIdx: 0,
+  stegIdx: 0,
+  phoneTab: 'runde1',
+  selectedStmt: null,
+  fasit: null,
+  explanation: null,
+  r1Vote: null,
+  r2Vote: null,
+  inLobby: true,
+  nickname: 'Markus'
+};
+
+const $ = sel => document.querySelector(sel);
+
+// ── Double-buffer helpers ──
+// Each device has two iframes (a/b). One is "front" (visible), the other is "back" (loading behind).
+// Uses generation counters to safely handle rapid navigation.
+const buf = {
+  laptop: { front: 'a', a: null, b: null, gen: 0 },
+  ipad:   { front: 'a', a: null, b: null, gen: 0 }
+};
+
+function initBuf() {
+  buf.laptop.a = $('#iframe-laptop-a');
+  buf.laptop.b = $('#iframe-laptop-b');
+  buf.ipad.a   = $('#iframe-ipad-a');
+  buf.ipad.b   = $('#iframe-ipad-b');
+}
+
+function getFront(dev) { return buf[dev][buf[dev].front]; }
+function getBack(dev)  { return buf[dev][buf[dev].front === 'a' ? 'b' : 'a']; }
+
+// Load new src into back buffer; on load, swap to front.
+// Generation counter ensures stale loads from rapid clicks are ignored.
+function bufferLoad(dev, newSrc, onReady) {
+  var gen = ++buf[dev].gen;
+  var back = getBack(dev);
+  back.style.visibility = 'hidden';
+  var handler = function() {
+    back.removeEventListener('load', handler);
+    // If a newer load was started, ignore this one
+    if (gen !== buf[dev].gen) return;
+    if (onReady) onReady(back);
+    // Swap immediately (synchronous) to avoid race conditions
+    // where a new bufferLoad call arrives before RAF executes
+    var oldFront = getFront(dev);
+    back.style.visibility = 'visible';
+    back.classList.remove('back');
+    back.classList.add('front');
+    oldFront.classList.remove('front');
+    oldFront.classList.add('back');
+    oldFront.style.visibility = 'hidden';
+    buf[dev].front = (buf[dev].front === 'a') ? 'b' : 'a';
+  };
+  back.addEventListener('load', handler);
+  // Cache-bust to ensure fresh content
+  var sep = newSrc.indexOf('?') >= 0 ? '&' : '?';
+  back.src = newSrc + sep + '_v=' + Date.now();
+}
+
+// ── Helpers ──
+function tabForSteg(num) {
+  if (num <= 2) return 'runde1';
+  if (num >= 3 && num <= 5) return 'runde2';
+  return 'resultat';
+}
+
+function elevUrl(base) {
+  if (!state.selectedStmt) return base;
+  var url = base + '?stmt=' + encodeURIComponent(state.selectedStmt.text) + '&color=' + state.selectedStmt.color;
+  if (state.fasit) url += '&fasit=' + state.fasit;
+  return url;
+}
+
+function hideLaptopNav(doc) {
+  try {
+    if (!doc) return;
+    var style = doc.getElementById('demo-hide-nav');
+    if (!style) {
+      style = doc.createElement('style');
+      style.id = 'demo-hide-nav';
+      style.textContent = '.step-nav-bar{display:none !important;}.btn-end-activity{display:none !important;}.btn-record-topbar{display:none !important;}';
+      doc.head.appendChild(style);
+    }
+  } catch (e) {}
+}
+
+function cleanIpadDoc(doc) {
+  try {
+    if (!doc) return;
+    doc.querySelectorAll('.ipad-portrait').forEach(function(el) {
+      var col = el.closest('.device-col');
+      (col || el).remove();
+    });
+    doc.querySelectorAll('.page-title, .step-nav-bar, .device-label').forEach(function(el) { el.remove(); });
+    // Set nickname
+    if (state.nickname) {
+      doc.querySelectorAll('.sv-nickname-badge').forEach(function(el) { el.textContent = state.nickname; });
+    }
+    var style = doc.getElementById('demo-hide-nav');
+    if (!style) {
+      style = doc.createElement('style');
+      style.id = 'demo-hide-nav';
+      style.textContent = [
+        'html,body{background:transparent !important;background-color:transparent !important;margin:0 !important;padding:0 !important;overflow:hidden !important;}',
+        '.page-title,.step-nav-bar{display:none !important;}',
+        '.ipad-portrait{display:none !important;}',
+        '.device-col:has(.ipad-portrait){display:none !important;}',
+        '.device-label{display:none !important;}',
+        '.devices-row{display:flex !important;justify-content:center !important;align-items:flex-start !important;gap:0 !important;padding:0 !important;margin:0 !important;background:transparent !important;}',
+        '.device-col{background:transparent !important;padding:0 !important;margin:0 !important;}',
+        '.sv-disclaimer{display:none !important;}'
+      ].join('');
+      doc.head.appendChild(style);
+    }
+  } catch (e) {}
+}
+
+function updateUI() {
+  var s = STEG[state.stegIdx];
+  $('#step-indicator').textContent = 'Påstand ' + (state.pastandIdx+1) + '/' + NUM_PASTANDER + ' · ' + s.navn;
+  var pNum = $('#p-num'); if (pNum) pNum.textContent = state.pastandIdx + 1;
+  $('#btn-prev').disabled = (state.stegIdx === 0 && state.pastandIdx === 0);
+  $('#btn-next').disabled = (state.stegIdx === STEG.length-1 && state.pastandIdx === NUM_PASTANDER-1);
+}
+
+// ── Render: load new content into back buffers, swap when ready ──
+var firstRender = true;
+
+function render() {
+  var s = STEG[state.stegIdx];
+  var wasPrev = prevLaptopSteg;
+
+  // Track previous steg for navigation
+  prevLaptopSteg = s.num;
+
+  // When leaving a timer steg (1 or 3) while the timer is still running,
+  // auto-finish the phone so all students and reasons are revealed.
+  // If the timer was manually stopped, keep the current partial state.
+  if ((wasPrev === 1 || wasPrev === 3) && wasPrev !== s.num && state.timerRunning) {
+    state.timerRunning = false;
+    try {
+      $('#iframe-phone').contentWindow.postMessage({ type: 'fagprat-timer', action: 'finish' }, '*');
+    } catch (ex) {}
+  }
+
+  // Keep actualLaptopIdx in sync when render() explicitly loads a steg
+  actualLaptopIdx = state.stegIdx;
+
+  if (firstRender) {
+    // First render: iframes already have correct src from HTML, just clean them up
+    getFront('laptop').addEventListener('load', function onFirst() {
+      getFront('laptop').removeEventListener('load', onFirst);
+      hideLaptopNav(getFront('laptop').contentDocument);
+    });
+    getFront('ipad').addEventListener('load', function onFirst() {
+      getFront('ipad').removeEventListener('load', onFirst);
+      cleanIpadDoc(getFront('ipad').contentDocument);
+    });
+    firstRender = false;
+  } else {
+    // Buffer-load laptop
+    bufferLoad('laptop', s.laptop, function(iframe) {
+      hideLaptopNav(iframe.contentDocument);
+      // Relay selected statement to steg2/steg4 so teacher panel shows correct stats
+      if (state.selectedStmt && iframe.contentWindow) {
+        try {
+          iframe.contentWindow.postMessage({
+            type: 'fagprat-statement',
+            text: state.selectedStmt.text,
+            color: state.selectedStmt.color
+          }, '*');
+        } catch(ex) {}
+      }
+      // Ask phone to re-broadcast current stats (steg2/steg4 is now ready to receive)
+      try {
+        $('#iframe-phone').contentWindow.postMessage({ type: 'fagprat-request-stats' }, '*');
+      } catch(ex) {}
+      // Also send stored stats immediately as fallback
+      if ((state.currentReasons || state.currentStats) && iframe.contentWindow) {
+        try {
+          iframe.contentWindow.postMessage({
+            type: 'fagprat-reasons-update',
+            reasons: state.currentReasons || [],
+            stats: state.currentStats || null,
+            r1Stats: state.currentR1Stats || null,
+            changes: state.currentChanges || null
+          }, '*');
+        } catch(ex) {}
+      }
+      // Send stored resultat data as fallback (for steg6)
+      if (state.currentResultat && iframe.contentWindow) {
+        try { iframe.contentWindow.postMessage(state.currentResultat, '*'); } catch(ex) {}
+      }
+      // Also ask phone to re-broadcast resultat (in case steg6 loaded after tab switch)
+      try {
+        $('#iframe-phone').contentWindow.postMessage({ type: 'fagprat-request-resultat' }, '*');
+      } catch(ex) {}
+    });
+    // Buffer-load iPad
+    bufferLoad('ipad', elevUrl(s.elev), function(iframe) {
+      cleanIpadDoc(iframe.contentDocument);
+      // Relay fasit to newly loaded iframe if available
+      if (state.fasit && iframe.contentWindow) {
+        try { iframe.contentWindow.postMessage({ type: 'fagprat-fasit', fasit: state.fasit }, '*'); } catch(ex) {}
+      }
+      // Relay explanation data if available (for steg5 sync)
+      if (state.explanation && iframe.contentWindow) {
+        try { iframe.contentWindow.postMessage(state.explanation, '*'); } catch(ex) {}
+      }
+      // Vote history is sent on-demand via fagprat-request-my-votes from the iframe
+    });
+  }
+
+  // Phone tab
+  var newTab = tabForSteg(s.num);
+  if (newTab !== state.phoneTab) {
+    state.phoneTab = newTab;
+    try {
+      var phoneWin = $('#iframe-phone').contentWindow;
+      if (phoneWin) phoneWin.postMessage({ type: 'fagprat-switch-tab', tab: newTab }, '*');
+    } catch (ex) {
+      $('#iframe-phone').src = 'Statistikk/statistikk.html#' + newTab;
+    }
+  }
+  // Fortell telefonen hvilket steg vi er på (kontrollerer R1→R2-sammenligning)
+  try {
+    var phoneWinSteg = $('#iframe-phone').contentWindow;
+    if (phoneWinSteg) phoneWinSteg.postMessage({ type: 'fagprat-steg-num', num: s.num }, '*');
+  } catch (ex) {}
+
+  // When back at påstandsoversikt (steg 0), disable phone and switch to iPad
+  if (s.num === 0) {
+    $('#btn-view-phone').disabled = true;
+    $('#btn-view-ipad').classList.add('active');
+    $('#btn-view-phone').classList.remove('active');
+    $('.ipad-holder').style.display = '';
+    $('#phone-overlay').classList.remove('visible');
+  }
+
+  updateUI();
+}
+
+// ── Sync from teacher iframe (postMessage) ──
+window.addEventListener('message', function(e) {
+  if (!e.data) return;
+  // Nickname from student lobby — store and relay to teacher lobby
+  if (e.data.type === 'fagprat-student-nickname') {
+    state.nickname = e.data.nickname;
+    try { getFront('laptop').contentWindow.postMessage(e.data, '*'); } catch (ex) {}
+    try { getBack('laptop').contentWindow.postMessage(e.data, '*'); } catch (ex) {}
+    return;
+  }
+  if (e.data.type === 'fagprat-statement') {
+    state.selectedStmt = { text: e.data.text, color: e.data.color };
+    if (e.data.fasit) state.fasit = e.data.fasit;
+    // Keep demo-isolated localStorage in sync so child iframes load correct statement
+    if (typeof e.data.index === 'number') {
+      localStorage.setItem('fagprat-demo-statement', e.data.index);
+    }
+    // Enable phone view toggle now that a statement is selected
+    $('#btn-view-phone').disabled = false;
+    // Relay to iPad so student view can highlight the same card
+    try {
+      var ipadFront = getFront('ipad');
+      if (ipadFront.contentWindow) ipadFront.contentWindow.postMessage(e.data, '*');
+    } catch (ex) {}
+    // Relay to phone/statistics so it shows the correct statement + data
+    try {
+      $('#iframe-phone').contentWindow.postMessage(e.data, '*');
+    } catch (ex) {}
+    return;
+  }
+  if (e.data.type === 'fagprat-reasons-update') {
+    // Store R1 stats if present
+    if (e.data.r1Stats) state.currentR1Stats = e.data.r1Stats;
+    // Store latest data so we can relay to newly loaded steg2/steg4
+    state.currentReasons = e.data.reasons || [];
+    state.currentStats = e.data.stats || null;
+    state.currentChanges = e.data.changes || null;
+    // Relay full stats + reasons from phone to teacher laptop (steg2 panel)
+    try { buf.laptop.a.contentWindow.postMessage(e.data, '*'); } catch (ex) {}
+    try { buf.laptop.b.contentWindow.postMessage(e.data, '*'); } catch (ex) {}
+    return;
+  }
+  if (e.data.type === 'fagprat-highlight-reason') {
+    try { buf.laptop.a.contentWindow.postMessage(e.data, '*'); } catch (ex) {}
+    try { buf.laptop.b.contentWindow.postMessage(e.data, '*'); } catch (ex) {}
+    return;
+  }
+  if (e.data.type === 'fagprat-unhighlight-reason') {
+    // Relay from teacher panel back to phone to remove visual highlight
+    try { $('#iframe-phone').contentWindow.postMessage(e.data, '*'); } catch (ex) {}
+    return;
+  }
+  if (e.data.type === 'fagprat-resultat-update') {
+    // Relay resultat data from phone to teacher laptop (steg6 panel)
+    state.currentResultat = e.data;
+    try { buf.laptop.a.contentWindow.postMessage(e.data, '*'); } catch (ex) {}
+    try { buf.laptop.b.contentWindow.postMessage(e.data, '*'); } catch (ex) {}
+    return;
+  }
+  if (e.data.type === 'fagprat-student-ev') {
+    // Relay iPad user's self-assessment score to teacher laptop + phone
+    try { buf.laptop.a.contentWindow.postMessage(e.data, '*'); } catch (ex) {}
+    try { buf.laptop.b.contentWindow.postMessage(e.data, '*'); } catch (ex) {}
+    try { $('#iframe-phone').contentWindow.postMessage(e.data, '*'); } catch (ex) {}
+    return;
+  }
+  if (e.data.type === 'fagprat-fasit') {
+    state.fasit = e.data.fasit;
+    // Send to both iPad iframes (front and back) since back might be loading steg4
+    try {
+      buf.ipad.a.contentWindow.postMessage(e.data, '*');
+      buf.ipad.b.contentWindow.postMessage(e.data, '*');
+    } catch (ex) {}
+    return;
+  }
+  if (e.data.type === 'fagprat-explanation') {
+    state.explanation = e.data;
+    // Relay explanation data (fasit, explanation text, color) to both iPad iframes
+    try {
+      buf.ipad.a.contentWindow.postMessage(e.data, '*');
+      buf.ipad.b.contentWindow.postMessage(e.data, '*');
+    } catch (ex) {}
+    return;
+  }
+  if (e.data.type === 'fagprat-student-vote') {
+    // Store student vote so we can relay to newly loaded iframes
+    state.studentVote = e.data;
+    // Store per-round vote for "Mine svar" panel
+    // Use explicit round field from elev iframe (reliable), fall back to steg inference
+    var voteRound = e.data.round || (STEG[state.stegIdx].num <= 1 ? 1 : STEG[state.stegIdx].num === 3 ? 2 : 0);
+    if (voteRound === 1) {
+      state.r1Vote = { vote: e.data.vote, conf: e.data.conf, reason: e.data.reason };
+    } else if (voteRound === 2) {
+      state.r2Vote = { vote: e.data.vote, conf: e.data.conf, reason: e.data.reason };
+    }
+    // Send updated vote history to both iPad buffers immediately
+    if (state.r1Vote || state.r2Vote) {
+      var updatedVotes = { type: 'fagprat-my-votes', r1: state.r1Vote, r2: state.r2Vote };
+      try { buf.ipad.a.contentWindow.postMessage(updatedVotes, '*'); } catch(ex) {}
+      try { buf.ipad.b.contentWindow.postMessage(updatedVotes, '*'); } catch(ex) {}
+    }
+    // Relay student vote from iPad to phone/statistics
+    try {
+      $('#iframe-phone').contentWindow.postMessage(e.data, '*');
+    } catch (ex) {}
+    // Relay to both laptop buffers (steg2 may be in either)
+    try { buf.laptop.a.contentWindow.postMessage(e.data, '*'); } catch (ex) {}
+    try { buf.laptop.b.contentWindow.postMessage(e.data, '*'); } catch (ex) {}
+    return;
+  }
+  if (e.data.type === 'fagprat-request-my-votes') {
+    if (state.r1Vote || state.r2Vote) {
+      var voteMsg = { type: 'fagprat-my-votes', r1: state.r1Vote, r2: state.r2Vote };
+      // Send to the requesting source and both iPad buffers for reliability
+      try { e.source.postMessage(voteMsg, '*'); } catch(ex) {}
+      try { buf.ipad.a.contentWindow.postMessage(voteMsg, '*'); } catch(ex) {}
+      try { buf.ipad.b.contentWindow.postMessage(voteMsg, '*'); } catch(ex) {}
+    }
+    return;
+  }
+  if (e.data.type === 'fagprat-timer') {
+    // Track timer state for auto-finish logic
+    if (e.data.action === 'start') state.timerRunning = true;
+    else if (e.data.action === 'stop' || e.data.action === 'finish') state.timerRunning = false;
+    // Relay to both iPad iframes (front may be swapping)
+    try { buf.ipad.a.contentWindow.postMessage(e.data, '*'); } catch (ex) {}
+    try { buf.ipad.b.contentWindow.postMessage(e.data, '*'); } catch (ex) {}
+    // Also relay to phone/statistics iframe
+    try {
+      $('#iframe-phone').contentWindow.postMessage(e.data, '*');
+    } catch (ex) {}
+    return;
+  }
+  // Teacher steg page loaded — ignored for state sync (render() owns state).
+  // Finish detection is handled in render() instead.
+  if (e.data.type === 'fagprat-steg-loaded') {
+    return;
+  }
+  // fagprat-nav from internal iframe navigation (e.g. steg0→steg1 after statement click).
+  // Update iPad + phone to match, but do NOT change state.stegIdx — next()/prev() own that.
+  // Track the "actual laptop steg" separately so next() knows to skip the increment.
+  if (e.data.type === 'fagprat-nav') {
+    var num = e.data.steg;
+    // Leaving lobby → go to steg 0
+    if (state.inLobby && num === 0) {
+      state.inLobby = false;
+      state.stegIdx = 0;
+      state.pastandIdx = 0;
+      firstRender = false;
+      render();
+      // Delay showing restart until the buffer swap is done
+      setTimeout(function() { $('#btn-restart').style.display = ''; }, 150);
+      return;
+    }
+    var idx = STEG.findIndex(function(s) { return s.num === num; });
+    if (idx >= 0) {
+      // When leaving a timer steg (1 or 3) via internal nav, auto-finish phone
+      if ((prevLaptopSteg === 1 || prevLaptopSteg === 3) && prevLaptopSteg !== num && state.timerRunning) {
+        state.timerRunning = false;
+        try {
+          $('#iframe-phone').contentWindow.postMessage({ type: 'fagprat-timer', action: 'finish' }, '*');
+        } catch (ex) {}
+      }
+      // Track what the laptop is actually showing
+      actualLaptopIdx = idx;
+      prevLaptopSteg = num;
+      // Rapporter til parent (Reddi) etter intern nav
+      if (typeof reportStepToParent === 'function') reportStepToParent();
+      // When navigating back to påstandsoversikt (steg 0), clear student votes and switch to iPad
+      if (num === 0) {
+        state.r1Vote = null;
+        state.r2Vote = null;
+        var clearMsg = { type: 'fagprat-my-votes', r1: null, r2: null };
+        try { buf.ipad.a.contentWindow.postMessage(clearMsg, '*'); } catch (ex) {}
+        try { buf.ipad.b.contentWindow.postMessage(clearMsg, '*'); } catch (ex) {}
+        // Disable phone and switch to iPad view
+        $('#btn-view-phone').disabled = true;
+        $('#btn-view-ipad').classList.add('active');
+        $('#btn-view-phone').classList.remove('active');
+        $('.ipad-holder').style.display = '';
+        $('#phone-overlay').classList.remove('visible');
+      }
+      // Load iPad to match the teacher's internal navigation
+      bufferLoad('ipad', elevUrl(STEG[idx].elev), function(iframe) {
+        cleanIpadDoc(iframe.contentDocument);
+        if (state.fasit && iframe.contentWindow) {
+          try { iframe.contentWindow.postMessage({ type: 'fagprat-fasit', fasit: state.fasit }, '*'); } catch(ex) {}
+        }
+        if (state.explanation && iframe.contentWindow) {
+          try { iframe.contentWindow.postMessage(state.explanation, '*'); } catch(ex) {}
+        }
+      });
+      // Sync phone tab
+      var newTab = tabForSteg(num);
+      if (newTab !== state.phoneTab) {
+        state.phoneTab = newTab;
+        try {
+          var phoneWin = $('#iframe-phone').contentWindow;
+          if (phoneWin) phoneWin.postMessage({ type: 'fagprat-switch-tab', tab: newTab }, '*');
+        } catch (ex) {}
+      }
+      // Oppdater telefonens steg-visning ved intern nav
+      try {
+        var phoneWinNav = $('#iframe-phone').contentWindow;
+        if (phoneWinNav) phoneWinNav.postMessage({ type: 'fagprat-steg-num', num: num }, '*');
+      } catch (ex) {}
+      // When navigating to steg 2 or 4 internally, send stats to the laptop iframe
+      // because the new steg loaded inside the same iframe and needs current data
+      if (num === 2 || num === 4) {
+        // Small delay to let steg2 initialize its message listener
+        setTimeout(function() {
+          var laptopFront = getFront('laptop');
+          // Send statement info
+          if (state.selectedStmt && laptopFront.contentWindow) {
+            try {
+              laptopFront.contentWindow.postMessage({
+                type: 'fagprat-statement',
+                text: state.selectedStmt.text,
+                color: state.selectedStmt.color
+              }, '*');
+            } catch(ex) {}
+          }
+          // Ask phone to re-broadcast current stats
+          try {
+            $('#iframe-phone').contentWindow.postMessage({ type: 'fagprat-request-stats' }, '*');
+          } catch(ex) {}
+          // Send stored stats as fallback
+          if (state.currentStats && laptopFront.contentWindow) {
+            try {
+              laptopFront.contentWindow.postMessage({
+                type: 'fagprat-reasons-update',
+                reasons: state.currentReasons || [],
+                stats: state.currentStats,
+                changes: state.currentChanges || null
+              }, '*');
+            } catch(ex) {}
+          }
+        }, 200);
+      }
+    }
+    return;
+  }
+});
+
+// Track where the laptop iframe actually is (may differ from state.stegIdx due to internal nav)
+var actualLaptopIdx = 0;
+
+function next() {
+  // If the laptop already advanced via internal navigation (e.g. steg0→steg1),
+  // sync stegIdx to the actual position instead of blindly incrementing.
+  if (actualLaptopIdx > state.stegIdx) {
+    state.stegIdx = actualLaptopIdx;
+    // iPad was already loaded by fagprat-nav handler, just update UI
+    updateUI();
+    return;
+  }
+  if (state.stegIdx < STEG.length - 1) {
+    state.stegIdx++;
+  } else if (state.pastandIdx < NUM_PASTANDER - 1) {
+    state.pastandIdx++;
+    state.stegIdx = 1;
+    state.r1Vote = null;
+    state.r2Vote = null;
+  }
+  render();
+}
+function prev() {
+  if (state.stegIdx > 0) state.stegIdx--;
+  else if (state.pastandIdx > 0) {
+    state.pastandIdx--;
+    state.stegIdx = STEG.length - 1;
+  }
+  render();
+}
+function restart() {
+  state.pastandIdx = 0;
+  state.stegIdx = 0;
+  state.phoneTab = 'runde1';
+  state.selectedStmt = null;
+  state.fasit = null;
+  state.explanation = null;
+  state.r1Vote = null;
+  state.r2Vote = null;
+  firstRender = false;
+  $('#btn-view-phone').disabled = true;
+  // Switch back to iPad view
+  $('#btn-view-ipad').classList.add('active');
+  $('#btn-view-phone').classList.remove('active');
+  $('#phone-overlay').classList.remove('visible');
+  $('.ipad-holder').style.display = '';
+  render();
+}
+
+// Reset demo-specific localStorage so child iframes always start clean
+localStorage.setItem('fagprat-demo-statement', '0');
+
+initBuf();
+// Re-inject hideLaptopNav whenever teacher iframes load
+var prevLaptopSteg = -1;
+$('#iframe-laptop-a').addEventListener('load', function() { hideLaptopNav(this.contentDocument); });
+$('#iframe-laptop-b').addEventListener('load', function() { hideLaptopNav(this.contentDocument); });
+$('#btn-next').addEventListener('click', next);
+$('#btn-prev').addEventListener('click', prev);
+$('#btn-restart').addEventListener('click', restart);
+// View toggle: iPad vs Phone
+$('#btn-view-ipad').addEventListener('click', function() {
+  $('#btn-view-ipad').classList.add('active');
+  $('#btn-view-phone').classList.remove('active');
+  $('.ipad-holder').style.display = '';
+  $('#phone-overlay').classList.remove('visible');
+});
+$('#btn-view-phone').addEventListener('click', function() {
+  if (this.disabled) return;
+  $('#btn-view-phone').classList.add('active');
+  $('#btn-view-ipad').classList.remove('active');
+  $('.ipad-holder').style.display = 'none';
+  $('#phone-overlay').classList.add('visible');
+  cleanPhoneDoc();
+  setTimeout(cleanPhoneDoc, 100);
+  setTimeout(cleanPhoneDoc, 500);
+});
+
+// ── Lobby button ──
+$('#btn-lobby').addEventListener('click', function() {
+  state.inLobby = true;
+  state.selectedStmt = null;
+  state.fasit = null;
+  state.explanation = null;
+  state.r1Vote = null;
+  state.r2Vote = null;
+  // Disable phone view
+  $('#btn-view-phone').disabled = true;
+  $('#btn-view-ipad').classList.add('active');
+  $('#btn-view-phone').classList.remove('active');
+  $('.ipad-holder').style.display = '';
+  $('#phone-overlay').classList.remove('visible');
+  // Hide restart button in lobby
+  $('#btn-restart').style.display = 'none';
+  // Load lobby views
+  bufferLoad('laptop', 'fagprat-lobby.html', function(iframe) {
+    hideLaptopNav(iframe.contentDocument);
+  });
+  bufferLoad('ipad', 'Elevvisning/demo-lobby-elev.html', function(iframe) {
+    cleanIpadDoc(iframe.contentDocument);
+  });
+});
+
+// Hide external chrome inside statistics iframe (keep phone frame)
+function cleanPhoneDoc() {
+  try {
+    var doc = $('#iframe-phone').contentDocument;
+    if (!doc) return;
+    doc.querySelectorAll('.external-tabs, .page-title, .phone-label').forEach(function(el) { el.remove(); });
+    var s = doc.getElementById('demo-phone-style');
+    if (!s) {
+      s = doc.createElement('style');
+      s.id = 'demo-phone-style';
+      s.textContent = [
+        'html,body{background:transparent !important;background-color:transparent !important;padding:0 !important;margin:0 !important;min-height:0 !important;overflow:hidden !important;}',
+        '.phone-wrapper{gap:0 !important;padding:0 !important;margin:0 !important;height:100% !important;justify-content:center !important;}',
+        '.iphone-frame{margin:0 auto !important;}',
+        '.external-tabs,.page-title,.phone-label{display:none !important;}'
+      ].join('');
+      doc.head.appendChild(s);
+    }
+  } catch(e) {}
+}
+$('#iframe-phone').addEventListener('load', function() {
+  cleanPhoneDoc();
+  setTimeout(cleanPhoneDoc, 50);
+  setTimeout(cleanPhoneDoc, 200);
+});
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'ArrowRight') next();
+  else if (e.key === 'ArrowLeft') prev();
+});
+
+// ════════════════ Rapporter gjeldende steg til parent (Reddi i index.html) ════════════════
+function currentReddiKey() {
+  if (state.inLobby) return 'lobby';
+  // Bruk actualLaptopIdx hvis den er høyere (fanger intern iframe-navigasjon)
+  var idx = Math.max(state.stegIdx, (typeof actualLaptopIdx === 'number' ? actualLaptopIdx : 0));
+  var num = STEG[idx].num;
+  if (num === 1) return 'steg1-p' + state.pastandIdx;
+  return 'steg' + num;
+}
+
+function reportStepToParent() {
+  if (window.parent === window) return; // ikke i iframe
+  try {
+    var idx = Math.max(state.stegIdx, (typeof actualLaptopIdx === 'number' ? actualLaptopIdx : 0));
+    window.parent.postMessage({
+      type: 'fagprat-demo-step',
+      key: currentReddiKey(),
+      stegNum: state.inLobby ? 'lobby' : STEG[idx].num,
+      pastandIdx: state.pastandIdx,
+      inLobby: !!state.inLobby
+    }, '*');
+  } catch (e) {}
+}
+
+// Wrap render() så hver steg-endring rapporteres til parent.
+const _originalRender = render;
+render = function() {
+  _originalRender.apply(this, arguments);
+  reportStepToParent();
+};
+
+// Lobby-klikk: rapporter etter at original handler har satt state.inLobby
+document.getElementById('btn-lobby').addEventListener('click', function() {
+  setTimeout(reportStepToParent, 50);
+});
+
+render();
+// Første rapport etter init (render ovenfor kaller også, men gjør en eksplisitt ekstra for robusthet)
+setTimeout(reportStepToParent, 200);
+</script>
+
+</body>
+</html>

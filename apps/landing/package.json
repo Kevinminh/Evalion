@@ -12,8 +12,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@convex-dev/better-auth": "catalog:",
+    "@fontsource-variable/fraunces": "catalog:",
+    "@fontsource-variable/nunito": "catalog:",
     "@tailwindcss/postcss": "catalog:",
+    "@workspace/backend": "workspace:*",
     "@workspace/ui": "workspace:*",
+    "better-auth": "catalog:",
+    "convex": "catalog:",
     "lucide-react": "catalog:",
     "next": "catalog:",
     "react": "catalog:",

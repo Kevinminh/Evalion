@@ -101,4 +101,9 @@ export default defineSchema({
     .index("by_session_statement", ["sessionId", "statementIndex"])
     .index("by_session_statement_student_round", ["sessionId", "statementIndex", "studentId", "round"])
     .index("by_session_student", ["sessionId", "studentId"]),
+
+  emailSubscribers: defineTable({
+    email: v.string(),
+    source: v.optional(v.string()),
+  }).index("by_email", ["email"]),
 });

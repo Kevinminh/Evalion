@@ -1,18 +1,123 @@
 @import "@workspace/ui/globals.css";
+@import "@fontsource-variable/fraunces";
+@import "@fontsource-variable/nunito";
 
-.purple-pattern {
-  background-image: repeating-linear-gradient(
-      45deg,
-      rgba(255, 255, 255, 0.05) 0px,
-      rgba(255, 255, 255, 0.05) 2px,
-      transparent 2px,
-      transparent 20px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      rgba(255, 255, 255, 0.05) 0px,
-      rgba(255, 255, 255, 0.05) 2px,
-      transparent 2px,
-      transparent 20px
-    );
+/* ─────────── CO-LAB landing tokens ─────────── */
+.theme-co-lab {
+  --color-bg: #ecf3ee;
+  --color-bg-warm: #ecf3ee;
+  --color-bg-dark: #1f3530;
+  --color-ink: #1a2420;
+  --color-ink-secondary: #3e5048;
+  --color-ink-tertiary: #708578;
+  --color-sage: #3e7864;
+  --color-sage-light: #d9e8de;
+  --color-sage-dark: #2a5847;
+  --color-coral: #2f8f83;
+  --color-coral-light: #d6ece8;
+  --color-coral-hover: #1f7268;
+  --color-section-dark: #0b3840;
+  --color-section-light: #ecf3ee;
+  --color-cl-border: #cde0d3;
+  --color-cl-purple: #5e4ac0;
+
+  --gradient-light: linear-gradient(180deg, #ecf3ee 0%, #f0f1e9 50%, #f4efe4 100%);
+  --gradient-dark: linear-gradient(180deg, #1f2128 0%, #0b3840 15%, #0b3840 85%, #1f2128 100%);
+
+  --co-lab-radius-sm: 8px;
+  --co-lab-radius-md: 12px;
+  --co-lab-radius-lg: 20px;
+  --co-lab-radius-xl: 32px;
+  --co-lab-radius-full: 100px;
+
+  --font-display: "Fraunces Variable", Georgia, serif;
+  --font-body: "Nunito Variable", system-ui, sans-serif;
+
+  background: var(--gradient-light);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+/* Display heading style: Fraunces with the WONK + SOFT axes set */
+.font-display {
+  font-family: var(--font-display);
+  font-variation-settings:
+    "SOFT" 100,
+    "WONK" 1;
+  font-optical-sizing: auto;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+}
+
+.font-display-italic {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-variation-settings:
+    "SOFT" 100,
+    "WONK" 1;
+  font-optical-sizing: auto;
+}
+
+/* Small all-caps kicker label used above section titles */
+.section-label {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+/* Reusable pill chip */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: var(--co-lab-radius-full);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.15s,
+    color 0.15s;
+}
+
+/* Gradient backgrounds — defined as full `background:` shorthand so they accept
+   gradient values. Tailwind's `bg-[var(...)]` arbitrary syntax compiles to
+   `background-color`, which won't accept linear-gradient. */
+.bg-cl-light {
+  background: var(--gradient-light);
+}
+.bg-cl-dark {
+  background: var(--gradient-dark);
+}
+
+/* Sage callout (used on legal page) */
+.legal-callout {
+  background: var(--color-sage-light);
+  border-left: 4px solid var(--color-sage);
+  padding: 20px 24px;
+  border-radius: 0 12px 12px 0;
+  margin: 20px 0;
+}
+
+.legal-callout--ai {
+  background: #efe7fc;
+  border-left-color: var(--color-cl-purple);
+}
+
+/* Scroll-reveal: hidden until .visible is applied */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
 }

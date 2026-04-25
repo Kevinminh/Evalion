@@ -5,12 +5,9 @@ import { SITE_URL } from "./lib/constants";
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     { path: "", changeFrequency: "weekly" as const, priority: 1 },
-    { path: "/priser", changeFrequency: "monthly" as const, priority: 0.8 },
-    { path: "/faq", changeFrequency: "monthly" as const, priority: 0.8 },
-    { path: "/hjelpesenter", changeFrequency: "monthly" as const, priority: 0.8 },
-    { path: "/personvern", changeFrequency: "yearly" as const, priority: 0.5 },
-    { path: "/vilkar", changeFrequency: "yearly" as const, priority: 0.5 },
-    { path: "/informasjonskapsler", changeFrequency: "yearly" as const, priority: 0.5 },
+    { path: "/teamet", changeFrequency: "monthly" as const, priority: 0.7 },
+    { path: "/personvern-og-vilkar", changeFrequency: "yearly" as const, priority: 0.5 },
+    { path: "/logg-inn", changeFrequency: "yearly" as const, priority: 0.4 },
   ];
 
   return routes.map((route) => ({

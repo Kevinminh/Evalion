@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { Footer } from "./components/footer";
 import { Header } from "./components/header";
+import { Providers } from "./components/providers";
+import { getToken } from "./lib/auth-server";
 import { SITE_URL } from "./lib/constants";
 
 import "./globals.css";
@@ -9,39 +11,39 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Evalion – Morsomme læringsspill for lærere og elever",
-    template: "%s | Evalion",
+    default: "CO-LAB – Gi alle elever en stemme",
+    template: "%s | CO-LAB",
   },
   description:
-    "Evalion er en gratis plattform for læringsbaserte spill. Lag spørsmål, spill med elevene, og få umiddelbar tilbakemelding.",
+    "CO-LAB gjør den faglige samtalen til en strukturert økt i seks steg. Fra påstand og anonym avstemning til pardiskusjon og oppsummering.",
   keywords: [
-    "læringsspill",
-    "klasserom",
-    "quiz",
-    "skole",
+    "klassesamtale",
+    "FagPrat",
     "lærer",
     "elev",
-    "utdanning",
-    "gamification",
-    "evalion",
+    "skole",
+    "påstand",
+    "didaktikk",
+    "co-lab",
   ],
-  authors: [{ name: "Evalion" }],
-  creator: "Evalion",
-  publisher: "Evalion",
+  authors: [{ name: "CO-LAB" }],
+  creator: "CO-LAB AS",
+  publisher: "CO-LAB AS",
   openGraph: {
     type: "website",
     locale: "nb_NO",
     url: SITE_URL,
-    siteName: "Evalion",
-    title: "Evalion – Morsomme læringsspill for lærere og elever",
+    siteName: "CO-LAB",
+    title: "CO-LAB – Gi alle elever en stemme",
     description:
-      "Evalion er en gratis plattform for læringsbaserte spill. Lag spørsmål, spill med elevene, og få umiddelbar tilbakemelding.",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Evalion" }],
+      "Et lærerstyrt verktøy som gjør klassesamtalen engasjerende og tilgjengelig for alle elevene.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "CO-LAB" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Evalion – Morsomme læringsspill for lærere og elever",
-    description: "Evalion er en gratis plattform for læringsbaserte spill.",
+    title: "CO-LAB – Gi alle elever en stemme",
+    description:
+      "Et lærerstyrt verktøy som gjør klassesamtalen engasjerende og tilgjengelig for alle elevene.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -51,15 +53,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const token = await getToken();
   return (
-    <html lang="no">
-      <body>
-        <div className="min-h-svh bg-white text-foreground">
-          <Header />
-          <main>{children}</main>
-          <Footer />
-        </div>
+    <html lang="nb">
+      <body className="theme-co-lab antialiased">
+        <Providers initialToken={token}>
+          <div className="min-h-svh">
+            <Header />
+            <main>{children}</main>
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   );
