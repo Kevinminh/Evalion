@@ -11,7 +11,7 @@
     "format:check": "oxfmt --check",
     "typecheck": "turbo typecheck",
     "db:dev": "pnpm --filter @workspace/backend dev",
-    "db:deploy": "pnpm --filter @workspace/backend deploy",
+    "db:deploy": "pnpm --filter @workspace/backend run deploy",
     "db:codegen": "pnpm --filter @workspace/backend codegen",
     "db:dashboard": "pnpm --filter @workspace/backend dashboard",
     "db:logs": "pnpm --filter @workspace/backend logs"
