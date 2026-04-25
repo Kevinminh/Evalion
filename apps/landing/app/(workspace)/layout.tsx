@@ -1,8 +1,8 @@
 import { WorkspaceShell } from "@workspace/ui/components/workspace-shell";
 import { redirect } from "next/navigation";
 
+import { Header } from "@/components/header";
 import { isAuthenticated } from "@/lib/auth-server";
-import { WorkspaceTopNav } from "./workspace-top-nav";
 
 export default async function WorkspaceLayout({ children }: { children: React.ReactNode }) {
   if (!(await isAuthenticated())) {
@@ -10,7 +10,7 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
   }
   return (
     <WorkspaceShell>
-      <WorkspaceTopNav />
+      <Header />
       {children}
     </WorkspaceShell>
   );
