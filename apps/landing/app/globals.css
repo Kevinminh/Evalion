@@ -200,9 +200,9 @@
 /* ─────────── Demo section (Prøv demo) ─────────── */
 .section-demo {
   background: var(--gradient-dark);
-  padding: 32px 0 24px;
+  padding: 48px 0 56px;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -211,25 +211,27 @@
   .section-demo {
     padding: 60px 0 0;
     min-height: calc(100vh - 200px);
+    overflow: visible;
   }
 }
 .demo-embed {
+  display: none;
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
   position: relative;
 }
+@media (min-width: 768px) {
+  .demo-embed {
+    display: block;
+  }
+}
 .demo-embed-frame {
   display: block;
   width: 100%;
-  height: clamp(440px, 70vh, 560px);
+  height: 560px;
   border: 0;
   background: transparent;
-}
-@media (min-width: 768px) {
-  .demo-embed-frame {
-    height: 560px;
-  }
 }
 .demo-header {
   display: flex;
@@ -237,10 +239,10 @@
   align-items: center;
   justify-content: center;
   gap: 14px;
-  margin: 0 auto 12px;
+  margin: 0 auto 24px;
   width: 100%;
   max-width: 1400px;
-  padding: 0 16px;
+  padding: 0 20px;
   position: relative;
   z-index: 10;
   flex-shrink: 0;
@@ -256,15 +258,80 @@
   }
 }
 .demo-header-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
+  display: none;
 }
 @media (min-width: 768px) {
   .demo-header-controls {
     display: contents;
+  }
+}
+
+/* Mobile launch card — replaces the embedded iframe on small screens */
+.demo-mobile-launch {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: calc(100% - 32px);
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 24px 22px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  color: #fff;
+  text-decoration: none;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    transform 0.15s;
+}
+.demo-mobile-launch:hover,
+.demo-mobile-launch:focus-visible {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.32);
+  transform: translateY(-1px);
+}
+.demo-mobile-launch:focus-visible {
+  outline: 3px solid rgba(182, 168, 255, 0.7);
+  outline-offset: 4px;
+}
+.demo-mobile-launch-eyebrow {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #b6a8ff;
+}
+.demo-mobile-launch-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1.2;
+  font-variation-settings:
+    "SOFT" 100,
+    "WONK" 1;
+}
+.demo-mobile-launch-desc {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.7);
+}
+.demo-mobile-launch-cta {
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  background: var(--color-cl-purple);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(108, 63, 197, 0.35);
+}
+@media (min-width: 768px) {
+  .demo-mobile-launch {
+    display: none;
   }
 }
 .demo-header .section-heading {

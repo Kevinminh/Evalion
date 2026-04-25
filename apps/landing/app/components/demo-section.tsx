@@ -204,6 +204,23 @@ export function DemoSection() {
           className="demo-embed-frame"
         />
       </div>
+      <a
+        href="/demo/fagprat-demo.html"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="demo-mobile-launch"
+      >
+        <span className="demo-mobile-launch-eyebrow">Interaktiv demo</span>
+        <span className="demo-mobile-launch-title">Åpne FagPrat-demoen</span>
+        <span className="demo-mobile-launch-desc">
+          Demoen er bygget for stor skjerm. Trykk for å åpne i ny fane – best opplevelse på nettbrett
+          eller PC.
+        </span>
+        <span className="demo-mobile-launch-cta">
+          Åpne demo
+          <Maximize2 className="size-4" />
+        </span>
+      </a>
     </section>
   );
 }

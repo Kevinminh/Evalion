@@ -2,6 +2,7 @@
 <html lang="nb">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>FagPrat – Demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,15 +13,70 @@
   body {
     font-family: 'Nunito', system-ui, sans-serif;
     background: #DDD3E8;
+    /* Default zoom; overridden dynamically by JS based on viewport width */
     zoom: 0.73;
     color: #2A1810;
     min-height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
   }
   body.embedded { background: transparent; }
   body.embedded .demo-bar { display: none !important; }
   body.embedded .stage { padding-top: 16px; }
   body.embedded .device-label { color: #FDFAF6; }
+
+  /* ── Mobile / narrow viewport (standalone only): stack TV and iPad vertically,
+        and scale iPad column up to match the TV's 1040px native width so both
+        devices render at the same visual width after body zoom is applied.
+        Embedded mode (inside landing iframe) keeps side-by-side because the iframe
+        is desktop-only and has a fixed height that can't fit a stacked layout. ── */
+  @media (max-width: 900px) {
+    body:not(.embedded) { overflow-x: hidden; }
+    body:not(.embedded) .demo-bar {
+      flex-direction: column;
+      gap: 8px;
+      padding: 14px 16px;
+    }
+    body:not(.embedded) .demo-bar .controls { position: static; transform: none; }
+    body:not(.embedded) .btn-lobby { position: static; transform: none; }
+    body:not(.embedded) .stage {
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      padding: 24px 0 48px;
+    }
+    body:not(.embedded) .device-header {
+      margin-bottom: 12px;
+      width: 100%;
+      justify-content: center;
+    }
+    body:not(.embedded) .view-toggle {
+      margin-top: 0;
+      width: 100%;
+      max-width: 1040px;
+    }
+    body:not(.embedded) .view-toggle-btn { flex: 1 1 0; }
+
+    /* iPad column scales up to TV native width (1040px) → same visual size after zoom.
+       Scale factor = 1040 / 661 ≈ 1.573 applied to iPad and phone overlay. */
+    body:not(.embedded) .ipad-col {
+      width: 1040px;
+      min-width: 1040px;
+    }
+    body:not(.embedded) .ipad-holder {
+      width: 1040px;
+      height: 791px; /* 1040 * (503/661) */
+    }
+    body:not(.embedded) .ipad-holder iframe {
+      transform: scale(1.362); /* 0.866 * (1040/661) */
+    }
+    body:not(.embedded) .phone-overlay {
+      width: 664px; /* 422 * (1040/661) */
+      top: -88px;
+    }
+    body:not(.embedded) .phone-overlay iframe {
+      transform: scale(1.109); /* 0.705 * (1040/661) */
+    }
+  }
 
   /* ── Top control bar ── */
   .demo-bar {
@@ -30,7 +86,6 @@
     background: rgba(255,255,255,0.95);
     backdrop-filter: blur(12px);
     border-bottom: 1.5px solid rgba(0,0,0,0.12);
-    position: relative;
   }
   .demo-bar-center {
     display: flex; align-items: center; gap: 14px;
@@ -291,6 +346,22 @@
 if (/[?&]embedded=1/.test(location.search) || location.hash === '#embedded') {
   document.body.classList.add('embedded');
 }
+
+// ── Responsive zoom: scale the entire stage to fit the viewport ──
+// Standalone wide viewport (≥900px): TV + iPad side-by-side (~1731px native).
+// Standalone narrow viewport: devices stack, widest element is the TV at ~1040px.
+// Embedded mode: always side-by-side (parent iframe is desktop-only with fixed height).
+function applyResponsiveZoom() {
+  var embedded = document.body.classList.contains('embedded');
+  var stacked = !embedded && window.innerWidth < 900;
+  var nativeWidth = stacked ? 1040 : 1731;
+  var safety = embedded ? 16 : 32;
+  var zoom = Math.min(0.73, (window.innerWidth - safety) / nativeWidth);
+  if (zoom < 0.18) zoom = 0.18;
+  document.body.style.zoom = String(zoom);
+}
+applyResponsiveZoom();
+window.addEventListener('resize', applyResponsiveZoom);
 // ════════════════ STEG-konfig ════════════════
 const STEG = [
   { num: 0, navn: 'Lobby',                      laptop: 'fagprat-steg0.html', elev: 'Elevvisning/demo-steg0-elev.html' },
