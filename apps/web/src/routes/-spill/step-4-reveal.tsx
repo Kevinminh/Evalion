@@ -3,7 +3,7 @@ import { FASIT_TEXT } from "@workspace/evalion/lib/constants";
 
 import { CountdownOverlay } from "./countdown-overlay";
 import { RecordingDisclaimer } from "./recording-disclaimer";
-import { StatementCard } from "./statement-card";
+import { StatementCard } from "@workspace/ui/components/statement-card";
 
 interface Step4RevealProps {
   statement: { text: string; fasit: "sant" | "usant" | "delvis" };

@@ -4,7 +4,7 @@ import { Search, SlidersHorizontal, Sprout, Target } from "lucide-react";
 import { useState, useRef } from "react";
 
 import { CustomDropdown } from "@/components/custom-dropdown";
-import { ErrorState } from "@/components/error-state";
+import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { FagPratCard } from "@/components/fagprat-card";
 import { FagPratCardSkeleton } from "@workspace/evalion/components/skeletons/fagprat-card-skeleton";
 import { SUBJECT_OPTIONS, LEVEL_OPTIONS, CARD_GRID_CLASS, SKELETON_COUNT } from "@/lib/constants";

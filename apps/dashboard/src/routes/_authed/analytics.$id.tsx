@@ -7,8 +7,8 @@ import { useState } from "react";
 
 import { RoundAnalytics } from "@/components/analytics/round-analytics";
 import { ResultatTab } from "@/components/analytics/resultat-tab";
-import { ErrorState } from "@/components/error-state";
-import { NotFoundState } from "@/components/not-found-state";
+import { ErrorState } from "@workspace/ui/components/states/error-state";
+import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 

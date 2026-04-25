@@ -10,11 +10,11 @@ import { Users, Mic, CheckSquare, ArrowRight, BarChart3 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { ErrorState } from "@/components/error-state";
-import { NotFoundState } from "@/components/not-found-state";
+import { ErrorState } from "@workspace/ui/components/states/error-state";
+import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { LaunchModal } from "@/components/live/launch-modal";
 import { OptionCard } from "@/components/live/option-card";
-import { Stepper } from "@/components/live/stepper";
+import { Stepper } from "@workspace/ui/components/stepper";
 import { DEFAULT_GROUP_COUNT, MIN_GROUP_COUNT, MAX_GROUP_COUNT } from "@/lib/constants";
 import { fagpratQueries, api } from "@/lib/convex";
 import { PLAY_URL } from "@/lib/env";

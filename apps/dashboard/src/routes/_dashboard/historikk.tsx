@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import { SessionCardSkeleton } from "@workspace/evalion/components/skeletons/session-card-skeleton";
 import { DeleteFagPratDialog } from "@/components/delete-fagprat-dialog";
-import { ErrorState } from "@/components/error-state";
+import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { SKELETON_COUNT } from "@/lib/constants";
 import { api, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";

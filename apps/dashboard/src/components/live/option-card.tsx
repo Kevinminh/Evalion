@@ -21,10 +21,9 @@ export function OptionCard({
   return (
     <div
       className={cn(
-        "rounded-2xl border-[1.5px] bg-card transition-all",
-        enabled ? "border-primary/30 bg-primary/[0.02]" : "border-border",
+        "rounded-2xl border-[1.5px] border-l-4 bg-card transition-all",
+        enabled ? "border-primary/30 border-l-primary bg-primary/[0.02]" : "border-border border-l-border",
       )}
-      style={{ borderLeftWidth: 4, borderLeftColor: enabled ? "var(--primary)" : "var(--border)" }}
     >
       <div className="flex items-start gap-4 p-5">
         <div

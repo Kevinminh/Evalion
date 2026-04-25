@@ -1,7 +1,7 @@
 import { cn } from "@workspace/ui/lib/utils";
 
 import { RecordingDisclaimer } from "./recording-disclaimer";
-import { StatementCard } from "./statement-card";
+import { StatementCard } from "@workspace/ui/components/statement-card";
 
 interface Step2DiscussionProps {
   statement: { text: string };

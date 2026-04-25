@@ -15,9 +15,9 @@ import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { ErrorState } from "@/components/error-state";
+import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { MetadataCard } from "@/components/metadata-card";
-import { NotFoundState } from "@/components/not-found-state";
+import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { StatementEditor } from "@/components/statement-editor";
 import { api, fagpratQueries } from "@/lib/convex";
 import type { FagPratId, FagPratType, Visibility } from "@/lib/types";

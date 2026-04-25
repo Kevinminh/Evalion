@@ -4,7 +4,7 @@ import { STUDENT_VOTE_OPTIONS } from "@workspace/evalion/lib/constants";
 import { toast } from "sonner";
 
 import { ConfidenceScale } from "./confidence-scale";
-import { StatementCard } from "./statement-card";
+import { StatementCard } from "@workspace/ui/components/statement-card";
 import { SubmitButton } from "./submit-button";
 import { WaitingScreen } from "./waiting-screen";
 

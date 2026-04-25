@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { toast } from "sonner";
 
-import { StatementCard } from "./statement-card";
+import { StatementCard } from "@workspace/ui/components/statement-card";
 import { SubmitButton } from "./submit-button";
 import { WaitingScreen } from "./waiting-screen";
 

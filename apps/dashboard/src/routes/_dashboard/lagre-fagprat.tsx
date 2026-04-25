@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { ConceptTags } from "@/components/concept-tags";
-import { NotFoundState } from "@/components/not-found-state";
+import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { VisibilityToggle } from "@/components/visibility-toggle";
 import { api } from "@/lib/convex";
 import { LABEL_CLASS } from "@/lib/constants";

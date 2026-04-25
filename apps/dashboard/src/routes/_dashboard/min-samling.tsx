@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { CustomDropdown } from "@/components/custom-dropdown";
-import { ErrorState } from "@/components/error-state";
+import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { FagPratCard } from "@/components/fagprat-card";
 import { FagPratCardSkeleton } from "@workspace/evalion/components/skeletons/fagprat-card-skeleton";
 import { CARD_GRID_CLASS, SKELETON_COUNT } from "@/lib/constants";
