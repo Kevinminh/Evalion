@@ -1,10 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 
-import { revalidateAuthState } from "@/lib/auth-actions";
 import { authClient } from "@/lib/auth-client";
 
 function getInitials(name: string): string {
@@ -18,7 +16,6 @@ function getInitials(name: string): string {
 }
 
 export function WorkspaceTopNav() {
-  const router = useRouter();
   const { data: session } = authClient.useSession();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -43,8 +40,7 @@ export function WorkspaceTopNav() {
   function handleLogout() {
     startTransition(async () => {
       await authClient.signOut();
-      await revalidateAuthState();
-      router.push("/");
+      window.location.href = "/";
     });
   }
 

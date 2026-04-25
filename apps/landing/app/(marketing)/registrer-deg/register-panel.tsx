@@ -1,16 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { RegisterForm } from "@workspace/ui/components/register-form";
 
-import { revalidateAuthState } from "@/lib/auth-actions";
 import { authClient, signInWithGoogle } from "@/lib/auth-client";
 
 export function RegisterPanel() {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -27,8 +24,8 @@ export function RegisterPanel() {
       if (authError) {
         setError(authError.message ?? "Registrering feilet. Prøv igjen.");
       } else {
-        await revalidateAuthState();
-        router.push("/lag-pastander");
+        window.location.href = "/lag-pastander";
+        return;
       }
     } catch {
       setError("Registrering feilet. Prøv igjen.");

@@ -1,16 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { LoginForm } from "@workspace/ui/components/login-form";
 
-import { revalidateAuthState } from "@/lib/auth-actions";
 import { authClient, signInWithGoogle } from "@/lib/auth-client";
 
 export function LoginPanel() {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -26,8 +23,8 @@ export function LoginPanel() {
       if (authError) {
         setError(authError.message ?? "Innlogging feilet. Sjekk e-post og passord.");
       } else {
-        await revalidateAuthState();
-        router.push("/lag-pastander");
+        window.location.href = "/lag-pastander";
+        return;
       }
     } catch {
       setError("Innlogging feilet. Prøv igjen.");

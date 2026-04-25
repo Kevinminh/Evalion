@@ -4,22 +4,18 @@ import { DropdownMenuItem } from "@workspace/ui/components/dropdown-menu";
 import { UserMenu as SharedUserMenu } from "@workspace/ui/components/user-menu";
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 
-import { revalidateAuthState } from "../lib/auth-actions";
 import { authClient } from "../lib/auth-client";
 
 export function UserMenu() {
-  const router = useRouter();
   const { data: session } = authClient.useSession();
   const [pending, startTransition] = useTransition();
 
   function handleLogout() {
     startTransition(async () => {
       await authClient.signOut();
-      await revalidateAuthState();
-      router.push("/");
+      window.location.href = "/";
     });
   }
 
