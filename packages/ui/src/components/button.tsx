@@ -12,11 +12,11 @@ const buttonVariants = cva(
         default:
           "bg-primary text-primary-foreground shadow-[0_3px_0_oklch(0.35_0.16_295)] hover:-translate-y-0.5 hover:shadow-[0_5px_0_oklch(0.35_0.16_295)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.35_0.16_295)]",
         outline:
-          "border-2 border-border bg-background hover:border-primary/40 hover:bg-primary/5 hover:text-primary aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+          "border-2 border-border bg-background shadow-[0_3px_0_oklch(0.85_0.005_250)] hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/5 hover:text-primary hover:shadow-[0_5px_0_oklch(0.85_0.005_250)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.85_0.005_250)] aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost:
-          "border-2 border-primary/25 text-primary hover:border-primary/50 hover:bg-primary/5 aria-expanded:bg-primary/5 aria-expanded:text-primary dark:hover:bg-muted/50",
+          "border-2 border-primary/25 text-primary shadow-[0_3px_0_oklch(0.78_0.08_295)] hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/5 hover:shadow-[0_5px_0_oklch(0.78_0.08_295)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.78_0.08_295)] aria-expanded:bg-primary/5 aria-expanded:text-primary dark:hover:bg-muted/50",
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         teal: "bg-secondary-teal text-white shadow-[0_3px_0_var(--secondary-teal-dark)] hover:-translate-y-0.5 hover:shadow-[0_4px_0_var(--secondary-teal-dark)] active:translate-y-0.5 active:shadow-[0_1px_0_var(--secondary-teal-dark)]",
