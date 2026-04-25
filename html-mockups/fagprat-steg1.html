@@ -439,16 +439,18 @@
     }
     .step-item.active .step-num { background: var(--color-primary-500); color: white; }
     .step-item.active .step-label { color: var(--color-primary-700); }
+
   </style>
+  <script>if(window.parent!==window)window.parent.postMessage({type:'fagprat-steg-loaded',steg:1},'*');</script>
 </head>
 <body>
 
   <!-- ═══════════ TOP BAR ═══════════ -->
   <header class="top-bar">
     <div class="top-bar-left">
-      <img src="../Logoer og professoren/FagPrat - logo.png" alt="FagPrat" class="top-bar-logo">
+      <img src="assets/FagPrat - logo.png" alt="FagPrat" class="top-bar-logo">
       <div class="top-bar-divider"></div>
-      <span class="top-bar-title">Newtons lover</span>
+      <span class="top-bar-title">Klima og bærekraft</span>
     </div>
     <div class="top-bar-center">
       <div class="topbar-timer" id="topbar-timer">
@@ -480,21 +482,21 @@
         </button>
         <div class="vote-count" id="vote-count">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span id="vote-count-text">0 / 24 har stemt</span>
+          <span id="vote-count-text">0 / 22 har stemt</span>
         </div>
       </div>
       <div class="statement-spacer"></div>
 
       <!-- Statement – colored, no label -->
       <div class="statement-card">
-        <div class="statement-text">Dyr er avhengige av planter for å overleve, mens planter er ikke avhengige av dyr for å overleve.</div>
+        <div class="statement-text">Klimaendringene rammer fattige land hardest.</div>
       </div>
 
       <div class="professor-spacer"></div>
 
       <!-- Professor -->
       <div class="professor-row">
-        <img src="../Logoer og professoren/Professoren.png" alt="Professoren" class="professor-img">
+        <img src="assets/Professoren.png" alt="Professoren" class="professor-img">
         <div class="professor-bubble">
           Stem uten å avsløre for de andre, og skriv gjerne ned hva du tenker. Hvor sikker er du?
         </div>
@@ -560,6 +562,7 @@
 
   </div>
 
+
   <!-- ═══════════ BOTTOM NAV ═══════════ -->
   <nav class="bottom-nav">
     <div class="step-nav">
@@ -603,6 +606,20 @@
       if (stmt) {
         var stmtText = document.querySelector('.statement-text');
         if (stmtText) stmtText.textContent = stmt.text;
+        // Apply statement color
+        var colorMap = {
+          blue:   { bg1: '#E3F1FC', bg2: '#D6ECFA', border: '#B8DAF0', text: '#2C5F8A' },
+          orange: { bg1: '#FFF3E0', bg2: '#FFE0B2', border: '#FFB74D', text: '#BF360C' },
+          yellow: { bg1: '#FFF8E1', bg2: '#FFF3CD', border: '#FFD54F', text: '#5D4037' },
+          purple: { bg1: '#F3E5F5', bg2: '#E8D5F0', border: '#CE93D8', text: '#6A1B9A' },
+          red:    { bg1: '#FFEBEE', bg2: '#FFCDD2', border: '#EF9A9A', text: '#B71C1C' }
+        };
+        var c = colorMap[stmt.color];
+        if (c) {
+          var card = document.querySelector('.statement-card');
+          if (card) { card.style.background = 'linear-gradient(135deg, ' + c.bg1 + ', ' + c.bg2 + ')'; card.style.borderColor = c.border; }
+          if (stmtText) stmtText.style.color = c.text;
+        }
       }
     })();
 
@@ -701,7 +718,7 @@
 
       // Show vote count on canvas
       voteCountEl.classList.add('visible');
-      voteCountText.textContent = '0 / 24 har stemt';
+      voteCountText.textContent = '0 / 22 har stemt';
 
       // Auto-collapse panel
       if (!panel.classList.contains('collapsed')) {
@@ -714,13 +731,24 @@
       updateDisplays();
       updateTopbarTimer();
       simulateVotes();
+      // Notify demo parent that timer started
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'fagprat-timer', action: 'start', remaining: remainingSeconds }, '*');
+      }
       timerInterval = setInterval(() => {
         if (!isPaused) {
           remainingSeconds--;
           updateDisplays();
+          // Sync timer to demo parent
+          if (window.parent !== window) {
+            window.parent.postMessage({ type: 'fagprat-timer', action: 'tick', remaining: remainingSeconds }, '*');
+          }
           if (remainingSeconds <= 0) {
             clearInterval(timerInterval);
             timerInterval = null;
+            if (window.parent !== window) {
+              window.parent.postMessage({ type: 'fagprat-timer', action: 'finish' }, '*');
+            }
             finishTimer();
           }
         }
@@ -782,6 +810,11 @@
 
       updateDisplays();
       updateTopbarTimer();
+
+      // Notify student view and statistics that the timer was stopped (keep current state)
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'fagprat-timer', action: 'stop' }, '*');
+      }
     }
 
     // Next step button
@@ -790,16 +823,42 @@
     });
 
     // Simulate votes trickling in — updates canvas vote count
+    let studentVoteReceived = false;
     function simulateVotes() {
-      let stemmer = 0;
+      // Synced with statistikk.html trickle-in easing
+      // 22 total: 21 auto-trickle + 1 iPad user (Markus)
+      const total = 22;
+      const autoTotal = 21;
+      const dur = totalSeconds;
+      studentVoteReceived = false;
+      let elapsed = 0;
+      let autoCount = 0;
       const voteInterval = setInterval(() => {
         if (!isRunning) { clearInterval(voteInterval); return; }
-        if (stemmer < 24 && Math.random() > 0.3) {
-          stemmer++;
-          voteCountText.textContent = stemmer + ' / 24 har stemt';
-        }
-      }, 800);
+        if (isPaused) return;
+        elapsed++;
+        var progress = elapsed / dur;
+        if (progress > 1) progress = 1;
+        var eased = progress < 0.1 ? progress * 2
+                  : progress < 0.8 ? 0.2 + (progress - 0.1) * (0.7 / 0.7)
+                  : 0.9 + (progress - 0.8) * (0.1 / 0.2);
+        autoCount = Math.min(Math.round(eased * autoTotal), autoTotal);
+        var displayed = autoCount + (studentVoteReceived ? 1 : 0);
+        voteCountText.textContent = displayed + ' / ' + total + ' har stemt';
+      }, 1000);
     }
+    // Listen for iPad student vote
+    window.addEventListener('message', function(e) {
+      if (e.data && e.data.type === 'fagprat-student-vote') {
+        studentVoteReceived = true;
+        // Immediately update display
+        var current = voteCountText.textContent.match(/(\d+)/);
+        if (current) {
+          var num = parseInt(current[1]) + 1;
+          voteCountText.textContent = num + ' / 22 har stemt';
+        }
+      }
+    });
 
     // Panel toggle
     function togglePanel() {
@@ -819,13 +878,27 @@
 
     toggleBtn.addEventListener('click', togglePanel);
 
-    // Steg 1: Panel should always START OPEN (ignore localStorage)
-    panel.classList.remove('collapsed');
-    toggleBtn.classList.remove('flipped');
-    localStorage.setItem('fagprat-panel-collapsed', '0');
+    // Steg 1: Panel should end up OPEN
+    // If previous step left it collapsed, animate it open
+    if (localStorage.getItem('fagprat-panel-collapsed') === '1') {
+      panel.style.transition = 'none';
+      panel.classList.add('collapsed');
+      toggleBtn.classList.add('flipped');
+      setTimeout(function() {
+        panel.style.transition = '';
+        panel.classList.remove('collapsed');
+        toggleBtn.classList.remove('flipped');
+        localStorage.setItem('fagprat-panel-collapsed', '0');
+      }, 30);
+    } else {
+      panel.classList.remove('collapsed');
+      toggleBtn.classList.remove('flipped');
+      localStorage.setItem('fagprat-panel-collapsed', '0');
+    }
 
     // Init
     updateDisplays();
+
   </script>
 
 </body>

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=794, initial-scale=1, user-scalable=yes">
+  <title>Lag PDF – Forhåndsvisning</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #1A2420;
+      --ink-2: #3E5048;
+      --ink-3: #708578;
+      --border: #E5E8E5;
+      --sant: #2E7D32;
+      --sant-bg: #E8F5E9;
+      --sant-border: #81C784;
+      --usant: #C62828;
+      --usant-bg: #FFEBEE;
+      --usant-border: #EF9A9A;
+      --delvis: #B04A00;
+      --delvis-bg: #FFF3E0;
+      --delvis-border: #FFCC80;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+
+    html, body { min-height: 100vh; }
+    body {
+      font-family: 'Nunito', system-ui, sans-serif;
+      color: var(--ink);
+      background: #DDE2DE;
+      padding: 24px 0 60px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .screen-intro {
+      max-width: 210mm;
+      margin: 0 auto 28px;
+      padding: 0 16px;
+      text-align: center;
+    }
+    .screen-intro h1 {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .screen-intro p {
+      font-size: 13px;
+      color: var(--ink-2);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       A4-SIDE (fast størrelse – 210 × 297 mm)
+       ═══════════════════════════════════════════════════ */
+    .page {
+      width: 210mm;
+      height: 297mm;
+      margin: 0 auto 24px;
+      background: white;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+      overflow: hidden;
+      position: relative;
+      page-break-after: always;
+      display: flex;
+      flex-direction: column;
+    }
+    .page:last-of-type { page-break-after: auto; }
+
+    /* Side-merking på skjerm (fjernes ved utskrift) */
+    .page-label {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      padding: 4px 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 4px;
+      z-index: 10;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* ══════════════════════════════════════════════════
+       HEADER – forslag 11 sentrert
+       ══════════════════════════════════════════════════ */
+    .pdf-header {
+      background: linear-gradient(135deg, #ECF3EE 0%, #F4EFE4 100%);
+      padding: 14mm 20mm 11mm;
+      text-align: center;
+      border-bottom: 1.5px solid #DDE2DE;
+      flex-shrink: 0;
+    }
+    .pdf-logo {
+      height: 16mm;
+      display: block;
+      margin: 0 auto 5mm;
+    }
+    .pdf-title {
+      font-size: 22pt;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 4.5mm;
+      color: var(--ink);
+    }
+    .pdf-meta {
+      display: flex;
+      justify-content: center;
+      gap: 3mm;
+      flex-wrap: wrap;
+    }
+    .pdf-meta-item {
+      padding: 1.8mm 5mm;
+      background: white;
+      border: 1.5px solid rgba(255,255,255,0.8);
+      border-radius: 100px;
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: var(--ink-2);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    /* ══════════════════════════════════════════════════
+       KORT-LISTE (alltid én kolonne, maks 3 kort per side)
+       ══════════════════════════════════════════════════ */
+    .cards-list {
+      padding: 10mm 16mm 16mm;
+      display: flex;
+      flex-direction: column;
+      gap: 6mm;
+      flex: 1;
+    }
+
+    .card {
+      position: relative;
+      padding: 9mm 14mm 9mm;
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: 5mm;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-num {
+      position: absolute;
+      top: 4mm;
+      left: 6mm;
+      font-size: 11pt;
+      font-weight: 800;
+      color: #48208B;
+      line-height: 1;
+    }
+    .fasit-box {
+      display: inline-block;
+      min-width: 36mm;
+      padding: 2mm 5.5mm;
+      border-radius: 100px;
+      font-size: 9.5pt;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1.5px solid;
+      margin-bottom: 5mm;
+    }
+    .fasit-box.sant { background: var(--sant-bg); color: var(--sant); border-color: var(--sant-border); }
+    .fasit-box.usant { background: var(--usant-bg); color: var(--usant); border-color: var(--usant-border); }
+    .fasit-box.delvis { background: var(--delvis-bg); color: var(--delvis); border-color: var(--delvis-border); }
+    .pastand-text {
+      font-size: 12pt;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 3mm;
+      color: var(--ink);
+    }
+    .forklaring-text {
+      font-size: 10pt;
+      line-height: 1.55;
+      color: var(--ink-2);
+    }
+
+    /* Variant-gruppe – grupperer siden(e) for en antall-påstand-variant */
+    .variant-group {
+      margin-bottom: 36px;
+    }
+    .variant-group-title {
+      max-width: 210mm;
+      margin: 0 auto 12px;
+      padding: 0 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-2);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* ══════════════════════════════════════════════════
+       PRINT – rent A4-ark uten pynt
+       ══════════════════════════════════════════════════ */
+    @media print {
+      body { background: white; padding: 0; }
+      .screen-intro { display: none; }
+      .variant-group-title { display: none; }
+      .page-label { display: none; }
+      .variant-group { margin-bottom: 0; }
+      .page {
+        box-shadow: none;
+        margin: 0;
+        page-break-after: always;
+      }
+      .page:last-of-type { page-break-after: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="screen-intro">
+    <h1>Lag PDF – forhåndsvisning</h1>
+    <p>A4-format (210 × 297 mm). Alle påstandskort strekker seg over hele bredden – maks 3 per side. Ved 4–6 påstander bryter innholdet til en ny A4-side med samme format.</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       VARIANT 1 – 1 påstand
+       ═══════════════════════════════════════════════════ -->
+  <section class="variant-group">
+    <div class="variant-group-title">1 påstand · 1 side</div>
+    <article class="page">
+      <span class="page-label">1 påstand · Side 1</span>
+      <header class="pdf-header">
+        <img class="pdf-logo" src="assets/CO-LAB (Hoved) - uten skygge.png" alt="CO-LAB">
+        <h1 class="pdf-title">Den norske velferdsstaten</h1>
+        <div class="pdf-meta">
+          <span class="pdf-meta-item">Samfunnsfag</span>
+          <span class="pdf-meta-item">10. trinn</span>
+          <span class="pdf-meta-item">Oppsummering</span>
+        </div>
+      </header>
+      <div class="cards-list">
+        <article class="card">
+          <span class="card-num">1</span>
+          <div class="fasit-box sant">Sant</div>
+          <p class="pastand-text">Gratis helsetilbud og utdanning er i hovedsak finansiert gjennom skatter og avgifter.</p>
+          <p class="forklaring-text">Skatter og avgifter er den viktigste inntektskilden for den norske velferdsstaten og dekker utgifter til blant annet helse, utdanning og trygdeordninger.</p>
+        </article>
+      </div>
+    </article>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       VARIANT 2 – 2 påstander
+       ═══════════════════════════════════════════════════ -->
+  <section class="variant-group">
+    <div class="variant-group-title">2 påstander · 1 side</div>
+    <article class="page">
+      <span class="page-label">2 påstander · Side 1</span>
+      <header class="pdf-header">
+        <img class="pdf-logo" src="assets/CO-LAB (Hoved) - uten skygge.png" alt="CO-LAB">
+        <h1 class="pdf-title">Den norske velferdsstaten</h1>
+        <div class="pdf-meta">
+          <span class="pdf-meta-item">Samfunnsfag</span>
+          <span class="pdf-meta-item">10. trinn</span>
+          <span class="pdf-meta-item">Oppsummering</span>
+        </div>
+      </header>
+      <div class="cards-list">
+        <article class="card">
+          <span class="card-num">1</span>
+          <div class="fasit-box sant">Sant</div>
+          <p class="pastand-text">Gratis helsetilbud og utdanning er i hovedsak finansiert gjennom skatter og avgifter.</p>
+          <p class="forklaring-text">Skatter og avgifter er den viktigste inntektskilden for den norske velferdsstaten og dekker utgifter til blant annet helse, utdanning og trygdeordninger.</p>
+        </article>
+        <article class="card">
+          <span class="card-num">2</span>
+          <div class="fasit-box delvis">Delvis sant</div>
+          <p class="pastand-text">Velferdsstaten gjør at ingen i Norge lever i fattigdom.</p>
+          <p class="forklaring-text">Velferdsstaten reduserer fattigdom betydelig gjennom støtteordninger og tjenester, men rundt 10 prosent av befolkningen regnes likevel som fattige etter den relative fattigdomsgrensen.</p>
+        </article>
+      </div>
+    </article>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       VARIANT 3 – 3 påstander
+       ═══════════════════════════════════════════════════ -->
+  <section class="variant-group">
+    <div class="variant-group-title">3 påstander · 1 side</div>
+    <article class="page">
+      <span class="page-label">3 påstander · Side 1</span>
+      <header class="pdf-header">
+        <img class="pdf-logo" src="assets/CO-LAB (Hoved) - uten skygge.png" alt="CO-LAB">
+        <h1 class="pdf-title">Den norske velferdsstaten</h1>
+        <div class="pdf-meta">
+          <span class="pdf-meta-item">Samfunnsfag</span>
+          <span class="pdf-meta-item">10. trinn</span>
+          <span class="pdf-meta-item">Oppsummering</span>
+        </div>
+      </header>
+      <div class="cards-list">
+        <article class="card">
+          <span class="card-num">1</span>
+          <div class="fasit-box sant">Sant</div>
+          <p class="pastand-text">Gratis helsetilbud og utdanning er i hovedsak finansiert gjennom skatter og avgifter.</p>
+          <p class="forklaring-text">Skatter og avgifter er den viktigste inntektskilden for den norske velferdsstaten og dekker utgifter til blant annet helse, utdanning og trygdeordninger.</p>
+        </article>
+        <article class="card">
+          <span class="card-num">2</span>
+          <div class="fasit-box delvis">Delvis sant</div>
+          <p class="pastand-text">Velferdsstaten gjør at ingen i Norge lever i fattigdom.</p>
+          <p class="forklaring-text">Velferdsstaten reduserer fattigdom betydelig gjennom støtteordninger og tjenester, men rundt 10 prosent av befolkningen regnes likevel som fattige etter den relative fattigdomsgrensen.</p>
+        </article>
+        <article class="card">
+          <span class="card-num">3</span>
+          <div class="fasit-box usant">Usant</div>
+          <p class="pastand-text">Et land med høy BNP betyr at innbyggerne har en høy levestandard.</p>
+          <p class="forklaring-text">BNP måler den samlede verdiskapingen i et land, men sier ingenting om hvordan rikdommen er fordelt. Et land kan ha høyt BNP samtidig som store forskjeller gjør at mange lever med lav levestandard.</p>
+        </article>
+      </div>
+    </article>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       VARIANT 4 – 4 påstander (3 + 1, to sider)
+       ═══════════════════════════════════════════════════ -->
+  <section class="variant-group">
+    <div class="variant-group-title">4 påstander · 2 sider</div>
+    <article class="page">
+      <span class="page-label">4 påstander · Side 1 av 2</span>
+      <header class="pdf-header">
+        <img class="pdf-logo" src="assets/CO-LAB (Hoved) - uten skygge.png" alt="CO-LAB">
+        <h1 class="pdf-title">Den norske velferdsstaten</h1>
+        <div class="pdf-meta">
+          <span class="pdf-meta-item">Samfunnsfag</span>
+          <span class="pdf-meta-item">10. trinn</span>
+          <span class="pdf-meta-item">Oppsummering</span>
+        </div>
+      </header>
+      <div class="cards-list">
+        <article class="card">
+          <span class="card-num">1</span>
+          <div class="fasit-box sant">Sant</div>
+          <p class="pastand-text">Gratis helsetilbud og utdanning er i hovedsak finansiert gjennom skatter og avgifter.</p>
+          <p class="forklaring-text">Skatter og avgifter er den viktigste inntektskilden for den norske velferdsstaten og dekker utgifter til blant annet helse, utdanning og trygdeordninger.</p>
+        </article>
+        <article class="card">
+          <span class="card-num">2</span>
+          <div class="fasit-box delvis">Delvis sant</div>
+          <p class="pastand-text">Velferdsstaten gjør at ingen i Norge lever i fattigdom.</p>
+          <p class="forklaring-text">Velferdsstaten reduserer fattigdom betydelig gjennom støtteordninger og tjenester, men rundt 10 prosent av befolkningen regnes likevel som fattige etter den relative fattigdomsgrensen.</p>
+        </article>
+        <article class="card">
+          <span class="card-num">3</span>
+          <div class="fasit-box usant">Usant</div>
+          <p class="pastand-text">Et land med høy BNP betyr at innbyggerne har en høy levestandard.</p>
+          <p class="forklaring-text">BNP måler den samlede verdiskapingen i et land, men sier ingenting om hvordan rikdommen er fordelt. Et land kan ha høyt BNP samtidig som store forskjeller gjør at mange lever med lav levestandard.</p>
+        </article>
+      </div>
+    </article>
+    <article class="page">
+      <span class="page-label">4 påstander · Side 2 av 2</span>
+      <header class="pdf-header">
+        <img class="pdf-logo" src="assets/CO-LAB (Hoved) - uten skygge.png" alt="CO-LAB">
+        <h1 class="pdf-title">Den norske velferdsstaten</h1>
+        <div class="pdf-meta">
+          <span class="pdf-meta-item">Samfunnsfag</span>
+          <span class="pdf-meta-item">10. trinn</span>
+          <span class="pdf-meta-item">Oppsummering</span>
+        </div>
+      </header>
+      <div class="cards-list">
+        <article class="card">
+          <span class="card-num">4</span>
+          <div class="fasit-box sant">Sant</div>
+          <p class="pastand-text">NAV forvalter folketrygden som gir rett til alderspensjon og sykepenger.</p>
+          <p class="forklaring-text">NAV er ansvarlig for folketrygdens ytelser, inkludert alderspensjon, uføretrygd, sykepenger og arbeidsavklaringspenger.</p>
+        </article>
+      </div>
+    </article>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       VARIANT 5 – 5 påstander (3 + 2, to sider)
+       ═══════════════════════════════════════════════════ -->
+  <section class="variant-group">
+    <div class="variant-group-title">5 påstander · 2 sider</div>
+    <article class="page">
+      <span class="page-label">5 påstander · Side 1 av 2</span>
+      <header class="pdf-header">
+        <img class="pdf-logo" src="assets/CO-LAB (Hoved) - uten skygge.png" alt="CO-LAB">
+        <h1 class="pdf-title">Den norske velferdsstaten</h1>
+        <div class="pdf-meta">
+          <span class="pdf-meta-item">Samfunnsfag</span>
+          <span class="pdf-meta-item">10. trinn</span>
+          <span class="pdf-meta-item">Oppsummering</span>
+        </div>
+      </header>
+      <div class="cards-list">
+        <article class="card">
+          <span class="card-num">1</span>
+          <div class="fasit-box sant">Sant</div>
+          <p class="pastand-text">Gratis helsetilbud og utdanning er i hovedsak finansiert gjennom skatter og avgifter.</p>
+          <p class="forklaring-text">Skatter og avgifter er den viktigste inntektskilden for den norske velferdsstaten og dekker utgifter til blant annet helse, utdanning og trygdeordninger.</p>
+        </article>
+        <article class="card">
+          <span class="card-num">2</span>
+          <div class="fasit-box delvis">Delvis sant</div>
+          <p class="pastand-text">Velferdsstaten gjør at ingen i Norge lever i fattigdom.</p>
+          <p class="forklaring-text">Velferdsstaten reduserer fattigdom betydelig gjennom støtteordninger og tjenester, men rundt 10 prosent av befolkningen regnes likevel som fattige etter den relative fattigdomsgrensen.</p>
+        </article>
+        <article class="card">
+          <span class="card-num">3</span>
+          <div class="fasit-box usant">Usant</div>
+          <p class="pastand-text">Et land med høy BNP betyr at innbyggerne har en høy levestandard.</p>
+          <p class="forklaring-text">BNP måler den samlede verdiskapingen i et land, men sier ingenting om hvordan rikdommen er fordelt. Et land kan ha høyt BNP samtidig som store forskjeller gjør at mange lever med lav levestandard.</p>
+        </article>
+      </div>
+    </article>
+    <article class="page">
+      <span class="page-label">5 påstander · Side 2 av 2</span>
+      <header class="pdf-header">
+        <img class="pdf-logo" src="assets/CO-LAB (Hoved) - uten skygge.png" alt="CO-LAB">
+        <h1 class="pdf-title">Den norske velferdsstaten</h1>
+        <div class="pdf-meta">
+          <span class="pdf-meta-item">Samfunnsfag</span>
+          <span class="pdf-meta-item">10. trinn</span>
+          <span class="pdf-meta-item">Oppsummering</span>
+        </div>
+      </header>
+      <div class="cards-list">
+        <article class="card">
+          <span class="card-num">4</span>
+          <div class="fasit-box sant">Sant</div>
+          <p class="pastand-text">NAV forvalter folketrygden som gir rett til alderspensjon og sykepenger.</p>
+          <p class="forklaring-text">NAV er ansvarlig for folketrygdens ytelser, inkludert alderspensjon, uføretrygd, sykepenger og arbeidsavklaringspenger.</p>
+        </article>
+        <article class="card">
+          <span class="card-num">5</span>
+          <div class="fasit-box delvis">Delvis sant</div>
+          <p class="pastand-text">Nordmenn betaler mer skatt enn folk i de fleste andre land.</p>
+          <p class="forklaring-text">Skattenivået er blant de høyere i OECD, men flere land som Danmark og Sverige har høyere samlet skattebyrde som andel av BNP.</p>
+        </article>
+      </div>
+    </article>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       VARIANT 6 – 6 påstander (3 + 3, to sider)
+       ═══════════════════════════════════════════════════ -->
+  <section class="variant-group">
+    <div class="variant-group-title">6 påstander · 2 sider</div>
+    <article class="page">
+      <span class="page-label">6 påstander · Side 1 av 2</span>
+      <header class="pdf-header">
+        <img class="pdf-logo" src="assets/CO-LAB (Hoved) - uten skygge.png" alt="CO-LAB">
+        <h1 class="pdf-title">Den norske velferdsstaten</h1>
+        <div class="pdf-meta">
+          <span class="pdf-meta-item">Samfunnsfag</span>
+          <span class="pdf-meta-item">10. trinn</span>
+          <span class="pdf-meta-item">Oppsummering</span>
+        </div>
+      </header>
+      <div class="cards-list">
+        <article class="card">
+          <span class="card-num">1</span>
+          <div class="fasit-box sant">Sant</div>
+          <p class="pastand-text">Gratis helsetilbud og utdanning er i hovedsak finansiert gjennom skatter og avgifter.</p>
+          <p class="forklaring-text">Skatter og avgifter er den viktigste inntektskilden for den norske velferdsstaten og dekker utgifter til blant annet helse, utdanning og trygdeordninger.</p>
+        </article>
+        <article class="card">
+          <span class="card-num">2</span>
+          <div class="fasit-box delvis">Delvis sant</div>
+          <p class="pastand-text">Velferdsstaten gjør at ingen i Norge lever i fattigdom.</p>
+          <p class="forklaring-text">Velferdsstaten reduserer fattigdom betydelig gjennom støtteordninger og tjenester, men rundt 10 prosent av befolkningen regnes likevel som fattige etter den relative fattigdomsgrensen.</p>
+        </article>
+        <article class="card">
+          <span class="card-num">3</span>
+          <div class="fasit-box usant">Usant</div>
+          <p class="pastand-text">Et land med høy BNP betyr at innbyggerne har en høy levestandard.</p>
+          <p class="forklaring-text">BNP måler den samlede verdiskapingen i et land, men sier ingenting om hvordan rikdommen er fordelt. Et land kan ha høyt BNP samtidig som store forskjeller gjør at mange lever med lav levestandard.</p>
+        </article>
+      </div>
+    </article>
+    <article class="page">
+      <span class="page-label">6 påstander · Side 2 av 2</span>
+      <header class="pdf-header">
+        <img class="pdf-logo" src="assets/CO-LAB (Hoved) - uten skygge.png" alt="CO-LAB">
+        <h1 class="pdf-title">Den norske velferdsstaten</h1>
+        <div class="pdf-meta">
+          <span class="pdf-meta-item">Samfunnsfag</span>
+          <span class="pdf-meta-item">10. trinn</span>
+          <span class="pdf-meta-item">Oppsummering</span>
+        </div>
+      </header>
+      <div class="cards-list">
+        <article class="card">
+          <span class="card-num">4</span>
+          <div class="fasit-box sant">Sant</div>
+          <p class="pastand-text">NAV forvalter folketrygden som gir rett til alderspensjon og sykepenger.</p>
+          <p class="forklaring-text">NAV er ansvarlig for folketrygdens ytelser, inkludert alderspensjon, uføretrygd, sykepenger og arbeidsavklaringspenger.</p>
+        </article>
+        <article class="card">
+          <span class="card-num">5</span>
+          <div class="fasit-box delvis">Delvis sant</div>
+          <p class="pastand-text">Nordmenn betaler mer skatt enn folk i de fleste andre land.</p>
+          <p class="forklaring-text">Skattenivået er blant de høyere i OECD, men flere land som Danmark og Sverige har høyere samlet skattebyrde som andel av BNP.</p>
+        </article>
+        <article class="card">
+          <span class="card-num">6</span>
+          <div class="fasit-box usant">Usant</div>
+          <p class="pastand-text">Alle som bor i Norge får trygdeytelser uansett arbeidsinnsats.</p>
+          <p class="forklaring-text">Mange ytelser krever opptjening gjennom arbeid (f.eks. sykepenger og dagpenger). Andre er behovsprøvd eller knyttet til medlemskap i folketrygden.</p>
+        </article>
+      </div>
+    </article>
+  </section>
+
+</body>
+</html>

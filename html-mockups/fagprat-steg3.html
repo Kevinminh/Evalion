@@ -441,15 +441,16 @@
     .step-item.active .step-num { background: var(--color-primary-500); color: white; }
     .step-item.active .step-label { color: var(--color-primary-700); }
   </style>
+  <script>if(window.parent!==window)window.parent.postMessage({type:'fagprat-steg-loaded',steg:3},'*');</script>
 </head>
 <body>
 
   <!-- ═══════════ TOP BAR ═══════════ -->
   <header class="top-bar">
     <div class="top-bar-left">
-      <img src="../Logoer og professoren/FagPrat - logo.png" alt="FagPrat" class="top-bar-logo">
+      <img src="assets/FagPrat - logo.png" alt="FagPrat" class="top-bar-logo">
       <div class="top-bar-divider"></div>
-      <span class="top-bar-title">Newtons lover</span>
+      <span class="top-bar-title">Klima og bærekraft</span>
     </div>
     <div class="top-bar-center">
       <div class="topbar-timer" id="topbar-timer">
@@ -488,14 +489,14 @@
 
       <!-- Statement – colored, no label -->
       <div class="statement-card">
-        <div class="statement-text">Dyr er avhengige av planter for å overleve, mens planter er ikke avhengige av dyr for å overleve.</div>
+        <div class="statement-text">Klimaendringene rammer fattige land hardest.</div>
       </div>
 
       <div class="professor-spacer"></div>
 
       <!-- Professor -->
       <div class="professor-row">
-        <img src="../Logoer og professoren/Professoren.png" alt="Professoren" class="professor-img">
+        <img src="assets/Professoren.png" alt="Professoren" class="professor-img">
         <div class="professor-bubble">
           Har du endret mening etter diskusjonen?<br>Stem på nytt!
         </div>
@@ -526,12 +527,12 @@
             </button>
             <div class="timer-setup" id="timer-setup">
               <div class="timer-slider-wrap">
-                <input type="range" class="timer-range" id="timer-range" min="10" max="180" value="60" step="5">
+                <input type="range" class="timer-range" id="timer-range" min="10" max="60" value="30" step="5">
               </div>
               <div class="timer-presets">
-                <button class="preset-pill">30s</button>
-                <button class="preset-pill selected">1m</button>
-                <button class="preset-pill">2m</button>
+                <button class="preset-pill">15s</button>
+                <button class="preset-pill selected">30s</button>
+                <button class="preset-pill">1m</button>
               </div>
             </div>
 
@@ -604,6 +605,19 @@
       if (stmt) {
         var stmtText = document.querySelector('.statement-text');
         if (stmtText) stmtText.textContent = stmt.text;
+        var colorMap = {
+          blue:   { bg1: '#E3F1FC', bg2: '#D6ECFA', border: '#B8DAF0', text: '#2C5F8A' },
+          orange: { bg1: '#FFF3E0', bg2: '#FFE0B2', border: '#FFB74D', text: '#BF360C' },
+          yellow: { bg1: '#FFF8E1', bg2: '#FFF3CD', border: '#FFD54F', text: '#5D4037' },
+          purple: { bg1: '#F3E5F5', bg2: '#E8D5F0', border: '#CE93D8', text: '#6A1B9A' },
+          red:    { bg1: '#FFEBEE', bg2: '#FFCDD2', border: '#EF9A9A', text: '#B71C1C' }
+        };
+        var c = colorMap[stmt.color];
+        if (c) {
+          var card = document.querySelector('.statement-card');
+          if (card) { card.style.background = 'linear-gradient(135deg, ' + c.bg1 + ', ' + c.bg2 + ')'; card.style.borderColor = c.border; }
+          if (stmtText) stmtText.style.color = c.text;
+        }
       }
     })();
 
@@ -630,8 +644,8 @@
     const panel = document.getElementById('teacher-panel');
     const toggleBtn = document.getElementById('panel-toggle');
 
-    let totalSeconds = 60;
-    let remainingSeconds = 60;
+    let totalSeconds = 30;
+    let remainingSeconds = 30;
     let timerInterval = null;
     let isRunning = false;
     let isPaused = false;
@@ -647,7 +661,7 @@
       const text = formatTime(remainingSeconds);
       display.textContent = text;
       topbarValue.textContent = text;
-      const pct = ((parseInt(range.value) - 10) / (180 - 10)) * 100;
+      const pct = ((parseInt(range.value) - 10) / (60 - 10)) * 100;
       range.style.background = `linear-gradient(90deg, var(--color-primary-300) 0%, var(--color-primary-300) ${pct}%, var(--color-neutral-200) ${pct}%)`;
       if (isRunning && remainingSeconds <= 10) {
         display.classList.add('urgent');
@@ -670,9 +684,10 @@
         presets.forEach(p => p.classList.remove('selected'));
         btn.classList.add('selected');
         const text = btn.textContent.trim();
-        let secs = 60;
-        if (text.includes('30')) secs = 30;
-        else if (text.includes('2')) secs = 120;
+        let secs = 30;
+        if (text.includes('15')) secs = 15;
+        else if (text.includes('1m')) secs = 60;
+        else secs = 30;
         totalSeconds = secs;
         remainingSeconds = secs;
         range.value = secs;
@@ -715,13 +730,24 @@
       updateDisplays();
       updateTopbarTimer();
       simulateVotes();
+      // Notify demo parent that timer started
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'fagprat-timer', action: 'start', remaining: remainingSeconds }, '*');
+      }
       timerInterval = setInterval(() => {
         if (!isPaused) {
           remainingSeconds--;
           updateDisplays();
+          // Sync timer to demo parent
+          if (window.parent !== window) {
+            window.parent.postMessage({ type: 'fagprat-timer', action: 'tick', remaining: remainingSeconds }, '*');
+          }
           if (remainingSeconds <= 0) {
             clearInterval(timerInterval);
             timerInterval = null;
+            if (window.parent !== window) {
+              window.parent.postMessage({ type: 'fagprat-timer', action: 'finish' }, '*');
+            }
             finishTimer();
           }
         }
@@ -783,6 +809,11 @@
 
       updateDisplays();
       updateTopbarTimer();
+
+      // Notify student view and statistics that the timer was reset
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'fagprat-timer', action: 'reset' }, '*');
+      }
     }
 
     // Next step button
@@ -790,16 +821,27 @@
       window.location.href = 'fagprat-steg4.html';
     });
 
-    // Simulate votes trickling in — updates canvas vote count
-    function simulateVotes() {
-      let stemmer = 0;
-      const voteInterval = setInterval(() => {
-        if (!isRunning) { clearInterval(voteInterval); return; }
-        if (stemmer < 24 && Math.random() > 0.3) {
-          stemmer++;
-          voteCountText.textContent = stemmer + ' / 24 har stemt';
+    // Real vote count sync from phone (source of truth)
+    window.addEventListener('message', function(e) {
+      if (!e.data) return;
+      if (e.data.type === 'fagprat-reasons-update') {
+        var c = e.data.changes;
+        if (c && typeof c.count === 'number') {
+          voteCountText.textContent = c.count + ' / ' + c.classTotal + ' har stemt';
+          voteCountEl.classList.add('visible');
+        } else if (e.data.stats) {
+          // Fallback: sum up vote counts
+          var s = e.data.stats;
+          var total = (s.counts.sant || 0) + (s.counts.delvis || 0) + (s.counts.usant || 0);
+          voteCountText.textContent = total + ' / 22 har stemt';
+          voteCountEl.classList.add('visible');
         }
-      }, 800);
+      }
+    });
+
+    // Legacy simulate (no longer used when embedded in demo)
+    function simulateVotes() {
+      // Vote count now comes live from phone via postMessage
     }
 
     // Panel toggle
@@ -820,10 +862,23 @@
 
     toggleBtn.addEventListener('click', togglePanel);
 
-    // Steg 3: Panel should always START OPEN (ignore localStorage)
-    panel.classList.remove('collapsed');
-    toggleBtn.classList.remove('flipped');
-    localStorage.setItem('fagprat-panel-collapsed', '0');
+    // Steg 3: Panel should end up OPEN
+    // If previous step left it collapsed, animate it open
+    if (localStorage.getItem('fagprat-panel-collapsed') === '1') {
+      panel.style.transition = 'none';
+      panel.classList.add('collapsed');
+      toggleBtn.classList.add('flipped');
+      setTimeout(function() {
+        panel.style.transition = '';
+        panel.classList.remove('collapsed');
+        toggleBtn.classList.remove('flipped');
+        localStorage.setItem('fagprat-panel-collapsed', '0');
+      }, 30);
+    } else {
+      panel.classList.remove('collapsed');
+      toggleBtn.classList.remove('flipped');
+      localStorage.setItem('fagprat-panel-collapsed', '0');
+    }
 
     // Init
     updateDisplays();

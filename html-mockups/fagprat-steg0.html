@@ -69,6 +69,20 @@
       font-size: var(--text-base); font-weight: var(--font-semibold);
       color: var(--color-text-tertiary);
     }
+    .professor-dots {
+      display: flex; gap: 6px; margin-top: var(--space-1);
+    }
+    .professor-dots span {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--color-text-tertiary);
+      animation: dotPulse 1.4s ease-in-out infinite;
+    }
+    .professor-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .professor-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dotPulse {
+      0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+      40% { opacity: 1; transform: scale(1); }
+    }
 
     /* Statement cards grid: 3 rows, 2 cols, last centered */
     .statements-grid {
@@ -188,15 +202,16 @@
       pointer-events: none;
     }
   </style>
+  <script>if(window.parent!==window)window.parent.postMessage({type:'fagprat-steg-loaded',steg:0},'*');</script>
 </head>
 <body>
 
   <!-- ═══════════ TOP BAR ═══════════ -->
   <header class="top-bar">
     <div class="top-bar-left">
-      <img src="../Logoer og professoren/FagPrat - logo.png" alt="FagPrat" class="top-bar-logo">
+      <img src="assets/FagPrat - logo.png" alt="FagPrat" class="top-bar-logo">
       <div class="top-bar-divider"></div>
-      <span class="top-bar-title">Newtons lover</span>
+      <span class="top-bar-title">Klima og bærekraft</span>
     </div>
     <button class="btn-end-activity">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -209,26 +224,24 @@
 
     <!-- Professor – large, left -->
     <div class="professor-side">
-      <img src="../Logoer og professoren/Professoren.png" alt="Professoren" class="professor-img">
+      <img src="assets/Professoren.png" alt="Professoren" class="professor-img">
       <span class="professor-label">Velg en påstand</span>
+      <div class="professor-dots"><span></span><span></span><span></span></div>
     </div>
 
     <!-- Statement cards – 2-2-1 grid -->
     <div class="statements-grid">
-      <div class="stmt-card yellow">
-        Det fins ingen regel for hvor stort eller lite et økosystem kan være. Et økosystem kan være en liten vanndam eller en stor skog.
+      <div class="stmt-card blue" onclick="selectStatement(this)" data-index="0">
+        Klimaendringene rammer fattige land hardest.
       </div>
-      <div class="stmt-card blue" onclick="selectStatement(this)">
-        Dyr er avhengige av planter for å overleve, mens planter er ikke avhengige av dyr for overleve.
+      <div class="stmt-card orange" onclick="selectStatement(this)" data-index="1">
+        El-biler er helt utslippsfrie.
       </div>
-      <div class="stmt-card orange">
-        De fleste økosystemer, som for eksempel skogen, jungelen og ørkenen, er avhengig av tilgang på vann og sollys.
+      <div class="stmt-card purple" onclick="selectStatement(this)" data-index="2">
+        Alle FNs bærekraftsmål handler om klima og miljø.
       </div>
-      <div class="stmt-card purple">
-        Økologi handler om samspillet mellom ulike arter i et avgrenset område kalt et økosystem.
-      </div>
-      <div class="stmt-card red">
-        Alle dyr og planter, både store og små, er like viktige i et økosystem.
+      <div class="stmt-card yellow" onclick="selectStatement(this)" data-index="3">
+        Fornybar energi kan erstatte fossil energi og løse klimaproblemet.
       </div>
     </div>
 
@@ -271,7 +284,21 @@
     function selectStatement(card) {
       const index = parseInt(card.dataset.index, 10);
       if (!isNaN(index)) {
-        localStorage.setItem('fagprat-current-statement', index);
+        // Use separate key when in demo (iframe) so standalone sessions don't interfere
+        var key = (window.parent !== window) ? 'fagprat-demo-statement' : 'fagprat-current-statement';
+        localStorage.setItem(key, index);
+      }
+
+      // Notify demo parent of selected statement (text + color + fasit)
+      var colorClasses = ['yellow', 'blue', 'orange', 'purple', 'red'];
+      var color = colorClasses.find(function(c) { return card.classList.contains(c); }) || 'blue';
+      var fasit = 'sant';
+      var stmt = (typeof getCurrentStatement === 'function') ? getCurrentStatement() : null;
+      if (stmt && stmt.fasit) {
+        fasit = stmt.fasit;
+      }
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'fagprat-statement', text: card.textContent.trim(), color: color, index: index, fasit: fasit }, '*');
       }
 
       // Dim all other cards, highlight selected

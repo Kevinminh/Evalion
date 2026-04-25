@@ -143,7 +143,7 @@
     }
 
     .evalion-logo {
-      height: 88px;
+      height: 64px;
       object-fit: contain;
     }
 
@@ -308,6 +308,11 @@
       from { opacity: 0; transform: scale(0.9) translateY(4px); }
       to { opacity: 1; transform: scale(1) translateY(0); }
     }
+    @keyframes cardPop {
+      0% { opacity: 0; transform: scale(0.7); }
+      60% { transform: scale(1.05); }
+      100% { opacity: 1; transform: scale(1); }
+    }
 
     .student-avatar {
       width: 32px;
@@ -316,16 +321,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: var(--text-sm);
-      font-weight: var(--font-bold);
-      color: white;
+      font-size: 18px;
       flex-shrink: 0;
     }
-    .student-avatar.purple { background: var(--color-primary-400); }
-    .student-avatar.teal   { background: var(--color-secondary-400); }
-    .student-avatar.pink   { background: var(--color-accent-400); }
-    .student-avatar.green  { background: var(--color-sant); }
-    .student-avatar.orange { background: var(--color-delvis); }
 
     .student-name {
       font-size: var(--text-sm);
@@ -392,7 +390,7 @@
   <!-- ═══════════ TOP BAR ═══════════ -->
   <header class="top-bar">
     <div class="top-bar-left">
-      <img class="top-bar-logo" src="../Logoer og professoren/FagPrat - logo.png" alt="FagPrat">
+      <img class="top-bar-logo" src="assets/FagPrat - logo.png" alt="FagPrat">
       <div class="top-bar-divider"></div>
       <span class="top-bar-title">Newtons lover</span>
     </div>
@@ -410,9 +408,9 @@
 
     <!-- Left: Join Info Panel -->
     <div class="join-panel">
-      <img class="evalion-logo" src="../Logoer og professoren/Evalion logo.png" alt="Evalion">
+      <img class="evalion-logo" src="assets/CO-LAB (Hoved).jpg" alt="CO-LAB">
 
-      <span class="join-url">www.evalion.no/delta</span>
+      <span class="join-url">www.co-lab.no/delta</span>
       <span class="join-label">Skriv inn koden for å bli med:</span>
 
       <div class="game-code-box">
@@ -436,36 +434,32 @@
     <!-- Right: Students Panel -->
     <div class="students-panel">
       <div class="students-area" id="students-area">
-        <div class="student-card" data-name="Emma" data-color="purple">
-          <div class="student-avatar purple">E</div>
-          <span class="student-name">Emma</span>
-          <button class="student-remove">✕</button>
-        </div>
-        <div class="student-card" data-name="Oliver" data-color="teal">
-          <div class="student-avatar teal">O</div>
-          <span class="student-name">Oliver</span>
-          <button class="student-remove">✕</button>
-        </div>
-        <div class="student-card" data-name="Sofia" data-color="pink">
-          <div class="student-avatar pink">S</div>
-          <span class="student-name">Sofia</span>
-          <button class="student-remove">✕</button>
-        </div>
-        <div class="student-card" data-name="Lucas" data-color="green">
-          <div class="student-avatar green">L</div>
-          <span class="student-name">Lucas</span>
-          <button class="student-remove">✕</button>
-        </div>
-        <div class="student-card" data-name="Nora" data-color="orange">
-          <div class="student-avatar orange">N</div>
-          <span class="student-name">Nora</span>
-          <button class="student-remove">✕</button>
-        </div>
+        <div class="student-card"><div class="student-avatar" style="background:#E8D5F0">🦊</div><span class="student-name">Nora</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#D6ECFA">🐸</div><span class="student-name">Lars</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#FFE0B2">🦁</div><span class="student-name">Henrik</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#C8E6C9">🐼</div><span class="student-name">Amina</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#FFCDD2">🐰</div><span class="student-name">Sofie</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#FFF3CD">🦋</div><span class="student-name">Thea</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#B3E5FC">🐬</div><span class="student-name">Mia</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#F0E68C">🦉</div><span class="student-name">Elias</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#D1C4E9">🐧</div><span class="student-name">Isak</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#FFE0B2">🐢</div><span class="student-name">Oliver</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#C8E6C9">🦎</div><span class="student-name">Erik</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#F8BBD0">🦩</div><span class="student-name">Ingrid</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#B3E5FC">🐋</div><span class="student-name">Sebastian</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#E8D5F0">🦜</div><span class="student-name">Emil</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#FFCDD2">🐙</div><span class="student-name">Filip</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#FFF3CD">🐝</div><span class="student-name">Liam</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#D6ECFA">🦈</div><span class="student-name">Aksel</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#C8E6C9">🐨</div><span class="student-name">Oskar</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#F8BBD0">🦔</div><span class="student-name">Frida</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#D1C4E9">🐾</div><span class="student-name">Leah</span><button class="student-remove">✕</button></div>
+        <div class="student-card"><div class="student-avatar" style="background:#FFE0B2">🦒</div><span class="student-name">Vilde</span><button class="student-remove">✕</button></div>
       </div>
 
       <div class="students-footer">
         <div class="waiting-text">
-          Venter på at elever kobler til...
+          Venter på at elever kobler til
           <div class="waiting-dots">
             <span></span><span></span><span></span>
           </div>
@@ -477,7 +471,7 @@
             <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
             <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
           </svg>
-          5
+          <span id="student-count-num">21</span>
         </div>
       </div>
     </div>
@@ -496,15 +490,15 @@
     })();
 
     // ── Groups logic ──
-    var groupsEnabled = localStorage.getItem('fagprat-groups-enabled') === '1';
-    var groupCount = parseInt(localStorage.getItem('fagprat-group-count') || '4');
+    // Launch-demoen har ikke grupper – ignorer eventuell localStorage-flag
+    // (kan ha blitt satt av andre demo-kopier på samme origin)
+    localStorage.removeItem('fagprat-groups-enabled');
+    localStorage.removeItem('fagprat-group-count');
+    var groupsEnabled = false;
+    var groupCount = 4;
     var btnGroups = document.getElementById('btn-groups');
     var btnStart = document.getElementById('btn-start');
-
-    if (groupsEnabled) {
-      btnGroups.style.display = '';
-      btnStart.style.display = 'none';
-    }
+    // btnGroups forblir skjult via inline style="display:none"
 
     btnGroups.addEventListener('click', function() {
       var area = document.getElementById('students-area');
@@ -559,9 +553,38 @@
       btnStart.style.display = '';
     });
 
+    // ── Listen for new student from iPad lobby ──
+    var avatarEmojis = ['🐶','🐱','🐻','🦊','🐸','🐵','🦁','🐼','🐰','🐨','🐯','🦋','🐬','🦉','🐧','🐢','🦎','🦩','🐝','🦈','🐙','🦜','🦔','🦒','🐾'];
+    var avatarColors = ['#E8D5F0','#D6ECFA','#FFE0B2','#C8E6C9','#FFCDD2','#FFF3CD','#B3E5FC','#F0E68C','#D1C4E9','#F8BBD0'];
+    window.addEventListener('message', function(e) {
+      if (!e.data || e.data.type !== 'fagprat-student-nickname') return;
+      var name = e.data.nickname;
+      var area = document.getElementById('students-area');
+      var countEl = document.getElementById('student-count-num');
+      // Don't add duplicates
+      var existing = area.querySelectorAll('.student-name');
+      for (var i = 0; i < existing.length; i++) {
+        if (existing[i].textContent === name) return;
+      }
+      var emoji = avatarEmojis[Math.floor(Math.random() * avatarEmojis.length)];
+      var bg = avatarColors[Math.floor(Math.random() * avatarColors.length)];
+      var card = document.createElement('div');
+      card.className = 'student-card';
+      card.style.animation = 'cardPop 0.3s ease';
+      card.innerHTML = '<div class="student-avatar" style="background:' + bg + '">' + emoji + '</div>' +
+        '<span class="student-name">' + name + '</span>' +
+        '<button class="student-remove">✕</button>';
+      area.appendChild(card);
+      if (countEl) countEl.textContent = area.children.length;
+    });
+
     // ── Start activity ──
     btnStart.addEventListener('click', function() {
-      window.location.href = 'fagprat-steg0.html';
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'fagprat-nav', steg: 0 }, '*');
+      } else {
+        window.location.href = 'fagprat-steg0.html';
+      }
     });
   </script>
 

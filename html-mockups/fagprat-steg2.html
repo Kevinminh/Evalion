@@ -210,6 +210,35 @@
     }
     .panel-toggle.flipped svg {
       transform: rotate(180deg);
+      width: 20px; height: 20px;
+    }
+    /* Attention-styling når panelet er kollapset – gjør tabben tydelig */
+    .panel-toggle.flipped {
+      background: var(--color-primary-500);
+      color: white;
+      border-color: var(--color-primary-500);
+      width: 42px; height: 80px;
+      box-shadow:
+        0 3px 0 var(--color-primary-700),
+        -4px 0 18px rgba(108, 63, 197, 0.35);
+      animation: panel-tab-attention 2.4s ease-in-out infinite;
+    }
+    .panel-toggle.flipped:hover {
+      background: var(--color-primary-400);
+      color: white;
+      animation: none;
+      transform: translate(calc(-100% - 4px), -50%);
+      box-shadow:
+        0 3px 0 var(--color-primary-700),
+        -6px 0 22px rgba(108, 63, 197, 0.55);
+    }
+    @keyframes panel-tab-attention {
+      0%, 100% {
+        box-shadow: 0 3px 0 var(--color-primary-700), -4px 0 14px rgba(108, 63, 197, 0.3);
+      }
+      50% {
+        box-shadow: 0 3px 0 var(--color-primary-700), -6px 0 22px rgba(108, 63, 197, 0.55);
+      }
     }
     .teacher-panel {
       width: 340px;
@@ -239,6 +268,7 @@
       flex: 1; display: flex; flex-direction: column;
       padding: var(--space-4) var(--space-4);
       gap: var(--space-3);
+      min-height: 0;
     }
 
     @keyframes blink {
@@ -250,7 +280,7 @@
     .elevsvar-group {
       display: flex; flex-direction: column; gap: var(--space-3);
       flex: 1;
-      overflow: visible;
+      min-height: 0;
     }
 
     /* ── Section Toggle Tabs ── */
@@ -279,7 +309,7 @@
       box-shadow: var(--shadow-sm);
     }
     .tab-content { display: none; flex: 1; min-height: 0; }
-    .tab-content.active { display: flex; flex-direction: column; gap: var(--space-2-5); flex: 1; }
+    .tab-content.active { display: flex; flex-direction: column; gap: var(--space-2-5); flex: 1; min-height: 0; }
 
     /* ── Elevsvar card wrapper (fixed size for both tabs) ── */
     .elevsvar-card-wrap {
@@ -393,14 +423,15 @@
     }
     .dist-pct {
       font-size: 11px; font-weight: var(--font-bold);
-      color: var(--color-text-secondary); line-height: 1;
-      position: absolute; width: 100%; text-align: center;
-      z-index: 2;
+      color: white; line-height: 1;
     }
     .dist-bar {
       width: 100%; border-radius: var(--radius-lg);
       transition: height 0.6s ease;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 0;
     }
+    .dist-bar[data-pct="0"] .dist-pct { display: none; }
     .dist-bar.sant { background: var(--color-sant); }
     .dist-bar.delvis { background: var(--color-delvis); }
     .dist-bar.usant { background: var(--color-error); }
@@ -414,6 +445,8 @@
       display: flex; flex-direction: column;
       gap: var(--space-3);
       flex: 1;
+      min-height: 0;
+      overflow-y: auto;
     }
     .begrunnelse-empty {
       flex: 1;
@@ -440,7 +473,58 @@
       font-size: var(--text-base); font-weight: var(--font-medium);
       color: var(--color-text-primary);
       line-height: var(--leading-relaxed);
+    }
+    .begrunnelse-item .begrunnelse-vote {
+      font-size: var(--text-xs); font-weight: var(--font-extrabold);
+      color: white; padding: 2px 9px; border-radius: var(--radius-full);
+      display: inline-block; margin-bottom: var(--space-2);
+    }
+    .begrunnelse-item .begrunnelse-vote.vote-sant { background: var(--color-sant); }
+    .begrunnelse-item .begrunnelse-vote.vote-delvis { background: var(--color-delvis); }
+    .begrunnelse-item .begrunnelse-vote.vote-usant { background: var(--color-usant); }
+    .begrunnelse-item .begrunnelse-reason-text { font-style: italic; }
+    .begrunnelse-highlighted-list {
+      display: flex; flex-direction: column;
+      gap: var(--space-3);
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+    .begrunnelse-highlighted-item {
+      padding: var(--space-4) var(--space-5);
+      border-left: 3px solid var(--color-primary-400);
+      background: var(--color-primary-50);
+      border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+      font-size: var(--text-base); font-weight: var(--font-medium);
+      color: var(--color-text-primary);
+      line-height: var(--leading-relaxed);
+    }
+    .begrunnelse-highlighted-item .highlighted-vote {
+      font-size: var(--text-xs); font-weight: var(--font-extrabold);
+      color: white; padding: 2px 9px; border-radius: var(--radius-full);
+      display: inline-block; margin-bottom: var(--space-2);
+    }
+    .begrunnelse-highlighted-item .highlighted-vote.vote-sant { background: var(--color-sant); }
+    .begrunnelse-highlighted-item .highlighted-vote.vote-delvis { background: var(--color-delvis); }
+    .begrunnelse-highlighted-item .highlighted-vote.vote-usant { background: var(--color-usant); }
+    .begrunnelse-highlighted-item .highlighted-text {
       font-style: italic;
+    }
+    .begrunnelse-highlighted-item { position: relative; }
+    .btn-remove-highlighted {
+      position: absolute; top: 8px; right: 8px;
+      width: 22px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+      background: transparent; border: 1.5px solid var(--color-neutral-300);
+      border-radius: var(--radius-full);
+      font-size: 14px; line-height: 1; color: var(--color-text-tertiary);
+      cursor: pointer; transition: all var(--transition-fast);
+      padding: 0;
+    }
+    .btn-remove-highlighted:hover {
+      background: var(--color-neutral-100);
+      border-color: var(--color-neutral-400);
+      color: var(--color-text-primary);
     }
     .begrunnelse-nav {
       display: flex; align-items: center; justify-content: space-between;
@@ -471,6 +555,11 @@
     }
     .btn-back-highlighted svg { width: 12px; height: 12px; }
     .btn-back-highlighted.visible { display: flex; }
+    .highlighted-label {
+      font-size: var(--text-xs); font-weight: var(--font-bold);
+      color: var(--color-primary-500);
+      padding: var(--space-1) 0;
+    }
     .begrunnelse-btns {
       display: flex; gap: var(--space-2);
     }
@@ -535,15 +624,16 @@
     .step-item.active .step-num { background: var(--color-primary-500); color: white; }
     .step-item.active .step-label { color: var(--color-primary-700); }
   </style>
+  <script>if(window.parent!==window)window.parent.postMessage({type:'fagprat-steg-loaded',steg:2},'*');</script>
 </head>
 <body>
 
   <!-- ═══════════ TOP BAR ═══════════ -->
   <header class="top-bar">
     <div class="top-bar-left">
-      <img src="../Logoer og professoren/FagPrat - logo.png" alt="FagPrat" class="top-bar-logo">
+      <img src="assets/FagPrat - logo.png" alt="FagPrat" class="top-bar-logo">
       <div class="top-bar-divider"></div>
-      <span class="top-bar-title">Newtons lover</span>
+      <span class="top-bar-title">Klima og bærekraft</span>
     </div>
     <div class="top-bar-right">
       <button class="btn-record-topbar" id="btn-record-topbar" title="Ta opp diskusjonen">
@@ -575,14 +665,14 @@
 
       <!-- Statement – colored, no label -->
       <div class="statement-card">
-        <div class="statement-text">Dyr er avhengige av planter for å overleve, mens planter er ikke avhengige av dyr for å overleve.</div>
+        <div class="statement-text">Klimaendringene rammer fattige land hardest.</div>
       </div>
 
       <div class="professor-spacer"></div>
 
       <!-- Professor -->
       <div class="professor-row">
-        <img src="../Logoer og professoren/Professoren.png" alt="Professoren" class="professor-img">
+        <img src="assets/Professoren.png" alt="Professoren" class="professor-img">
         <div class="professor-bubble">
           Diskuter med læringspartneren din. Forklar hva du tenker og lytt til hva den andre mener.
         </div>
@@ -615,7 +705,7 @@
                   <div class="avg-confidence">
                     <div class="avg-left">
                       <span class="avg-label">Gjennomsnittlig sikkerhet:</span>
-                      <span class="avg-number">2.8</span>
+                      <span class="avg-number" id="avg-number">–</span>
                     </div>
                     <button class="btn-expand-avg" id="btn-expand-avg" title="Vis fordelt på kategori">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -623,41 +713,38 @@
                     <div class="avg-breakdown" id="avg-breakdown">
                       <div class="avg-breakdown-row">
                         <span class="avg-breakdown-label">Sant:</span>
-                        <span class="avg-breakdown-value">3,4</span>
+                        <span class="avg-breakdown-value" id="avg-sant">–</span>
                       </div>
                       <div class="avg-breakdown-row">
                         <span class="avg-breakdown-label">Delvis sant:</span>
-                        <span class="avg-breakdown-value">2,6</span>
+                        <span class="avg-breakdown-value" id="avg-delvis">–</span>
                       </div>
                       <div class="avg-breakdown-row">
                         <span class="avg-breakdown-label">Usant:</span>
-                        <span class="avg-breakdown-value">3,2</span>
+                        <span class="avg-breakdown-value" id="avg-usant">–</span>
                       </div>
                     </div>
                   </div>
                   <div class="stats-divider"></div>
-                  <div class="distribution-rows">
-                    <div class="dist-row">
-                      <span class="dist-count">10 stk</span>
+                  <div class="distribution-rows" id="distribution-rows">
+                    <div class="dist-row" id="dist-sant">
+                      <span class="dist-count">–</span>
                       <div class="dist-bar-wrap">
-                        <span class="dist-pct" data-pct="42">42%</span>
-                        <div class="dist-bar sant" data-pct="42"></div>
+                        <div class="dist-bar sant" data-pct="0"><span class="dist-pct">0%</span></div>
                       </div>
                       <span class="dist-label">Sant</span>
                     </div>
-                    <div class="dist-row">
-                      <span class="dist-count">8 stk</span>
+                    <div class="dist-row" id="dist-delvis">
+                      <span class="dist-count">–</span>
                       <div class="dist-bar-wrap">
-                        <span class="dist-pct" data-pct="33">33%</span>
-                        <div class="dist-bar delvis" data-pct="33"></div>
+                        <div class="dist-bar delvis" data-pct="0"><span class="dist-pct">0%</span></div>
                       </div>
                       <span class="dist-label">Delvis sant</span>
                     </div>
-                    <div class="dist-row">
-                      <span class="dist-count">6 stk</span>
+                    <div class="dist-row" id="dist-usant">
+                      <span class="dist-count">–</span>
                       <div class="dist-bar-wrap">
-                        <span class="dist-pct" data-pct="25">25%</span>
-                        <div class="dist-bar usant" data-pct="25"></div>
+                        <div class="dist-bar usant" data-pct="0"><span class="dist-pct">0%</span></div>
                       </div>
                       <span class="dist-label">Usant</span>
                     </div>
@@ -673,6 +760,7 @@
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                       Fremhevet
                     </button>
+                    <span class="highlighted-label" id="highlighted-label" style="display:none;">Fremhevet</span>
                     <div class="begrunnelse-nav-right">
                       <span class="begrunnelse-counter" id="begrunnelse-counter">1 av 3</span>
                       <div class="begrunnelse-btns">
@@ -689,9 +777,10 @@
                     <div class="begrunnelse-empty-icon">
                       <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
                     </div>
-                    <div class="begrunnelse-empty-text">Velg en begrunnelse fra live-oversikten på din enhet for å vise den her.</div>
+                    <div class="begrunnelse-empty-text">Trykk på begrunnelser i live-statistikken på din eksterne enhet for å fremheve dem her.</div>
                   </div>
                   <div class="begrunnelse-item" id="begrunnelse-text" style="display:none;"></div>
+                  <div class="begrunnelse-highlighted-list" id="begrunnelse-highlighted" style="display:none;"></div>
                 </div>
               </div>
             </div>
@@ -747,6 +836,19 @@
       if (stmt) {
         var stmtText = document.querySelector('.statement-text');
         if (stmtText) stmtText.textContent = stmt.text;
+        var colorMap = {
+          blue:   { bg1: '#E3F1FC', bg2: '#D6ECFA', border: '#B8DAF0', text: '#2C5F8A' },
+          orange: { bg1: '#FFF3E0', bg2: '#FFE0B2', border: '#FFB74D', text: '#BF360C' },
+          yellow: { bg1: '#FFF8E1', bg2: '#FFF3CD', border: '#FFD54F', text: '#5D4037' },
+          purple: { bg1: '#F3E5F5', bg2: '#E8D5F0', border: '#CE93D8', text: '#6A1B9A' },
+          red:    { bg1: '#FFEBEE', bg2: '#FFCDD2', border: '#EF9A9A', text: '#B71C1C' }
+        };
+        var c = colorMap[stmt.color];
+        if (c) {
+          var card = document.querySelector('.statement-card');
+          if (card) { card.style.background = 'linear-gradient(135deg, ' + c.bg1 + ', ' + c.bg2 + ')'; card.style.borderColor = c.border; }
+          if (stmtText) stmtText.style.color = c.text;
+        }
       }
     })();
 
@@ -759,20 +861,9 @@
     function positionPctLabels() {
       document.querySelectorAll('.dist-bar-wrap').forEach(wrap => {
         const bar = wrap.querySelector('.dist-bar');
-        const pct = wrap.querySelector('.dist-pct');
-        if (!bar || !pct) return;
+        if (!bar) return;
         const val = parseInt(bar.dataset.pct);
         bar.style.height = val + '%';
-        // Position pct just above the colored bar, inside the grey area
-        if (val >= 85) {
-          // Inside the colored bar (near the top)
-          pct.style.bottom = (val - 5) + '%';
-          pct.style.color = 'white';
-        } else {
-          // Just above the colored bar
-          pct.style.bottom = (val + 2) + '%';
-          pct.style.color = 'var(--color-text-secondary)';
-        }
       });
     }
     positionPctLabels();
@@ -809,8 +900,21 @@
       }
     });
 
-    // Steg 2: Panel should always START CLOSED (set in HTML, just update localStorage)
-    localStorage.setItem('fagprat-panel-collapsed', '1');
+    // Steg 2: Panel should end up CLOSED
+    // If previous step left it open, animate it closed
+    if (localStorage.getItem('fagprat-panel-collapsed') !== '1') {
+      panel.style.transition = 'none';
+      panel.classList.remove('collapsed');
+      toggleBtn.classList.remove('flipped');
+      setTimeout(function() {
+        panel.style.transition = '';
+        panel.classList.add('collapsed');
+        toggleBtn.classList.add('flipped');
+        localStorage.setItem('fagprat-panel-collapsed', '1');
+      }, 30);
+    } else {
+      localStorage.setItem('fagprat-panel-collapsed', '1');
+    }
 
     // Position chart labels on load
     setTimeout(positionPctLabels, 100);
@@ -844,46 +948,454 @@
       if (!isRecording) startRecording(); else stopRecording();
     });
 
-    // ── Begrunnelser navigation ──
-    const begrunnelser = [
-      '«Planter er de eneste som har klorofyll»',
-      '«Alger kan også drive fotosyntese»',
-      '«Bare grønne deler av planten gjør det»'
+    var stmtStats = {
+      0: {
+        rh: [
+          { vote: 'sant', conf: 4, reason: 'De har ikke like mye penger til å fikse ting hvis noe skjer.' },
+          { vote: 'sant', conf: 5, reason: 'Rike land klarer seg bedre, mens fattige land får større problemer når det blir ekstremvær.' },
+          { vote: 'sant', conf: 4 },
+          { vote: 'sant', conf: 4, reason: 'Hvis det blir tørke eller flom så er det verre der.' },
+          { vote: 'sant', conf: 4 },
+          { vote: 'sant', conf: 4, reason: 'De har mindre ressurser til å takle det.' },
+          { vote: 'sant', conf: 4 },
+          { vote: 'sant', conf: 4 },
+          { vote: 'sant', conf: 5 },
+          { vote: 'sant', conf: 5, reason: 'Det blir større konsekvenser der.' },
+          { vote: 'sant', conf: 5 }
+        ],
+        rl: [
+          { vote: 'sant', conf: 3, reason: 'De har mindre hjelp og sånt.' },
+          { vote: 'sant', conf: 3 },
+          { vote: 'sant', conf: 3 },
+          { vote: 'sant', conf: 2, reason: 'Jeg er ikke helt sikker, men tror det er varmere der.' }
+        ],
+        fh: [
+          { vote: 'usant', conf: 5, reason: 'Jeg tror klimaendringer rammer alle ganske likt.' },
+          { vote: 'delvis', conf: 5 }
+        ],
+        fl: [
+          { vote: 'delvis', conf: 3 },
+          { vote: 'delvis', conf: 3 },
+          { vote: 'usant', conf: 3 },
+          { vote: 'usant', conf: 2, reason: 'Jeg vet ikke helt, men tror det handler mest om vær.' }
+        ]
+      },
+      1: {
+        rh: [
+          { vote: 'usant', conf: 5 },
+          { vote: 'usant', conf: 5 },
+          { vote: 'usant', conf: 5, reason: 'Det er utslipp når de lages.' },
+          { vote: 'usant', conf: 5 },
+          { vote: 'usant', conf: 5 }
+        ],
+        rl: [
+          { vote: 'usant', conf: 3 }
+        ],
+        fh: [
+          { vote: 'sant', conf: 4, reason: 'De slipper ikke ut noe når man kjører.' },
+          { vote: 'sant', conf: 5, reason: 'Jeg tenker elbiler er mye bedre enn bensinbiler, så da virker det som null utslipp.' },
+          { vote: 'sant', conf: 4, reason: 'De har ikke eksos så da er det null utslipp.' },
+          { vote: 'sant', conf: 5, reason: 'De går på strøm, men det kan jo være utslipp et annet sted.' },
+          { vote: 'sant', conf: 5, reason: 'Elbiler er utslippsfrie fordi de ikke har eksos.' },
+          { vote: 'sant', conf: 5, reason: 'De er helt utslippsfrie.' },
+          { vote: 'sant', conf: 4, reason: 'Ingen eksos = ingen utslipp.' },
+          { vote: 'sant', conf: 4 }
+        ],
+        fl: [
+          { vote: 'delvis', conf: 3, reason: 'Det er ikke utslipp når man kjører, men kanskje når de lages.' },
+          { vote: 'sant', conf: 3 },
+          { vote: 'delvis', conf: 3 },
+          { vote: 'delvis', conf: 3, reason: 'Ikke når man kjører, men kanskje ellers.' },
+          { vote: 'sant', conf: 2, reason: 'De går på strøm så jeg tror det er null.' },
+          { vote: 'delvis', conf: 3 },
+          { vote: 'delvis', conf: 3, reason: 'Strømmen og batteriet gir utslipp.' }
+        ]
+      },
+      2: {
+        rh: [
+          { vote: 'usant', conf: 4, reason: 'Noen handler om fattigdom og skole også.' },
+          { vote: 'usant', conf: 4 },
+          { vote: 'usant', conf: 5, reason: 'Mange av målene handler om fattigdom, helse og utdanning, ikke bare klima.' }
+        ],
+        rl: [
+          { vote: 'usant', conf: 3 },
+          { vote: 'usant', conf: 3, reason: 'Jeg tror noen av målene handler om helse, utdanning og å stoppe fattigdom.' },
+          { vote: 'usant', conf: 3 },
+          { vote: 'usant', conf: 3, reason: 'Er ikke noe med skole og sånt også?' },
+          { vote: 'usant', conf: 2 },
+          { vote: 'usant', conf: 3 },
+          { vote: 'usant', conf: 2 }
+        ],
+        fh: [
+          { vote: 'sant', conf: 4, reason: 'Det handler om å redde jorda og miljøet.' }
+        ],
+        fl: [
+          { vote: 'delvis', conf: 2, reason: 'Jeg tror ikke alle handler om miljø.' },
+          { vote: 'delvis', conf: 2, reason: 'Jeg tror de fleste handler om klima, men er ikke helt sikker.' },
+          { vote: 'sant', conf: 2, reason: 'Vi snakker mest om klima, så jeg trodde det var det.' },
+          { vote: 'sant', conf: 2 },
+          { vote: 'sant', conf: 1 },
+          { vote: 'sant', conf: 1 },
+          { vote: 'sant', conf: 1 },
+          { vote: 'sant', conf: 2, reason: 'Kanskje det handler om mer enn bare miljø.' },
+          { vote: 'sant', conf: 1 },
+          { vote: 'sant', conf: 3, reason: 'Jeg forbinder bærekraft mest med klima og miljø.' }
+        ]
+      },
+      3: {
+        rh: [
+          { vote: 'delvis', conf: 4, reason: 'Det hjelper mye, men ikke alt.' },
+          { vote: 'delvis', conf: 4, reason: 'Vi må gjøre mer enn bare energi.' },
+          { vote: 'delvis', conf: 4, reason: 'Fornybar energi hjelper med strøm, men vi må også endre transport, industri og hvordan vi lever.' }
+        ],
+        rl: [
+          { vote: 'delvis', conf: 3 },
+          { vote: 'delvis', conf: 2 },
+          { vote: 'delvis', conf: 3, reason: 'Det er ikke bare strøm som forurenser, så det løser ikke alt.' },
+          { vote: 'delvis', conf: 3 },
+          { vote: 'delvis', conf: 3, reason: 'Jeg er ikke helt sikker på hvor mye det hjelper.' },
+          { vote: 'delvis', conf: 3 }
+        ],
+        fh: [
+          { vote: 'sant', conf: 5, reason: 'Hvis vi bare bytter til fornybar så løser det seg.' },
+          { vote: 'sant', conf: 4, reason: 'Hvis strømmen blir fornybar, forsvinner utslippene.' },
+          { vote: 'sant', conf: 5, reason: 'Hvis alle bruker fornybar så stopper utslipp.' }
+        ],
+        fl: [
+          { vote: 'sant', conf: 3 },
+          { vote: 'usant', conf: 1, reason: 'Jeg er ikke helt sikker egentlig.' },
+          { vote: 'sant', conf: 2 },
+          { vote: 'sant', conf: 3 },
+          { vote: 'sant', conf: 3 },
+          { vote: 'usant', conf: 2, reason: 'Det er en del av løsningen.' },
+          { vote: 'usant', conf: 2 },
+          { vote: 'usant', conf: 2, reason: 'Det er kanskje ikke nok alene.' },
+          { vote: 'usant', conf: 1 }
+        ]
+      }
+    };
+
+    // Map statement text to index (first few chars)
+    var stmtTextMap = [
+      'Klimaendringene rammer',
+      'El-biler er helt',
+      'Alle FNs bærekraftsmål',
+      'Fornybar energi kan'
     ];
-    let currentBegrunnelse = -1;
-    let highlightedBegrunnelse = 0; // the one teacher highlighted from mobile
+
+    function computeStats(data, stmtIdx) {
+      var all = [].concat(data.rh || [], data.rl || [], data.fh || [], data.fl || []);
+      var counts = { sant: 0, delvis: 0, usant: 0 };
+      var confSums = { sant: 0, delvis: 0, usant: 0 };
+      var totalConf = 0;
+
+      all.forEach(function(s) {
+        var v = s.vote === 'delvis' ? 'delvis' : s.vote;
+        counts[v] = (counts[v] || 0) + 1;
+        confSums[v] = (confSums[v] || 0) + s.conf;
+        totalConf += s.conf;
+      });
+
+      // Collect reasons in chronological trickle-in order (same algorithm as statistikk.html)
+      var withReasons = [];
+      all.forEach(function(s, i) {
+        if (s.reason) withReasons.push({ reason: s.reason, origIdx: i, reasonLen: s.reason.length });
+      });
+      // Deterministic shuffle matching statistikk.html's Fisher-Yates
+      var idx = (stmtIdx != null) ? stmtIdx : 0;
+      var seed = (idx + 1) * 7919;
+      function nextRand() { seed = (seed * 16807 + 11) % 2147483647; return seed / 2147483647; }
+      // Shuffle all students (not just those with reasons) to get same seed state
+      var order = [];
+      for (var i = 0; i < all.length; i++) order.push(i);
+      for (var j = all.length - 1; j > 0; j--) {
+        var k = Math.floor(nextRand() * (j + 1));
+        var tmp = order[j]; order[j] = order[k]; order[k] = tmp;
+      }
+      var shuffledAll = order.map(function(i) { return { s: all[i], origIdx: i }; });
+      // Arrival scoring: reason length tiers + jitter (matching statistikk.html)
+      shuffledAll.forEach(function(item) {
+        var len = item.s.reason ? item.s.reason.length : 0;
+        var tier = len === 0 ? 0 : len <= 35 ? 1 : len <= 50 ? 2 : 3;
+        var jitter = nextRand() * 4;
+        item._arrivalScore = tier * 2 + jitter;
+      });
+      shuffledAll.sort(function(a, b) { return a._arrivalScore - b._arrivalScore; });
+      // Extract reasons in arrival order
+      var reasons = [];
+      shuffledAll.forEach(function(item) {
+        if (item.s.reason) reasons.push({ vote: item.s.vote, reason: item.s.reason });
+      });
+
+      var total = all.length;
+      var avgTotal = total > 0 ? (totalConf / total) : 0;
+      var avgSant = counts.sant > 0 ? (confSums.sant / counts.sant) : 0;
+      var avgDelvis = counts.delvis > 0 ? (confSums.delvis / counts.delvis) : 0;
+      var avgUsant = counts.usant > 0 ? (confSums.usant / counts.usant) : 0;
+
+      return {
+        total: total,
+        counts: counts,
+        pcts: {
+          sant: total > 0 ? Math.round(counts.sant / total * 100) : 0,
+          delvis: total > 0 ? Math.round(counts.delvis / total * 100) : 0,
+          usant: total > 0 ? Math.round(counts.usant / total * 100) : 0
+        },
+        avgTotal: avgTotal,
+        avgSant: avgSant,
+        avgDelvis: avgDelvis,
+        avgUsant: avgUsant,
+        reasons: reasons
+      };
+    }
+
+    function updatePanel(stats, resetBegrunnelser) {
+      // Average confidence
+      document.getElementById('avg-number').textContent = stats.avgTotal.toFixed(1).replace('.', ',');
+      document.getElementById('avg-sant').textContent = stats.avgSant.toFixed(1).replace('.', ',');
+      document.getElementById('avg-delvis').textContent = stats.avgDelvis.toFixed(1).replace('.', ',');
+      document.getElementById('avg-usant').textContent = stats.avgUsant.toFixed(1).replace('.', ',');
+
+      // Distribution bars
+      ['sant', 'delvis', 'usant'].forEach(function(cat) {
+        var row = document.getElementById('dist-' + cat);
+        var count = row.querySelector('.dist-count');
+        var pctEl = row.querySelector('.dist-pct');
+        var bar = row.querySelector('.dist-bar');
+        var pct = stats.pcts[cat];
+        count.textContent = stats.counts[cat] + ' stk';
+        pctEl.textContent = pct + '%';
+        bar.dataset.pct = pct;
+      });
+
+      positionPctLabels();
+
+      // Only reset begrunnelser on statement change, not on live stats updates
+      if (resetBegrunnelser) {
+        begrunnelser = [];
+        currentBegrunnelse = -1;
+        begrunnelseEmpty.style.display = '';
+        begrunnelseText.style.display = 'none';
+        begrunnelseCounter.textContent = '0 av 0';
+      }
+    }
+
+    // ── Begrunnelser navigation ──
+    var begrunnelser = [];
+    var currentBegrunnelse = -1;
+    var highlightedReasons = [];
+    var viewMode = 'highlighted'; // Start in highlighted mode (waiting for teacher to pick)
     const begrunnelseText = document.getElementById('begrunnelse-text');
     const begrunnelseCounter = document.getElementById('begrunnelse-counter');
     const begrunnelseEmpty = document.getElementById('begrunnelse-empty');
     const btnBackHighlighted = document.getElementById('btn-back-highlighted');
+    const highlightedContainer = document.getElementById('begrunnelse-highlighted');
 
-    function showBegrunnelse() {
-      begrunnelseEmpty.style.display = 'none';
-      begrunnelseText.style.display = '';
-      begrunnelseText.textContent = begrunnelser[currentBegrunnelse];
-      begrunnelseCounter.textContent = (currentBegrunnelse + 1) + ' av ' + begrunnelser.length;
-      // Show back button if browsing away from highlighted
-      if (currentBegrunnelse !== highlightedBegrunnelse) {
-        btnBackHighlighted.classList.add('visible');
-      } else {
+    var voteLabelsMap = { sant: 'Sant', delvis: 'Delvis sant', usant: 'Usant' };
+
+    var highlightedLabel = document.getElementById('highlighted-label');
+
+    function updateNavVisibility() {
+      if (viewMode === 'highlighted') {
+        begrunnelseCounter.style.display = 'none';
         btnBackHighlighted.classList.remove('visible');
+        highlightedLabel.style.display = highlightedReasons.length > 0 ? '' : 'none';
+      } else {
+        begrunnelseCounter.style.display = '';
+        highlightedLabel.style.display = 'none';
+        if (highlightedReasons.length > 0) {
+          btnBackHighlighted.classList.add('visible');
+        } else {
+          btnBackHighlighted.classList.remove('visible');
+        }
       }
     }
 
-    btnBackHighlighted.addEventListener('click', () => {
-      currentBegrunnelse = highlightedBegrunnelse;
-      showBegrunnelse();
-    });
+    function showBegrunnelse() {
+      if (begrunnelser.length === 0 || currentBegrunnelse < 0) {
+        begrunnelseEmpty.style.display = '';
+        begrunnelseText.style.display = 'none';
+        begrunnelseCounter.textContent = '0 av 0';
+        return;
+      }
+      begrunnelseEmpty.style.display = 'none';
+      begrunnelseText.style.display = '';
+      var item = begrunnelser[currentBegrunnelse];
+      var vote = typeof item === 'object' ? item.vote : null;
+      var reason = typeof item === 'object' ? item.reason : item;
+      var html = '';
+      if (vote) {
+        html += '<span class="begrunnelse-vote vote-' + vote + '">' + (voteLabelsMap[vote] || vote) + '</span>';
+      }
+      html += '<div class="begrunnelse-reason-text">«' + reason + '»</div>';
+      begrunnelseText.innerHTML = html;
+      begrunnelseCounter.textContent = (currentBegrunnelse + 1) + ' av ' + begrunnelser.length;
+    }
 
-    document.getElementById('btn-prev-begrunnelse').addEventListener('click', () => {
+    function removeHighlighted(reason) {
+      highlightedReasons = highlightedReasons.filter(function(h) { return h.reason !== reason; });
+      window.parent.postMessage({ type: 'fagprat-unhighlight-reason', reason: reason }, '*');
+      if (highlightedReasons.length > 0) {
+        renderHighlighted();
+      } else {
+        // Show the highlighted empty state
+        highlightedContainer.style.display = 'none';
+        highlightedContainer.innerHTML = '';
+        begrunnelseEmpty.style.display = '';
+        begrunnelseEmpty.querySelector('.begrunnelse-empty-text').textContent = 'Trykk på begrunnelser i live-statistikken på din eksterne enhet for å fremheve dem her.';
+      }
+      updateNavVisibility();
+    }
+
+    function renderHighlighted() {
+      highlightedContainer.innerHTML = '';
+      if (highlightedReasons.length === 0) {
+        highlightedContainer.style.display = 'none';
+        begrunnelseEmpty.style.display = '';
+        begrunnelseEmpty.querySelector('.begrunnelse-empty-text').textContent = 'Trykk på begrunnelser i live-statistikken på din eksterne enhet for å fremheve dem her.';
+        return;
+      }
+      begrunnelseEmpty.style.display = 'none';
+      highlightedContainer.style.display = '';
+      highlightedReasons.forEach(function(h) {
+        var div = document.createElement('div');
+        div.className = 'begrunnelse-highlighted-item';
+        div.innerHTML = '<span class="highlighted-vote vote-' + h.vote + '">' + (voteLabelsMap[h.vote] || h.vote) + '</span>' +
+          '<button class="btn-remove-highlighted" title="Fjern">&times;</button>' +
+          '<div class="highlighted-text">«' + h.reason + '»</div>';
+        div.querySelector('.btn-remove-highlighted').addEventListener('click', function() {
+          removeHighlighted(h.reason);
+        });
+        highlightedContainer.appendChild(div);
+      });
+    }
+
+    function switchToHighlighted() {
+      viewMode = 'highlighted';
+      begrunnelseText.style.display = 'none';
+      highlightedContainer.style.display = '';
+      renderHighlighted();
+      updateNavVisibility();
+    }
+
+    function switchToCarousel() {
+      viewMode = 'carousel';
+      highlightedContainer.style.display = 'none';
+      begrunnelseEmpty.style.display = 'none';
+      showBegrunnelse();
+      updateNavVisibility();
+    }
+
+    document.getElementById('btn-prev-begrunnelse').addEventListener('click', function() {
+      if (begrunnelser.length === 0) return;
+      if (viewMode === 'highlighted') {
+        currentBegrunnelse = 0; // Start at first when coming from highlighted
+        switchToCarousel();
+        return;
+      }
       if (currentBegrunnelse <= 0) currentBegrunnelse = begrunnelser.length - 1;
       else currentBegrunnelse--;
       showBegrunnelse();
     });
-    document.getElementById('btn-next-begrunnelse').addEventListener('click', () => {
+    document.getElementById('btn-next-begrunnelse').addEventListener('click', function() {
+      if (begrunnelser.length === 0) return;
+      if (viewMode === 'highlighted') {
+        currentBegrunnelse = 0; // Start at first when coming from highlighted
+        switchToCarousel();
+        return;
+      }
       currentBegrunnelse = (currentBegrunnelse + 1) % begrunnelser.length;
       showBegrunnelse();
     });
+
+    btnBackHighlighted.addEventListener('click', function() {
+      switchToHighlighted();
+    });
+
+    // ── Initial state: highlighted mode with empty message ──
+    begrunnelseEmpty.querySelector('.begrunnelse-empty-text').textContent = 'Trykk på begrunnelser i live-statistikken på din eksterne enhet for å fremheve dem her.';
+    begrunnelseEmpty.style.display = '';
+    begrunnelseText.style.display = 'none';
+    highlightedContainer.style.display = 'none';
+    updateNavVisibility();
+
+    // ── Listen for messages from demo parent ──
+    window.addEventListener('message', function(e) {
+      if (!e.data) return;
+
+      // Statement changed — reset to highlighted empty state
+      if (e.data.type === 'fagprat-statement') {
+        begrunnelser = [];
+        currentBegrunnelse = -1;
+        highlightedReasons = [];
+        viewMode = 'highlighted';
+        begrunnelseEmpty.querySelector('.begrunnelse-empty-text').textContent = 'Trykk på begrunnelser i live-statistikken på din eksterne enhet for å fremheve dem her.';
+        begrunnelseEmpty.style.display = '';
+        begrunnelseText.style.display = 'none';
+        highlightedContainer.style.display = 'none';
+        highlightedContainer.innerHTML = '';
+        updateNavVisibility();
+      }
+
+      // Live sync from phone: update stats + begrunnelser carousel (don't switch view)
+      if (e.data.type === 'fagprat-reasons-update') {
+        if (e.data.stats) {
+          updatePanel(e.data.stats, false);
+        }
+        begrunnelser = e.data.reasons || [];
+        if (begrunnelser.length === 0) {
+          currentBegrunnelse = -1;
+        } else if (currentBegrunnelse >= begrunnelser.length) {
+          currentBegrunnelse = begrunnelser.length - 1;
+        } else if (currentBegrunnelse < 0) {
+          currentBegrunnelse = 0;
+        }
+        // Only update carousel if already in carousel mode
+        if (viewMode === 'carousel') {
+          showBegrunnelse();
+        }
+      }
+
+      // Highlight/unhighlight a specific reason from phone
+      if (e.data.type === 'fagprat-highlight-reason') {
+        var vote = e.data.vote;
+        var reason = e.data.reason;
+        var isHighlighted = e.data.highlighted;
+
+        if (isHighlighted) {
+          // Add if not already there
+          var exists = highlightedReasons.some(function(h) { return h.reason === reason; });
+          if (!exists) {
+            highlightedReasons.push({ vote: vote, reason: reason });
+          }
+        } else {
+          // Remove
+          highlightedReasons = highlightedReasons.filter(function(h) { return h.reason !== reason; });
+        }
+
+        if (highlightedReasons.length > 0) {
+          // Always switch to highlighted view when a reason is highlighted
+          switchToHighlighted();
+        } else {
+          // All removed
+          if (viewMode === 'highlighted') {
+            highlightedContainer.style.display = 'none';
+            highlightedContainer.innerHTML = '';
+            begrunnelseEmpty.style.display = '';
+            begrunnelseEmpty.querySelector('.begrunnelse-empty-text').textContent = 'Trykk på begrunnelser i live-statistikken på din eksterne enhet for å fremheve dem her.';
+          }
+          updateNavVisibility();
+        }
+      }
+    });
+
+    // ── Initial load: start with empty stats ──
+    // All stats will be populated live from phone via fagprat-reasons-update
+    updatePanel({
+      avgTotal: 0, avgSant: 0, avgDelvis: 0, avgUsant: 0,
+      counts: { sant: 0, delvis: 0, usant: 0 },
+      pcts: { sant: 0, delvis: 0, usant: 0 }
+    }, true);
 
   </script>
 

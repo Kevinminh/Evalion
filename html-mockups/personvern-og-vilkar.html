@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personvern og brukervilkår – CO-LAB</title>
+  <meta name="description" content="Personvernerklæring og brukervilkår for CO-LAB (pre-launch).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-bg: #ECF3EE;
+      --color-bg-warm: #ECF3EE;
+      --color-bg-dark: #1F3530;
+      --color-ink: #1A2420;
+      --color-ink-secondary: #3E5048;
+      --color-ink-tertiary: #708578;
+      --color-sage: #3E7864;
+      --color-sage-light: #D9E8DE;
+      --color-sage-dark: #2A5847;
+      --color-accent: #5E4AC0;
+      --color-white: #FFFFFF;
+      --color-border: #CDE0D3;
+      --color-section-dark: #0B3840;
+      --color-section-light: #ECF3EE;
+
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body: 'Nunito', system-ui, sans-serif;
+
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-10: 40px;
+      --space-12: 48px;
+      --space-16: 64px;
+      --space-20: 80px;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --radius-full: 100px;
+
+      --max-width: 820px;
+    }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+    body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.65;
+      color: var(--color-ink);
+      background: var(--color-bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Top bar ── */
+    .legal-topbar {
+      background: var(--color-section-dark);
+      color: var(--color-white);
+      padding: var(--space-4) 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .legal-topbar-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 var(--space-6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+    }
+    .legal-back {
+      color: var(--color-white);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      opacity: 0.9;
+      transition: opacity 0.15s;
+    }
+    .legal-back:hover { opacity: 1; }
+    .legal-topbar-brand {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    /* ── Hero ── */
+    .legal-hero {
+      padding: var(--space-16) 0 var(--space-10);
+      text-align: center;
+    }
+    .legal-hero .section-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #6B7280;
+      margin-bottom: var(--space-4);
+    }
+    .legal-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 4.5vw, 52px);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--color-ink);
+      letter-spacing: -0.02em;
+      font-variation-settings: "SOFT" 100, "WONK" 1;
+      margin-bottom: var(--space-3);
+    }
+    .legal-hero h1 .accent {
+      font-style: italic;
+      color: var(--color-accent);
+    }
+    .legal-hero p {
+      font-size: 16px;
+      color: var(--color-ink-secondary);
+      max-width: 560px;
+      margin: 0 auto;
+    }
+    .legal-hero .last-updated {
+      margin-top: var(--space-5);
+      font-size: 13px;
+      color: var(--color-ink-tertiary);
+    }
+
+    /* ── TL;DR summary card ── */
+    .legal-summary {
+      max-width: var(--max-width);
+      margin: 0 auto var(--space-12);
+      padding: 0 var(--space-6);
+    }
+    .legal-summary-card {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-8);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+    .legal-summary-card h2 {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 500;
+      margin-bottom: var(--space-4);
+      font-variation-settings: "SOFT" 100, "WONK" 1;
+    }
+    .legal-summary-card ul {
+      list-style: none;
+      padding: 0;
+    }
+    .legal-summary-card li {
+      padding: var(--space-2) 0 var(--space-2) var(--space-6);
+      position: relative;
+      color: var(--color-ink-secondary);
+    }
+    .legal-summary-card li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      top: var(--space-2);
+      color: var(--color-sage);
+      font-weight: 900;
+    }
+
+    /* ── Jump-nav ── */
+    .legal-nav {
+      max-width: var(--max-width);
+      margin: 0 auto var(--space-10);
+      padding: 0 var(--space-6);
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+    .legal-nav a {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 18px;
+      border-radius: var(--radius-full);
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      color: var(--color-ink);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .legal-nav a:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      transform: translateY(-1px);
+    }
+
+    /* ── Content ── */
+    .legal-content {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 var(--space-6) var(--space-20);
+    }
+    .legal-section {
+      scroll-margin-top: 90px;
+      padding-top: var(--space-10);
+    }
+    .legal-section:first-child { padding-top: 0; }
+    .legal-section > h2 {
+      font-family: var(--font-display);
+      font-size: clamp(26px, 3vw, 34px);
+      font-weight: 500;
+      line-height: 1.25;
+      color: var(--color-ink);
+      letter-spacing: -0.01em;
+      font-variation-settings: "SOFT" 100, "WONK" 1;
+      margin-bottom: var(--space-5);
+      padding-bottom: var(--space-4);
+      border-bottom: 2px solid var(--color-border);
+    }
+    .legal-section h3 {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 600;
+      margin: var(--space-8) 0 var(--space-3);
+      color: var(--color-ink);
+      font-variation-settings: "SOFT" 100, "WONK" 0;
+    }
+    .legal-section h3:first-of-type { margin-top: 0; }
+    .legal-section p {
+      margin-bottom: var(--space-4);
+      color: var(--color-ink-secondary);
+    }
+    .legal-section p strong { color: var(--color-ink); }
+    .legal-section ul, .legal-section ol {
+      margin: 0 0 var(--space-5) var(--space-5);
+      padding-left: var(--space-4);
+      color: var(--color-ink-secondary);
+    }
+    .legal-section li {
+      margin-bottom: var(--space-2);
+    }
+
+    /* ── Data tables ── */
+    .legal-table-wrap {
+      overflow-x: auto;
+      margin: var(--space-4) 0 var(--space-6);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+    }
+    .legal-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14.5px;
+    }
+    .legal-table th {
+      background: var(--color-sage-light);
+      color: var(--color-ink);
+      font-weight: 700;
+      text-align: left;
+      padding: var(--space-3) var(--space-4);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .legal-table td {
+      padding: var(--space-3) var(--space-4);
+      border-top: 1px solid var(--color-border);
+      color: var(--color-ink-secondary);
+      vertical-align: top;
+    }
+    .legal-table td strong { color: var(--color-ink); }
+
+    /* ── Callout boxes ── */
+    .legal-callout {
+      background: var(--color-sage-light);
+      border-left: 4px solid var(--color-sage);
+      padding: var(--space-5) var(--space-6);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      margin: var(--space-5) 0;
+    }
+    .legal-callout--ai {
+      background: #EFE7FC;
+      border-left-color: var(--color-accent);
+    }
+    .legal-callout strong { color: var(--color-ink); }
+
+    /* ── Divider between Personvern og Brukervilkår ── */
+    .legal-divider {
+      max-width: var(--max-width);
+      margin: var(--space-20) auto;
+      padding: 0 var(--space-6);
+      text-align: center;
+    }
+    .legal-divider::before {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 2px;
+      background: var(--color-accent);
+      margin: 0 auto var(--space-5);
+      border-radius: 2px;
+    }
+    .legal-divider span {
+      font-family: var(--font-display);
+      font-style: italic;
+      color: var(--color-ink-tertiary);
+      font-size: 15px;
+    }
+
+    /* ── Footer ── */
+    .legal-footer {
+      background: var(--color-section-dark);
+      color: rgba(255,255,255,0.7);
+      padding: var(--space-10) 0;
+      text-align: center;
+      font-size: 14px;
+    }
+    .legal-footer a {
+      color: var(--color-white);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+    }
+    .legal-footer a:hover { border-bottom-color: var(--color-white); }
+    .legal-footer-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 var(--space-6);
+    }
+
+    @media (max-width: 640px) {
+      .legal-topbar-brand { display: none; }
+      .legal-hero { padding: var(--space-10) 0 var(--space-8); }
+      .legal-summary-card { padding: var(--space-5); }
+      .legal-section > h2 { font-size: 24px; }
+      .legal-section h3 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════ TOP BAR ══════════ -->
+  <div class="legal-topbar">
+    <div class="legal-topbar-inner">
+      <a href="index.html" class="legal-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Tilbake til CO-LAB
+      </a>
+      <span class="legal-topbar-brand">CO-LAB</span>
+    </div>
+  </div>
+
+  <!-- ══════════ HERO ══════════ -->
+  <section class="legal-hero">
+    <span class="section-label">Personvern og vilkår</span>
+    <h1>Hvordan vi tar vare på <span class="accent">dataen din</span></h1>
+    <p>En ærlig og enkel forklaring av hva vi samler inn, hvorfor, og hva vi aldri gjør.</p>
+    <p class="last-updated">Sist oppdatert: [Dato]</p>
+  </section>
+
+  <!-- ══════════ TL;DR SUMMARY ══════════ -->
+  <div class="legal-summary">
+    <div class="legal-summary-card">
+      <h2>Kort fortalt</h2>
+      <ul>
+        <li>Vi samler minimalt med data: e-post for varsling og innlogging for påstandsgeneratoren.</li>
+        <li>Input og genererte påstander lagres på profilen din så du finner dem igjen – du kan slette dem når som helst.</li>
+        <li><strong>Vi trener ingen AI-modeller på din data.</strong> Det krever et eget, separat samtykke som vi eventuelt ber om senere.</li>
+        <li>Azure OpenAI (EU-region) genererer påstander og trener ikke på det du sender inn.</li>
+        <li>All data håndteres etter personopplysningsloven og GDPR, lagret i EU/EØS.</li>
+        <li>Du har rett til innsyn, retting, sletting og klage til Datatilsynet.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══════════ JUMP NAV ══════════ -->
+  <nav class="legal-nav" aria-label="Hopp til seksjon">
+    <a href="#personvern">Personvernerklæring</a>
+    <a href="#brukervilkar">Brukervilkår</a>
+    <a href="#kontakt">Kontakt</a>
+  </nav>
+
+  <!-- ══════════ CONTENT ══════════ -->
+  <main class="legal-content">
+
+    <!-- ════ PERSONVERN ════ -->
+    <section class="legal-section" id="personvern">
+      <h2>Personvernerklæring</h2>
+
+      <h3>1. Behandlingsansvarlig</h3>
+      <p>
+        <strong>CO-LAB AS</strong><br>
+        Org.nr. [sett inn]<br>
+        Kontakt: <a href="mailto:hei@co-lab.no">hei@co-lab.no</a>
+      </p>
+
+      <h3>2. Hvilke personopplysninger vi samler inn</h3>
+      <p><strong>Ved påmelding til lanseringsvarsel:</strong></p>
+      <ul>
+        <li>E-postadresse</li>
+        <li>(Valgfritt) navn og skole</li>
+      </ul>
+      <p><strong>Ved opprettelse av konto for påstandsgeneratoren:</strong></p>
+      <ul>
+        <li>E-postadresse</li>
+        <li>Passord (lagret som kryptert hash – vi ser aldri passordet ditt)</li>
+        <li>(Valgfritt) navn og skole</li>
+        <li>Innloggingslogger (tidspunkt, IP) for sikkerhet</li>
+      </ul>
+      <p><strong>Ved bruk av påstandsgeneratoren:</strong></p>
+      <ul>
+        <li>Tekstinput (fag, tema, trinn)</li>
+        <li>Genererte påstander (lagres på din profil så du kan gjenbruke og eksportere dem)</li>
+      </ul>
+
+      <h3>3. Hva som lagres, og hvor lenge</h3>
+      <div class="legal-table-wrap">
+        <table class="legal-table">
+          <thead>
+            <tr><th>Type data</th><th>Lagres?</th><th>Varighet</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>E-postadresse</td><td>Ja</td><td>Til du melder deg av eller sletter kontoen</td></tr>
+            <tr><td>Passord-hash</td><td>Ja</td><td>Til du sletter kontoen</td></tr>
+            <tr><td>Innloggingslogger</td><td>Ja</td><td>90 dager</td></tr>
+            <tr><td>Input til påstandsgeneratoren</td><td>Ja</td><td>Koblet til profilen din, til du sletter</td></tr>
+            <tr><td>Genererte påstander</td><td>Ja</td><td>Koblet til profilen din, til du sletter</td></tr>
+            <tr><td>Anonymisert og aggregert statistikk</td><td>Ja</td><td>Ubestemt (uten personidentifisering)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>4. Formål og rettslig grunnlag</h3>
+      <div class="legal-table-wrap">
+        <table class="legal-table">
+          <thead>
+            <tr><th>Formål</th><th>Rettslig grunnlag (GDPR art. 6)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Varsle om lansering</td><td>Samtykke (a)</td></tr>
+            <tr><td>Drift av innlogging og påstandsgenerator</td><td>Avtaleoppfyllelse (b)</td></tr>
+            <tr><td>Sikkerhetslogger, misbrukshindring</td><td>Berettiget interesse (f)</td></tr>
+            <tr><td>Produktforbedring via anonymisert statistikk</td><td>Berettiget interesse (f)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>5. AI og maskinlæring</h3>
+      <p>Vi bruker <strong>Azure OpenAI</strong> (Microsofts hosting av OpenAI-modeller i EU-region) til å generere påstander fra inputen din.</p>
+
+      <div class="legal-callout legal-callout--ai">
+        <p><strong>Hva vi gjør:</strong></p>
+        <ul>
+          <li>Lagrer input og genererte påstander på din konto så du enkelt kan finne dem igjen.</li>
+          <li>Bruker anonymiserte, aggregerte data (f.eks. "X påstander generert innen naturfag denne måneden") for å forstå bruksmønstre og forbedre generatoren.</li>
+          <li>Retter feil og forbedrer prompter når vi ser at generatoren gir dårlige resultater.</li>
+        </ul>
+        <p style="margin-top: var(--space-4);"><strong>Hva vi IKKE gjør:</strong></p>
+        <ul>
+          <li>Vi trener ingen egne AI-modeller på din data – dette krever et separat, uttrykkelig samtykke vi eventuelt ber om senere.</li>
+          <li>Azure OpenAI trener ikke modellene sine på det du sender inn (Microsofts "no-training"-garanti for Azure OpenAI-tjenesten).</li>
+          <li>Vi deler aldri dine påstander offentlig uten ditt uttrykkelige samtykke.</li>
+        </ul>
+      </div>
+
+      <p><strong>Du kan:</strong></p>
+      <ul>
+        <li>Se dine tidligere genereringer under "Min historikk"</li>
+        <li>Slette enkelt-genereringer eller hele historikken</li>
+        <li>Eksportere påstander som PDF</li>
+      </ul>
+
+      <h3>6. Deling med tredjeparter (databehandlere)</h3>
+      <p>Vi deler kun data med disse leverandørene, og kun der det er nødvendig for å levere tjenesten:</p>
+      <div class="legal-table-wrap">
+        <table class="legal-table">
+          <thead>
+            <tr><th>Leverandør</th><th>Formål</th><th>Lokasjon</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Azure OpenAI (Microsoft)</td><td>AI-generering</td><td>EU-region</td></tr>
+            <tr><td>[E-posttjener, f.eks. Brevo]</td><td>Utsending av lanseringsvarsel</td><td>EU</td></tr>
+            <tr><td>[Hosting, f.eks. Hetzner/AWS EU]</td><td>Drift av nettside og database</td><td>EU</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="legal-callout">
+        <p><strong>Vi selger aldri data. Vi deler aldri med annonsører.</strong></p>
+      </div>
+
+      <h3>7. Overføring utenfor EØS</h3>
+      <p>Vi holder data i EU/EØS der det er mulig. Ved eventuell overføring utenfor EØS bruker vi EUs standardkontrakter (Standard Contractual Clauses).</p>
+
+      <h3>8. Dine rettigheter</h3>
+      <p>Du har rett til å:</p>
+      <ul>
+        <li><strong>Få innsyn</strong> i personopplysningene vi har om deg</li>
+        <li><strong>Rette</strong> feil i opplysningene</li>
+        <li><strong>Slette</strong> opplysningene dine ("retten til å bli glemt")</li>
+        <li><strong>Få utlevert</strong> dataen din i et maskinlesbart format (dataportabilitet)</li>
+        <li><strong>Trekke tilbake samtykke</strong> når som helst</li>
+        <li><strong>Klage til Datatilsynet</strong> (<a href="https://www.datatilsynet.no" target="_blank" rel="noopener">www.datatilsynet.no</a>)</li>
+      </ul>
+      <p>Kontakt <a href="mailto:hei@co-lab.no">hei@co-lab.no</a> for å utøve rettighetene dine.</p>
+
+      <h3>9. Informasjonskapsler (cookies)</h3>
+      <p>Vi bruker kun nødvendige cookies (for innlogging og sikkerhet). Eventuelle analyse-cookies vil kreve samtykke via en banner.</p>
+
+      <h3>10. Sikkerhet</h3>
+      <ul>
+        <li>Alle forbindelser krypteres med TLS (HTTPS).</li>
+        <li>Passord lagres som sikre hasher (bcrypt/argon2).</li>
+        <li>Tilgangskontroll begrenser hvem som kan se dataen.</li>
+      </ul>
+
+      <h3>11. Endringer i personvernerklæringen</h3>
+      <p>Vesentlige endringer varsles via e-post til registrerte brukere, minst 14 dager før de trer i kraft.</p>
+    </section>
+
+    <!-- ════ DIVIDER ════ -->
+    <div class="legal-divider">
+      <span>Del 2 · Brukervilkår</span>
+    </div>
+
+    <!-- ════ BRUKERVILKÅR ════ -->
+    <section class="legal-section" id="brukervilkar">
+      <h2>Brukervilkår</h2>
+
+      <h3>1. Hva er CO-LAB?</h3>
+      <p>CO-LAB er et lærerstyrt digitalt verktøy for klasseromssamtaler. I pre-launch-perioden tilbyr vi:</p>
+      <ul>
+        <li>Påmelding til lanseringsvarsel</li>
+        <li>Tilgang til påstandsgeneratoren (med innlogging)</li>
+      </ul>
+
+      <h3>2. Hvem kan bruke tjenesten</h3>
+      <p>Tjenesten er rettet mot <strong>lærere og pedagogisk personale over 18 år</strong> i norske skoler. Elever kan ikke opprette konto i pre-launch-perioden.</p>
+
+      <h3>3. Konto og sikkerhet</h3>
+      <ul>
+        <li>Du er ansvarlig for å holde passordet ditt hemmelig.</li>
+        <li>Ikke del kontoen din med andre.</li>
+        <li>Mistanke om uautorisert bruk? Kontakt <a href="mailto:hei@co-lab.no">hei@co-lab.no</a>.</li>
+      </ul>
+
+      <h3>4. Bruk av påstandsgeneratoren</h3>
+      <p><strong>Hva du kan gjøre:</strong></p>
+      <ul>
+        <li>Generere påstander til egen undervisning</li>
+        <li>Finne igjen tidligere genereringer i "Min historikk"</li>
+        <li>Eksportere påstander som PDF</li>
+        <li>Bruke påstandene fritt i din egen undervisning</li>
+      </ul>
+      <p><strong>Hva du ikke kan gjøre:</strong></p>
+      <ul>
+        <li>Bruke tjenesten til ulovlig, trakasserende eller skadelig innhold</li>
+        <li>Legge inn personidentifiserende elev-informasjon (som elevnavn) i input</li>
+        <li>Forsøke å reversere, "hacke" eller overbelaste tjenesten</li>
+        <li>Videreselge eller distribuere påstander som om de var CO-LAB-produkter</li>
+      </ul>
+
+      <h3>5. Innhold og eierskap</h3>
+      <ul>
+        <li>Påstandene du genererer er dine å bruke fritt i undervisning.</li>
+        <li>CO-LAB har ingen rettighetskrav på påstandene du lager.</li>
+        <li><strong>AI-generert innhold kan være unøyaktig</strong> – du har ansvar for å kvalitetssjekke før bruk i klasserommet.</li>
+      </ul>
+
+      <h3>6. Gratis i pre-launch</h3>
+      <p>Pre-launch-tilgangen er gratis fram til offisiell lansering. Vi forbeholder oss retten til å innføre betaling eller endre tilgangsnivåer etter lansering, med rimelig varsel på forhånd.</p>
+
+      <h3>7. Ansvarsfraskrivelse</h3>
+      <ul>
+        <li>Tjenesten leveres "som den er" i pre-launch-fasen.</li>
+        <li>Vi gir ingen garanti for oppetid, nøyaktighet av AI-generert innhold eller tilgjengelighet.</li>
+        <li>CO-LAB er ikke ansvarlig for hvordan påstandene brukes i klasserommet.</li>
+      </ul>
+
+      <h3>8. Oppsigelse</h3>
+      <ul>
+        <li>Du kan slette kontoen din når som helst via innstillinger eller ved å kontakte oss.</li>
+        <li>Vi forbeholder oss retten til å suspendere kontoer som bryter vilkårene.</li>
+      </ul>
+
+      <h3>9. Endringer i vilkårene</h3>
+      <p>Vi kan oppdatere vilkårene. Vesentlige endringer varsles 14 dager før de trer i kraft.</p>
+
+      <h3>10. Lovvalg og verneting</h3>
+      <p>Disse vilkårene reguleres av <strong>norsk rett</strong>. Eventuelle tvister løses i <strong>Oslo tingrett</strong> som verneting.</p>
+    </section>
+
+    <!-- ════ KONTAKT ════ -->
+    <section class="legal-section" id="kontakt">
+      <h2>Kontakt oss</h2>
+      <p>Har du spørsmål om personvern, vilkår, eller vil utøve rettighetene dine?</p>
+      <div class="legal-callout">
+        <p><strong>E-post:</strong> <a href="mailto:hei@co-lab.no">hei@co-lab.no</a></p>
+        <p style="margin-top: var(--space-2);"><strong>Datatilsynet:</strong> <a href="https://www.datatilsynet.no" target="_blank" rel="noopener">www.datatilsynet.no</a></p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ══════════ FOOTER ══════════ -->
+  <footer class="legal-footer">
+    <div class="legal-footer-inner">
+      <p>© CO-LAB AS · <a href="index.html">Tilbake til forsiden</a></p>
+    </div>
+  </footer>
+</body>
+</html>

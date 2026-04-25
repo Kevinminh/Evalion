@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teamet – CO-LAB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-bg: #ECF3EE;
+      --color-cream: #F4EFE4;
+      --color-ink: #1A2420;
+      --color-ink-secondary: #3E5048;
+      --color-ink-tertiary: #708578;
+      --color-border: #CDE0D3;
+      --color-white: #FFFFFF;
+      --color-accent: #5E4AC0;
+
+      --font-body: 'Nunito', system-ui, sans-serif;
+      --font-display: 'Nunito', system-ui, sans-serif;
+
+      --radius-full: 100px;
+      --radius-lg: 24px;
+      --radius-md: 16px;
+    }
+
+    html, body { min-height: 100vh; }
+    body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      color: var(--color-ink);
+      background: linear-gradient(180deg, #ECF3EE 0%, #F0F1E9 50%, #F4EFE4 100%);
+      line-height: 1.55;
+    }
+
+    /* ── Tilbake-knapp (samme stil som logg-inn) ── */
+    .auth-back {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--color-ink-secondary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      transition: background 0.15s, color 0.15s;
+      z-index: 10;
+    }
+    .auth-back:hover {
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--color-ink);
+    }
+
+    /* ── Hovedseksjon ── */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+    }
+
+    .section-kicker {
+      color: #6B7280;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 3.5vw, 40px);
+      font-weight: 400;
+      line-height: 1.25;
+      letter-spacing: -0.015em;
+      font-variation-settings: "SOFT" 100, "WONK" 1;
+      margin-bottom: 44px;
+      text-align: center;
+    }
+    .section-heading em {
+      color: #5E4AC0;
+      font-style: italic;
+      font-weight: 500;
+    }
+    .section-lead {
+      color: var(--color-ink-secondary);
+      font-size: 17px;
+      max-width: 640px;
+      margin: 0 auto 56px;
+      text-align: center;
+    }
+
+    /* ── Team-grid ── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .team-card {
+      background: var(--color-white);
+      border-radius: var(--radius-lg);
+      padding: 32px 28px 28px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .team-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+    .team-avatar {
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      border: 3px solid var(--color-bg);
+      overflow: hidden;
+      /* Mørk varm grå gradient – matcher Markus/Asbjørn og vises bak de transparente PNG-ene */
+      background: linear-gradient(180deg, #9D988F 0%, #5A554E 100%);
+    }
+    .team-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .team-name {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-variation-settings: 'SOFT' 100, 'WONK' 0;
+    }
+    .team-role {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--color-bg);
+      color: var(--color-accent);
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .team-bio {
+      color: var(--color-ink-secondary);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 880px) {
+      .team-grid { grid-template-columns: repeat(2, 1fr); }
+      main { padding: 44px 24px 64px; }
+    }
+    @media (max-width: 560px) {
+      .team-grid { grid-template-columns: 1fr; }
+      main { padding: 44px 20px 56px; }
+      .team-card { padding: 28px 22px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="auth-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Tilbake
+  </a>
+
+  <main>
+    <p class="section-kicker">Møt teamet</p>
+    <h1 class="section-heading">Tverrfaglighet med <em>pedagogisk</em> tyngde</h1>
+
+    <div class="team-grid">
+      <article class="team-card">
+        <div class="team-avatar"><img src="assets/Markus (team).png" alt="Markus Furseth" style="object-position: 60% 25%; transform: translateY(7px);"></div>
+        <h2 class="team-name">Markus Furseth</h2>
+        <span class="team-role">Gründer &amp; daglig leder</span>
+        <p class="team-bio">Siviløkonom og lektor med over ti års undervisningserfaring i matematikk og naturfag.</p>
+      </article>
+      <article class="team-card">
+        <div class="team-avatar"><img src="assets/Erai (teamet).png" alt="Erai Selvakumaran" style="transform: translateY(20px) scale(1.5); object-position: center 15%;"></div>
+        <h2 class="team-name">Erai Selvakumaran</h2>
+        <span class="team-role">Teknisk lead</span>
+        <p class="team-bio">Fullstack-utvikler og grunnlegger av Matte.no. Solid erfaring fra digitale læringsverktøy i utdanningssektoren.</p>
+      </article>
+      <article class="team-card">
+        <div class="team-avatar"><img src="assets/Asbjørn (teamet).png" alt="Asbjørn Lerø Kongsnes" style="object-position: center top; transform: scale(0.995) translateY(-3px);"></div>
+        <h2 class="team-name">Asbjørn Lerø Kongsnes</h2>
+        <span class="team-role">Pedagogisk rådgiver</span>
+        <p class="team-bio">Medforfatter av læreverket Matemagisk 5–10 og kjent fra podkasten «SnakkeMatte». Bringer unik didaktisk og pedagogisk kompetanse.</p>
+      </article>
+      <article class="team-card">
+        <div class="team-avatar"><img src="assets/Martin (teamet).png" alt="Martin Sørdal" style="transform: translateY(15px) scale(1.4); object-position: center top;"></div>
+        <h2 class="team-name">Martin Sørdal</h2>
+        <span class="team-role">Pedagogisk rådgiver</span>
+        <p class="team-bio">Medforfatter av læreverket Matemagisk 5–7. Kombinerer pedagogikk, økonomi og teknisk innsikt i sin arbeidshverdag.</p>
+      </article>
+      <article class="team-card">
+        <div class="team-avatar"><img src="assets/Per Erlend (teamet).png" alt="Per Erlend Mathisen" style="transform: translateY(-5px) scale(1.3);"></div>
+        <h2 class="team-name">Per Erlend Mathisen</h2>
+        <span class="team-role">Strategisk rådgiver</span>
+        <p class="team-bio">Siviløkonom og en del av gründerteamet bak Qtime. Bred erfaring med oppstart og skalering av teknologibedrifter.</p>
+      </article>
+      <article class="team-card">
+        <div class="team-avatar"><img src="assets/Kevin (teamet).png" alt="Kevin Minh" style="transform: translateY(20px) scale(1.5); object-position: center 15%;"></div>
+        <h2 class="team-name">Kevin Minh</h2>
+        <span class="team-role">Teknisk rådgiver</span>
+        <p class="team-bio">Fullstack-utvikler fra Gyldendal med verdifull kjennskap til både tekniske og pedagogiske krav innen utdanning.</p>
+      </article>
+    </div>
+  </main>
+
+</body>
+</html>

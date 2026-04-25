@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FagPrat Læringsprosess – 6 forslag</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-bg: #FDFAF6;
+      --color-bg-warm: #F8F4EE;
+      --color-ink: #1C1A17;
+      --color-ink-secondary: #5C584F;
+      --color-ink-tertiary: #8A8579;
+      --color-sage: #5A7A6A;
+      --color-sage-light: #E8F0EB;
+      --color-coral: #C85A2E;
+      --color-coral-light: #F5E0D5;
+      --color-white: #FFFFFF;
+      --color-border: #E5DFD6;
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+      --max-width: 1120px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      font-size: 17px;
+      line-height: 1.65;
+      color: var(--color-ink);
+      background: #E8E2DA;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Page chrome ── */
+    .page-header {
+      text-align: center;
+      padding: 60px 24px 40px;
+    }
+    .page-header h1 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 500;
+      font-variation-settings: "SOFT" 100, "WONK" 1;
+      margin-bottom: 8px;
+    }
+    .page-header p { color: var(--color-ink-secondary); font-size: 15px; }
+
+    .proposal {
+      max-width: var(--max-width);
+      margin: 0 auto 60px;
+      background: var(--color-bg);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+    .proposal-label {
+      background: var(--color-ink);
+      color: var(--color-white);
+      padding: 14px 32px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .proposal-inner {
+      padding: 64px 48px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 500;
+      text-align: center;
+      margin-bottom: 48px;
+      font-variation-settings: "SOFT" 100, "WONK" 1;
+    }
+    .section-subtitle {
+      font-size: 15px;
+      color: var(--color-ink-secondary);
+      text-align: center;
+      margin-top: -40px;
+      margin-bottom: 48px;
+    }
+
+    /* ═══════════════════════════════════════════
+       FORSLAG 1: Vertikal tidslinje (zigzag)
+       ═══════════════════════════════════════════ */
+    .v1-timeline {
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .v1-timeline::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--color-border);
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+    .v1-step {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 40px;
+      position: relative;
+    }
+    .v1-step:last-child { margin-bottom: 0; }
+    .v1-step:nth-child(odd) { flex-direction: row; }
+    .v1-step:nth-child(even) { flex-direction: row-reverse; }
+
+    .v1-card {
+      width: calc(50% - 40px);
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 24px 28px;
+      position: relative;
+    }
+    .v1-step:nth-child(odd) .v1-card { margin-right: auto; }
+    .v1-step:nth-child(even) .v1-card { margin-left: auto; }
+
+    .v1-dot {
+      position: absolute;
+      left: 50%;
+      top: 28px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--color-white);
+      z-index: 2;
+    }
+    .v1-step:nth-child(1) .v1-dot { background: var(--color-sage); }
+    .v1-step:nth-child(2) .v1-dot { background: var(--color-coral); }
+    .v1-step:nth-child(3) .v1-dot { background: #6A7FC1; }
+    .v1-step:nth-child(4) .v1-dot { background: #C49A3C; }
+    .v1-step:nth-child(5) .v1-dot { background: #8B6AAE; }
+    .v1-step:nth-child(6) .v1-dot { background: #5A9A8A; }
+
+    .v1-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-ink-tertiary);
+      margin-bottom: 4px;
+    }
+    .v1-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-variation-settings: "SOFT" 100, "WONK" 1;
+    }
+    .v1-desc {
+      font-size: 14px;
+      color: var(--color-ink-secondary);
+      line-height: 1.6;
+    }
+
+    /* ═══════════════════════════════════════════
+       FORSLAG 2: Horisontal flyt med piler
+       ═══════════════════════════════════════════ */
+    .v2-flow {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    .v2-step {
+      flex: 1;
+      min-width: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+    .v2-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 28px;
+      right: -2px;
+      width: 24px;
+      height: 2px;
+      background: var(--color-border);
+      z-index: 1;
+    }
+    .v2-step:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      top: 23px;
+      right: -4px;
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid var(--color-border);
+      border-bottom: 2px solid var(--color-border);
+      transform: rotate(-45deg);
+      z-index: 1;
+    }
+    .v2-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 16px;
+      flex-shrink: 0;
+    }
+    .v2-step:nth-child(1) .v2-circle { background: #E8F0EB; }
+    .v2-step:nth-child(2) .v2-circle { background: #F5E0D5; }
+    .v2-step:nth-child(3) .v2-circle { background: #E0E6F5; }
+    .v2-step:nth-child(4) .v2-circle { background: #F5EDDA; }
+    .v2-step:nth-child(5) .v2-circle { background: #EDE0F5; }
+    .v2-step:nth-child(6) .v2-circle { background: #DAF0EB; }
+
+    .v2-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-ink-tertiary);
+      margin-bottom: 4px;
+    }
+    .v2-title {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-variation-settings: "SOFT" 100, "WONK" 1;
+      line-height: 1.3;
+    }
+    .v2-desc {
+      font-size: 13px;
+      color: var(--color-ink-secondary);
+      line-height: 1.55;
+      max-width: 180px;
+      margin: 0 auto;
+    }
+
+    /* ═══════════════════════════════════════════
+       FORSLAG 3: Kort-grid (3x2) med fargetopp
+       ═══════════════════════════════════════════ */
+    .v3-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .v3-card {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .v3-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.06);
+    }
+    .v3-bar {
+      height: 6px;
+    }
+    .v3-card:nth-child(1) .v3-bar { background: var(--color-sage); }
+    .v3-card:nth-child(2) .v3-bar { background: var(--color-coral); }
+    .v3-card:nth-child(3) .v3-bar { background: #6A7FC1; }
+    .v3-card:nth-child(4) .v3-bar { background: #C49A3C; }
+    .v3-card:nth-child(5) .v3-bar { background: #8B6AAE; }
+    .v3-card:nth-child(6) .v3-bar { background: #5A9A8A; }
+
+    .v3-body {
+      padding: 24px;
+    }
+    .v3-num {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--color-ink-tertiary);
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+    .v3-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-variation-settings: "SOFT" 100, "WONK" 1;
+    }
+    .v3-desc {
+      font-size: 14px;
+      color: var(--color-ink-secondary);
+      line-height: 1.6;
+    }
+
+    /* ═══════════════════════════════════════════
+       FORSLAG 4: Kompakt liste med venstre-linje
+       ═══════════════════════════════════════════ */
+    .v4-list {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+    }
+    .v4-list::before {
+      content: '';
+      position: absolute;
+      left: 27px;
+      top: 28px;
+      bottom: 28px;
+      width: 3px;
+      background: linear-gradient(180deg, var(--color-sage), var(--color-coral), #6A7FC1, #C49A3C, #8B6AAE, #5A9A8A);
+      border-radius: 2px;
+    }
+    .v4-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      padding: 20px 0;
+      position: relative;
+    }
+    .v4-item:not(:last-child) {
+      border-bottom: 1px solid var(--color-border);
+    }
+    .v4-badge {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      z-index: 2;
+    }
+    .v4-item:nth-child(1) .v4-badge { background: #E8F0EB; }
+    .v4-item:nth-child(2) .v4-badge { background: #F5E0D5; }
+    .v4-item:nth-child(3) .v4-badge { background: #E0E6F5; }
+    .v4-item:nth-child(4) .v4-badge { background: #F5EDDA; }
+    .v4-item:nth-child(5) .v4-badge { background: #EDE0F5; }
+    .v4-item:nth-child(6) .v4-badge { background: #DAF0EB; }
+
+    .v4-badge-num {
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--color-ink);
+    }
+    .v4-content { flex: 1; padding-top: 4px; }
+    .v4-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-variation-settings: "SOFT" 100, "WONK" 1;
+    }
+    .v4-desc {
+      font-size: 14px;
+      color: var(--color-ink-secondary);
+      line-height: 1.6;
+    }
+    .v4-tag {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 100px;
+      color: var(--color-white);
+    }
+    .v4-item:nth-child(1) .v4-tag { background: var(--color-sage); }
+    .v4-item:nth-child(2) .v4-tag { background: var(--color-coral); }
+    .v4-item:nth-child(3) .v4-tag { background: #6A7FC1; }
+    .v4-item:nth-child(4) .v4-tag { background: #C49A3C; }
+    .v4-item:nth-child(5) .v4-tag { background: #8B6AAE; }
+    .v4-item:nth-child(6) .v4-tag { background: #5A9A8A; }
+
+    /* ═══════════════════════════════════════════
+       FORSLAG 5: Bølge-bane med kort
+       ═══════════════════════════════════════════ */
+    .v5-path {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .v5-row {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .v5-row:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+    .v5-num-col {
+      flex-shrink: 0;
+      width: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .v5-big-num {
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 300;
+      line-height: 1;
+      font-variation-settings: "SOFT" 100, "WONK" 1;
+    }
+    .v5-row:nth-child(1) .v5-big-num { color: var(--color-sage); }
+    .v5-row:nth-child(2) .v5-big-num { color: var(--color-coral); }
+    .v5-row:nth-child(3) .v5-big-num { color: #6A7FC1; }
+    .v5-row:nth-child(4) .v5-big-num { color: #C49A3C; }
+    .v5-row:nth-child(5) .v5-big-num { color: #8B6AAE; }
+    .v5-row:nth-child(6) .v5-big-num { color: #5A9A8A; }
+
+    .v5-card {
+      flex: 1;
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .v5-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .v5-row:nth-child(1) .v5-icon { background: #E8F0EB; }
+    .v5-row:nth-child(2) .v5-icon { background: #F5E0D5; }
+    .v5-row:nth-child(3) .v5-icon { background: #E0E6F5; }
+    .v5-row:nth-child(4) .v5-icon { background: #F5EDDA; }
+    .v5-row:nth-child(5) .v5-icon { background: #EDE0F5; }
+    .v5-row:nth-child(6) .v5-icon { background: #DAF0EB; }
+
+    .v5-text { flex: 1; }
+    .v5-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-variation-settings: "SOFT" 100, "WONK" 1;
+    }
+    .v5-desc {
+      font-size: 14px;
+      color: var(--color-ink-secondary);
+      line-height: 1.6;
+    }
+    .v5-connector {
+      display: flex;
+      justify-content: center;
+      padding: 0 40px;
+      margin: -12px 0;
+    }
+    .v5-connector svg {
+      width: 24px;
+      height: 24px;
+      color: var(--color-border);
+    }
+    /* ═══════════════════════════════════════════
+       FORSLAG 6: Vertikal linje + brede kort
+       ═══════════════════════════════════════════ */
+    .v6-list {
+      max-width: 760px;
+      margin: 0 auto;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding-left: 88px;
+    }
+    .v6-list::before {
+      content: '';
+      position: absolute;
+      left: 28px;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--color-sage), var(--color-coral), #6A7FC1, #C49A3C, #8B6AAE, #5A9A8A);
+      border-radius: 2px;
+    }
+    .v6-item {
+      position: relative;
+    }
+    .v6-badge {
+      position: absolute;
+      left: -88px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--color-ink);
+      z-index: 2;
+    }
+    .v6-item:nth-child(1) .v6-badge { background: #E8F0EB; }
+    .v6-item:nth-child(2) .v6-badge { background: #F5E0D5; }
+    .v6-item:nth-child(3) .v6-badge { background: #E0E6F5; }
+    .v6-item:nth-child(4) .v6-badge { background: #F5EDDA; }
+    .v6-item:nth-child(5) .v6-badge { background: #EDE0F5; }
+    .v6-item:nth-child(6) .v6-badge { background: #DAF0EB; }
+
+    .v6-card {
+      background: var(--color-white);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .v6-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .v6-item:nth-child(1) .v6-icon { background: #E8F0EB; }
+    .v6-item:nth-child(2) .v6-icon { background: #F5E0D5; }
+    .v6-item:nth-child(3) .v6-icon { background: #E0E6F5; }
+    .v6-item:nth-child(4) .v6-icon { background: #F5EDDA; }
+    .v6-item:nth-child(5) .v6-icon { background: #EDE0F5; }
+    .v6-item:nth-child(6) .v6-icon { background: #DAF0EB; }
+
+    .v6-text { flex: 1; }
+    .v6-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-variation-settings: "SOFT" 100, "WONK" 1;
+    }
+    .v6-desc {
+      font-size: 14px;
+      color: var(--color-ink-secondary);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Slik fungerer en FagPrat-aktivitet</h1>
+  <p>6 forslag til visuell fremstilling av de 6 stegene</p>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     FORSLAG 1 – Vertikal tidslinje (zigzag)
+     ══════════════════════════════════════════════════════ -->
+<div class="proposal">
+  <div class="proposal-label">Forslag 1 &mdash; Vertikal tidslinje</div>
+  <div class="proposal-inner">
+    <h2 class="section-title">Slik fungerer en FagPrat-aktivitet</h2>
+    <div class="v1-timeline">
+
+      <div class="v1-step">
+        <div class="v1-card">
+          <div class="v1-label">Steg 1</div>
+          <div class="v1-title">F&oslash;rste stemmerunde</div>
+          <div class="v1-desc">Elevene tenker individuelt og tar stilling til om p&aring;standen er sant, delvis sant eller usant.</div>
+        </div>
+        <div class="v1-dot">1</div>
+      </div>
+
+      <div class="v1-step">
+        <div class="v1-card">
+          <div class="v1-label">Steg 2</div>
+          <div class="v1-title">Diskusjon</div>
+          <div class="v1-desc">Elevene diskuterer p&aring;standen med hverandre f&oslash;r l&aelig;reren leder en utforskende samtale i plenum.</div>
+        </div>
+        <div class="v1-dot">2</div>
+      </div>
+
+      <div class="v1-step">
+        <div class="v1-card">
+          <div class="v1-label">Steg 3</div>
+          <div class="v1-title">Andre stemmerunde</div>
+          <div class="v1-desc">Etter deling i plenum, tar elevene p&aring; nytt stilling til om p&aring;standen er sant, delvis sant eller usant.</div>
+        </div>
+        <div class="v1-dot">3</div>
+      </div>
+
+      <div class="v1-step">
+        <div class="v1-card">
+          <div class="v1-label">Steg 4</div>
+          <div class="v1-title">Vise fasit</div>
+          <div class="v1-desc">Fasiten blir avsl&oslash;rt, og elevene forklarer til hverandre og i plenum hvorfor fasiten er slik.</div>
+        </div>
+        <div class="v1-dot">4</div>
+      </div>
+
+      <div class="v1-step">
+        <div class="v1-card">
+          <div class="v1-label">Steg 5</div>
+          <div class="v1-title">Forklaring fra professoren</div>
+          <div class="v1-desc">Elevene f&aring;r en forklaring fra professoren for &aring; sikre en viss forankret forst&aring;else for p&aring;standen.</div>
+        </div>
+        <div class="v1-dot">5</div>
+      </div>
+
+      <div class="v1-step">
+        <div class="v1-card">
+          <div class="v1-label">Steg 6</div>
+          <div class="v1-title">Egenvurdering</div>
+          <div class="v1-desc">Elevene vurderer selv individuelt hvor godt de forst&aring;r p&aring;standen fra 1&ndash;5 etter endt diskusjon.</div>
+        </div>
+        <div class="v1-dot">6</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     FORSLAG 2 – Horisontal flyt med piler
+     ══════════════════════════════════════════════════════ -->
+<div class="proposal">
+  <div class="proposal-label">Forslag 2 &mdash; Horisontal flyt</div>
+  <div class="proposal-inner">
+    <h2 class="section-title">Slik fungerer en FagPrat-aktivitet</h2>
+    <div class="v2-flow">
+
+      <div class="v2-step">
+        <div class="v2-circle">&#x1F5F3;&#xFE0F;</div>
+        <div class="v2-label">Steg 1</div>
+        <div class="v2-title">F&oslash;rste stemmerunde</div>
+        <div class="v2-desc">Elevene tenker individuelt og tar stilling til om p&aring;standen er sant, delvis sant eller usant.</div>
+      </div>
+
+      <div class="v2-step">
+        <div class="v2-circle">&#x1F4AC;</div>
+        <div class="v2-label">Steg 2</div>
+        <div class="v2-title">Diskusjon</div>
+        <div class="v2-desc">Elevene diskuterer p&aring;standen med hverandre f&oslash;r l&aelig;reren leder en utforskende samtale i plenum.</div>
+      </div>
+
+      <div class="v2-step">
+        <div class="v2-circle">&#x1F504;</div>
+        <div class="v2-label">Steg 3</div>
+        <div class="v2-title">Andre stemmerunde</div>
+        <div class="v2-desc">Etter deling i plenum, tar elevene p&aring; nytt stilling til om p&aring;standen er sant, delvis sant eller usant.</div>
+      </div>
+
+      <div class="v2-step">
+        <div class="v2-circle">&#x2705;</div>
+        <div class="v2-label">Steg 4</div>
+        <div class="v2-title">Vise fasit</div>
+        <div class="v2-desc">Fasiten blir avsl&oslash;rt, og elevene forklarer til hverandre og i plenum hvorfor fasiten er slik.</div>
+      </div>
+
+      <div class="v2-step">
+        <div class="v2-circle">&#x1F9D1;&#x200D;&#x1F3EB;</div>
+        <div class="v2-label">Steg 5</div>
+        <div class="v2-title">Forklaring fra professoren</div>
+        <div class="v2-desc">Elevene f&aring;r en forklaring fra professoren for &aring; sikre en viss forankret forst&aring;else for p&aring;standen.</div>
+      </div>
+
+      <div class="v2-step">
+        <div class="v2-circle">&#x1F4CB;</div>
+        <div class="v2-label">Steg 6</div>
+        <div class="v2-title">Egenvurdering</div>
+        <div class="v2-desc">Elevene vurderer selv individuelt hvor godt de forst&aring;r p&aring;standen fra 1&ndash;5 etter endt diskusjon.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     FORSLAG 3 – Kort-grid (3x2) med fargetopp
+     ══════════════════════════════════════════════════════ -->
+<div class="proposal">
+  <div class="proposal-label">Forslag 3 &mdash; Kort-grid med fargetopp</div>
+  <div class="proposal-inner">
+    <h2 class="section-title">Slik fungerer en FagPrat-aktivitet</h2>
+    <div class="v3-grid">
+
+      <div class="v3-card">
+        <div class="v3-bar"></div>
+        <div class="v3-body">
+          <div class="v3-num">STEG 1</div>
+          <div class="v3-title">F&oslash;rste stemmerunde</div>
+          <div class="v3-desc">Elevene tenker individuelt og tar stilling til om p&aring;standen er sant, delvis sant eller usant.</div>
+        </div>
+      </div>
+
+      <div class="v3-card">
+        <div class="v3-bar"></div>
+        <div class="v3-body">
+          <div class="v3-num">STEG 2</div>
+          <div class="v3-title">Diskusjon</div>
+          <div class="v3-desc">Elevene diskuterer p&aring;standen med hverandre f&oslash;r l&aelig;reren leder en utforskende samtale i plenum.</div>
+        </div>
+      </div>
+
+      <div class="v3-card">
+        <div class="v3-bar"></div>
+        <div class="v3-body">
+          <div class="v3-num">STEG 3</div>
+          <div class="v3-title">Andre stemmerunde</div>
+          <div class="v3-desc">Etter deling i plenum, tar elevene p&aring; nytt stilling til om p&aring;standen er sant, delvis sant eller usant.</div>
+        </div>
+      </div>
+
+      <div class="v3-card">
+        <div class="v3-bar"></div>
+        <div class="v3-body">
+          <div class="v3-num">STEG 4</div>
+          <div class="v3-title">Vise fasit</div>
+          <div class="v3-desc">Fasiten blir avsl&oslash;rt, og elevene forklarer til hverandre og i plenum hvorfor fasiten er slik.</div>
+        </div>
+      </div>
+
+      <div class="v3-card">
+        <div class="v3-bar"></div>
+        <div class="v3-body">
+          <div class="v3-num">STEG 5</div>
+          <div class="v3-title">Forklaring fra professoren</div>
+          <div class="v3-desc">Elevene f&aring;r en forklaring fra professoren for &aring; sikre en viss forankret forst&aring;else for p&aring;standen.</div>
+        </div>
+      </div>
+
+      <div class="v3-card">
+        <div class="v3-bar"></div>
+        <div class="v3-body">
+          <div class="v3-num">STEG 6</div>
+          <div class="v3-title">Egenvurdering</div>
+          <div class="v3-desc">Elevene vurderer selv individuelt hvor godt de forst&aring;r p&aring;standen fra 1&ndash;5 etter endt diskusjon.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     FORSLAG 4 – Kompakt liste med venstre-linje
+     ══════════════════════════════════════════════════════ -->
+<div class="proposal">
+  <div class="proposal-label">Forslag 4 &mdash; Kompakt liste med gradient-linje</div>
+  <div class="proposal-inner">
+    <h2 class="section-title">Slik fungerer en FagPrat-aktivitet</h2>
+    <div class="v4-list">
+
+      <div class="v4-item">
+        <div class="v4-badge">
+          <div class="v4-badge-num">1</div>
+        </div>
+        <div class="v4-content">
+          <div class="v4-title">F&oslash;rste stemmerunde</div>
+          <div class="v4-desc">Elevene tenker individuelt og tar stilling til om p&aring;standen er sant, delvis sant eller usant.</div>
+          <span class="v4-tag">Individuelt</span>
+        </div>
+      </div>
+
+      <div class="v4-item">
+        <div class="v4-badge">
+          <div class="v4-badge-num">2</div>
+        </div>
+        <div class="v4-content">
+          <div class="v4-title">Diskusjon</div>
+          <div class="v4-desc">Elevene diskuterer p&aring;standen med hverandre f&oslash;r l&aelig;reren leder en utforskende samtale i plenum.</div>
+          <span class="v4-tag">Samarbeid</span>
+        </div>
+      </div>
+
+      <div class="v4-item">
+        <div class="v4-badge">
+          <div class="v4-badge-num">3</div>
+        </div>
+        <div class="v4-content">
+          <div class="v4-title">Andre stemmerunde</div>
+          <div class="v4-desc">Etter deling i plenum, tar elevene p&aring; nytt stilling til om p&aring;standen er sant, delvis sant eller usant.</div>
+          <span class="v4-tag">Individuelt</span>
+        </div>
+      </div>
+
+      <div class="v4-item">
+        <div class="v4-badge">
+          <div class="v4-badge-num">4</div>
+        </div>
+        <div class="v4-content">
+          <div class="v4-title">Vise fasit</div>
+          <div class="v4-desc">Fasiten blir avsl&oslash;rt, og elevene forklarer til hverandre og i plenum hvorfor fasiten er slik.</div>
+          <span class="v4-tag">Plenum</span>
+        </div>
+      </div>
+
+      <div class="v4-item">
+        <div class="v4-badge">
+          <div class="v4-badge-num">5</div>
+        </div>
+        <div class="v4-content">
+          <div class="v4-title">Forklaring fra professoren</div>
+          <div class="v4-desc">Elevene f&aring;r en forklaring fra professoren for &aring; sikre en viss forankret forst&aring;else for p&aring;standen.</div>
+          <span class="v4-tag">L&aelig;rerstyrt</span>
+        </div>
+      </div>
+
+      <div class="v4-item">
+        <div class="v4-badge">
+          <div class="v4-badge-num">6</div>
+        </div>
+        <div class="v4-content">
+          <div class="v4-title">Egenvurdering</div>
+          <div class="v4-desc">Elevene vurderer selv individuelt hvor godt de forst&aring;r p&aring;standen fra 1&ndash;5 etter endt diskusjon.</div>
+          <span class="v4-tag">Individuelt</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     FORSLAG 5 – Bølge-bane med store tall
+     ══════════════════════════════════════════════════════ -->
+<div class="proposal">
+  <div class="proposal-label">Forslag 5 &mdash; B&oslash;lge-bane med store tall</div>
+  <div class="proposal-inner">
+    <h2 class="section-title">Slik fungerer en FagPrat-aktivitet</h2>
+    <div class="v5-path">
+
+      <div class="v5-row">
+        <div class="v5-num-col"><div class="v5-big-num">1</div></div>
+        <div class="v5-card">
+          <div class="v5-icon">&#x1F5F3;&#xFE0F;</div>
+          <div class="v5-text">
+            <div class="v5-title">F&oslash;rste stemmerunde</div>
+            <div class="v5-desc">Elevene tenker individuelt og tar stilling til om p&aring;standen er sant, delvis sant eller usant.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v5-row">
+        <div class="v5-num-col"><div class="v5-big-num">2</div></div>
+        <div class="v5-card">
+          <div class="v5-icon">&#x1F4AC;</div>
+          <div class="v5-text">
+            <div class="v5-title">Diskusjon</div>
+            <div class="v5-desc">Elevene diskuterer p&aring;standen med hverandre f&oslash;r l&aelig;reren leder en utforskende samtale i plenum.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v5-row">
+        <div class="v5-num-col"><div class="v5-big-num">3</div></div>
+        <div class="v5-card">
+          <div class="v5-icon">&#x1F504;</div>
+          <div class="v5-text">
+            <div class="v5-title">Andre stemmerunde</div>
+            <div class="v5-desc">Etter deling i plenum, tar elevene p&aring; nytt stilling til om p&aring;standen er sant, delvis sant eller usant.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v5-row">
+        <div class="v5-num-col"><div class="v5-big-num">4</div></div>
+        <div class="v5-card">
+          <div class="v5-icon">&#x2705;</div>
+          <div class="v5-text">
+            <div class="v5-title">Vise fasit</div>
+            <div class="v5-desc">Fasiten blir avsl&oslash;rt, og elevene forklarer til hverandre og i plenum hvorfor fasiten er slik.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v5-row">
+        <div class="v5-num-col"><div class="v5-big-num">5</div></div>
+        <div class="v5-card">
+          <div class="v5-icon">&#x1F9D1;&#x200D;&#x1F3EB;</div>
+          <div class="v5-text">
+            <div class="v5-title">Forklaring fra professoren</div>
+            <div class="v5-desc">Elevene f&aring;r en forklaring fra professoren for &aring; sikre en viss forankret forst&aring;else for p&aring;standen.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v5-row">
+        <div class="v5-num-col"><div class="v5-big-num">6</div></div>
+        <div class="v5-card">
+          <div class="v5-icon">&#x1F4CB;</div>
+          <div class="v5-text">
+            <div class="v5-title">Egenvurdering</div>
+            <div class="v5-desc">Elevene vurderer selv individuelt hvor godt de forst&aring;r p&aring;standen fra 1&ndash;5 etter endt diskusjon.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     FORSLAG 6 – Vertikal linje + brede kort (4+5 kombinert)
+     ══════════════════════════════════════════════════════ -->
+<div class="proposal">
+  <div class="proposal-label">Forslag 6 &mdash; Vertikal linje + brede kort</div>
+  <div class="proposal-inner">
+    <h2 class="section-title">Slik fungerer en FagPrat-aktivitet</h2>
+    <div class="v6-list">
+
+      <div class="v6-item">
+        <div class="v6-badge">1</div>
+        <div class="v6-card">
+          <div class="v6-icon">&#x1F5F3;&#xFE0F;</div>
+          <div class="v6-text">
+            <div class="v6-title">F&oslash;rste stemmerunde</div>
+            <div class="v6-desc">Elevene tenker individuelt og tar stilling til om p&aring;standen er sant, delvis sant eller usant.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v6-item">
+        <div class="v6-badge">2</div>
+        <div class="v6-card">
+          <div class="v6-icon">&#x1F4AC;</div>
+          <div class="v6-text">
+            <div class="v6-title">Diskusjon</div>
+            <div class="v6-desc">Elevene diskuterer p&aring;standen med hverandre f&oslash;r l&aelig;reren leder en utforskende samtale i plenum.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v6-item">
+        <div class="v6-badge">3</div>
+        <div class="v6-card">
+          <div class="v6-icon">&#x1F504;</div>
+          <div class="v6-text">
+            <div class="v6-title">Andre stemmerunde</div>
+            <div class="v6-desc">Etter deling i plenum, tar elevene p&aring; nytt stilling til om p&aring;standen er sant, delvis sant eller usant.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v6-item">
+        <div class="v6-badge">4</div>
+        <div class="v6-card">
+          <div class="v6-icon">&#x2705;</div>
+          <div class="v6-text">
+            <div class="v6-title">Vise fasit</div>
+            <div class="v6-desc">Fasiten blir avsl&oslash;rt, og elevene forklarer til hverandre og i plenum hvorfor fasiten er slik.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v6-item">
+        <div class="v6-badge">5</div>
+        <div class="v6-card">
+          <div class="v6-icon">&#x1F9D1;&#x200D;&#x1F3EB;</div>
+          <div class="v6-text">
+            <div class="v6-title">Forklaring fra professoren</div>
+            <div class="v6-desc">Elevene f&aring;r en forklaring fra professoren for &aring; sikre en viss forankret forst&aring;else for p&aring;standen.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v6-item">
+        <div class="v6-badge">6</div>
+        <div class="v6-card">
+          <div class="v6-icon">&#x1F4CB;</div>
+          <div class="v6-text">
+            <div class="v6-title">Egenvurdering</div>
+            <div class="v6-desc">Elevene vurderer selv individuelt hvor godt de forst&aring;r p&aring;standen fra 1&ndash;5 etter endt diskusjon.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div style="height: 80px;"></div>
+
+</body>
+</html>

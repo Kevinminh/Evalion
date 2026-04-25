@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logg inn – CO-LAB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-bg: #ECF3EE;
+      --color-ink: #1A2420;
+      --color-ink-secondary: #3E5048;
+      --color-ink-tertiary: #708578;
+      --color-border: #CDE0D3;
+      --color-white: #FFFFFF;
+      --color-btn: #3E2E88;
+      --color-btn-hover: #5B47BA;
+      --color-accent: #5E4AC0;
+      --gradient-light: linear-gradient(180deg, #ECF3EE 0%, #F0F1E9 50%, #F4EFE4 100%);
+
+      --font-body: 'Nunito', system-ui, sans-serif;
+      --font-display: 'Fraunces', Georgia, serif;
+
+      --radius-full: 100px;
+      --radius-lg: 20px;
+    }
+
+    html, body { min-height: 100vh; }
+    body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      color: var(--color-ink);
+      background: var(--gradient-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 360px;
+      background: var(--color-white);
+      border-radius: var(--radius-lg);
+      padding: 22px 26px 18px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), 0 6px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    .auth-logo {
+      display: block;
+      height: 31px;
+      margin: 0 auto 16px;
+    }
+
+    .auth-subtitle {
+      text-align: center;
+      color: var(--color-ink-secondary);
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .auth-field {
+      margin-bottom: 10px;
+    }
+    .auth-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 3px;
+      color: var(--color-ink);
+    }
+    .auth-input {
+      width: 100%;
+      padding: 9px 16px;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-full);
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--color-ink);
+      background: var(--color-white);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .auth-input::placeholder { color: var(--color-ink-tertiary); }
+    .auth-input:focus {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px rgba(94, 74, 192, 0.12);
+    }
+
+    .auth-submit {
+      width: 100%;
+      padding: 10px 22px;
+      margin-top: 4px;
+      background: var(--color-btn);
+      color: var(--color-white);
+      border: none;
+      border-radius: var(--radius-full);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .auth-submit:hover {
+      background: var(--color-btn-hover);
+      transform: translateY(-1px);
+    }
+    .auth-submit:active { transform: translateY(0); }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0 10px;
+      color: var(--color-ink-tertiary);
+      font-size: 11px;
+    }
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--color-border);
+    }
+
+    .auth-google {
+      width: 100%;
+      padding: 9px 22px;
+      background: var(--color-white);
+      color: var(--color-ink);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-full);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+    }
+    .auth-google:hover {
+      background: #F8F6F1;
+      border-color: var(--color-ink-tertiary);
+    }
+    .auth-google svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .auth-footer {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--color-border);
+      text-align: center;
+      font-size: 12px;
+      color: var(--color-ink-secondary);
+    }
+    .auth-footer a {
+      color: var(--color-accent);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .auth-footer a:hover { text-decoration: underline; }
+
+    .auth-back {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--color-ink-secondary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      transition: background 0.15s, color 0.15s;
+    }
+    .auth-back:hover {
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--color-ink);
+    }
+
+    @media (max-width: 480px) {
+      .auth-card { padding: 20px 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="auth-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Tilbake
+  </a>
+
+  <main class="auth-card">
+    <img src="assets/CO-LAB (Hoved) - uten skygge.png" alt="CO-LAB" class="auth-logo">
+    <p class="auth-subtitle">Logg inn for lage påstander med Reddi</p>
+
+    <form id="login-form" novalidate>
+      <div class="auth-field">
+        <label for="login-email" class="auth-label">E-post</label>
+        <input type="email" id="login-email" class="auth-input" placeholder="navn@skole.no" required autocomplete="email">
+      </div>
+
+      <div class="auth-field">
+        <label for="login-password" class="auth-label">Passord</label>
+        <input type="password" id="login-password" class="auth-input" placeholder="Skriv inn passord" required autocomplete="current-password">
+      </div>
+
+      <button type="submit" class="auth-submit">Logg inn</button>
+    </form>
+
+    <div class="auth-divider"><span>eller</span></div>
+
+    <button type="button" class="auth-google" id="google-btn">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.09-1.93 3.27-4.77 3.27-8.1z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.57-2.77c-.98.66-2.24 1.06-3.71 1.06-2.86 0-5.29-1.93-6.15-4.53H2.18v2.84A11 11 0 0 0 12 23z"/>
+        <path fill="#FBBC05" d="M5.85 14.11A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.44.35-2.11V7.05H2.18A11 11 0 0 0 1 12c0 1.77.42 3.45 1.18 4.95l3.67-2.84z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.07.55 4.21 1.64l3.16-3.16C17.45 2.09 14.96 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.67 2.84C6.71 7.31 9.14 5.38 12 5.38z"/>
+      </svg>
+      Fortsett med Google
+    </button>
+
+    <div class="auth-footer">
+      Ingen konto? <a href="registrer.html">Registrer deg</a>
+    </div>
+  </main>
+
+  <script>
+    // Placeholder: ingen ekte auth i pre-launch – videresend til Lag påstander
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      window.location.href = 'lag-pastander-split.html';
+    });
+    document.getElementById('google-btn').addEventListener('click', function() {
+      window.location.href = 'lag-pastander-split.html';
+    });
+  </script>
+</body>
+</html>

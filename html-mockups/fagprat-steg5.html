@@ -200,6 +200,35 @@
     }
     .panel-toggle.flipped svg {
       transform: rotate(180deg);
+      width: 20px; height: 20px;
+    }
+    /* Attention-styling når panelet er kollapset – gjør tabben tydelig */
+    .panel-toggle.flipped {
+      background: var(--color-primary-500);
+      color: white;
+      border-color: var(--color-primary-500);
+      width: 42px; height: 80px;
+      box-shadow:
+        0 3px 0 var(--color-primary-700),
+        -4px 0 18px rgba(108, 63, 197, 0.35);
+      animation: panel-tab-attention 2.4s ease-in-out infinite;
+    }
+    .panel-toggle.flipped:hover {
+      background: var(--color-primary-400);
+      color: white;
+      animation: none;
+      transform: translate(calc(-100% - 4px), -50%);
+      box-shadow:
+        0 3px 0 var(--color-primary-700),
+        -6px 0 22px rgba(108, 63, 197, 0.55);
+    }
+    @keyframes panel-tab-attention {
+      0%, 100% {
+        box-shadow: 0 3px 0 var(--color-primary-700), -4px 0 14px rgba(108, 63, 197, 0.3);
+      }
+      50% {
+        box-shadow: 0 3px 0 var(--color-primary-700), -6px 0 22px rgba(108, 63, 197, 0.55);
+      }
     }
     .teacher-panel {
       width: 340px;
@@ -560,15 +589,16 @@
     .step-item.active .step-num { background: var(--color-primary-500); color: white; }
     .step-item.active .step-label { color: var(--color-primary-700); }
   </style>
+  <script>if(window.parent!==window)window.parent.postMessage({type:'fagprat-steg-loaded',steg:5},'*');</script>
 </head>
 <body>
 
   <!-- ═══════════ TOP BAR ═══════════ -->
   <header class="top-bar">
     <div class="top-bar-left">
-      <img src="../Logoer og professoren/FagPrat - logo.png" alt="FagPrat" class="top-bar-logo">
+      <img src="assets/FagPrat - logo.png" alt="FagPrat" class="top-bar-logo">
       <div class="top-bar-divider"></div>
-      <span class="top-bar-title">Newtons lover</span>
+      <span class="top-bar-title">Klima og bærekraft</span>
     </div>
     <div class="top-bar-right">
       <button class="btn-record-topbar disabled" title="Opptak er tilgjengelig i steg 2 og 4">
@@ -596,10 +626,10 @@
         <div class="sant-badge">SANT</div>
         <div class="combined-card">
           <div class="statement-section">
-            <div class="statement-text">Dyr er avhengige av planter for å overleve, mens planter er ikke avhengige av dyr for å overleve.</div>
+            <div class="statement-text">Klimaendringene rammer fattige land hardest.</div>
           </div>
           <div class="explanation-section">
-            <img src="../Logoer og professoren/Professoren.png" alt="Professoren" class="professor-img">
+            <img src="assets/Professoren.png" alt="Professoren" class="professor-img">
             <div class="explanation-text">
               Dyr trenger planter for mat og oksygen. Planter er også avhengige av dyr for å overleve av ulike grunner. <span class="explanation-highlight">Nedbrytere</span>, som mark og sopp, bryter ned døde organismer og fører næringsstoffene tilbake til jorden og plantene. Mange planter trenger dyr, som for eksempel insekter og fugler, for å spre <span class="explanation-highlight">pollen</span> og <span class="explanation-highlight">frøene</span> sine slik at de kan vokse flere steder.
             </div>
@@ -686,6 +716,21 @@
       if (stmt) {
         var stmtText = document.querySelector('.statement-text');
         if (stmtText) stmtText.textContent = stmt.text;
+        var colorMap = {
+          blue:   { bg1: '#E3F1FC', bg2: '#D6ECFA', border: '#B8DAF0', text: '#2C5F8A' },
+          orange: { bg1: '#FFF3E0', bg2: '#FFE0B2', border: '#FFB74D', text: '#BF360C' },
+          yellow: { bg1: '#FFF8E1', bg2: '#FFF3CD', border: '#FFD54F', text: '#5D4037' },
+          purple: { bg1: '#F3E5F5', bg2: '#E8D5F0', border: '#CE93D8', text: '#6A1B9A' },
+          red:    { bg1: '#FFEBEE', bg2: '#FFCDD2', border: '#EF9A9A', text: '#B71C1C' }
+        };
+        var c = colorMap[stmt.color];
+        if (c) {
+          var card = document.querySelector('.combined-card');
+          if (card) card.style.borderColor = c.border;
+          var section = document.querySelector('.statement-section');
+          if (section) { section.style.background = 'linear-gradient(135deg, ' + c.bg1 + ', ' + c.bg2 + ')'; section.style.borderBottomColor = c.border; }
+          if (stmtText) stmtText.style.color = c.text;
+        }
       }
       if (stmt) {
         var badge = document.querySelector('.sant-badge');
@@ -698,6 +743,17 @@
         if (explText && stmt.explanation) explText.innerHTML = stmt.explanation;
         var begrunnelse = document.querySelector('.begrunnelse-item');
         if (begrunnelse && stmt.begrunnelse) begrunnelse.textContent = stmt.begrunnelse;
+
+        // Send explanation data to parent (demo) for syncing with student view
+        if (window.parent !== window) {
+          window.parent.postMessage({
+            type: 'fagprat-explanation',
+            fasit: stmt.fasit || 'sant',
+            explanation: stmt.explanation || '',
+            color: stmt.color || 'blue',
+            text: stmt.text || ''
+          }, '*');
+        }
       }
     })();
 
@@ -716,8 +772,21 @@
       localStorage.setItem('fagprat-panel-collapsed', panel.classList.contains('collapsed') ? '1' : '0');
     });
 
-    // Steg 5: Panel should always START CLOSED (set in HTML, just update localStorage)
-    localStorage.setItem('fagprat-panel-collapsed', '1');
+    // Steg 5: Panel should end up CLOSED
+    // If previous step left it open, animate it closed
+    if (localStorage.getItem('fagprat-panel-collapsed') !== '1') {
+      panel.style.transition = 'none';
+      panel.classList.remove('collapsed');
+      toggleBtn.classList.remove('flipped');
+      setTimeout(function() {
+        panel.style.transition = '';
+        panel.classList.add('collapsed');
+        toggleBtn.classList.add('flipped');
+        localStorage.setItem('fagprat-panel-collapsed', '1');
+      }, 30);
+    } else {
+      localStorage.setItem('fagprat-panel-collapsed', '1');
+    }
 
     // ── Auto-scale explanation text to fit max card height ──
     (function() {

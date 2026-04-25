@@ -6,31 +6,53 @@
   <title>Velg påstander | Evalion</title>
   <link rel="stylesheet" href="tokens.css">
   <link rel="stylesheet" href="components.css">
-  <link rel="stylesheet" href="sidebar.css">
   <style>
-    .page-content {
-      max-width: calc(1100px + var(--sidebar-expanded));
-      padding-bottom: var(--space-24);
+    /* Mint/cream gradient-bakgrunn (matcher resten av pre-launch) */
+    html, body { min-height: 100vh; }
+    body {
+      background: linear-gradient(180deg, #ECF3EE 0%, #F0F1E9 50%, #F4EFE4 100%);
     }
 
-    /* ── Tilbake-lenke ── */
+    /* Layout uten sidepanel */
+    .page-content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 72px var(--space-6) var(--space-24);
+    }
+
+    /* ── Tilbake-lenke (samme stil som i logg-inn og teamet) ── */
     .back-link {
+      position: absolute;
+      top: 24px;
+      left: 24px;
       display: inline-flex;
       align-items: center;
-      gap: var(--space-2);
-      font-size: var(--text-sm);
-      font-weight: var(--font-semibold);
-      color: var(--color-text-tertiary);
+      gap: 6px;
+      color: #3E5048;
       text-decoration: none;
-      margin-bottom: var(--space-2);
-      transition: color var(--transition-fast);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 100px;
+      transition: background 0.15s, color 0.15s;
+      z-index: 10;
     }
-    .back-link:hover { color: var(--color-text-primary); }
-    .back-link svg { width: 16px; height: 16px; }
+    .back-link:hover {
+      background: rgba(0, 0, 0, 0.04);
+      color: #1A2420;
+    }
+    .back-link svg { width: 14px; height: 14px; }
 
     /* ── Page header ── */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: var(--space-8);
+    }
     .page-title {
-      font-size: var(--text-3xl);
+      font-size: 26px;
       font-weight: var(--font-extrabold);
       color: var(--color-text-primary);
       margin-bottom: var(--space-1);
@@ -38,7 +60,104 @@
     .page-subtitle {
       font-size: var(--text-sm);
       color: var(--color-text-secondary);
-      margin-bottom: var(--space-8);
+      margin-bottom: 0;
+    }
+
+    /* "Lag nye påstander"-knapp oppe til høyre */
+    .btn-regenerate {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: white;
+      border: 1.5px solid var(--color-neutral-300);
+      border-radius: 100px;
+      color: var(--color-text-secondary);
+      font-family: var(--font-family-body);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
+    }
+    .btn-regenerate:hover {
+      background: var(--color-neutral-50);
+      border-color: var(--color-neutral-400);
+      color: var(--color-text-primary);
+      transform: translateY(-1px);
+    }
+    .btn-regenerate:active { transform: translateY(1px); }
+    .btn-regenerate svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ══════════════════════════════════════════
+       REDDI LOADING STATE (sentrert modal-stil)
+       ══════════════════════════════════════════ */
+    .reddi-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 40px 40px 44px;
+      background: #F3EEFF;
+      border: 1.5px solid #D8C8FF;
+      border-radius: 26px;
+      box-shadow: 0 16px 40px rgba(108, 63, 197, 0.14), 0 4px 10px rgba(0, 0, 0, 0.04);
+      text-align: center;
+    }
+    .reddi-loading[hidden] { display: none; }
+    .reddi-loading-avatar {
+      width: 106px;
+      height: 106px;
+      object-fit: contain;
+      animation: reddi-bounce 1.6s ease-in-out infinite;
+    }
+    @keyframes reddi-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .reddi-loading-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--color-text-primary);
+      line-height: 1.3;
+    }
+    .reddi-loading-title .dot {
+      display: inline-block;
+      opacity: 0.25;
+      animation: dot-pulse 1.4s ease-in-out infinite;
+    }
+    .reddi-loading-title .dot:nth-child(2) { animation-delay: 0.2s; }
+    .reddi-loading-title .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dot-pulse {
+      0%, 80%, 100% { opacity: 0.25; }
+      40% { opacity: 1; }
+    }
+    .reddi-loading-subtitle {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+      max-width: 360px;
+    }
+
+    /* Skjul annen UI mens Reddi jobber */
+    body.loading .back-link,
+    body.loading .page-header,
+    body.loading .bottom-bar {
+      display: none;
+    }
+    body.loading .page-content {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 0;
+      padding-bottom: 0;
     }
 
     /* ══════════════════════════════════════════
@@ -50,6 +169,7 @@
       gap: var(--space-5);
       align-items: start;
     }
+    .category-sections[hidden] { display: none; }
 
     .category-strip {
       background: var(--color-neutral-0);
@@ -70,19 +190,19 @@
       letter-spacing: 0.01em;
     }
     .strip-sant .strip-header {
-      background: var(--color-sant-bg);
-      color: var(--color-sant);
-      border-bottom: 3px solid #81C784;
+      background: #C8E6C9;
+      color: #1B5E20;
+      border-bottom: 3px solid #4CAF50;
     }
     .strip-usant .strip-header {
-      background: var(--color-usant-bg);
-      color: var(--color-usant);
-      border-bottom: 3px solid #EF9A9A;
+      background: #FFCDD2;
+      color: #B71C1C;
+      border-bottom: 3px solid #E53935;
     }
     .strip-delvis .strip-header {
-      background: var(--color-delvis-bg);
-      color: #E65100;
-      border-bottom: 3px solid #FFCC80;
+      background: #FFE0B2;
+      color: #B04A00;
+      border-bottom: 3px solid #FB8C00;
     }
 
     /* Strip body */
@@ -134,7 +254,7 @@
     .bottom-bar {
       position: fixed;
       bottom: 0;
-      left: var(--sidebar-expanded);
+      left: 0;
       right: 0;
       background: var(--color-neutral-0);
       border-top: 1.5px solid var(--color-neutral-200);
@@ -201,69 +321,47 @@
     }
   </style>
 </head>
-<body>
+<body class="loading">
 
-  <!-- ═══════════ SIDEBAR ═══════════ -->
-  <nav class="sidebar">
-    <div class="sidebar-logo">
-      <img class="logo-mini" src="../Logoer og professoren/E-minilogo.jpg" alt="E">
-      <img class="logo-full" src="../Logoer og professoren/Evalion (gjennomsiktig).png" alt="Evalion">
-    </div>
-    <div class="sidebar-cta">
-      <button class="sidebar-cta-btn" onclick="window.location.href='lag-pastand.html'">
-        <span class="sidebar-cta-icon">+</span>
-        <span class="sidebar-cta-label">Lag en FagPrat</span>
-      </button>
-    </div>
-    <div class="sidebar-nav">
-      <a class="sidebar-item" href="utforsk.html">
-        <span class="sidebar-item-icon">🔍</span>
-        <span class="sidebar-item-label">Utforsk</span>
-      </a>
-      <a class="sidebar-item" href="min-samling.html">
-        <span class="sidebar-item-icon">📁</span>
-        <span class="sidebar-item-label">Min samling</span>
-      </a>
-      <a class="sidebar-item" href="#">
-        <span class="sidebar-item-icon">🕐</span>
-        <span class="sidebar-item-label">Historikk</span>
-      </a>
-    </div>
-    <div class="sidebar-spacer"></div>
-    <a class="sidebar-user" href="#">
-      <div class="sidebar-user-avatar">MF</div>
-      <div class="sidebar-user-info">
-        <span class="sidebar-user-name">Markus Furseth</span>
-        <span class="sidebar-user-email">markus@evalion.no</span>
-      </div>
-    </a>
-  </nav>
+  <a class="back-link" href="lag-pastander-split.html">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Tilbake
+  </a>
 
   <!-- ═══════════ MAIN CONTENT ═══════════ -->
   <main class="page-content">
 
-    <a class="back-link" href="lag-pastand.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="19" y1="12" x2="5" y2="12"/>
-        <polyline points="12 19 5 12 12 5"/>
-      </svg>
-      Tilbake
-    </a>
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Velg påstander</h1>
+        <p class="page-subtitle">Påstandene du velger blir lagt til under "Mine påstander" med tilhørende fasit og forklaring.</p>
+      </div>
+      <button type="button" class="btn-regenerate" id="btn-regenerate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="23 4 23 10 17 10"/>
+          <polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+        Lag nye påstander
+      </button>
+    </div>
 
-    <h1 class="page-title">Velg påstander</h1>
-    <p class="page-subtitle">Velg påstandene du vil ha med — REDDI lager forklaringene automatisk.</p>
+    <!-- Reddi-lasteboks (vises mens AI genererer) -->
+    <div class="reddi-loading" id="reddi-loading" role="status" aria-live="polite">
+      <img class="reddi-loading-avatar" src="assets/Reddi.png" alt="Reddi">
+      <div class="reddi-loading-title">Reddi lager påstandene<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>
+      <div class="reddi-loading-subtitle">Innholdet er generert av AI og kan inneholde feil.<br>Husk å bruke faglig skjønn!</div>
+    </div>
 
-    <div class="category-sections">
+    <div class="category-sections" id="category-sections" hidden>
 
       <!-- SANT -->
       <div class="category-strip strip-sant">
         <div class="strip-header">Sant</div>
         <div class="strip-body">
-          <div class="pastand-card" data-type="sant">Et legeme i ro forblir i ro hvis ingen kraft virker på det.</div>
-          <div class="pastand-card" data-type="sant">Kraft måles i newton (N).</div>
-          <div class="pastand-card" data-type="sant">Aksjon og reaksjon er like store, men motsatt rettet.</div>
-          <div class="pastand-card" data-type="sant">Akselerasjon øker når kraften øker, gitt samme masse.</div>
-          <div class="pastand-card" data-type="sant">Et objekt i bevegelse fortsetter i bevegelse med samme hastighet og retning med mindre en kraft virker på det.</div>
+          <div class="pastand-card" data-type="sant" data-forklaring="Dette er Newtons 1. lov – treghetsloven. Uten en netto ytre kraft endrer ikke bevegelsestilstanden seg.">Et legeme i ro forblir i ro hvis ingen kraft virker på det.</div>
+          <div class="pastand-card" data-type="sant" data-forklaring="Newton (N) er SI-enheten for kraft, og er oppkalt etter Isaac Newton. 1 N er kraften som gir 1 kg en akselerasjon på 1 m/s².">Kraft måles i newton (N).</div>
+          <div class="pastand-card" data-type="sant" data-forklaring="Dette er Newtons 3. lov. Når to objekter påvirker hverandre, virker kreftene alltid parvis – like store og motsatt rettet.">Aksjon og reaksjon er like store, men motsatt rettet.</div>
         </div>
       </div>
 
@@ -271,11 +369,9 @@
       <div class="category-strip strip-usant">
         <div class="strip-header">Usant</div>
         <div class="strip-body">
-          <div class="pastand-card" data-type="usant">Kraft er lik masse delt på akselerasjon.</div>
-          <div class="pastand-card" data-type="usant">Tunge objekter faller alltid raskere enn lette objekter.</div>
-          <div class="pastand-card" data-type="usant">En gjenstand trenger en konstant kraft for å holde seg i bevegelse.</div>
-          <div class="pastand-card" data-type="usant">Newtons lover gjelder bare for store objekter, ikke for små partikler.</div>
-          <div class="pastand-card" data-type="usant">Friksjon er en kraft som alltid øker farten til et objekt.</div>
+          <div class="pastand-card" data-type="usant" data-forklaring="Newtons 2. lov sier F = m · a (kraft er masse ganger akselerasjon), ikke dividert.">Kraft er lik masse delt på akselerasjon.</div>
+          <div class="pastand-card" data-type="usant" data-forklaring="Uten luftmotstand faller alle objekter med samme tyngdeakselerasjon (g ≈ 9,81 m/s²) uavhengig av masse.">Tunge objekter faller alltid raskere enn lette objekter.</div>
+          <div class="pastand-card" data-type="usant" data-forklaring="Ifølge Newtons 1. lov fortsetter en gjenstand i bevegelse med konstant hastighet så lenge det ikke virker en netto kraft på den.">En gjenstand trenger en konstant kraft for å holde seg i bevegelse.</div>
         </div>
       </div>
 
@@ -283,11 +379,9 @@
       <div class="category-strip strip-delvis">
         <div class="strip-header">Delvis sant</div>
         <div class="strip-body">
-          <div class="pastand-card" data-type="delvis">Tyngre gjenstander er vanskeligere å flytte.</div>
-          <div class="pastand-card" data-type="delvis">I verdensrommet er det ingen tyngdekraft.</div>
-          <div class="pastand-card" data-type="delvis">Hvis du dytter en vegg, dytter veggen like hardt tilbake.</div>
-          <div class="pastand-card" data-type="delvis">Et objekt som faller øker alltid i fart.</div>
-          <div class="pastand-card" data-type="delvis">Raketter fungerer fordi de dytter mot luften bak seg.</div>
+          <div class="pastand-card" data-type="delvis" data-forklaring="Tyngre gjenstander har mer treghet (masse), men om de ligger på friksjonsfritt underlag eller er i fritt fall spiller vekten mindre rolle.">Tyngre gjenstander er vanskeligere å flytte.</div>
+          <div class="pastand-card" data-type="delvis" data-forklaring="Tyngdekraft finnes overalt, men i en romstasjon i fritt fall rundt jorda virker det som om det er vektløst (mikrogravitasjon).">I verdensrommet er det ingen tyngdekraft.</div>
+          <div class="pastand-card" data-type="delvis" data-forklaring="Det stemmer ifølge Newtons 3. lov, men veggen utøver bare motkraft så lenge den står imot – en løs vegg ville gitt etter.">Hvis du dytter en vegg, dytter veggen like hardt tilbake.</div>
         </div>
       </div>
 
@@ -299,8 +393,8 @@
   <div class="bottom-bar">
     <div class="bottom-bar-inner">
       <div class="reddi-attribution">
-        <img src="../Logoer og professoren/Reddi.png" alt="Reddi">
-        <span class="reddi-attribution-text">Foreslått av REDDI</span>
+        <img src="assets/Reddi.png" alt="Reddi">
+        <span class="reddi-attribution-text">Foreslått av Reddi</span>
       </div>
       <button class="btn-legg-til" id="btn-legg-til">
         <span id="btn-label">Legg til påstander</span>
@@ -313,6 +407,7 @@
   </div>
 
   <script>
+    // ─── Oppsett: DOM-referanser og handlers ───
     const cards = document.querySelectorAll('.pastand-card');
     const btnLeggTil = document.getElementById('btn-legg-til');
     const btnLabel = document.getElementById('btn-label');
@@ -335,10 +430,45 @@
       }
     }
 
+    // ─── Reddi-generering: skjuler tabeller, viser loading-modal, bytter etter 5s ───
+    function runReddiGeneration() {
+      const loading = document.getElementById('reddi-loading');
+      const sections = document.getElementById('category-sections');
+      if (!loading || !sections) return;
+      document.body.classList.add('loading');
+      loading.hidden = false;
+      sections.hidden = true;
+      // Nullstill eventuelle valg fra forrige runde
+      document.querySelectorAll('.pastand-card.selected').forEach(c => c.classList.remove('selected'));
+      updateUI();
+      setTimeout(function() {
+        document.body.classList.remove('loading');
+        loading.hidden = true;
+        sections.hidden = false;
+      }, 5000);
+    }
+
+    // Kjør én gang ved sidevisning
+    runReddiGeneration();
+
+    // "Lag nye påstander"-knapp trigger samme loading-sekvens
+    const btnRegenerate = document.getElementById('btn-regenerate');
+    if (btnRegenerate) btnRegenerate.addEventListener('click', runReddiGeneration);
+
     btnLeggTil.addEventListener('click', () => {
-      if (document.querySelectorAll('.pastand-card.selected').length > 0) {
-        window.location.href = 'lag-pastand.html';
+      const selected = document.querySelectorAll('.pastand-card.selected');
+      if (selected.length === 0) return;
+      const payload = Array.from(selected).map(card => ({
+        text: card.textContent.trim(),
+        type: card.dataset.type,
+        forklaring: card.dataset.forklaring || ''
+      }));
+      try {
+        localStorage.setItem('pastand-payload', JSON.stringify(payload));
+      } catch (e) {
+        console.error('Kunne ikke lagre påstander:', e);
       }
+      window.location.href = 'lag-pastander-split.html';
     });
   </script>
 </body>
