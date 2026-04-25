@@ -121,3 +121,290 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+/* ─────────── Demo section (Prøv demo) ─────────── */
+.section-demo {
+  background: var(--gradient-dark);
+  padding: 60px 0 0;
+  position: relative;
+  overflow: visible;
+  min-height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.demo-embed {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+}
+.demo-embed-frame {
+  display: block;
+  width: 100%;
+  height: 560px;
+  border: 0;
+  background: transparent;
+}
+.demo-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin: 0 auto 8px;
+  width: 100%;
+  max-width: 1400px;
+  padding: 0 24px;
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.demo-header .section-heading {
+  max-width: 760px;
+  margin: 0;
+  width: 760px;
+  max-width: calc(100% - 48px);
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+.demo-header .section-heading .section-label {
+  display: block;
+  margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+.demo-header .section-heading .section-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.5vw, 40px);
+  font-weight: 400;
+  line-height: 1.25;
+  color: #fff;
+  letter-spacing: -0.015em;
+  font-variation-settings:
+    "SOFT" 100,
+    "WONK" 1;
+}
+.demo-header .section-heading .section-title .accent {
+  font-style: italic;
+  color: #b6a8ff;
+  font-weight: 500;
+}
+
+.demo-fullscreen-btn {
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  color: #fff;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    transform 0.15s,
+    border-color 0.15s;
+  padding: 0;
+  z-index: 20;
+}
+.demo-fullscreen-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-50%) scale(1.05);
+}
+.demo-fullscreen-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.section-demo:fullscreen {
+  min-height: 100vh;
+  height: 100vh;
+  padding: 30px 0 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.section-demo:-webkit-full-screen {
+  min-height: 100vh;
+  height: 100vh;
+  padding: 30px 0 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.section-demo:fullscreen .demo-embed,
+.section-demo:-webkit-full-screen .demo-embed {
+  margin-bottom: 0;
+}
+.section-demo:fullscreen .reveal,
+.section-demo:-webkit-full-screen .reveal {
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+/* ─────────── Reddi corner (avatar + bubble) ─────────── */
+.reddi-corner {
+  position: absolute;
+  left: calc(24px + 25px);
+  top: calc(50% + 25px);
+  transform: translateY(-50%);
+  z-index: 50;
+}
+.reddi-avatar-btn {
+  position: relative;
+  width: 89px;
+  height: 89px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: transform 0.15s;
+  display: block;
+}
+.reddi-avatar-btn:hover {
+  transform: scale(1.06);
+}
+.reddi-avatar-btn:focus-visible {
+  outline: 3px solid rgba(200, 160, 255, 0.9);
+  outline-offset: 4px;
+}
+.reddi-avatar-img {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border: 6px solid #bfbcb4;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  display: block;
+  position: relative;
+  z-index: 2;
+  transition: border-color 0.2s;
+}
+.reddi-avatar-btn.has-tip .reddi-avatar-img {
+  border-color: #6c3fc5;
+  animation: reddi-border-blink 2.6s ease-in-out infinite;
+}
+@keyframes reddi-border-blink {
+  0%,
+  100% {
+    border-color: #6c3fc5;
+    box-shadow:
+      0 0 0 0 rgba(108, 63, 197, 0.22),
+      0 4px 14px rgba(0, 0, 0, 0.25);
+  }
+  50% {
+    border-color: #b99aef;
+    box-shadow:
+      0 0 0 6px rgba(108, 63, 197, 0),
+      0 4px 14px rgba(0, 0, 0, 0.25);
+  }
+}
+.reddi-avatar-btn.reading .reddi-avatar-img {
+  border-color: #6c3fc5;
+  animation: none;
+}
+.reddi-avatar-btn:not(.has-tip):not(.reading) .reddi-avatar-img {
+  border-color: #bfbcb4;
+  animation: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.reddi-bubble {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 0;
+  z-index: 200;
+  width: 460px;
+  max-width: calc(100vw - 40px);
+  background: #fdfaf6;
+  color: #1c1810;
+  border-radius: 18px;
+  padding: 18px 22px 16px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition:
+    opacity 0.25s,
+    transform 0.25s;
+}
+.reddi-bubble.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.reddi-bubble::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 22px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 12px solid #fdfaf6;
+}
+.reddi-speech-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.reddi-name {
+  font-size: 13px;
+  font-weight: 900;
+  color: #6c3fc5;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: var(--font-body);
+}
+.reddi-close {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #8a7a6f;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+.reddi-close:hover {
+  background: #f5edff;
+  color: #6c3fc5;
+}
+.reddi-text {
+  font-size: 15px;
+  color: #1c1810;
+  line-height: 1.55;
+  font-family: var(--font-body);
+}
+.reddi-text p {
+  margin: 0 0 10px 0;
+}
+.reddi-text p:last-child {
+  margin-bottom: 0;
+}
+.reddi-text strong {
+  font-weight: 700;
+  color: #1c1810;
+}

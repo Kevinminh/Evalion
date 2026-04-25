@@ -35,7 +35,7 @@ function LoginForm({
   footer,
 }: LoginFormProps) {
   return (
-    <Card className={cn("w-full max-w-sm", className)}>
+    <Card className={cn("w-full max-w-sm p-4", className)}>
       <CardHeader>
         {logo}
         <CardTitle className="sr-only">Logg inn</CardTitle>
@@ -68,7 +68,7 @@ function LoginForm({
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="justify-center">{footer}</CardFooter>
+      <CardFooter className="-mx-4 justify-center">{footer}</CardFooter>
     </Card>
   );
 }
