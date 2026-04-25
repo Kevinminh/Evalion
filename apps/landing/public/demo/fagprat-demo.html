@@ -270,7 +270,7 @@
     <div class="device-header">
       <div class="view-toggle">
         <button class="view-toggle-btn active" id="btn-view-ipad">Elevvisning (iPad)</button>
-        <button class="view-toggle-btn" id="btn-view-phone" disabled>Live-statistikk for lærer</button>
+        <button class="view-toggle-btn" id="btn-view-phone">Live-statistikk for lærer</button>
       </div>
     </div>
     <div class="ipad-phone-wrap">
@@ -535,9 +535,8 @@ function render() {
     if (phoneWinSteg) phoneWinSteg.postMessage({ type: 'fagprat-steg-num', num: s.num }, '*');
   } catch (ex) {}
 
-  // When back at påstandsoversikt (steg 0), disable phone and switch to iPad
+  // When back at påstandsoversikt (steg 0), switch back to iPad (but keep phone tab clickable)
   if (s.num === 0) {
-    $('#btn-view-phone').disabled = true;
     $('#btn-view-ipad').classList.add('active');
     $('#btn-view-phone').classList.remove('active');
     $('.ipad-holder').style.display = '';
@@ -722,8 +721,7 @@ window.addEventListener('message', function(e) {
         var clearMsg = { type: 'fagprat-my-votes', r1: null, r2: null };
         try { buf.ipad.a.contentWindow.postMessage(clearMsg, '*'); } catch (ex) {}
         try { buf.ipad.b.contentWindow.postMessage(clearMsg, '*'); } catch (ex) {}
-        // Disable phone and switch to iPad view
-        $('#btn-view-phone').disabled = true;
+        // Switch to iPad view (phone tab stays clickable)
         $('#btn-view-ipad').classList.add('active');
         $('#btn-view-phone').classList.remove('active');
         $('.ipad-holder').style.display = '';
@@ -831,8 +829,7 @@ function restart() {
   state.r1Vote = null;
   state.r2Vote = null;
   firstRender = false;
-  $('#btn-view-phone').disabled = true;
-  // Switch back to iPad view
+  // Switch back to iPad view (phone tab stays clickable)
   $('#btn-view-ipad').classList.add('active');
   $('#btn-view-phone').classList.remove('active');
   $('#phone-overlay').classList.remove('visible');
@@ -859,7 +856,6 @@ $('#btn-view-ipad').addEventListener('click', function() {
   $('#phone-overlay').classList.remove('visible');
 });
 $('#btn-view-phone').addEventListener('click', function() {
-  if (this.disabled) return;
   $('#btn-view-phone').classList.add('active');
   $('#btn-view-ipad').classList.remove('active');
   $('.ipad-holder').style.display = 'none';
@@ -877,8 +873,7 @@ $('#btn-lobby').addEventListener('click', function() {
   state.explanation = null;
   state.r1Vote = null;
   state.r2Vote = null;
-  // Disable phone view
-  $('#btn-view-phone').disabled = true;
+  // Switch back to iPad view (phone tab stays clickable in lobby)
   $('#btn-view-ipad').classList.add('active');
   $('#btn-view-phone').classList.remove('active');
   $('.ipad-holder').style.display = '';

@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/teamet", changeFrequency: "monthly" as const, priority: 0.7 },
     { path: "/personvern-og-vilkar", changeFrequency: "yearly" as const, priority: 0.5 },
     { path: "/logg-inn", changeFrequency: "yearly" as const, priority: 0.4 },
+    { path: "/registrer-deg", changeFrequency: "yearly" as const, priority: 0.4 },
   ];
 
   return routes.map((route) => ({

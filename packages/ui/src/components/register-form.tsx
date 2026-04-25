@@ -35,7 +35,7 @@ function RegisterForm({
   footer,
 }: RegisterFormProps) {
   return (
-    <Card className={cn("w-full max-w-sm", className)}>
+    <Card className={cn("w-full max-w-sm p-4", className)}>
       <CardHeader>
         {logo}
         <CardTitle className="sr-only">Registrer</CardTitle>
@@ -65,14 +65,16 @@ function RegisterForm({
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Registrerer..." : "Registrer"}
           </Button>
-          <FieldSeparator>eller</FieldSeparator>
+          <FieldSeparator className="[&>[data-slot=field-separator-content]]:bg-card">
+            eller
+          </FieldSeparator>
           <Button type="button" variant="outline" className="w-full" onClick={onGoogleSignIn}>
             <GoogleIcon />
             Fortsett med Google
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="justify-center">{footer}</CardFooter>
+      <CardFooter className="-mx-4 justify-center">{footer}</CardFooter>
     </Card>
   );
 }

@@ -42,7 +42,7 @@ export async function Header() {
               >
                 Logg inn
               </Button>
-              <Button size="sm" className="rounded-full" render={<Link href="/logg-inn" />}>
+              <Button size="sm" className="rounded-full" render={<Link href="/registrer-deg" />}>
                 Registrer deg
               </Button>
             </>
