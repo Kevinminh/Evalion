@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 
+import { revalidateAuthState } from "../lib/auth-actions";
 import { authClient } from "../lib/auth-client";
 
 export function UserMenu() {
@@ -17,7 +18,7 @@ export function UserMenu() {
   function handleLogout() {
     startTransition(async () => {
       await authClient.signOut();
-      router.refresh();
+      await revalidateAuthState();
       router.push("/");
     });
   }

@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { LoginForm } from "@workspace/ui/components/login-form";
 
+import { revalidateAuthState } from "@/lib/auth-actions";
 import { authClient, signInWithGoogle } from "@/lib/auth-client";
 
 export function LoginPanel() {
@@ -25,7 +26,7 @@ export function LoginPanel() {
       if (authError) {
         setError(authError.message ?? "Innlogging feilet. Sjekk e-post og passord.");
       } else {
-        router.refresh();
+        await revalidateAuthState();
         router.push("/lag-pastander");
       }
     } catch {

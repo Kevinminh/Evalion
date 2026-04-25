@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 
+import { revalidateAuthState } from "@/lib/auth-actions";
 import { authClient } from "@/lib/auth-client";
 
 function getInitials(name: string): string {
@@ -42,7 +43,7 @@ export function WorkspaceTopNav() {
   function handleLogout() {
     startTransition(async () => {
       await authClient.signOut();
-      router.refresh();
+      await revalidateAuthState();
       router.push("/");
     });
   }

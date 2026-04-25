@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { RegisterForm } from "@workspace/ui/components/register-form";
 
+import { revalidateAuthState } from "@/lib/auth-actions";
 import { authClient, signInWithGoogle } from "@/lib/auth-client";
 
 export function RegisterPanel() {
@@ -26,7 +27,7 @@ export function RegisterPanel() {
       if (authError) {
         setError(authError.message ?? "Registrering feilet. Prøv igjen.");
       } else {
-        router.refresh();
+        await revalidateAuthState();
         router.push("/lag-pastander");
       }
     } catch {
