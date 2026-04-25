@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
+import { UserAvatar } from "@workspace/ui/components/user-menu";
 import { Play, LogOut, User, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -71,18 +72,13 @@ function App() {
       {isAuthenticated && session?.user && (
         <div className="fixed top-0 right-0 left-0 flex items-center justify-end gap-3 border-b bg-card px-6 py-3">
           <div className="flex items-center gap-2">
-            <div className="flex size-8 items-center justify-center rounded-full bg-primary text-xs font-extrabold text-primary-foreground">
-              {session.user.name ? (
-                session.user.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .toUpperCase()
-                  .slice(0, 2)
-              ) : (
+            {session.user.name ? (
+              <UserAvatar name={session.user.name} />
+            ) : (
+              <div className="flex size-8 items-center justify-center rounded-full bg-primary text-xs font-extrabold text-primary-foreground">
                 <User className="size-4" />
-              )}
-            </div>
+              </div>
+            )}
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-foreground">
                 {session.user.name || "Bruker"}

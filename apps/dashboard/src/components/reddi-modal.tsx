@@ -1,5 +1,6 @@
 import { Button } from "@workspace/ui/components/button";
-import { useEffect, useRef, useState } from "react";
+import { Modal } from "@workspace/ui/components/modal";
+import { useState } from "react";
 
 import { LABEL_CLASS, TEXTAREA_CLASS } from "@/lib/constants";
 
@@ -17,29 +18,10 @@ const steps = [
 
 export function ReddiModal({ open, onClose, onSubmit }: ReddiModalProps) {
   const [topic, setTopic] = useState("");
-  const overlayRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [open, onClose]);
-
-  if (!open) return null;
 
   return (
-    <div
-      ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-      onClick={(e) => {
-        if (e.target === overlayRef.current) onClose();
-      }}
-    >
-      <div className="w-full max-w-lg rounded-2xl bg-card p-8 shadow-xl">
-        {/* Reddi robot + badge */}
+    <Modal open={open} onClose={onClose}>
+      {/* Reddi robot + badge */}
         <div className="mb-4 flex items-center gap-3">
           <img src="/reddi.png" alt="Reddi" className="size-12 rounded-full object-cover" />
           <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
@@ -95,7 +77,6 @@ export function ReddiModal({ open, onClose, onSubmit }: ReddiModalProps) {
             Generer påstander
           </Button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

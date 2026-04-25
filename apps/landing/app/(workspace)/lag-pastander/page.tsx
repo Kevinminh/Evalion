@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
-import { Workspace } from "./workspace";
+import "@workspace/ui/styles/lag-pastander.css";
 
-import "./styles.css";
+import { Workspace } from "./workspace";
 
 export const metadata: Metadata = {
   title: "Lag påstander",

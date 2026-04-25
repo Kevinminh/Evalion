@@ -1,14 +1,6 @@
 import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@workspace/ui/components/dropdown-menu";
+import { DropdownMenuItem } from "@workspace/ui/components/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -20,7 +12,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@workspace/ui/components/sidebar";
-import { Search, FolderOpen, Clock, Plus, LogOut, Settings, HelpCircle } from "lucide-react";
+import { UserMenu } from "@workspace/ui/components/user-menu";
+import { Search, FolderOpen, Clock, Plus, Settings, HelpCircle } from "lucide-react";
 import type { ComponentProps } from "react";
 
 import { authClient } from "@/lib/auth-client";
@@ -30,16 +23,6 @@ const navItems = [
   { label: "Min samling", path: "/min-samling" as const, icon: FolderOpen },
   { label: "Historikk", path: "/historikk" as const, icon: Clock },
 ];
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
 
 export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
   const matchRoute = useMatchRoute();
@@ -54,10 +37,6 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
     await authClient.signOut();
     await navigate({ to: "/login" });
   };
-
-  const userName = session?.user?.name ?? "Bruker";
-  const userEmail = session?.user?.email ?? "";
-  const initials = getInitials(userName);
 
   return (
     <Sidebar {...props}>
@@ -98,47 +77,21 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       <SidebarFooter>
-        <DropdownMenu>
-          <DropdownMenuTrigger className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 transition-colors hover:bg-sidebar-accent">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-extrabold text-primary-foreground">
-              {initials}
-            </div>
-            <div className="flex flex-col text-left">
-              <span className="text-sm font-semibold">{userName}</span>
-              {userEmail && <span className="text-xs text-muted-foreground">{userEmail}</span>}
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="top" sideOffset={8} align="start">
-            <DropdownMenuGroup>
-              <DropdownMenuLabel>
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold">{userName}</span>
-                  {userEmail && (
-                    <span className="text-xs font-normal text-muted-foreground">{userEmail}</span>
-                  )}
-                </div>
-              </DropdownMenuLabel>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem disabled>
-                <Settings className="size-4" />
-                Innstillinger
-              </DropdownMenuItem>
-              <DropdownMenuItem disabled>
-                <HelpCircle className="size-4" />
-                Hjelp
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem variant="destructive" onClick={handleLogout}>
-                <LogOut className="size-4" />
-                Logg ut
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <UserMenu
+          name={session?.user?.name ?? "Bruker"}
+          email={session?.user?.email ?? ""}
+          variant="expanded"
+          onLogout={handleLogout}
+        >
+          <DropdownMenuItem disabled>
+            <Settings className="size-4" />
+            Innstillinger
+          </DropdownMenuItem>
+          <DropdownMenuItem disabled>
+            <HelpCircle className="size-4" />
+            Hjelp
+          </DropdownMenuItem>
+        </UserMenu>
       </SidebarFooter>
     </Sidebar>
   );
