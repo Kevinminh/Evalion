@@ -1,5 +1,5 @@
-import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
-import { FASIT_TEXT } from "@workspace/ui/lib/constants";
+import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
+import { FASIT_TEXT } from "@workspace/evalion/lib/constants";
 
 import { CountdownOverlay } from "./countdown-overlay";
 import { RecordingDisclaimer } from "./recording-disclaimer";

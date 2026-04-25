@@ -1,4 +1,4 @@
-import { WorkspaceShell } from "@workspace/ui/components/workspace-shell";
+import { WorkspaceShell } from "@workspace/evalion/components/workspace-shell";
 import { redirect } from "next/navigation";
 
 import { Header } from "@/components/header";

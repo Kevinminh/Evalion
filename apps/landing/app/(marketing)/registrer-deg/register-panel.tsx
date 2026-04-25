@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { RegisterForm } from "@workspace/ui/components/register-form";
+import { RegisterForm } from "@workspace/evalion/components/auth/register-form";
 
 import { authClient, signInWithGoogle } from "@/lib/auth-client";
 

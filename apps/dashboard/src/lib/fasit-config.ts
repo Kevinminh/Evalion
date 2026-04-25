@@ -3,4 +3,4 @@ export {
   FASIT_LABELS,
   FASIT_OPTIONS,
   FASIT_STYLES,
-} from "@workspace/ui/lib/constants";
+} from "@workspace/evalion/lib/constants";

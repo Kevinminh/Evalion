@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
+import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { toast } from "sonner";
 
 import { StatementCard } from "./statement-card";

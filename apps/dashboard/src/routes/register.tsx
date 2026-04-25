@@ -1,5 +1,5 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
-import { RegisterForm } from "@workspace/ui/components/register-form";
+import { RegisterForm } from "@workspace/evalion/components/auth/register-form";
 import { useState } from "react";
 
 import { authClient, signInWithGoogle } from "@/lib/auth-client";

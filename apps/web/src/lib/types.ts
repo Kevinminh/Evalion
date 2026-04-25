@@ -5,4 +5,4 @@ export type {
   Fasit,
   LiveSession,
   SessionStudent,
-} from "@workspace/ui/lib/types";
+} from "@workspace/evalion/lib/types";

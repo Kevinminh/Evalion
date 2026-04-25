@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { RouteErrorBoundary } from "@workspace/ui/components/route-error-boundary";
+import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { cn } from "@workspace/ui/lib/utils";
 import { useState } from "react";

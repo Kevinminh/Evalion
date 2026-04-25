@@ -14,7 +14,7 @@ import { authClient } from "@/lib/auth-client";
 import { getToken } from "@/lib/auth-server";
 
 import appCss from "@workspace/ui/globals.css?url";
-import { RootErrorFallback, RootNotFound } from "@workspace/ui/components/root-fallbacks";
+import { RootErrorFallback, RootNotFound } from "@workspace/evalion/components/root-fallbacks";
 import { Toaster } from "@workspace/ui/components/sonner";
 
 const getAuth = createServerFn({ method: "GET" }).handler(async () => {

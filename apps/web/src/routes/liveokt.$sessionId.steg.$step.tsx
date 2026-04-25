@@ -1,17 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
-import { isValidConvexId } from "@workspace/ui/lib/convex-id";
-import { RouteErrorBoundary } from "@workspace/ui/components/route-error-boundary";
-import { Professor } from "@workspace/ui/components/live/professor";
-import { RecordButton } from "@workspace/ui/components/live/record-button";
-import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
-import { StepNav } from "@workspace/ui/components/live/step-nav";
-import { TeacherPanel } from "@workspace/ui/components/live/teacher-panel";
+import { isValidConvexId } from "@workspace/evalion/lib/convex-id";
+import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
+import { Professor } from "@workspace/evalion/components/live/professor";
+import { RecordButton } from "@workspace/evalion/components/live/record-button";
+import { SessionTopBar } from "@workspace/evalion/components/live/session-top-bar";
+import { StepNav } from "@workspace/evalion/components/live/step-nav";
+import { TeacherPanel } from "@workspace/evalion/components/live/teacher-panel";
 import {
   STATEMENT_COLORS_HEX,
   VOTE_DOT_COLORS,
   VOTE_LABELS,
-} from "@workspace/ui/lib/constants";
+} from "@workspace/evalion/lib/constants";
 import { cn } from "@workspace/ui/lib/utils";
 // VoteButtons removed — teacher view doesn't vote
 import { useMutation } from "convex/react";
@@ -19,7 +19,7 @@ import { ArrowRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { LiveStepSkeleton } from "@workspace/ui/components/skeletons/live-step-skeleton";
+import { LiveStepSkeleton } from "@workspace/evalion/components/skeletons/live-step-skeleton";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 import { DASHBOARD_URL } from "@/lib/env";

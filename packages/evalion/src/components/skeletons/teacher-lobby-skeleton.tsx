@@ -1,4 +1,4 @@
-import { Skeleton } from "../skeleton";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 
 export function TeacherLobbySkeleton() {
   return (

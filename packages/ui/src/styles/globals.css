@@ -10,46 +10,108 @@
 @source "../**/*.{ts,tsx}";
 
 @theme inline {
+  /* ── Fonts ───────────────────────────────────────────────────────────── */
+  --font-sans: 'Nunito Variable', 'Inter Variable', sans-serif;
   --font-heading: var(--font-sans);
+  --font-display: var(--display-font, var(--font-sans));
+  --font-body: var(--font-sans);
+
+  /* ── Semantic shadcn tokens (themeable via :root / .dark) ────────────── */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* ── Charts ──────────────────────────────────────────────────────────── */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* ── Sidebar ─────────────────────────────────────────────────────────── */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* ── Domain: vote answers (sant/usant/delvis) ───────────────────────── */
   --color-sant: var(--sant);
   --color-sant-bg: var(--sant-bg);
   --color-usant: var(--usant);
   --color-usant-bg: var(--usant-bg);
   --color-delvis: var(--delvis);
   --color-delvis-bg: var(--delvis-bg);
+
+  /* ── Brand: secondary teal ──────────────────────────────────────────── */
   --color-secondary-teal: var(--secondary-teal);
   --color-secondary-teal-dark: var(--secondary-teal-dark);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --color-foreground: var(--foreground);
-  --color-background: var(--background);
+
+  /* ── Brand purple scale (workspace + landing) ───────────────────────── */
+  --color-purple-50: #f5efff;
+  --color-purple-100: #e9dcff;
+  --color-purple-200: #d8c8ff;
+  --color-purple-300: #b99aef;
+  --color-purple-400: #8554f6;
+  --color-purple-500: #6c3fc5;
+  --color-purple-600: #5a30aa;
+  --color-purple-700: #48208b;
+  --color-purple-shadow: #36126e;
+
+  /* ── Brand sage (landing CO-LAB) ────────────────────────────────────── */
+  --color-sage-50: #ecf3ee;
+  --color-sage-100: #d9e8de;
+  --color-sage-200: #bdd6c5;
+  --color-sage-300: #8fb89c;
+  --color-sage-400: #5e9a72;
+  --color-sage-500: #3e7864;
+  --color-sage-600: #2a5847;
+
+  /* ── Brand coral (landing CO-LAB) ───────────────────────────────────── */
+  --color-coral: #2f8f83;
+  --color-coral-light: #d6ece8;
+  --color-coral-hover: #1f7268;
+
+  /* ── Neutral scale (warm, paper-ish) ────────────────────────────────── */
+  --color-neutral-0: #ffffff;
+  --color-neutral-50: #f7f7f5;
+  --color-neutral-100: #efefec;
+  --color-neutral-200: #e1e1dc;
+  --color-neutral-300: #c8c8c0;
+  --color-neutral-400: #a3a39a;
+  --color-neutral-500: #6f6f66;
+
+  /* ── Ink (text colors used by landing + workspace) ──────────────────── */
+  --color-ink: #1a2420;
+  --color-ink-secondary: #3e5048;
+  --color-ink-tertiary: #708578;
+
+  /* ── Section backgrounds (landing) ──────────────────────────────────── */
+  --color-section-light: #ecf3ee;
+  --color-section-dark: #0b3840;
+
+  /* ── Misc landing tokens ────────────────────────────────────────────── */
+  --color-cl-border: #cde0d3;
+
+  /* ── Radius scale ───────────────────────────────────────────────────── */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -57,7 +119,14 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
-  --font-sans: 'Nunito Variable', 'Inter Variable', sans-serif;
+
+  /* ── Animations ─────────────────────────────────────────────────────── */
+  --animate-fade-in-up: fadeInUp 0.4s ease-out both;
+  --animate-countdown-pop: countdown-pop 1s ease-in-out;
+  --animate-badge-bounce: badge-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-blink: blink 1s ease-in-out infinite;
+  --animate-dot-pulse: dotPulse 1.4s ease-in-out infinite;
+  --animate-gentle-bounce: gentle-bounce 2s ease-in-out infinite;
   --animate-cursor-blink: cl-cursor-blink 1s step-end infinite;
   --animate-professor-float: cl-professor-float 3.5s ease-in-out infinite alternate;
   --animate-reddi-float: cl-reddi-float 4.5s ease-in-out infinite;
@@ -106,6 +175,36 @@
   --sidebar-accent-foreground: oklch(0.3 0.06 295);
   --sidebar-border: oklch(0.92 0.005 250);
   --sidebar-ring: oklch(0.45 0.2 295);
+
+  /* ── Legacy aliases — kept until Phase 3 rewrite of lag-pastander.css and ── */
+  /* ── velg-pastander/selection-view.tsx finishes. Do not introduce new uses. ── */
+  --color-primary-50: var(--color-purple-50);
+  --color-primary-100: var(--color-purple-100);
+  --color-primary-200: var(--color-purple-200);
+  --color-primary-300: var(--color-purple-300);
+  --color-primary-400: var(--color-purple-400);
+  --color-primary-500: var(--color-purple-500);
+  --color-primary-600: var(--color-purple-600);
+  --color-primary-700: var(--color-purple-700);
+  --color-secondary-50: var(--color-sage-50);
+  --color-secondary-100: var(--color-sage-100);
+  --color-secondary-200: var(--color-sage-200);
+  --color-secondary-300: var(--color-sage-300);
+  --color-secondary-400: var(--color-sage-400);
+  --color-secondary-500: var(--color-sage-500);
+  --color-secondary-600: var(--color-sage-600);
+  --color-text-primary: var(--color-ink);
+  --color-text-secondary: var(--color-ink-secondary);
+  --color-text-tertiary: var(--color-ink-tertiary);
+  --font-family-body: var(--font-sans);
+  --gradient-light: linear-gradient(180deg, #ecf3ee 0%, #f0f1e9 50%, #f4efe4 100%);
+  --gradient-dark: linear-gradient(180deg, #1f2128 0%, #0b3840 15%, #0b3840 85%, #1f2128 100%);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.03);
+  --shadow-glow-primary: 0 0 0 4px rgba(108, 63, 197, 0.18);
+  --workspace-radius-xl: 14px;
+  --workspace-radius-2xl: 18px;
+  --transition-fast: 0.15s ease;
+  --z-sticky: 40;
 }
 
 .dark {
@@ -154,6 +253,142 @@
   }
 }
 
+/* ─────────── Workspace shell layout (used by landing /(workspace) routes) ─────────── */
+/* Layout-only CSS that resists Tailwind translation due to fixed positioning math. */
+/* Color tokens come from @theme — this block no longer redeclares colors. */
+.workspace-shell {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #ecf3ee 0%, #f0f1e9 50%, #f4efe4 100%);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.workspace-top-nav {
+  position: fixed;
+  top: 28px;
+  left: calc(max(0px, (100vw - 1180px) / 2) + 218px);
+  transform: translateX(-50%);
+  z-index: 20;
+}
+@media (max-width: 1040px) {
+  .workspace-top-nav {
+    left: 50%;
+  }
+}
+.workspace-top-nav-link {
+  display: inline-flex;
+  align-items: center;
+}
+.workspace-top-nav-logo {
+  height: 53px;
+  width: auto;
+  display: block;
+}
+
+.workspace-profile-menu {
+  position: fixed;
+  top: 28px;
+  left: max(16px, calc((100vw - 1180px) / 2 - 6px));
+  z-index: 30;
+}
+.workspace-profile-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 5px;
+  background: white;
+  border: 1.5px solid var(--color-neutral-200);
+  border-radius: 100px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.workspace-profile-btn:hover {
+  background: var(--color-neutral-50);
+  border-color: var(--color-neutral-300);
+}
+.workspace-profile-btn:focus-visible {
+  outline: 2px solid var(--color-purple-400);
+  outline-offset: 2px;
+}
+.workspace-profile-initials {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-purple-500);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 12px;
+}
+.workspace-profile-chevron {
+  width: 14px;
+  height: 14px;
+  color: var(--color-ink-secondary);
+  transition: transform 0.2s ease;
+}
+.workspace-profile-btn[aria-expanded="true"] .workspace-profile-chevron {
+  transform: rotate(180deg);
+}
+.workspace-profile-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 200px;
+  background: white;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: 14px;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.14),
+    0 2px 6px rgba(0, 0, 0, 0.04);
+  padding: 6px;
+  z-index: 31;
+}
+.workspace-profile-dropdown[hidden] {
+  display: none;
+}
+.workspace-profile-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 9px;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.12s;
+  text-align: left;
+}
+.workspace-profile-dropdown-item:hover {
+  background: var(--color-purple-50);
+}
+.workspace-profile-dropdown-item svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-ink-tertiary);
+  flex-shrink: 0;
+}
+.workspace-profile-dropdown-divider {
+  height: 1px;
+  background: var(--color-neutral-200);
+  margin: 4px 8px;
+}
+
+/* ─────────── Keyframes ─────────── */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -273,184 +508,4 @@
   50% {
     transform: translateY(-6px);
   }
-}
-
-/* ─────────── Workspace shell tokens (shared across landing + dashboard workspace pages) ─────────── */
-.workspace-shell {
-  --color-primary-50: #f5efff;
-  --color-primary-100: #e9dcff;
-  --color-primary-200: #d8c8ff;
-  --color-primary-300: #b99aef;
-  --color-primary-400: #8554f6;
-  --color-primary-500: #6c3fc5;
-  --color-primary-600: #5a30aa;
-  --color-primary-700: #48208b;
-
-  --color-secondary-50: #ecf3ee;
-  --color-secondary-100: #d9e8de;
-  --color-secondary-200: #bdd6c5;
-  --color-secondary-300: #8fb89c;
-  --color-secondary-400: #5e9a72;
-  --color-secondary-500: #3e7864;
-  --color-secondary-600: #2a5847;
-
-  --color-neutral-0: #ffffff;
-  --color-neutral-50: #f7f7f5;
-  --color-neutral-100: #efefec;
-  --color-neutral-200: #e1e1dc;
-  --color-neutral-300: #c8c8c0;
-  --color-neutral-400: #a3a39a;
-  --color-neutral-500: #6f6f66;
-
-  --color-text-primary: #1a2420;
-  --color-text-secondary: #3e5048;
-  --color-text-tertiary: #708578;
-
-  --color-sant: #4caf50;
-  --color-sant-bg: #e8f5e9;
-  --color-usant: #e53935;
-  --color-usant-bg: #ffebee;
-  --color-delvis: #fb8c00;
-  --color-delvis-bg: #fff3e0;
-
-  --font-family-body: var(--font-body);
-  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.03);
-  --shadow-glow-primary: 0 0 0 4px rgba(108, 63, 197, 0.18);
-  --workspace-radius-xl: 14px;
-  --workspace-radius-2xl: 18px;
-  --transition-fast: 0.15s ease;
-  --z-sticky: 40;
-}
-
-/* ─────────── Workspace shell layout (used by landing /(workspace) routes; dashboard may opt-in later) ─────────── */
-.workspace-shell {
-  min-height: 100vh;
-  background: var(--gradient-light);
-  color: var(--color-text-primary);
-  font-family: var(--font-body);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-.workspace-top-nav {
-  position: fixed;
-  top: 28px;
-  left: calc(max(0px, (100vw - 1180px) / 2) + 218px);
-  transform: translateX(-50%);
-  z-index: 20;
-}
-@media (max-width: 1040px) {
-  .workspace-top-nav {
-    left: 50%;
-  }
-}
-.workspace-top-nav-link {
-  display: inline-flex;
-  align-items: center;
-}
-.workspace-top-nav-logo {
-  height: 53px;
-  width: auto;
-  display: block;
-}
-
-.workspace-profile-menu {
-  position: fixed;
-  top: 28px;
-  left: max(16px, calc((100vw - 1180px) / 2 - 6px));
-  z-index: 30;
-}
-.workspace-profile-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 12px 5px 5px;
-  background: white;
-  border: 1.5px solid var(--color-neutral-200);
-  border-radius: 100px;
-  cursor: pointer;
-  font-family: var(--font-body);
-  transition:
-    background 0.15s,
-    border-color 0.15s,
-    box-shadow 0.15s;
-}
-.workspace-profile-btn:hover {
-  background: var(--color-neutral-50);
-  border-color: var(--color-neutral-300);
-}
-.workspace-profile-btn:focus-visible {
-  outline: 2px solid var(--color-primary-400);
-  outline-offset: 2px;
-}
-.workspace-profile-initials {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: var(--color-primary-500);
-  color: white;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 12px;
-}
-.workspace-profile-chevron {
-  width: 14px;
-  height: 14px;
-  color: var(--color-text-secondary);
-  transition: transform 0.2s ease;
-}
-.workspace-profile-btn[aria-expanded="true"] .workspace-profile-chevron {
-  transform: rotate(180deg);
-}
-.workspace-profile-dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  min-width: 200px;
-  background: white;
-  border: 1px solid var(--color-neutral-200);
-  border-radius: 14px;
-  box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.14),
-    0 2px 6px rgba(0, 0, 0, 0.04);
-  padding: 6px;
-  z-index: 31;
-}
-.workspace-profile-dropdown[hidden] {
-  display: none;
-}
-.workspace-profile-dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 12px;
-  background: transparent;
-  border: none;
-  border-radius: 9px;
-  color: var(--color-text-primary);
-  font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 0.12s;
-  text-align: left;
-}
-.workspace-profile-dropdown-item:hover {
-  background: var(--color-primary-50);
-}
-.workspace-profile-dropdown-item svg {
-  width: 16px;
-  height: 16px;
-  color: var(--color-text-tertiary);
-  flex-shrink: 0;
-}
-.workspace-profile-dropdown-divider {
-  height: 1px;
-  background: var(--color-neutral-200);
-  margin: 4px 8px;
 }

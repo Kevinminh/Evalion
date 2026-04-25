@@ -24,6 +24,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@workspace/backend/*": ["../../packages/backend/*"],
+      "@workspace/evalion/*": ["../../packages/evalion/src/*"],
       "@workspace/ui/*": ["../../packages/ui/src/*"]
     }
   }

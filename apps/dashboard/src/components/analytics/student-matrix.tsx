@@ -1,5 +1,5 @@
-import { VOTE_DOT_COLORS, VOTE_LABELS, LEVEL_CIRCLE_COLORS } from "@workspace/ui/lib/constants";
-import type { Fasit } from "@workspace/ui/lib/types";
+import { VOTE_DOT_COLORS, VOTE_LABELS, LEVEL_CIRCLE_COLORS } from "@workspace/evalion/lib/constants";
+import type { Fasit } from "@workspace/evalion/lib/types";
 import { cn } from "@workspace/ui/lib/utils";
 import { useState } from "react";
 

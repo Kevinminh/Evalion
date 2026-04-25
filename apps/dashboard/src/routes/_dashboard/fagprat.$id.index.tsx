@@ -13,7 +13,7 @@ import { ArrowLeft, Users, Pencil, MoreVertical, Copy, Trash2, FolderPlus } from
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { FagPratDetailSkeleton } from "@workspace/ui/components/skeletons/fagprat-detail-skeleton";
+import { FagPratDetailSkeleton } from "@workspace/evalion/components/skeletons/fagprat-detail-skeleton";
 import { ErrorState } from "@/components/error-state";
 import { NotFoundState } from "@/components/not-found-state";
 import { AuthorAvatar } from "@/components/author-avatar";

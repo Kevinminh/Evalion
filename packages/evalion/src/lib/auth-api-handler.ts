@@ -1,6 +1,6 @@
 import { setResponseHeader } from "@tanstack/react-start/server";
 
-import { handler } from "@workspace/ui/lib/auth-server";
+import { handler } from "@workspace/evalion/lib/auth-server";
 
 /**
  * Creates a TanStack Start-compatible auth handler that rewrites any

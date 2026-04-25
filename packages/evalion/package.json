@@ -1,11 +1,9 @@
 {
-  "name": "@workspace/ui",
+  "name": "@workspace/evalion",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "exports": {
-    "./globals.css": "./src/styles/globals.css",
-    "./styles/*.css": "./src/styles/*.css",
     "./lib/*": "./src/lib/*.ts",
     "./components/*": "./src/components/*.tsx",
     "./hooks/*": "./src/hooks/*.ts"
@@ -16,28 +14,33 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@workspace/backend": "workspace:*",
+    "@workspace/ui": "workspace:*",
+    "@convex-dev/better-auth": "catalog:",
+    "@convex-dev/react-query": "catalog:",
+    "better-auth": "catalog:",
     "@base-ui/react": "catalog:",
-    "@fontsource-variable/inter": "catalog:",
-    "@fontsource-variable/nunito": "catalog:",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@tanstack/react-router": "catalog:",
+    "@tanstack/react-start": "catalog:",
+    "@tanstack/react-query": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
+    "convex": "catalog:",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "recharts": "catalog:",
-    "shadcn": "catalog:",
     "sonner": "catalog:",
     "tailwind-merge": "catalog:",
-    "tw-animate-css": "catalog:"
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "catalog:",
-    "vite": "catalog:",
     "@turbo/gen": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "tailwindcss": "catalog:",
     "typescript": "catalog:"
   }
 }

@@ -1,13 +1,13 @@
 import { useQuery, skipToken } from "@tanstack/react-query";
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
-import { isValidConvexId } from "@workspace/ui/lib/convex-id";
+import { isValidConvexId } from "@workspace/evalion/lib/convex-id";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 import { useMutation } from "convex/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { RouteErrorBoundary } from "@workspace/ui/components/route-error-boundary";
-import { StudentGameSkeleton } from "@workspace/ui/components/skeletons/student-game-skeleton";
+import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
+import { StudentGameSkeleton } from "@workspace/evalion/components/skeletons/student-game-skeleton";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 import { COUNTDOWN_STEP_MS, COUNTDOWN_TOTAL_MS } from "@/lib/timings";

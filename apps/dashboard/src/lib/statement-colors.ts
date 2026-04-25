@@ -1,1 +1,1 @@
-export { getStatementColor, STATEMENT_COLORS } from "@workspace/ui/lib/constants";
+export { getStatementColor, STATEMENT_COLORS } from "@workspace/evalion/lib/constants";

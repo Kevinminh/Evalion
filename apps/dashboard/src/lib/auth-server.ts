@@ -1,1 +1,1 @@
-export { fetchAuthAction, fetchAuthMutation, fetchAuthQuery, getToken, handler } from "@workspace/ui/lib/auth-server";
+export { fetchAuthAction, fetchAuthMutation, fetchAuthQuery, getToken, handler } from "@workspace/evalion/lib/auth-server";

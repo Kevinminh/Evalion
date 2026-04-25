@@ -1,10 +1,10 @@
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
-import { DistributionChart } from "@workspace/ui/components/live/distribution-chart";
-import { EndringerCard } from "@workspace/ui/components/live/endringer-card";
-import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
-import { PanelTabs } from "@workspace/ui/components/live/panel-tabs";
-import { Professor } from "@workspace/ui/components/live/professor";
-import { FASIT_TEXT } from "@workspace/ui/lib/constants";
+import { DistributionChart } from "@workspace/evalion/components/live/distribution-chart";
+import { EndringerCard } from "@workspace/evalion/components/live/endringer-card";
+import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
+import { PanelTabs } from "@workspace/evalion/components/live/panel-tabs";
+import { Professor } from "@workspace/evalion/components/live/professor";
+import { FASIT_TEXT } from "@workspace/evalion/lib/constants";
 import type { ReactNode } from "react";
 
 type Statement = Doc<"fagprats">["statements"][number];

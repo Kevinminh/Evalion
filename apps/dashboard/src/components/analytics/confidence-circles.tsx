@@ -1,4 +1,4 @@
-import { LEVEL_CIRCLE_COLORS } from "@workspace/ui/lib/constants";
+import { LEVEL_CIRCLE_COLORS } from "@workspace/evalion/lib/constants";
 
 interface ConfidenceCirclesProps {
   distribution: Array<{ level: number; count: number }>;

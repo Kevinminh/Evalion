@@ -4,7 +4,7 @@ export {
   DEFAULT_GROUP_COUNT,
   MIN_GROUP_COUNT,
   MAX_GROUP_COUNT,
-} from "@workspace/ui/lib/constants";
+} from "@workspace/evalion/lib/constants";
 
 /** Standard 3-column responsive card grid */
 export const CARD_GRID_CLASS =

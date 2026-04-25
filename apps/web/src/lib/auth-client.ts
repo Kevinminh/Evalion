@@ -1,1 +1,1 @@
-export { authClient } from "@workspace/ui/lib/auth-client";
+export { authClient } from "@workspace/evalion/lib/auth-client";

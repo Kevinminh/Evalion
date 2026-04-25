@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
-import { JoinSessionSkeleton } from "@workspace/ui/components/skeletons/join-session-skeleton";
+import { JoinSessionSkeleton } from "@workspace/evalion/components/skeletons/join-session-skeleton";
 import { useMutation } from "convex/react";
 import { ArrowLeft, Loader2, UserPlus } from "lucide-react";
 import { useState } from "react";

@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { LogoutCard } from "@workspace/ui/components/logout-card";
+import { LogoutCard } from "@workspace/evalion/components/auth/logout-card";
 
 import { authClient } from "@/lib/auth-client";
 

@@ -5,7 +5,7 @@ import { Users, Calendar, BarChart3, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { SessionCardSkeleton } from "@workspace/ui/components/skeletons/session-card-skeleton";
+import { SessionCardSkeleton } from "@workspace/evalion/components/skeletons/session-card-skeleton";
 import { DeleteFagPratDialog } from "@/components/delete-fagprat-dialog";
 import { ErrorState } from "@/components/error-state";
 import { SKELETON_COUNT } from "@/lib/constants";

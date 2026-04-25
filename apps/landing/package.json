@@ -17,6 +17,7 @@
     "@fontsource-variable/nunito": "catalog:",
     "@tailwindcss/postcss": "catalog:",
     "@workspace/backend": "workspace:*",
+    "@workspace/evalion": "workspace:*",
     "@workspace/ui": "workspace:*",
     "better-auth": "catalog:",
     "convex": "catalog:",

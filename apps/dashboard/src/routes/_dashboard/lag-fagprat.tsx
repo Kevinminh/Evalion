@@ -2,12 +2,12 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
-import { parseDraftJson } from "@workspace/ui/lib/draft-utils";
+import { parseDraftJson } from "@workspace/evalion/lib/draft-utils";
 import {
   toStatementPayload,
   toStatementsWithId,
   useStatements,
-} from "@workspace/ui/hooks/use-statements";
+} from "@workspace/evalion/hooks/use-statements";
 import { Plus, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";

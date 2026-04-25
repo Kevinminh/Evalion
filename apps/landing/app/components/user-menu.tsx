@@ -1,7 +1,7 @@
 "use client";
 
 import { DropdownMenuItem } from "@workspace/ui/components/dropdown-menu";
-import { UserMenu as SharedUserMenu } from "@workspace/ui/components/user-menu";
+import { UserMenu as SharedUserMenu } from "@workspace/evalion/components/auth/user-menu";
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useTransition } from "react";

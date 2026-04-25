@@ -1,13 +1,13 @@
 import { useQuery, skipToken } from "@tanstack/react-query";
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
-import { isValidConvexId } from "@workspace/ui/lib/convex-id";
-import { RouteErrorBoundary } from "@workspace/ui/components/route-error-boundary";
-import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
+import { isValidConvexId } from "@workspace/evalion/lib/convex-id";
+import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
+import { SessionTopBar } from "@workspace/evalion/components/live/session-top-bar";
 import { useMutation } from "convex/react";
 import { Users, X } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
-import { TeacherLobbySkeleton } from "@workspace/ui/components/skeletons/teacher-lobby-skeleton";
+import { TeacherLobbySkeleton } from "@workspace/evalion/components/skeletons/teacher-lobby-skeleton";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 import { pastelFor } from "@/lib/avatar";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";

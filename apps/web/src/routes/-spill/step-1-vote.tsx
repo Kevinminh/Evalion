@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { cn } from "@workspace/ui/lib/utils";
-import { STUDENT_VOTE_OPTIONS } from "@workspace/ui/lib/constants";
+import { STUDENT_VOTE_OPTIONS } from "@workspace/evalion/lib/constants";
 import { toast } from "sonner";
 
 import { ConfidenceScale } from "./confidence-scale";

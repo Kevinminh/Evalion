@@ -12,7 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@workspace/ui/components/sidebar";
-import { UserMenu } from "@workspace/ui/components/user-menu";
+import { UserMenu } from "@workspace/evalion/components/auth/user-menu";
 import { Search, FolderOpen, Clock, Plus, Settings, HelpCircle } from "lucide-react";
 import type { ComponentProps } from "react";
 

@@ -12,7 +12,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./dropdown-menu";
+} from "@workspace/ui/components/dropdown-menu";
 
 export function getInitials(name: string): string {
   return name

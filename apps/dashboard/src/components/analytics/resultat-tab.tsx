@@ -1,6 +1,6 @@
 import { BarChart3 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { VOTE_DOT_COLORS, VOTE_LABELS, LEVEL_CIRCLE_COLORS } from "@workspace/ui/lib/constants";
+import { VOTE_DOT_COLORS, VOTE_LABELS, LEVEL_CIRCLE_COLORS } from "@workspace/evalion/lib/constants";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { ColumnChart } from "./column-chart";

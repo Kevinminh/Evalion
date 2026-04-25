@@ -1,4 +1,4 @@
-import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
+import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 
 interface Step5ExplanationProps {
   statement: {

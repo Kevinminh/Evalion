@@ -3,13 +3,13 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
-import { RouteErrorBoundary } from "@workspace/ui/components/route-error-boundary";
-import { FagPratDetailSkeleton } from "@workspace/ui/components/skeletons/fagprat-detail-skeleton";
+import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
+import { FagPratDetailSkeleton } from "@workspace/evalion/components/skeletons/fagprat-detail-skeleton";
 import {
   toStatementPayload,
   toStatementsWithId,
   useStatements,
-} from "@workspace/ui/hooks/use-statements";
+} from "@workspace/evalion/hooks/use-statements";
 import { useMutation } from "convex/react";
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";

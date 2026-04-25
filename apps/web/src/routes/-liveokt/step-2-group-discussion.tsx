@@ -1,10 +1,10 @@
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
-import { BegrunnelseCard } from "@workspace/ui/components/live/begrunnelse-card";
-import { BegrunnelseNav } from "@workspace/ui/components/live/begrunnelse-nav";
-import { DistributionChart } from "@workspace/ui/components/live/distribution-chart";
-import { PanelTabs } from "@workspace/ui/components/live/panel-tabs";
-import { Professor } from "@workspace/ui/components/live/professor";
-import { TimerCard } from "@workspace/ui/components/live/timer-card";
+import { BegrunnelseCard } from "@workspace/evalion/components/live/begrunnelse-card";
+import { BegrunnelseNav } from "@workspace/evalion/components/live/begrunnelse-nav";
+import { DistributionChart } from "@workspace/evalion/components/live/distribution-chart";
+import { PanelTabs } from "@workspace/evalion/components/live/panel-tabs";
+import { Professor } from "@workspace/evalion/components/live/professor";
+import { TimerCard } from "@workspace/evalion/components/live/timer-card";
 import { cn } from "@workspace/ui/lib/utils";
 import type { ReactNode } from "react";
 

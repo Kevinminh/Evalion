@@ -6,4 +6,4 @@ export type {
   FagPratType,
   Fasit,
   Visibility,
-} from "@workspace/ui/lib/types";
+} from "@workspace/evalion/lib/types";

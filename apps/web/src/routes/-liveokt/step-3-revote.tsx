@@ -1,8 +1,8 @@
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
-import { BackButton } from "@workspace/ui/components/live/back-button";
-import { DistributionChart } from "@workspace/ui/components/live/distribution-chart";
-import { Professor } from "@workspace/ui/components/live/professor";
-import { TimerCard } from "@workspace/ui/components/live/timer-card";
+import { BackButton } from "@workspace/evalion/components/live/back-button";
+import { DistributionChart } from "@workspace/evalion/components/live/distribution-chart";
+import { Professor } from "@workspace/evalion/components/live/professor";
+import { TimerCard } from "@workspace/evalion/components/live/timer-card";
 import { Users } from "lucide-react";
 import type { ReactNode } from "react";
 

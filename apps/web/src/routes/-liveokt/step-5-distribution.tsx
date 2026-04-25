@@ -1,7 +1,7 @@
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
-import { BegrunnelseCard } from "@workspace/ui/components/live/begrunnelse-card";
-import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
-import { Professor } from "@workspace/ui/components/live/professor";
+import { BegrunnelseCard } from "@workspace/evalion/components/live/begrunnelse-card";
+import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
+import { Professor } from "@workspace/evalion/components/live/professor";
 
 type Statement = Doc<"fagprats">["statements"][number];
 type Begrunnelse = Doc<"sessionBegrunnelser">;

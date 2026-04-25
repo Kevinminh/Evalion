@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { EndringerCard } from "@workspace/ui/components/live/endringer-card";
-import { FasitBadge } from "@workspace/ui/components/live/fasit-badge";
+import { EndringerCard } from "@workspace/evalion/components/live/endringer-card";
+import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 
 import { AnalyticsRatingChart } from "@/components/analytics/rating-chart-analytics";
