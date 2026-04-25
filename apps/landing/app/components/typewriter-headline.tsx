@@ -48,13 +48,13 @@ export function TypewriterHeadline() {
   return (
     <h1
       ref={ref}
-      className="font-display text-[clamp(28px,7vw,52px)] leading-[1.15] text-[var(--color-ink)]"
+      className="font-display text-[clamp(28px,7vw,52px)] leading-[1.15] text-ink"
       aria-label={TEXT}
     >
       <span>{typed}</span>
       <span
         aria-hidden="true"
-        className="cl-cursor ml-[2px] inline-block h-[0.82em] w-[2.5px] translate-y-[2px] bg-[var(--color-ink)]"
+        className="cl-cursor ml-[2px] inline-block h-[0.82em] w-[2.5px] translate-y-[2px] bg-ink"
       />
     </h1>
   );

@@ -37,7 +37,7 @@ const PAGE_BASE = "mx-auto max-w-[1100px] px-6 pt-24 pb-32";
 const ERROR_BOX =
   "mx-auto mt-8 max-w-[540px] rounded-[18px] border-[1.5px] border-[#f5c0c0] bg-white p-7 text-center shadow-[0_8px_28px_rgba(229,57,53,0.08)]";
 const ERROR_RETRY =
-  "inline-flex items-center gap-2 rounded-full border-none bg-[var(--color-primary-500)] px-[22px] py-2.5 font-[var(--font-family-body)] text-sm font-bold text-white shadow-[0_4px_0_var(--color-primary-700)] transition-[background,transform,box-shadow] duration-150 hover:-translate-y-px hover:bg-[var(--color-primary-400)] hover:shadow-[0_5px_0_var(--color-primary-700)] cursor-pointer";
+  "inline-flex items-center gap-2 rounded-full border-none bg-purple-500 px-[22px] py-2.5 font-[var(--font-family-body)] text-sm font-bold text-white shadow-[0_4px_0_var(--color-purple-700)] transition-[background,transform,box-shadow] duration-150 hover:-translate-y-px hover:bg-purple-400 hover:shadow-[0_5px_0_var(--color-purple-700)] cursor-pointer";
 
 export function SelectionView() {
   const router = useRouter();
@@ -109,10 +109,10 @@ export function SelectionView() {
     return (
       <main className={PAGE_BASE}>
         <div className={ERROR_BOX} role="status">
-          <h2 className="mb-2 text-lg font-extrabold text-[var(--color-text-primary)]">
+          <h2 className="mb-2 text-lg font-extrabold text-ink">
             Mangler input
           </h2>
-          <p className="mb-[18px] text-sm leading-relaxed text-[var(--color-text-secondary)]">
+          <p className="mb-[18px] text-sm leading-relaxed text-ink-secondary">
             Du må fylle ut skjemaet før Reddi kan lage påstander.
           </p>
           <Link href="/lag-pastander" className={ERROR_RETRY}>
@@ -138,7 +138,7 @@ export function SelectionView() {
       {!loading && (
         <Link
           href="/lag-pastander"
-          className="absolute top-[92px] left-[max(24px,calc((100vw-1180px)/2-6px))] z-10 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-semibold text-[var(--color-text-secondary)] transition-[background,color] duration-150 hover:bg-black/5 hover:text-[var(--color-text-primary)]"
+          className="absolute top-[92px] left-[max(24px,calc((100vw-1180px)/2-6px))] z-10 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-semibold text-ink-secondary transition-[background,color] duration-150 hover:bg-black/5 hover:text-ink"
         >
           <svg
             width="14"
@@ -167,10 +167,10 @@ export function SelectionView() {
         {!loading && (
           <div className="mb-7 flex items-center justify-between gap-4">
             <div>
-              <h1 className="mb-1 text-[26px] font-extrabold text-[var(--color-text-primary)]">
+              <h1 className="mb-1 text-[26px] font-extrabold text-ink">
                 Velg påstander
               </h1>
-              <p className="m-0 text-sm text-[var(--color-text-secondary)]">
+              <p className="m-0 text-sm text-ink-secondary">
                 Påstandene du velger blir lagt til under &laquo;Mine påstander&raquo; med tilhørende
                 fasit og forklaring.
               </p>
@@ -179,7 +179,7 @@ export function SelectionView() {
               type="button"
               onClick={runGeneration}
               disabled={loading}
-              className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-full border-[1.5px] border-[var(--color-neutral-300)] bg-white px-[18px] py-2.5 font-[var(--font-family-body)] text-sm font-bold text-[var(--color-text-secondary)] transition-[background,border-color,color,transform] duration-150 hover:not-disabled:-translate-y-px hover:not-disabled:border-[var(--color-neutral-400)] hover:not-disabled:bg-[var(--color-neutral-50)] hover:not-disabled:text-[var(--color-text-primary)] active:not-disabled:translate-y-px disabled:cursor-not-allowed disabled:opacity-55"
+              className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-full border-[1.5px] border-neutral-300 bg-white px-[18px] py-2.5 font-[var(--font-family-body)] text-sm font-bold text-ink-secondary transition-[background,border-color,color,transform] duration-150 hover:not-disabled:-translate-y-px hover:not-disabled:border-neutral-400 hover:not-disabled:bg-neutral-50 hover:not-disabled:text-ink active:not-disabled:translate-y-px disabled:cursor-not-allowed disabled:opacity-55"
             >
               <svg
                 className="size-4"
@@ -202,7 +202,7 @@ export function SelectionView() {
 
         {loading && (
           <div
-            className="mx-auto mt-8 flex w-full max-w-[480px] flex-col items-center gap-4 rounded-[26px] border-[1.5px] border-[var(--color-primary-200)] bg-[#f3eeff] px-10 pt-10 pb-11 text-center shadow-[0_16px_40px_rgba(108,63,197,0.14),0_4px_10px_rgba(0,0,0,0.04)]"
+            className="mx-auto mt-8 flex w-full max-w-[480px] flex-col items-center gap-4 rounded-[26px] border-[1.5px] border-purple-200 bg-[#f3eeff] px-10 pt-10 pb-11 text-center shadow-[0_16px_40px_rgba(108,63,197,0.14),0_4px_10px_rgba(0,0,0,0.04)]"
             role="status"
             aria-live="polite"
           >
@@ -211,7 +211,7 @@ export function SelectionView() {
               src="/assets/Reddi.png"
               alt="Reddi"
             />
-            <div className="text-xl font-extrabold leading-[1.3] text-[var(--color-text-primary)]">
+            <div className="text-xl font-extrabold leading-[1.3] text-ink">
               Reddi lager påstandene
               <span className="inline-block animate-[blink_1.4s_ease-in-out_infinite] opacity-25">
                 .
@@ -223,7 +223,7 @@ export function SelectionView() {
                 .
               </span>
             </div>
-            <div className="max-w-[360px] text-sm leading-relaxed text-[var(--color-text-secondary)]">
+            <div className="max-w-[360px] text-sm leading-relaxed text-ink-secondary">
               Innholdet er generert av AI og kan inneholde feil.
               <br />
               Husk å bruke faglig skjønn!
@@ -233,10 +233,10 @@ export function SelectionView() {
 
         {!loading && error && (
           <div className={ERROR_BOX} role="alert">
-            <h2 className="mb-2 text-lg font-extrabold text-[var(--color-text-primary)]">
+            <h2 className="mb-2 text-lg font-extrabold text-ink">
               Reddi støtte på et problem
             </h2>
-            <p className="mb-[18px] text-sm leading-relaxed text-[var(--color-text-secondary)]">
+            <p className="mb-[18px] text-sm leading-relaxed text-ink-secondary">
               {error}
             </p>
             <button type="button" className={ERROR_RETRY} onClick={runGeneration}>
@@ -273,11 +273,11 @@ export function SelectionView() {
       </main>
 
       {!loading && (
-        <div className="fixed inset-x-0 bottom-0 z-[var(--z-sticky)] border-t-[1.5px] border-[var(--color-neutral-200)] bg-[var(--color-neutral-0)] px-8 py-4 shadow-[0_-2px_12px_rgba(0,0,0,0.06)]">
+        <div className="fixed inset-x-0 bottom-0 z-[var(--z-sticky)] border-t-[1.5px] border-neutral-200 bg-neutral-0 px-8 py-4 shadow-[0_-2px_12px_rgba(0,0,0,0.06)]">
           <div className="mx-auto flex max-w-[900px] items-center justify-between">
             <div className="flex items-center gap-3">
               <img src="/assets/Reddi.png" alt="Reddi" className="size-11 object-contain" />
-              <span className="text-[15px] font-bold text-[var(--color-text-secondary)]">
+              <span className="text-[15px] font-bold text-ink-secondary">
                 Foreslått av Reddi
               </span>
             </div>
@@ -288,8 +288,8 @@ export function SelectionView() {
               className={
                 "inline-flex items-center gap-2 rounded-[var(--workspace-radius-xl)] border-none px-6 py-3 font-[var(--font-family-body)] text-sm font-bold text-white transition-all duration-150 disabled:opacity-70 " +
                 (totalSelected > 0
-                  ? "cursor-pointer bg-[var(--color-primary-500)] shadow-[0_4px_0_var(--color-primary-700)] hover:not-disabled:-translate-y-0.5 hover:not-disabled:bg-[var(--color-primary-400)] hover:not-disabled:shadow-[0_6px_0_var(--color-primary-700),var(--shadow-glow-primary)] active:not-disabled:translate-y-0.5 active:not-disabled:shadow-[0_2px_0_var(--color-primary-700)]"
-                  : "cursor-not-allowed bg-[var(--color-neutral-300)]")
+                  ? "cursor-pointer bg-purple-500 shadow-[0_4px_0_var(--color-purple-700)] hover:not-disabled:-translate-y-0.5 hover:not-disabled:bg-purple-400 hover:not-disabled:shadow-[0_6px_0_var(--color-purple-700),var(--shadow-glow-primary)] active:not-disabled:translate-y-0.5 active:not-disabled:shadow-[0_2px_0_var(--color-purple-700)]"
+                  : "cursor-not-allowed bg-neutral-300")
               }
             >
               <span>{submitting ? "Legger til …" : addLabel}</span>
@@ -321,9 +321,9 @@ const STRIP_HEADER: Record<Fasit, string> = {
 };
 
 const STRIP_SELECTED: Record<Fasit, string> = {
-  sant: "border-[var(--color-sant)] bg-[var(--color-neutral-0)] shadow-[0_0_0_2px_#c8e6c9]",
-  usant: "border-[var(--color-usant)] bg-[var(--color-neutral-0)] shadow-[0_0_0_2px_#ffcdd2]",
-  delvis: "border-[var(--color-delvis)] bg-[var(--color-neutral-0)] shadow-[0_0_0_2px_#ffe0b2]",
+  sant: "border-sant bg-neutral-0 shadow-[0_0_0_2px_#c8e6c9]",
+  usant: "border-usant bg-neutral-0 shadow-[0_0_0_2px_#ffcdd2]",
+  delvis: "border-delvis bg-neutral-0 shadow-[0_0_0_2px_#ffe0b2]",
 };
 
 function CategoryStrip({
@@ -340,7 +340,7 @@ function CategoryStrip({
   onToggle: (id: string) => void;
 }) {
   return (
-    <div className="overflow-hidden rounded-[var(--workspace-radius-2xl)] border-[1.5px] border-[var(--color-neutral-200)] bg-[var(--color-neutral-0)] shadow-[var(--shadow-sm)]">
+    <div className="overflow-hidden rounded-[var(--workspace-radius-2xl)] border-[1.5px] border-neutral-200 bg-neutral-0 shadow-[var(--shadow-sm)]">
       <div
         className={`flex items-center justify-center px-6 py-3.5 text-[15px] font-extrabold tracking-[0.01em] ${STRIP_HEADER[kind]}`}
       >
@@ -356,10 +356,10 @@ function CategoryStrip({
               onClick={() => onToggle(item.id)}
               title={item.explanation}
               className={
-                "select-none cursor-pointer rounded-[var(--workspace-radius-xl)] border-[1.5px] px-4 py-3.5 text-left font-[var(--font-family-body)] text-sm leading-relaxed text-[var(--color-text-primary)] transition-all duration-150 " +
+                "select-none cursor-pointer rounded-[var(--workspace-radius-xl)] border-[1.5px] px-4 py-3.5 text-left font-[var(--font-family-body)] text-sm leading-relaxed text-ink transition-all duration-150 " +
                 (isSelected
                   ? STRIP_SELECTED[kind]
-                  : "border-[var(--color-neutral-200)] bg-[var(--color-neutral-50)] hover:border-[var(--color-neutral-300)] hover:bg-[var(--color-neutral-100)]")
+                  : "border-neutral-200 bg-neutral-50 hover:border-neutral-300 hover:bg-neutral-100")
               }
             >
               {item.text}

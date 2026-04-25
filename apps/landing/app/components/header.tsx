@@ -12,7 +12,7 @@ export async function Header() {
   const authed = await isAuthenticated();
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-white/70 border-b border-[var(--color-cl-border)]">
+    <header className="sticky top-0 z-50 backdrop-blur-md bg-white/70 border-b border-cl-border">
       <nav className="relative mx-auto flex max-w-[1180px] items-center justify-between gap-3 px-4 py-3 sm:px-6">
         <Link href="/" className="flex items-center">
           <img
@@ -24,19 +24,19 @@ export async function Header() {
         <div className="hidden items-center gap-10 md:flex">
           <a
             href="/#om-co-lab"
-            className="text-sm font-medium text-[var(--color-ink-secondary)] transition hover:text-[var(--color-ink)]"
+            className="text-sm font-medium text-ink-secondary transition hover:text-ink"
           >
             Om CO-LAB
           </a>
           <a
             href="/#slik-fungerer"
-            className="text-sm font-medium text-[var(--color-ink-secondary)] transition hover:text-[var(--color-ink)]"
+            className="text-sm font-medium text-ink-secondary transition hover:text-ink"
           >
             Slik fungerer FagPrat
           </a>
           <a
             href="/#generator"
-            className="text-sm font-medium text-[var(--color-ink-secondary)] transition hover:text-[var(--color-ink)]"
+            className="text-sm font-medium text-ink-secondary transition hover:text-ink"
           >
             Vår påstandsgenerator
           </a>

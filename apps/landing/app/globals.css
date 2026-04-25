@@ -2,42 +2,35 @@
 @import "@fontsource-variable/fraunces";
 @import "@fontsource-variable/nunito";
 
-/* ─────────── CO-LAB landing tokens ─────────── */
+/* ─────────── CO-LAB landing namespace ─────────── */
+/* Aliases mapping landing's CL-* names to the unified tokens in @workspace/ui's @theme. */
+/* Page-level setup (gradient bg, ink color, body font) is also applied here. */
 .theme-co-lab {
-  --color-bg: #ecf3ee;
-  --color-bg-warm: #ecf3ee;
+  /* Aliases to @theme palette */
+  --color-bg: var(--color-sage-50);
+  --color-bg-warm: var(--color-sage-50);
   --color-bg-dark: #1f3530;
-  --color-ink: #1a2420;
-  --color-ink-secondary: #3e5048;
-  --color-ink-tertiary: #708578;
-  --color-sage: #3e7864;
-  --color-sage-light: #d9e8de;
-  --color-sage-dark: #2a5847;
-  --color-coral: #2f8f83;
-  --color-coral-light: #d6ece8;
-  --color-coral-hover: #1f7268;
-  --color-section-dark: #0b3840;
-  --color-section-light: #ecf3ee;
-  --color-cl-border: #cde0d3;
-  --color-cl-purple: #6c3fc5;
-  --color-cl-purple-hover: #8554f6;
-  --color-cl-purple-shadow: #36126e;
+  --color-cl-purple: var(--color-purple-500);
+  --color-cl-purple-hover: var(--color-purple-400);
+  --color-cl-purple-shadow: var(--color-purple-shadow);
+  --color-sage: var(--color-sage-500);
+  --color-sage-light: var(--color-sage-100);
+  --color-sage-dark: var(--color-sage-600);
 
-  --gradient-light: linear-gradient(180deg, #ecf3ee 0%, #f0f1e9 50%, #f4efe4 100%);
-  --gradient-dark: linear-gradient(180deg, #1f2128 0%, #0b3840 15%, #0b3840 85%, #1f2128 100%);
-
+  /* Landing-only radius scale */
   --co-lab-radius-sm: 8px;
   --co-lab-radius-md: 12px;
   --co-lab-radius-lg: 20px;
   --co-lab-radius-xl: 32px;
   --co-lab-radius-full: 100px;
 
-  --font-display: "Fraunces Variable", Georgia, serif;
-  --font-body: "Nunito Variable", system-ui, sans-serif;
+  /* Display font is landing-only */
+  --display-font: "Fraunces Variable", Georgia, serif;
+  --font-display: var(--display-font);
 
   background: var(--gradient-light);
   color: var(--color-ink);
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
 }
 
 /* Display heading style: Fraunces with the WONK + SOFT axes set */
@@ -87,9 +80,7 @@
     color 0.15s;
 }
 
-/* Gradient backgrounds — defined as full `background:` shorthand so they accept
-   gradient values. Tailwind's `bg-[var(...)]` arbitrary syntax compiles to
-   `background-color`, which won't accept linear-gradient. */
+/* Gradient backgrounds — full `background:` shorthand so they accept gradient values. */
 .bg-cl-light {
   background: var(--gradient-light);
 }
@@ -99,8 +90,8 @@
 
 /* Sage callout (used on legal page) */
 .legal-callout {
-  background: var(--color-sage-light);
-  border-left: 4px solid var(--color-sage);
+  background: var(--color-sage-100);
+  border-left: 4px solid var(--color-sage-500);
   padding: 20px 24px;
   border-radius: 0 12px 12px 0;
   margin: 20px 0;
@@ -108,7 +99,7 @@
 
 .legal-callout--ai {
   background: #efe7fc;
-  border-left-color: var(--color-cl-purple);
+  border-left-color: var(--color-purple-500);
 }
 
 /* ─────────── Landing CTA buttons (mockup parity) ─────────── */
@@ -117,13 +108,13 @@
   align-items: center;
   gap: 8px;
   padding: 12px 32px;
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
   font-size: 18.9px;
   font-weight: 700;
   color: #fff;
-  background: var(--color-cl-purple);
+  background: var(--color-purple-500);
   border-radius: var(--co-lab-radius-full);
-  box-shadow: 0 4px 0 var(--color-cl-purple-shadow);
+  box-shadow: 0 4px 0 var(--color-purple-shadow);
   text-decoration: none;
   transition:
     background 0.15s ease,
@@ -131,13 +122,13 @@
     box-shadow 0.15s ease;
 }
 .cl-cta:hover {
-  background: var(--color-cl-purple-hover);
+  background: var(--color-purple-400);
   transform: translateY(-1px);
-  box-shadow: 0 5px 0 var(--color-cl-purple-shadow);
+  box-shadow: 0 5px 0 var(--color-purple-shadow);
 }
 .cl-cta:active {
   transform: translateY(2px);
-  box-shadow: 0 1px 0 var(--color-cl-purple-shadow);
+  box-shadow: 0 1px 0 var(--color-purple-shadow);
 }
 
 .cl-cta--md {
@@ -153,7 +144,7 @@
   background: #fff;
   border: 1px solid var(--color-cl-border);
   border-radius: var(--co-lab-radius-full);
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -171,9 +162,7 @@
   flex-shrink: 0;
 }
 
-/* Keyframes (cl-cursor-blink, cl-professor-float, cl-reddi-float) are defined in
-   @workspace/ui/globals.css and exposed as Tailwind utilities animate-cursor-blink,
-   animate-professor-float, animate-reddi-float. */
+/* Animation utilities (keyframes defined in @workspace/ui/globals.css) */
 .cl-cursor {
   animation: cl-cursor-blink 1s step-end infinite;
 }
@@ -266,7 +255,6 @@
   }
 }
 
-/* Mobile launch card — replaces the embedded iframe on small screens */
 .demo-mobile-launch {
   display: flex;
   flex-direction: column;
@@ -321,7 +309,7 @@
   align-items: center;
   gap: 8px;
   align-self: flex-start;
-  background: var(--color-cl-purple);
+  background: var(--color-purple-500);
   color: #fff;
   font-weight: 700;
   font-size: 14px;
@@ -507,12 +495,11 @@
   transition: border-color 0.2s;
 }
 .reddi-avatar-btn.has-tip .reddi-avatar-img {
-  border-color: #6c3fc5;
+  border-color: var(--color-purple-500);
   animation: reddi-border-blink 2.6s ease-in-out infinite;
 }
-/* @keyframes reddi-border-blink is defined in @workspace/ui/globals.css */
 .reddi-avatar-btn.reading .reddi-avatar-img {
-  border-color: #6c3fc5;
+  border-color: var(--color-purple-500);
   animation: none;
 }
 .reddi-avatar-btn:not(.has-tip):not(.reading) .reddi-avatar-img {
@@ -585,10 +572,10 @@
 .reddi-name {
   font-size: 13px;
   font-weight: 900;
-  color: #6c3fc5;
+  color: var(--color-purple-500);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
 }
 .reddi-close {
   background: transparent;
@@ -607,13 +594,13 @@
 }
 .reddi-close:hover {
   background: #f5edff;
-  color: #6c3fc5;
+  color: var(--color-purple-500);
 }
 .reddi-text {
   font-size: 15px;
   color: #1c1810;
   line-height: 1.55;
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
 }
 .reddi-text p {
   margin: 0 0 10px 0;

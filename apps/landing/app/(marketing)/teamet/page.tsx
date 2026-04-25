@@ -58,7 +58,7 @@ export default function TeametPage() {
           <span className="section-label">Møt teamet</span>
           <h1 className="font-display mt-3 text-[clamp(28px,3.5vw,42px)] leading-tight">
             Tverrfaglighet med{" "}
-            <em className="font-display-italic text-[var(--color-cl-purple)]">pedagogisk</em>{" "}
+            <em className="font-display-italic text-purple-500">pedagogisk</em>{" "}
             tyngde
           </h1>
         </div>
@@ -67,9 +67,9 @@ export default function TeametPage() {
           {team.map((member) => (
             <article
               key={member.name}
-              className="rounded-[24px] border border-[var(--color-cl-border)] bg-white p-7 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
+              className="rounded-[24px] border border-cl-border bg-white p-7 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
             >
-              <div className="mx-auto mb-4 size-28 overflow-hidden rounded-full border-4 border-[var(--color-bg)] bg-gradient-to-b from-[#9d988f] to-[#5a554e]">
+              <div className="mx-auto mb-4 size-28 overflow-hidden rounded-full border-4 border-sage-50 bg-gradient-to-b from-[#9d988f] to-[#5a554e]">
                 <img
                   src={member.image}
                   alt={member.name}
@@ -78,10 +78,10 @@ export default function TeametPage() {
                 />
               </div>
               <h2 className="font-display text-xl font-semibold">{member.name}</h2>
-              <span className="mt-1 inline-block rounded-full bg-[var(--color-bg)] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--color-cl-purple)]">
+              <span className="mt-1 inline-block rounded-full bg-sage-50 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-purple-500">
                 {member.role}
               </span>
-              <p className="mt-4 text-sm leading-relaxed text-[var(--color-ink-secondary)]">
+              <p className="mt-4 text-sm leading-relaxed text-ink-secondary">
                 {member.bio}
               </p>
             </article>

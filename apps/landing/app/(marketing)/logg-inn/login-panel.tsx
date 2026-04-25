@@ -48,11 +48,11 @@ export function LoginPanel() {
       error={error}
       loading={loading}
       footer={
-        <span className="text-sm text-[var(--color-ink-secondary)]">
+        <span className="text-sm text-ink-secondary">
           Ingen konto?{" "}
           <Link
             href="/registrer-deg"
-            className="font-bold text-[var(--color-cl-purple)] hover:underline"
+            className="font-bold text-purple-500 hover:underline"
           >
             Registrer deg
           </Link>

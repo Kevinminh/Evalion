@@ -30,7 +30,7 @@ export function EmailSignupForm({ source }: { source?: string }) {
 
   if (done) {
     return (
-      <p className="rounded-[var(--co-lab-radius-full)] bg-[var(--color-sage-light)] px-5 py-3 text-center text-sm font-semibold text-[var(--color-sage-dark)]">
+      <p className="rounded-[var(--co-lab-radius-full)] bg-sage-100 px-5 py-3 text-center text-sm font-semibold text-sage-600">
         ✅ Takk! Vi gir deg beskjed når CO-LAB er klart.
       </p>
     );
@@ -45,12 +45,12 @@ export function EmailSignupForm({ source }: { source?: string }) {
         disabled={submitting}
         placeholder="din@epost.no"
         aria-label="E-postadresse"
-        className="flex-1 rounded-full border border-[var(--color-cl-border)] bg-white px-5 py-3 text-sm text-[var(--color-ink)] outline-none transition focus:border-[var(--color-cl-purple)] focus:ring-2 focus:ring-[var(--color-cl-purple)]/30"
+        className="flex-1 rounded-full border border-cl-border bg-white px-5 py-3 text-sm text-ink outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30"
       />
       <button
         type="submit"
         disabled={submitting}
-        className="rounded-full bg-[var(--color-cl-purple)] px-6 py-3 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-[var(--color-sage-dark)] disabled:cursor-not-allowed disabled:opacity-60"
+        className="rounded-full bg-purple-500 px-6 py-3 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-sage-600 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {submitting ? "Sender …" : "Meld interesse →"}
       </button>

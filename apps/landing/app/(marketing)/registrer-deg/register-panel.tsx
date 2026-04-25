@@ -49,11 +49,11 @@ export function RegisterPanel() {
       error={error}
       loading={loading}
       footer={
-        <span className="text-sm text-[var(--color-ink-secondary)]">
+        <span className="text-sm text-ink-secondary">
           Har du allerede en konto?{" "}
           <Link
             href="/logg-inn"
-            className="font-bold text-[var(--color-cl-purple)] hover:underline"
+            className="font-bold text-purple-500 hover:underline"
           >
             Logg inn
           </Link>

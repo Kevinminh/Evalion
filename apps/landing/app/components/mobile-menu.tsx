@@ -53,7 +53,7 @@ export function MobileMenu({ authed }: MobileMenuProps) {
         aria-label={open ? "Lukk meny" : "Åpne meny"}
         aria-expanded={open}
         aria-controls="mobile-menu-panel"
-        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-cl-border)] bg-white/80 text-[var(--color-ink)] transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-cl-purple)]"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-cl-border bg-white/80 text-ink transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
       >
         {open ? <X className="size-5" /> : <Menu className="size-5" />}
       </button>
@@ -61,7 +61,7 @@ export function MobileMenu({ authed }: MobileMenuProps) {
         <div
           ref={panelRef}
           id="mobile-menu-panel"
-          className="absolute inset-x-0 top-full z-40 border-b border-[var(--color-cl-border)] bg-white/95 shadow-[0_12px_32px_rgba(0,0,0,0.08)] backdrop-blur-md"
+          className="absolute inset-x-0 top-full z-40 border-b border-cl-border bg-white/95 shadow-[0_12px_32px_rgba(0,0,0,0.08)] backdrop-blur-md"
         >
           <nav className="mx-auto flex max-w-[1180px] flex-col gap-1 px-6 py-4">
             {SECTION_LINKS.map((link) => (
@@ -69,12 +69,12 @@ export function MobileMenu({ authed }: MobileMenuProps) {
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-3 text-[15px] font-medium text-[var(--color-ink-secondary)] transition hover:bg-[var(--color-cl-light)] hover:text-[var(--color-ink)]"
+                className="rounded-lg px-3 py-3 text-[15px] font-medium text-ink-secondary transition hover:bg-cl-light hover:text-ink"
               >
                 {link.label}
               </Link>
             ))}
-            <div className="mt-3 flex flex-col gap-2 border-t border-[var(--color-cl-border)] pt-4">
+            <div className="mt-3 flex flex-col gap-2 border-t border-cl-border pt-4">
               <Button
                 variant="outline"
                 size="sm"

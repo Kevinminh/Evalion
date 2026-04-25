@@ -25,24 +25,24 @@ export default function PersonvernOgVilkarPage() {
           <span className="section-label">Personvern og vilkår</span>
           <h1 className="font-display mt-3 text-[clamp(32px,4.5vw,52px)] leading-tight">
             Hvordan vi tar vare på{" "}
-            <em className="font-display-italic text-[var(--color-cl-purple)]">dataen din</em>
+            <em className="font-display-italic text-purple-500">dataen din</em>
           </h1>
-          <p className="mx-auto mt-3 max-w-[560px] text-base text-[var(--color-ink-secondary)]">
+          <p className="mx-auto mt-3 max-w-[560px] text-base text-ink-secondary">
             En ærlig og enkel forklaring av hva vi samler inn, hvorfor, og hva vi aldri gjør.
           </p>
-          <p className="mt-5 text-sm text-[var(--color-ink-tertiary)]">
+          <p className="mt-5 text-sm text-ink-tertiary">
             Sist oppdatert: 25. april 2026
           </p>
         </section>
 
         {/* TL;DR */}
-        <section className="mt-10 rounded-[20px] border border-[var(--color-cl-border)] bg-white p-5 shadow-sm sm:p-7">
+        <section className="mt-10 rounded-[20px] border border-cl-border bg-white p-5 shadow-sm sm:p-7">
           <h2 className="font-display text-xl font-semibold">Kort fortalt</h2>
           <ul className="mt-4 flex flex-col gap-2">
             {tldr.map((item) => (
               <li
                 key={item}
-                className="relative pl-7 text-[var(--color-ink-secondary)] before:absolute before:left-0 before:top-0.5 before:font-bold before:text-[var(--color-sage)] before:content-['✓']"
+                className="relative pl-7 text-ink-secondary before:absolute before:left-0 before:top-0.5 before:font-bold before:text-sage-500 before:content-['✓']"
               >
                 {item}
               </li>
@@ -60,7 +60,7 @@ export default function PersonvernOgVilkarPage() {
             <a
               key={item.id}
               href={`#${item.id}`}
-              className="inline-flex items-center rounded-full border border-[var(--color-cl-border)] bg-white px-5 py-2.5 text-sm font-semibold text-[var(--color-ink)] transition hover:-translate-y-0.5 hover:border-[var(--color-cl-purple)] hover:text-[var(--color-cl-purple)]"
+              className="inline-flex items-center rounded-full border border-cl-border bg-white px-5 py-2.5 text-sm font-semibold text-ink transition hover:-translate-y-0.5 hover:border-purple-500 hover:text-purple-500"
             >
               {item.label}
             </a>
@@ -69,7 +69,7 @@ export default function PersonvernOgVilkarPage() {
 
         {/* PERSONVERN */}
         <section id="personvern" className="mt-12 scroll-mt-24">
-          <h2 className="font-display border-b-2 border-[var(--color-cl-border)] pb-4 text-[clamp(26px,3vw,34px)] font-semibold">
+          <h2 className="font-display border-b-2 border-cl-border pb-4 text-[clamp(26px,3vw,34px)] font-semibold">
             Personvernerklæring
           </h2>
 
@@ -82,7 +82,7 @@ export default function PersonvernOgVilkarPage() {
             Kontakt:{" "}
             <a
               href={`mailto:${CONTACT_EMAIL}`}
-              className="font-semibold text-[var(--color-cl-purple)] hover:underline"
+              className="font-semibold text-purple-500 hover:underline"
             >
               {CONTACT_EMAIL}
             </a>
@@ -222,7 +222,7 @@ export default function PersonvernOgVilkarPage() {
                 href="https://www.datatilsynet.no"
                 target="_blank"
                 rel="noopener"
-                className="font-semibold text-[var(--color-cl-purple)] hover:underline"
+                className="font-semibold text-purple-500 hover:underline"
               >
                 www.datatilsynet.no
               </a>
@@ -254,16 +254,16 @@ export default function PersonvernOgVilkarPage() {
         <div className="my-20 text-center">
           <span
             aria-hidden="true"
-            className="mx-auto mb-5 block h-0.5 w-20 rounded bg-[var(--color-cl-purple)]"
+            className="mx-auto mb-5 block h-0.5 w-20 rounded bg-purple-500"
           />
-          <span className="font-display-italic text-sm text-[var(--color-ink-tertiary)]">
+          <span className="font-display-italic text-sm text-ink-tertiary">
             Del 2 · Brukervilkår
           </span>
         </div>
 
         {/* BRUKERVILKÅR */}
         <section id="brukervilkar" className="scroll-mt-24">
-          <h2 className="font-display border-b-2 border-[var(--color-cl-border)] pb-4 text-[clamp(26px,3vw,34px)] font-semibold">
+          <h2 className="font-display border-b-2 border-cl-border pb-4 text-[clamp(26px,3vw,34px)] font-semibold">
             Brukervilkår
           </h2>
 
@@ -291,7 +291,7 @@ export default function PersonvernOgVilkarPage() {
               Mistanke om uautorisert bruk? Kontakt{" "}
               <a
                 href={`mailto:${CONTACT_EMAIL}`}
-                className="font-semibold text-[var(--color-cl-purple)] hover:underline"
+                className="font-semibold text-purple-500 hover:underline"
               >
                 {CONTACT_EMAIL}
               </a>
@@ -364,7 +364,7 @@ export default function PersonvernOgVilkarPage() {
 
         {/* KONTAKT */}
         <section id="kontakt" className="mt-12 scroll-mt-24">
-          <h2 className="font-display border-b-2 border-[var(--color-cl-border)] pb-4 text-[clamp(26px,3vw,34px)] font-semibold">
+          <h2 className="font-display border-b-2 border-cl-border pb-4 text-[clamp(26px,3vw,34px)] font-semibold">
             Kontakt oss
           </h2>
           <P>Har du spørsmål om personvern, vilkår, eller vil utøve rettighetene dine?</P>
@@ -373,7 +373,7 @@ export default function PersonvernOgVilkarPage() {
               <strong>E-post:</strong>{" "}
               <a
                 href={`mailto:${CONTACT_EMAIL}`}
-                className="font-semibold text-[var(--color-cl-purple)] hover:underline"
+                className="font-semibold text-purple-500 hover:underline"
               >
                 {CONTACT_EMAIL}
               </a>
@@ -384,7 +384,7 @@ export default function PersonvernOgVilkarPage() {
                 href="https://www.datatilsynet.no"
                 target="_blank"
                 rel="noopener"
-                className="font-semibold text-[var(--color-cl-purple)] hover:underline"
+                className="font-semibold text-purple-500 hover:underline"
               >
                 www.datatilsynet.no
               </a>
@@ -398,19 +398,19 @@ export default function PersonvernOgVilkarPage() {
 
 function Heading({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="font-display mt-8 mb-3 text-xl font-semibold text-[var(--color-ink)]">
+    <h3 className="font-display mt-8 mb-3 text-xl font-semibold text-ink">
       {children}
     </h3>
   );
 }
 
 function P({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <p className={`mb-4 text-[var(--color-ink-secondary)] ${className ?? ""}`}>{children}</p>;
+  return <p className={`mb-4 text-ink-secondary ${className ?? ""}`}>{children}</p>;
 }
 
 function UL({ children }: { children: React.ReactNode }) {
   return (
-    <ul className="mb-5 ml-5 flex list-disc flex-col gap-2 pl-4 text-[var(--color-ink-secondary)] marker:text-[var(--color-sage)]">
+    <ul className="mb-5 ml-5 flex list-disc flex-col gap-2 pl-4 text-ink-secondary marker:text-sage-500">
       {children}
     </ul>
   );
@@ -418,14 +418,14 @@ function UL({ children }: { children: React.ReactNode }) {
 
 function Table({ head, rows }: { head: string[]; rows: string[][] }) {
   return (
-    <div className="my-4 overflow-x-auto rounded-[12px] border border-[var(--color-cl-border)]">
+    <div className="my-4 overflow-x-auto rounded-[12px] border border-cl-border">
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr>
             {head.map((h) => (
               <th
                 key={h}
-                className="bg-[var(--color-sage-light)] px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--color-ink)]"
+                className="bg-sage-100 px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-ink"
               >
                 {h}
               </th>
@@ -438,7 +438,7 @@ function Table({ head, rows }: { head: string[]; rows: string[][] }) {
               {row.map((cell, j) => (
                 <td
                   key={j}
-                  className="border-t border-[var(--color-cl-border)] px-4 py-3 align-top text-[var(--color-ink-secondary)]"
+                  className="border-t border-cl-border px-4 py-3 align-top text-ink-secondary"
                 >
                   {cell}
                 </td>
