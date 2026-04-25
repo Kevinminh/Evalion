@@ -8,7 +8,6 @@ const START_DELAY = 600;
 
 export function TypewriterHeadline() {
   const [typed, setTyped] = useState("");
-  const [done, setDone] = useState(false);
   const ref = useRef<HTMLHeadingElement>(null);
   const startedRef = useRef(false);
 
@@ -25,8 +24,6 @@ export function TypewriterHeadline() {
         setTyped(TEXT.slice(0, i));
         if (i < TEXT.length) {
           setTimeout(tick, CHAR_DELAY);
-        } else {
-          setTimeout(() => setDone(true), 400);
         }
       };
       setTimeout(tick, START_DELAY);
@@ -55,12 +52,10 @@ export function TypewriterHeadline() {
       aria-label={TEXT}
     >
       <span>{typed}</span>
-      {!done && (
-        <span
-          aria-hidden="true"
-          className="ml-[2px] inline-block h-[0.82em] w-[2.5px] translate-y-[2px] animate-pulse bg-[var(--color-ink)]"
-        />
-      )}
+      <span
+        aria-hidden="true"
+        className="cl-cursor ml-[2px] inline-block h-[0.82em] w-[2.5px] translate-y-[2px] bg-[var(--color-ink)]"
+      />
     </h1>
   );
 }

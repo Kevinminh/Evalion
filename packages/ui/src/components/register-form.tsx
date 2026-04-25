@@ -22,6 +22,7 @@ interface RegisterFormProps {
   error?: string | null;
   loading?: boolean;
   footer?: React.ReactNode;
+  terms?: React.ReactNode;
 }
 
 function RegisterForm({
@@ -33,6 +34,7 @@ function RegisterForm({
   error,
   loading,
   footer,
+  terms,
 }: RegisterFormProps) {
   return (
     <Card className={cn("w-full max-w-sm p-4", className)}>
@@ -74,7 +76,14 @@ function RegisterForm({
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="-mx-4 justify-center">{footer}</CardFooter>
+      <CardFooter className="-mx-4 flex-col items-center justify-center gap-2">
+        {footer}
+        {terms && (
+          <p className="text-center text-xs leading-relaxed text-muted-foreground [&_a]:underline [&_a:hover]:text-primary">
+            {terms}
+          </p>
+        )}
+      </CardFooter>
     </Card>
   );
 }

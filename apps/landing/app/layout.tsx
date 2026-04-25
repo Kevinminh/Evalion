@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 
-import { Footer } from "./components/footer";
-import { Header } from "./components/header";
 import { Providers } from "./components/providers";
 import { getToken } from "./lib/auth-server";
 import { SITE_URL } from "./lib/constants";
@@ -58,13 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="nb">
       <body className="theme-co-lab antialiased">
-        <Providers initialToken={token}>
-          <div className="min-h-svh">
-            <Header />
-            <main>{children}</main>
-            <Footer />
-          </div>
-        </Providers>
+        <Providers initialToken={token}>{children}</Providers>
       </body>
     </html>
   );

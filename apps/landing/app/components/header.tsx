@@ -20,6 +20,26 @@ export async function Header() {
             className="h-9 w-auto"
           />
         </Link>
+        <div className="hidden items-center gap-10 md:flex">
+          <a
+            href="/#om-co-lab"
+            className="text-sm font-medium text-[var(--color-ink-secondary)] transition hover:text-[var(--color-ink)]"
+          >
+            Om CO-LAB
+          </a>
+          <a
+            href="/#slik-fungerer"
+            className="text-sm font-medium text-[var(--color-ink-secondary)] transition hover:text-[var(--color-ink)]"
+          >
+            Slik fungerer FagPrat
+          </a>
+          <a
+            href="/#generator"
+            className="text-sm font-medium text-[var(--color-ink-secondary)] transition hover:text-[var(--color-ink)]"
+          >
+            Vår påstandsgenerator
+          </a>
+        </div>
         <div className="flex items-center gap-2 sm:gap-3">
           <Button
             variant="outline"

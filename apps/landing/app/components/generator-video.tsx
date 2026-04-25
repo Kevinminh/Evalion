@@ -1,6 +1,5 @@
 "use client";
 
-import { Play } from "lucide-react";
 import { useRef, useState } from "react";
 
 export function GeneratorVideo() {
@@ -15,7 +14,9 @@ export function GeneratorVideo() {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-[20px] bg-[var(--color-sage-light)] shadow-xl">
+    <div
+      className={`group/video relative flex w-full flex-1 items-center justify-center rounded-[24px] bg-[#2A2722] shadow-[0_18px_50px_rgba(0,0,0,0.18)] aspect-video lg:aspect-auto lg:min-h-[340px] ${playing ? "is-playing" : ""}`}
+    >
       <video
         ref={videoRef}
         src="/assets/Påstandsgenerator.mp4"
@@ -23,20 +24,32 @@ export function GeneratorVideo() {
         playsInline
         preload="metadata"
         aria-label="Demonstrasjon av påstandsgeneratoren"
-        className="block aspect-video w-full"
+        className="absolute inset-0 z-[1] h-full w-full rounded-[inherit] bg-black object-cover"
       />
       {!playing && (
-        <button
-          type="button"
-          onClick={handlePlay}
-          aria-label="Spill av demonstrasjonsvideo"
-          className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[var(--color-section-dark)]/30 text-white backdrop-blur-[1px] transition hover:bg-[var(--color-section-dark)]/40"
-        >
-          <span className="flex size-16 items-center justify-center rounded-full bg-white text-[var(--color-cl-purple)] shadow-lg">
-            <Play className="size-7 translate-x-0.5 fill-current" />
+        <>
+          <button
+            type="button"
+            onClick={handlePlay}
+            aria-label="Spill av demonstrasjonsvideo"
+            className="absolute inset-0 z-[3] grid cursor-pointer place-items-center rounded-[inherit] border-0 bg-[rgba(28,24,16,0.22)] p-6 backdrop-blur-[4px] backdrop-saturate-[1.05] transition focus-visible:outline-3 focus-visible:-outline-offset-6 focus-visible:outline-white/70"
+          >
+            <span className="flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-full bg-white/95 text-[#1C1810] shadow-[0_14px_40px_rgba(0,0,0,0.35)] transition group-hover/video:scale-[1.06] group-hover/video:bg-white">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="ml-[5px] h-10 w-10">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </span>
+          </button>
+          <span className="pointer-events-none absolute top-[22px] left-1/2 z-[4] max-w-[calc(100%-48px)] -translate-x-1/2 text-center text-[15px] leading-[1.4] font-semibold tracking-[0.01em] text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)]">
+            Se hvordan Reddi hjelper deg å lage påstander
           </span>
-          <span className="font-medium">Se hvordan Reddi hjelper deg å lage påstander</span>
-        </button>
+          <img
+            src="/assets/Reddi med skygge.png"
+            alt=""
+            aria-hidden="true"
+            className="cl-reddi-float pointer-events-none absolute right-[-20px] bottom-[-20px] z-[5] h-auto w-[38%] max-w-[220px]"
+          />
+        </>
       )}
     </div>
   );

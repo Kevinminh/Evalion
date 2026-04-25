@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import { LoginForm } from "@workspace/ui/components/login-form";
 
-import { authClient, signInWithGoogle } from "../lib/auth-client";
+import { authClient, signInWithGoogle } from "@/lib/auth-client";
 
 export function LoginPanel() {
   const router = useRouter();

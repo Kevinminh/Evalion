@@ -106,4 +106,24 @@ export default defineSchema({
     email: v.string(),
     source: v.optional(v.string()),
   }).index("by_email", ["email"]),
+
+  pastandDrafts: defineTable({
+    userId: v.string(),
+    pastander: v.array(
+      v.object({
+        clientId: v.string(),
+        text: v.string(),
+        fasit: v.optional(
+          v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis")),
+        ),
+        forklaring: v.string(),
+      }),
+    ),
+    lastFag: v.optional(v.string()),
+    lastTrinn: v.optional(v.string()),
+    lastForkunnskap: v.optional(
+      v.union(v.literal("intro"), v.literal("oppsummering")),
+    ),
+    updatedAt: v.number(),
+  }).index("by_user", ["userId"]),
 });

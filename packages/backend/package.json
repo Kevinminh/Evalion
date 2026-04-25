@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./convex/_generated/*": "./convex/_generated/*"
+    "./convex/_generated/*": {
+      "types": "./convex/_generated/*.d.ts",
+      "default": "./convex/_generated/*.js"
+    }
   },
   "scripts": {
     "build": "convex codegen",

@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import { RegisterForm } from "@workspace/ui/components/register-form";
 
-import { authClient, signInWithGoogle } from "../lib/auth-client";
+import { authClient, signInWithGoogle } from "@/lib/auth-client";
 
 export function RegisterPanel() {
   const router = useRouter();
@@ -60,6 +60,13 @@ export function RegisterPanel() {
             Logg inn
           </Link>
         </span>
+      }
+      terms={
+        <>
+          Ved å registrere deg godtar du våre{" "}
+          <Link href="/personvern-og-vilkar#brukervilkar">brukervilkår</Link> og{" "}
+          <Link href="/personvern-og-vilkar#personvern">personvernerklæring</Link>.
+        </>
       }
     />
   );

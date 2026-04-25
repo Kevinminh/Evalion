@@ -19,7 +19,9 @@
   --color-section-dark: #0b3840;
   --color-section-light: #ecf3ee;
   --color-cl-border: #cde0d3;
-  --color-cl-purple: #5e4ac0;
+  --color-cl-purple: #6c3fc5;
+  --color-cl-purple-hover: #8554f6;
+  --color-cl-purple-shadow: #36126e;
 
   --gradient-light: linear-gradient(180deg, #ecf3ee 0%, #f0f1e9 50%, #f4efe4 100%);
   --gradient-dark: linear-gradient(180deg, #1f2128 0%, #0b3840 15%, #0b3840 85%, #1f2128 100%);
@@ -107,6 +109,107 @@
 .legal-callout--ai {
   background: #efe7fc;
   border-left-color: var(--color-cl-purple);
+}
+
+/* ─────────── Landing CTA buttons (mockup parity) ─────────── */
+.cl-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  font-family: var(--font-body);
+  font-size: 18.9px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--color-cl-purple);
+  border-radius: var(--co-lab-radius-full);
+  box-shadow: 0 4px 0 var(--color-cl-purple-shadow);
+  text-decoration: none;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.cl-cta:hover {
+  background: var(--color-cl-purple-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 var(--color-cl-purple-shadow);
+}
+.cl-cta:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--color-cl-purple-shadow);
+}
+
+.cl-cta--md {
+  padding: 16px 32px;
+  font-size: 16px;
+}
+
+.cl-launch-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: #fff;
+  border: 1px solid var(--color-cl-border);
+  border-radius: var(--co-lab-radius-full);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-secondary);
+  box-shadow: 0 2px 8px rgba(28, 26, 23, 0.04);
+}
+.cl-launch-pill::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-coral);
+  box-shadow: 0 0 0 3px rgba(47, 143, 131, 0.18);
+  flex-shrink: 0;
+}
+
+/* Hero typewriter cursor — hard step blink, matches mockup .tw-cursor */
+@keyframes cl-cursor-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+.cl-cursor {
+  animation: cl-cursor-blink 1s step-end infinite;
+}
+
+/* Hero professor float — matches mockup .hero-professor */
+@keyframes cl-professor-float {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-10px);
+  }
+}
+.cl-professor-float {
+  animation: cl-professor-float 3.5s ease-in-out infinite alternate;
+}
+
+/* Reddi float in payload generator video — matches mockup .generator-reddi-float */
+@keyframes cl-reddi-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.cl-reddi-float {
+  animation: cl-reddi-float 4.5s ease-in-out infinite;
 }
 
 /* Scroll-reveal: hidden until .visible is applied */

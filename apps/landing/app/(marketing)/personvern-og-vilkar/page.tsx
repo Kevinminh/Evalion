@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { CONTACT_EMAIL } from "../lib/constants";
+import { CONTACT_EMAIL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Personvern og brukervilkår",
