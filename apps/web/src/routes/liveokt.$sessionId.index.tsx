@@ -1,7 +1,6 @@
 import { useQuery, skipToken } from "@tanstack/react-query";
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 import { isValidConvexId } from "@workspace/ui/lib/convex-id";
-import { cn } from "@workspace/ui/lib/utils";
 import { RouteErrorBoundary } from "@workspace/ui/components/route-error-boundary";
 import { SessionTopBar } from "@workspace/ui/components/live/session-top-bar";
 import { useMutation } from "convex/react";
@@ -10,6 +9,7 @@ import { QRCodeSVG } from "qrcode.react";
 
 import { TeacherLobbySkeleton } from "@workspace/ui/components/skeletons/teacher-lobby-skeleton";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
+import { pastelFor } from "@/lib/avatar";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import { DASHBOARD_URL } from "@/lib/env";
 import type { Id } from "@/lib/convex";
@@ -93,7 +93,7 @@ function TeacherLobbyPage() {
     : null;
 
   return (
-    <div className="flex min-h-svh flex-col bg-background">
+    <div className="flex min-h-svh flex-col bg-[#FFF8F2]">
       <SessionTopBar title={fagprat.title}>
         {showGroupButton && (
           <button
@@ -155,12 +155,10 @@ function TeacherLobbyPage() {
                     style={{ animation: "cardIn 0.3s ease" }}
                   >
                     <div
-                      className={cn(
-                        "flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white",
-                        student.avatarColor,
-                      )}
+                      className="flex size-9 shrink-0 items-center justify-center rounded-full text-lg leading-none"
+                      style={{ background: pastelFor(student._id) }}
                     >
-                      {student.name[0]}
+                      {student.avatarEmoji ?? student.name[0]}
                     </div>
                     <span className="text-sm font-bold text-foreground">{student.name}</span>
                     <button
@@ -190,12 +188,10 @@ function TeacherLobbyPage() {
                       {group.map((student) => (
                         <div key={student._id} className="flex items-center gap-2">
                           <div
-                            className={cn(
-                              "flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white",
-                              student.avatarColor,
-                            )}
+                            className="flex size-7 shrink-0 items-center justify-center rounded-full text-base leading-none"
+                            style={{ background: pastelFor(student._id) }}
                           >
-                            {student.name[0]}
+                            {student.avatarEmoji ?? student.name[0]}
                           </div>
                           <span className="text-sm font-semibold text-foreground">
                             {student.name}

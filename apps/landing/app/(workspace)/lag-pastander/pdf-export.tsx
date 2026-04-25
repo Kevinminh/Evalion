@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { Card, Fasit } from "./pastand-card";
 
@@ -48,11 +48,6 @@ export function PdfExport({
   const [trinn, setTrinn] = useState(defaultTrinn);
   const [forkunnskap, setForkunnskap] = useState<Forkunnskap | "">(defaultForkunnskap ?? "");
   const [error, setError] = useState<string | null>(null);
-  const titleRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    titleRef.current?.focus();
-  }, []);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -62,6 +57,12 @@ export function PdfExport({
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  const validPastander = pastander.filter(
+    (p) =>
+      p.text.trim().length > 0 &&
+      (p.fasit === "sant" || p.fasit === "usant" || p.fasit === "delvis"),
+  );
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
@@ -70,37 +71,36 @@ export function PdfExport({
     if (!fag) return setError("Velg fag.");
     if (!trinn) return setError("Velg trinn.");
     if (!forkunnskap) return setError("Velg forkunnskaper.");
-
-    const valid = pastander.filter(
-      (p) => p.text.trim().length > 0 && (p.fasit === "sant" || p.fasit === "usant" || p.fasit === "delvis"),
-    );
-    if (valid.length === 0) {
-      return setError(
-        "Legg til minst én påstand med tekst og fasit før du lager PDF.",
-      );
+    if (validPastander.length === 0) {
+      return setError("Legg til minst én påstand med tekst og fasit før du lager PDF.");
     }
 
-    buildPrintContainer(trimmedTitle, fag, trinn, FORKUNNSKAP_LABEL[forkunnskap], valid);
     document.title = `${trimmedTitle} – CO-LAB`;
-    onClose();
     setTimeout(() => window.print(), 80);
   }
 
   return (
-    <div className="pdf-modal" role="dialog" aria-modal="true" aria-labelledby="pdf-modal-title">
-      <div className="pdf-modal-backdrop" onClick={onClose} />
-      <div className="pdf-modal-content">
-        <h3 className="pdf-modal-title" id="pdf-modal-title">
+    <div className="pdf-export-screen" role="dialog" aria-modal="true" aria-labelledby="pdf-export-heading">
+      <header className="pdf-export-topbar">
+        <button type="button" className="pdf-export-back" onClick={onClose}>
+          ← Tilbake
+        </button>
+        <h2 id="pdf-export-heading" className="pdf-export-heading">
           Lag PDF
-        </h3>
-        <p className="pdf-modal-sub">Alle felt må fylles ut før du kan eksportere.</p>
+        </h2>
+        <button type="button" className="pdf-export-close" onClick={onClose} aria-label="Lukk">
+          ✕
+        </button>
+      </header>
+
+      <aside className="pdf-export-sidebar">
+        <p className="pdf-modal-sub">Fyll inn detaljene – forhåndsvisningen oppdateres mens du skriver.</p>
         <form onSubmit={handleSubmit}>
           <div className="pdf-modal-field">
             <label className="field-label" htmlFor="pdf-title-input">
               Tittel
             </label>
             <input
-              ref={titleRef}
               id="pdf-title-input"
               type="text"
               className="pdf-modal-input"
@@ -187,72 +187,88 @@ export function PdfExport({
             </button>
           </div>
         </form>
-      </div>
+      </aside>
+
+      <main className="pdf-export-canvas">
+        <PdfPagesPreview
+          title={title}
+          fag={fag}
+          trinn={trinn}
+          forkunnskap={forkunnskap ? FORKUNNSKAP_LABEL[forkunnskap] : ""}
+          pastander={validPastander}
+        />
+      </main>
     </div>
   );
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-function buildPrintContainer(
-  title: string,
-  fag: string,
-  trinn: string,
-  forkunnskap: string,
-  pastander: Card[],
-) {
-  let container = document.getElementById("pdf-print-container");
-  if (!container) {
-    container = document.createElement("div");
-    container.id = "pdf-print-container";
-    container.setAttribute("aria-hidden", "true");
-    document.body.appendChild(container);
-  }
-
+function PdfPagesPreview({
+  title,
+  fag,
+  trinn,
+  forkunnskap,
+  pastander,
+}: {
+  title: string;
+  fag: string;
+  trinn: string;
+  forkunnskap: string;
+  pastander: Card[];
+}) {
   const chunks: Card[][] = [];
   for (let i = 0; i < pastander.length; i += 3) {
     chunks.push(pastander.slice(i, i + 3));
   }
+  const pages = chunks.length > 0 ? chunks : [[]];
 
-  container.innerHTML = chunks
-    .map((chunk, pageIdx) => {
-      const cardsHtml = chunk
-        .map((p, cardIdx) => {
-          const num = pageIdx * 3 + cardIdx + 1;
-          const fasit = (p.fasit ?? "sant") as Fasit;
-          const fasitLabel = FASIT_LABEL[fasit];
-          const forklaringHtml = p.forklaring.trim()
-            ? `<p class="pdf-forklaring-text">${escapeHtml(p.forklaring)}</p>`
-            : "";
-          return `
-            <article class="pdf-card">
-              <span class="pdf-card-num">${num}</span>
-              <div class="pdf-fasit-box ${fasit}">${fasitLabel}</div>
-              <p class="pdf-pastand-text">${escapeHtml(p.text)}</p>
-              ${forklaringHtml}
-            </article>`;
-        })
-        .join("");
-      return `
-        <article class="pdf-page">
-          <header class="pdf-page-header">
-            <img class="pdf-page-logo" src="/assets/CO-LAB (Hoved) - uten skygge.png" alt="CO-LAB">
-            <h1 class="pdf-page-title">${escapeHtml(title)}</h1>
-            <div class="pdf-page-meta">
-              <span class="pdf-page-meta-item">${escapeHtml(fag)}</span>
-              <span class="pdf-page-meta-item">${escapeHtml(trinn)}</span>
-              <span class="pdf-page-meta-item">${escapeHtml(forkunnskap)}</span>
+  return (
+    <div id="pdf-print-container">
+      {pages.map((chunk, pageIdx) => (
+        <article className="pdf-page" key={pageIdx}>
+          <header className="pdf-page-header">
+            <img
+              className="pdf-page-logo"
+              src="/assets/CO-LAB (Hoved) - uten skygge.png"
+              alt="CO-LAB"
+            />
+            <h1 className={`pdf-page-title${title ? "" : " is-placeholder"}`}>
+              {title || "Tittel"}
+            </h1>
+            <div className="pdf-page-meta">
+              <span className={`pdf-page-meta-item${fag ? "" : " is-placeholder"}`}>
+                {fag || "Fag"}
+              </span>
+              <span className={`pdf-page-meta-item${trinn ? "" : " is-placeholder"}`}>
+                {trinn || "Trinn"}
+              </span>
+              <span className={`pdf-page-meta-item${forkunnskap ? "" : " is-placeholder"}`}>
+                {forkunnskap || "Forkunnskap"}
+              </span>
             </div>
           </header>
-          <div class="pdf-cards-list">${cardsHtml}</div>
-        </article>`;
-    })
-    .join("");
+          <div className="pdf-cards-list">
+            {chunk.map((p, cardIdx) => {
+              const fasit = p.fasit as Fasit;
+              return (
+                <article className="pdf-card" key={p.clientId}>
+                  <span className="pdf-card-num">{pageIdx * 3 + cardIdx + 1}</span>
+                  <div className={`pdf-fasit-box ${fasit}`}>{FASIT_LABEL[fasit]}</div>
+                  <p className="pdf-pastand-text">{p.text}</p>
+                  {p.forklaring.trim() && (
+                    <p className="pdf-forklaring-text">{p.forklaring}</p>
+                  )}
+                </article>
+              );
+            })}
+            {chunk.length === 0 && (
+              <p className="pdf-empty-hint">
+                Ingen gyldige påstander enda. Legg til tekst og velg fasit for å se
+                forhåndsvisningen.
+              </p>
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
+  );
 }

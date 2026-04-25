@@ -674,38 +674,79 @@
   }
 }
 
-/* ─────────── PDF export modal ─────────── */
-.pdf-modal {
+/* ─────────── PDF export full-screen overlay ─────────── */
+.pdf-export-screen {
   position: fixed;
   inset: 0;
+  z-index: 1000;
+  background: #dde2de;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  grid-template-rows: 56px 1fr;
+  grid-template-areas:
+    "topbar topbar"
+    "sidebar canvas";
+  font-family: var(--font-family-body);
+}
+.pdf-export-topbar {
+  grid-area: topbar;
+  background: white;
+  border-bottom: 1px solid var(--color-neutral-200);
   display: flex;
   align-items: center;
-  justify-content: center;
-  z-index: 1000;
+  justify-content: space-between;
+  padding: 0 18px;
 }
-.pdf-modal-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  -webkit-backdrop-filter: blur(2px);
-  backdrop-filter: blur(2px);
-}
-.pdf-modal-content {
-  position: relative;
-  background: white;
-  border-radius: 18px;
-  padding: 28px 32px 26px;
-  max-width: 440px;
-  width: calc(100% - 40px);
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.22),
-    0 4px 12px rgba(0, 0, 0, 0.08);
-}
-.pdf-modal-title {
-  font-size: 20px;
+.pdf-export-heading {
+  font-size: 15px;
   font-weight: 800;
-  margin-bottom: 6px;
   color: var(--color-text-primary);
+  letter-spacing: 0.02em;
+}
+.pdf-export-back,
+.pdf-export-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-family-body);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  padding: 8px 12px;
+  border-radius: 10px;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.pdf-export-back:hover,
+.pdf-export-close:hover {
+  background: var(--color-neutral-100);
+  color: var(--color-text-primary);
+}
+.pdf-export-close {
+  font-size: 16px;
+  padding: 6px 12px;
+}
+.pdf-export-sidebar {
+  grid-area: sidebar;
+  background: white;
+  border-right: 1px solid var(--color-neutral-200);
+  padding: 22px 22px 28px;
+  overflow-y: auto;
+}
+.pdf-export-canvas {
+  grid-area: canvas;
+  overflow-y: auto;
+  padding: 32px 24px 80px;
+}
+.pdf-export-canvas #pdf-print-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+.pdf-export-canvas .pdf-page {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
 }
 .pdf-modal-sub {
   font-size: 13px;
@@ -779,7 +820,7 @@
   gap: 10px;
   margin-top: 22px;
 }
-.pdf-modal .btn-cancel {
+.pdf-export-sidebar .btn-cancel {
   padding: 10px 18px;
   background: white;
   border: 1.5px solid var(--color-neutral-300);
@@ -793,11 +834,11 @@
     background 0.15s,
     border-color 0.15s;
 }
-.pdf-modal .btn-cancel:hover {
+.pdf-export-sidebar .btn-cancel:hover {
   background: var(--color-neutral-50);
   border-color: var(--color-neutral-400);
 }
-.pdf-modal .btn-primary-pdf {
+.pdf-export-sidebar .btn-primary-pdf {
   padding: 10px 20px;
   background: var(--color-primary-500);
   color: white;
@@ -813,16 +854,13 @@
     transform 0.15s,
     box-shadow 0.15s;
 }
-.pdf-modal .btn-primary-pdf:hover {
+.pdf-export-sidebar .btn-primary-pdf:hover {
   background: var(--color-primary-400);
   transform: translateY(-1px);
   box-shadow: 0 5px 0 var(--color-primary-700);
 }
 
 /* ─────────── PDF print container ─────────── */
-#pdf-print-container {
-  display: none;
-}
 .pdf-page {
   width: 210mm;
   height: 297mm;
@@ -942,6 +980,19 @@
   line-height: 1.55;
   color: #3e5048;
 }
+.pdf-page-title.is-placeholder,
+.pdf-page-meta-item.is-placeholder {
+  color: rgba(112, 133, 120, 0.5);
+}
+.pdf-empty-hint {
+  margin: auto;
+  padding: 16mm;
+  font-size: 11pt;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #708578;
+  text-align: center;
+}
 
 #pdf-print-container,
 #pdf-print-container * {
@@ -961,14 +1012,35 @@
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-  body > *:not(#pdf-print-container) {
+  .pdf-export-topbar,
+  .pdf-export-sidebar,
+  .pdf-empty-hint {
     display: none !important;
   }
-  #pdf-print-container {
-    display: block !important;
+  .pdf-export-screen {
+    position: static;
+    background: white;
+    display: block;
+  }
+  .pdf-export-canvas {
+    padding: 0;
+    overflow: visible;
+    background: white;
+  }
+  .pdf-export-canvas #pdf-print-container {
+    gap: 0;
+    align-items: stretch;
   }
   .pdf-page {
     margin: 0;
     box-shadow: none;
+    page-break-after: always;
+  }
+  .pdf-page:last-of-type {
+    page-break-after: auto;
+  }
+  .pdf-page-title.is-placeholder,
+  .pdf-page-meta-item.is-placeholder {
+    color: inherit;
   }
 }

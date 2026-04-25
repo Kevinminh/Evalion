@@ -23,6 +23,12 @@ const AVATAR_COLORS = [
   "bg-indigo-400",
 ];
 
+const AVATAR_EMOJIS = [
+  "🦊", "🐸", "🦁", "🐼", "🐰", "🦋", "🐬", "🦉", "🐧", "🐢",
+  "🦎", "🦩", "🐋", "🦜", "🐙", "🐝", "🦈", "🐨", "🦔", "🐾",
+  "🦒", "🐶", "🐱", "🐻", "🐵", "🐯",
+];
+
 // ── Session queries ──
 
 export const listByTeacher = query({
@@ -267,11 +273,13 @@ export const addStudent = mutation({
       .collect();
 
     const avatarColor = AVATAR_COLORS[students.length % AVATAR_COLORS.length];
+    const avatarEmoji = AVATAR_EMOJIS[Math.floor(Math.random() * AVATAR_EMOJIS.length)];
 
     return await ctx.db.insert("sessionStudents", {
       sessionId: args.sessionId,
       name: trimmedName,
       avatarColor,
+      avatarEmoji,
     });
   },
 });

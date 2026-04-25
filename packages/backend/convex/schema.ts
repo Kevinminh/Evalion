@@ -67,6 +67,7 @@ export default defineSchema({
     sessionId: v.id("liveSessions"),
     name: v.string(),
     avatarColor: v.string(),
+    avatarEmoji: v.optional(v.string()),
     groupIndex: v.optional(v.number()),
   }).index("by_session", ["sessionId"]),
 
