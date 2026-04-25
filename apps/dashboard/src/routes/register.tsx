@@ -3,11 +3,12 @@ import { RegisterForm } from "@workspace/ui/components/register-form";
 import { useState } from "react";
 
 import { authClient, signInWithGoogle } from "@/lib/auth-client";
+import { LANDING_URL } from "@/lib/env";
 
 export const Route = createFileRoute("/register")({
   beforeLoad: ({ context }) => {
     if (context.isAuthenticated) {
-      throw redirect({ to: "/" });
+      throw redirect({ href: `${LANDING_URL}/lag-pastander` });
     }
   },
   component: RegisterPage,

@@ -3,11 +3,12 @@ import { LoginForm } from "@workspace/ui/components/login-form";
 import { useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
+import { LANDING_URL } from "@/lib/env";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: ({ context }) => {
     if (context.isAuthenticated) {
-      throw redirect({ to: "/" });
+      throw redirect({ href: `${LANDING_URL}/lag-pastander` });
     }
   },
   component: LoginPage,
