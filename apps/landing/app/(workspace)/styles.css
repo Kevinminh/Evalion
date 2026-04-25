@@ -67,9 +67,16 @@
 .workspace-top-nav {
   position: fixed;
   top: 28px;
-  left: 50%;
+  /* Centred over the AI form (left column = main padding 24 + col 448 / 2 = 248 from page edge,
+     minus the 30px left bias on .lp-left). Falls back to viewport-centred on narrow screens. */
+  left: calc(max(0px, (100vw - 1180px) / 2) + 218px);
   transform: translateX(-50%);
   z-index: 20;
+}
+@media (max-width: 1040px) {
+  .workspace-top-nav {
+    left: 50%;
+  }
 }
 .workspace-top-nav-link {
   display: inline-flex;
