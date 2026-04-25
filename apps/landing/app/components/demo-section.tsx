@@ -140,59 +140,61 @@ export function DemoSection() {
   return (
     <section ref={sectionRef} id="demo" className="section-demo">
       <div className="demo-header">
-        <div className="reddi-corner">
-          <button
-            ref={avatarRef}
-            type="button"
-            onClick={toggleBubble}
-            className={`reddi-avatar-btn${hasTip ? " has-tip" : ""}${reading ? " reading" : ""}`}
-            aria-label="Reddi - trykk for tips"
-            title="Trykk for tips fra Reddi"
-          >
-            <img src="/assets/Reddi.png" alt="" className="reddi-avatar-img" />
-          </button>
-          <div
-            ref={bubbleRef}
-            className={`reddi-bubble${bubbleOpen ? " visible" : ""}`}
-            role="dialog"
-            aria-labelledby="reddi-name"
-            aria-hidden={!bubbleOpen}
-          >
-            <div className="reddi-speech-header">
-              <span className="reddi-name" id="reddi-name">
-                Reddi
-              </span>
-              <button
-                type="button"
-                className="reddi-close"
-                onClick={() => setBubbleOpen(false)}
-                aria-label="Lukk"
-              >
-                ✕
-              </button>
-            </div>
-            <div
-              className="reddi-text"
-              // eslint-disable-next-line react/no-danger -- copy is curated, hardcoded above
-              dangerouslySetInnerHTML={{ __html: bubbleHtml }}
-            />
-          </div>
-        </div>
         <div className="section-heading">
           <span className="section-label">Prøv demo</span>
           <h2 className="section-title mt-3">
             Utforsk <em className="accent font-display-italic">FagPrat</em>
           </h2>
         </div>
-        <button
-          type="button"
-          onClick={toggleFullscreen}
-          aria-label={isFullscreen ? "Avslutt fullskjerm" : "Fullskjerm"}
-          title={isFullscreen ? "Avslutt fullskjerm" : "Fullskjerm"}
-          className="demo-fullscreen-btn"
-        >
-          {isFullscreen ? <Minimize2 /> : <Maximize2 />}
-        </button>
+        <div className="demo-header-controls">
+          <div className="reddi-corner">
+            <button
+              ref={avatarRef}
+              type="button"
+              onClick={toggleBubble}
+              className={`reddi-avatar-btn${hasTip ? " has-tip" : ""}${reading ? " reading" : ""}`}
+              aria-label="Reddi - trykk for tips"
+              title="Trykk for tips fra Reddi"
+            >
+              <img src="/assets/Reddi.png" alt="" className="reddi-avatar-img" />
+            </button>
+            <div
+              ref={bubbleRef}
+              className={`reddi-bubble${bubbleOpen ? " visible" : ""}`}
+              role="dialog"
+              aria-labelledby="reddi-name"
+              aria-hidden={!bubbleOpen}
+            >
+              <div className="reddi-speech-header">
+                <span className="reddi-name" id="reddi-name">
+                  Reddi
+                </span>
+                <button
+                  type="button"
+                  className="reddi-close"
+                  onClick={() => setBubbleOpen(false)}
+                  aria-label="Lukk"
+                >
+                  ✕
+                </button>
+              </div>
+              <div
+                className="reddi-text"
+                // eslint-disable-next-line react/no-danger -- copy is curated, hardcoded above
+                dangerouslySetInnerHTML={{ __html: bubbleHtml }}
+              />
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            aria-label={isFullscreen ? "Avslutt fullskjerm" : "Fullskjerm"}
+            title={isFullscreen ? "Avslutt fullskjerm" : "Fullskjerm"}
+            className="demo-fullscreen-btn"
+          >
+            {isFullscreen ? <Minimize2 /> : <Maximize2 />}
+          </button>
+        </div>
       </div>
       <div className="demo-embed">
         <iframe

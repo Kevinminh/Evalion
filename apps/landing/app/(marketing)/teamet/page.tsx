@@ -52,7 +52,7 @@ const team = [
 
 export default function TeametPage() {
   return (
-    <section className="px-6 pt-16 pb-24 sm:pt-20">
+    <section className="px-4 pt-12 pb-16 sm:px-6 sm:pt-20 sm:pb-24">
       <div className="mx-auto max-w-[1180px]">
         <div className="text-center">
           <span className="section-label">Møt teamet</span>

@@ -48,7 +48,7 @@ export function TypewriterHeadline() {
   return (
     <h1
       ref={ref}
-      className="font-display whitespace-nowrap text-[clamp(32px,4vw,52px)] leading-[1.15] text-[var(--color-ink)]"
+      className="font-display text-[clamp(28px,7vw,52px)] leading-[1.15] text-[var(--color-ink)]"
       aria-label={TEXT}
     >
       <span>{typed}</span>

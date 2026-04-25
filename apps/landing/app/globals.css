@@ -200,13 +200,18 @@
 /* ─────────── Demo section (Prøv demo) ─────────── */
 .section-demo {
   background: var(--gradient-dark);
-  padding: 60px 0 0;
+  padding: 32px 0 24px;
   position: relative;
   overflow: visible;
-  min-height: calc(100vh - 200px);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+}
+@media (min-width: 768px) {
+  .section-demo {
+    padding: 60px 0 0;
+    min-height: calc(100vh - 200px);
+  }
 }
 .demo-embed {
   width: 100%;
@@ -217,32 +222,65 @@
 .demo-embed-frame {
   display: block;
   width: 100%;
-  height: 560px;
+  height: clamp(440px, 70vh, 560px);
   border: 0;
   background: transparent;
 }
+@media (min-width: 768px) {
+  .demo-embed-frame {
+    height: 560px;
+  }
+}
 .demo-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 18px;
-  margin: 0 auto 8px;
+  gap: 14px;
+  margin: 0 auto 12px;
   width: 100%;
   max-width: 1400px;
-  padding: 0 24px;
+  padding: 0 16px;
   position: relative;
   z-index: 10;
   flex-shrink: 0;
   box-sizing: border-box;
 }
+@media (min-width: 768px) {
+  .demo-header {
+    flex-direction: row;
+    align-items: center;
+    gap: 18px;
+    padding: 0 24px;
+    margin-bottom: 8px;
+  }
+}
+.demo-header-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .demo-header-controls {
+    display: contents;
+  }
+}
 .demo-header .section-heading {
-  max-width: 760px;
   margin: 0;
-  width: 760px;
+  width: 100%;
   max-width: calc(100% - 48px);
   text-align: center;
   position: relative;
   z-index: 2;
+}
+@media (min-width: 768px) {
+  .demo-header .section-heading {
+    width: 760px;
+    max-width: 760px;
+    flex: 0 1 760px;
+  }
 }
 .demo-header .section-heading .section-label {
   display: block;
@@ -252,7 +290,7 @@
 .demo-header .section-heading .section-title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(28px, 3.5vw, 40px);
+  font-size: clamp(24px, 6vw, 40px);
   font-weight: 400;
   line-height: 1.25;
   color: #fff;
@@ -268,18 +306,16 @@
 }
 
 .demo-fullscreen-btn {
-  position: absolute;
-  right: 24px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 44px;
-  height: 44px;
+  position: relative;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(255, 255, 255, 0.1);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
-  border-radius: 12px;
+  border-radius: 10px;
   color: #fff;
   cursor: pointer;
   transition:
@@ -289,14 +325,36 @@
   padding: 0;
   z-index: 20;
 }
+@media (min-width: 768px) {
+  .demo-fullscreen-btn {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+  }
+}
 .demo-fullscreen-btn:hover {
   background: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.45);
-  transform: translateY(-50%) scale(1.05);
+  transform: scale(1.05);
+}
+@media (min-width: 768px) {
+  .demo-fullscreen-btn:hover {
+    transform: translateY(-50%) scale(1.05);
+  }
 }
 .demo-fullscreen-btn svg {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
+}
+@media (min-width: 768px) {
+  .demo-fullscreen-btn svg {
+    width: 22px;
+    height: 22px;
+  }
 }
 
 .section-demo:fullscreen {
@@ -329,16 +387,22 @@
 
 /* ─────────── Reddi corner (avatar + bubble) ─────────── */
 .reddi-corner {
-  position: absolute;
-  left: calc(24px + 25px);
-  top: calc(50% + 25px);
-  transform: translateY(-50%);
+  position: relative;
+  flex-shrink: 0;
   z-index: 50;
+}
+@media (min-width: 768px) {
+  .reddi-corner {
+    position: absolute;
+    left: calc(24px + 25px);
+    top: calc(50% + 25px);
+    transform: translateY(-50%);
+  }
 }
 .reddi-avatar-btn {
   position: relative;
-  width: 89px;
-  height: 89px;
+  width: 56px;
+  height: 56px;
   padding: 0;
   border: none;
   background: transparent;
@@ -347,6 +411,12 @@
   flex-shrink: 0;
   transition: transform 0.15s;
   display: block;
+}
+@media (min-width: 768px) {
+  .reddi-avatar-btn {
+    width: 89px;
+    height: 89px;
+  }
 }
 .reddi-avatar-btn:hover {
   transform: scale(1.06);
@@ -387,37 +457,56 @@
 .reddi-bubble {
   position: absolute;
   top: calc(100% + 14px);
-  left: 0;
+  left: 50%;
+  transform: translate(-50%, -10px);
   z-index: 200;
   width: 460px;
-  max-width: calc(100vw - 40px);
+  max-width: calc(100vw - 32px);
   background: #fdfaf6;
   color: #1c1810;
   border-radius: 18px;
   padding: 18px 22px 16px;
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
   opacity: 0;
-  transform: translateY(-10px);
   pointer-events: none;
   transition:
     opacity 0.25s,
     transform 0.25s;
 }
+@media (min-width: 768px) {
+  .reddi-bubble {
+    left: 0;
+    transform: translateY(-10px);
+    max-width: calc(100vw - 40px);
+  }
+}
 .reddi-bubble.visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate(-50%, 0);
   pointer-events: auto;
+}
+@media (min-width: 768px) {
+  .reddi-bubble.visible {
+    transform: translateY(0);
+  }
 }
 .reddi-bubble::before {
   content: "";
   position: absolute;
   top: -10px;
-  left: 22px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 0;
   height: 0;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
   border-bottom: 12px solid #fdfaf6;
+}
+@media (min-width: 768px) {
+  .reddi-bubble::before {
+    left: 22px;
+    transform: none;
+  }
 }
 .reddi-speech-header {
   display: flex;

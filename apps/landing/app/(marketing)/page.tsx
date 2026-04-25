@@ -62,11 +62,11 @@ export default function Home() {
       {/* ─── HERO ─── */}
       <section
         id="hero"
-        className="relative flex min-h-[calc(100svh-60px)] flex-col overflow-hidden bg-cl-light"
+        className="relative flex flex-col overflow-hidden bg-cl-light lg:min-h-[calc(100svh-60px)]"
       >
-        <div className="flex flex-1 items-center px-6 py-8 sm:py-12">
-          <div className="mx-auto grid w-full max-w-[1180px] grid-cols-1 items-start gap-12 lg:grid-cols-[595px_1fr]">
-            <div className="pt-10 lg:pt-[140px]">
+        <div className="flex flex-1 items-center px-4 pt-8 pb-16 sm:px-6 sm:pt-10 sm:pb-20 lg:py-12">
+          <div className="mx-auto grid w-full max-w-[1180px] grid-cols-1 items-start gap-8 sm:gap-10 lg:grid-cols-[595px_1fr] lg:gap-12">
+            <div className="pt-2 lg:pt-[140px]">
               <TypewriterHeadline />
               <div className="mt-6 inline-flex flex-col items-center gap-2">
                 <a href="#demo" className="cl-cta">
@@ -76,28 +76,28 @@ export default function Home() {
                   Ingen innlogging kreves
                 </span>
               </div>
-              <div className="mt-24">
+              <div className="mt-12 sm:mt-16 lg:mt-24">
                 <span className="cl-launch-pill">Lanseres 18. mai 2026</span>
               </div>
             </div>
-            <div className="relative mt-[30px] min-h-[440px]">
+            <div className="relative mt-2 min-h-[260px] sm:mt-6 sm:min-h-[360px] lg:mt-[30px] lg:min-h-[440px]">
               <img
                 src="/assets/Digitale enheter.png"
                 alt="FagPrat på laptop, mobil og nettbrett"
-                className="mt-10 block h-auto w-[104.5%] max-w-none drop-shadow-[0_8px_32px_rgba(28,26,23,0.10)]"
+                className="mt-6 block h-auto w-full max-w-none drop-shadow-[0_8px_32px_rgba(28,26,23,0.10)] sm:mt-10 lg:w-[104.5%]"
               />
               <img
                 src="/assets/Professoren (med skygge).png"
                 alt=""
                 aria-hidden="true"
-                className="cl-professor-float pointer-events-none absolute bottom-[calc(8%+58px)] left-[calc(-6%+86px)] z-[3] h-auto w-[26%] drop-shadow-[0_4px_12px_rgba(28,26,23,0.12)]"
+                className="cl-professor-float pointer-events-none absolute bottom-[8%] left-[2%] z-[3] h-auto w-[30%] max-w-[160px] drop-shadow-[0_4px_12px_rgba(28,26,23,0.12)] sm:bottom-[calc(8%+30px)] sm:left-[calc(-2%+40px)] sm:w-[28%] sm:max-w-none lg:bottom-[calc(8%+58px)] lg:left-[calc(-6%+86px)] lg:w-[26%]"
               />
             </div>
           </div>
         </div>
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-[50px] left-1/2 z-[2] flex -translate-x-1/2 flex-col items-center gap-2 opacity-55"
+          className="pointer-events-none absolute bottom-[50px] left-1/2 z-[2] hidden -translate-x-1/2 flex-col items-center gap-2 opacity-55 lg:flex"
         >
           <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-ink-secondary)]">
             Bla videre
@@ -118,11 +118,11 @@ export default function Home() {
       {/* ─── VALUE CARDS ─── */}
       <section
         id="om-co-lab"
-        className="relative bg-cl-dark py-20 px-6 text-white"
+        className="relative bg-cl-dark py-16 px-4 text-white sm:py-20 sm:px-6"
       >
         <Link
           href="/teamet"
-          className="group/team absolute top-7 right-[max(24px,calc((100vw-1180px)/2+24px))] z-[3] inline-flex items-center gap-2 rounded-full border-[1.5px] border-white/30 bg-white/[0.08] px-4 py-[9px] text-[13px] font-bold text-white/90 backdrop-blur-[4px] transition hover:-translate-y-0.5 hover:border-white/55 hover:bg-white/15 hover:text-white"
+          className="group/team absolute top-7 right-[max(24px,calc((100vw-1180px)/2+24px))] z-[3] hidden items-center gap-2 rounded-full border-[1.5px] border-white/30 bg-white/[0.08] px-4 py-[9px] text-[13px] font-bold text-white/90 backdrop-blur-[4px] transition hover:-translate-y-0.5 hover:border-white/55 hover:bg-white/15 hover:text-white sm:inline-flex"
         >
           Møt teamet
           <svg
@@ -150,7 +150,7 @@ export default function Home() {
             fanger opp verdifull innsikt.
           </p>
         </RevealOnScroll>
-        <div className="mx-auto mt-12 grid max-w-[1180px] grid-cols-1 gap-6 px-3 md:grid-cols-3">
+        <div className="mx-auto mt-12 grid max-w-[1180px] grid-cols-1 gap-6 sm:grid-cols-2 sm:px-3 md:grid-cols-3">
           {valueCards.map((card, i) => (
             <RevealOnScroll
               key={card.title}
@@ -171,7 +171,7 @@ export default function Home() {
       {/* ─── HOW IT WORKS ─── */}
       <section
         id="slik-fungerer"
-        className="bg-cl-light py-20 px-6 text-[var(--color-ink)]"
+        className="bg-cl-light py-16 px-4 text-[var(--color-ink)] sm:py-20 sm:px-6"
       >
         <RevealOnScroll className="mx-auto max-w-[820px] text-center">
           <span className="section-label">Slik fungerer FagPrat</span>
@@ -187,7 +187,7 @@ export default function Home() {
             mellom flere måter å organisere samtalene på.
           </p>
         </RevealOnScroll>
-        <div className="relative mx-auto mt-16 grid max-w-[1180px] grid-cols-2 gap-9 px-2 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="relative mx-auto mt-12 grid max-w-[1180px] grid-cols-1 gap-6 sm:mt-16 sm:grid-cols-2 sm:gap-8 md:grid-cols-3 lg:grid-cols-6">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute top-9 right-[6%] left-[6%] hidden border-t-2 border-dashed border-[var(--color-coral)] opacity-55 lg:block"
@@ -199,7 +199,7 @@ export default function Home() {
               as="div"
               className="relative flex flex-col items-center text-center"
             >
-              <div className="font-display z-[2] mb-[18px] flex h-[72px] w-[72px] items-center justify-center rounded-full border-[1.5px] border-[rgba(11,56,64,0.18)] bg-white text-[28px] italic text-[var(--color-ink)] shadow-[0_6px_16px_rgba(11,56,64,0.12)]">
+              <div className="font-display z-[2] mb-[18px] flex h-[56px] w-[56px] items-center justify-center rounded-full border-[1.5px] border-[rgba(11,56,64,0.18)] bg-white text-[22px] italic text-[var(--color-ink)] shadow-[0_6px_16px_rgba(11,56,64,0.12)] sm:h-[64px] sm:w-[64px] sm:text-[24px] lg:h-[72px] lg:w-[72px] lg:text-[28px]">
                 {i + 1}
               </div>
               <h3 className="font-display mb-[10px] text-[17px] font-medium text-[var(--color-ink)]">
@@ -217,22 +217,22 @@ export default function Home() {
       <DemoSection />
 
       {/* ─── PÅSTANDSGENERATOR ─── */}
-      <section id="generator" className="relative bg-cl-light py-16">
+      <section id="generator" className="relative bg-cl-light py-12 sm:py-16">
         <span
           aria-label="Få tilgang nå!"
           className="absolute top-[60px] right-[130px] z-[5] hidden rotate-[24deg] rounded-[6px] border-2 border-[#3E2E88] px-4 py-3 text-[15px] font-extrabold uppercase tracking-[0.09em] whitespace-nowrap text-[#3E2E88] outline-2 outline-offset-[5px] outline-[#3E2E88] transition-transform hover:rotate-[18deg] hover:scale-[1.03] lg:inline-block"
         >
           Få tilgang nå!
         </span>
-        <div className="mx-auto max-w-[1200px] px-6">
-          <RevealOnScroll className="mb-12 text-center">
+        <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
+          <RevealOnScroll className="mb-10 text-center sm:mb-12">
             <span className="section-label">Vår påstandsgenerator</span>
             <h2 className="font-display mt-3 text-[clamp(28px,3.5vw,42px)] leading-tight">
               La <em className="font-display-italic text-[var(--color-cl-purple)]">Reddi</em> lage
               påstandene for deg
             </h2>
           </RevealOnScroll>
-          <div className="grid grid-cols-1 items-stretch gap-12 lg:grid-cols-2">
+          <div className="grid grid-cols-1 items-stretch gap-8 sm:gap-10 lg:grid-cols-2 lg:gap-12">
             <RevealOnScroll className="flex flex-col">
               <p className="text-[16px] leading-[1.55] text-[var(--color-ink)]">
                 Med hjelp fra Reddi kan du enkelt lage gode påstander som virkelig setter i gang

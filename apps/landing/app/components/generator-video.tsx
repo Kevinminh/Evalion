@@ -32,22 +32,22 @@ export function GeneratorVideo() {
             type="button"
             onClick={handlePlay}
             aria-label="Spill av demonstrasjonsvideo"
-            className="absolute inset-0 z-[3] grid cursor-pointer place-items-center rounded-[inherit] border-0 bg-[rgba(28,24,16,0.22)] p-6 backdrop-blur-[4px] backdrop-saturate-[1.05] transition focus-visible:outline-3 focus-visible:-outline-offset-6 focus-visible:outline-white/70"
+            className="absolute inset-0 z-[3] grid cursor-pointer place-items-center rounded-[inherit] border-0 bg-[rgba(28,24,16,0.22)] p-4 backdrop-blur-[4px] backdrop-saturate-[1.05] transition focus-visible:outline-3 focus-visible:-outline-offset-6 focus-visible:outline-white/70 sm:p-6"
           >
-            <span className="flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-full bg-white/95 text-[#1C1810] shadow-[0_14px_40px_rgba(0,0,0,0.35)] transition group-hover/video:scale-[1.06] group-hover/video:bg-white">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="ml-[5px] h-10 w-10">
+            <span className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-white/95 text-[#1C1810] shadow-[0_14px_40px_rgba(0,0,0,0.35)] transition group-hover/video:scale-[1.06] group-hover/video:bg-white sm:h-20 sm:w-20 lg:h-24 lg:w-24">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="ml-[3px] h-7 w-7 sm:ml-[4px] sm:h-9 sm:w-9 lg:ml-[5px] lg:h-10 lg:w-10">
                 <path d="M8 5v14l11-7z" />
               </svg>
             </span>
           </button>
-          <span className="pointer-events-none absolute top-[22px] left-1/2 z-[4] max-w-[calc(100%-48px)] -translate-x-1/2 text-center text-[15px] leading-[1.4] font-semibold tracking-[0.01em] text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)]">
+          <span className="pointer-events-none absolute top-[16px] left-1/2 z-[4] max-w-[calc(100%-32px)] -translate-x-1/2 text-center text-[14px] leading-[1.4] font-semibold tracking-[0.01em] text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)] sm:top-[22px] sm:max-w-[calc(100%-48px)] sm:text-[15px]">
             Se hvordan Reddi hjelper deg å lage påstander
           </span>
           <img
             src="/assets/Reddi med skygge.png"
             alt=""
             aria-hidden="true"
-            className="cl-reddi-float pointer-events-none absolute right-[-20px] bottom-[-20px] z-[5] h-auto w-[38%] max-w-[220px]"
+            className="cl-reddi-float pointer-events-none absolute right-[-10px] bottom-[-10px] z-[5] h-auto w-[34%] max-w-[220px] sm:right-[-20px] sm:bottom-[-20px] sm:w-[36%] lg:w-[38%]"
           />
         </>
       )}

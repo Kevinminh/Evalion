@@ -18,7 +18,7 @@ const tldr = [
 
 export default function PersonvernOgVilkarPage() {
   return (
-    <div className="px-6 pt-12 pb-24">
+    <div className="px-4 pt-8 pb-16 sm:px-6 sm:pt-12 sm:pb-24">
       <div className="mx-auto max-w-[820px]">
         {/* HERO */}
         <section className="text-center">
@@ -36,7 +36,7 @@ export default function PersonvernOgVilkarPage() {
         </section>
 
         {/* TL;DR */}
-        <section className="mt-10 rounded-[20px] border border-[var(--color-cl-border)] bg-white p-7 shadow-sm">
+        <section className="mt-10 rounded-[20px] border border-[var(--color-cl-border)] bg-white p-5 shadow-sm sm:p-7">
           <h2 className="font-display text-xl font-semibold">Kort fortalt</h2>
           <ul className="mt-4 flex flex-col gap-2">
             {tldr.map((item) => (

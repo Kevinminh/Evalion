@@ -7,9 +7,9 @@ import { RevealOnScroll } from "./reveal-on-scroll";
 export function Footer() {
   return (
     <>
-      <section id="signup" className="bg-[var(--color-section-dark)] px-6 py-20">
+      <section id="signup" className="bg-[var(--color-section-dark)] px-4 py-16 sm:px-6 sm:py-20">
         <RevealOnScroll className="mx-auto max-w-[820px]">
-          <div className="relative overflow-hidden rounded-[24px] border border-[var(--color-cl-border)] bg-white p-10 shadow-xl sm:p-12">
+          <div className="relative overflow-hidden rounded-[24px] border border-[var(--color-cl-border)] bg-white p-6 shadow-xl sm:p-10 md:p-12">
             <img
               src="/assets/Professoren (med skygge).png"
               alt=""
@@ -31,7 +31,7 @@ export function Footer() {
         </RevealOnScroll>
       </section>
       <footer className="bg-[var(--color-section-dark)] text-white/80">
-        <div className="mx-auto flex max-w-[1180px] flex-col items-center gap-3 px-6 py-12 text-center">
+        <div className="mx-auto flex max-w-[1180px] flex-col items-center gap-3 px-4 py-10 text-center sm:px-6 sm:py-12">
           <img
             src="/assets/CO-LAB (Hoved) - uten skygge.png"
             alt="CO-LAB"
