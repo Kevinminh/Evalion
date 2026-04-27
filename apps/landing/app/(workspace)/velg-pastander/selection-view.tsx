@@ -278,7 +278,7 @@ export function SelectionView() {
             <div className="flex items-center gap-3">
               <img src="/assets/Reddi.png" alt="Reddi" className="size-11 object-contain" />
               <span className="text-[15px] font-bold text-ink-secondary">
-                Foreslått av Reddi
+                Laget av Reddi
               </span>
             </div>
             <button

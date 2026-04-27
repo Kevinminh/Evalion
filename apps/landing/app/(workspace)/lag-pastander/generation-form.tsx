@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { api } from "@workspace/backend/convex/_generated/api";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select";
 
 const FAG_OPTIONS = ["Naturfag", "Matematikk", "Samfunnsfag", "Norsk", "Engelsk", "KRLE"];
 const TRINN_OPTIONS = [
@@ -109,43 +116,35 @@ export function GenerationForm({
           <label className="field-label" htmlFor="fag">
             Fag
           </label>
-          <select
-            className="field-select"
-            id="fag"
-            value={fag}
-            onChange={(e) => setFag(e.target.value)}
-            required
-          >
-            <option value="" disabled>
-              Velg fag
-            </option>
-            {FAG_OPTIONS.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
+          <Select value={fag} onValueChange={(v) => setFag(v ?? "")}>
+            <SelectTrigger id="fag" className="w-full">
+              <SelectValue placeholder="Velg fag" />
+            </SelectTrigger>
+            <SelectContent>
+              {FAG_OPTIONS.map((opt) => (
+                <SelectItem key={opt} value={opt}>
+                  {opt}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <label className="field-label" htmlFor="trinn">
             Trinn
           </label>
-          <select
-            className="field-select"
-            id="trinn"
-            value={trinn}
-            onChange={(e) => setTrinn(e.target.value)}
-            required
-          >
-            <option value="" disabled>
-              Velg trinn
-            </option>
-            {TRINN_OPTIONS.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
+          <Select value={trinn} onValueChange={(v) => setTrinn(v ?? "")}>
+            <SelectTrigger id="trinn" className="w-full">
+              <SelectValue placeholder="Velg trinn" />
+            </SelectTrigger>
+            <SelectContent>
+              {TRINN_OPTIONS.map((opt) => (
+                <SelectItem key={opt} value={opt}>
+                  {opt}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

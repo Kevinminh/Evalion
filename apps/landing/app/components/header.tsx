@@ -1,10 +1,8 @@
-import { Play } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@workspace/ui/components/button";
 
 import { isAuthenticated } from "../lib/auth-server";
-import { PLAY_URL } from "../lib/constants";
 import { MobileMenu } from "./mobile-menu";
 import { UserMenu } from "./user-menu";
 
@@ -21,7 +19,7 @@ export async function Header() {
             className="h-8 w-auto sm:h-9"
           />
         </Link>
-        <div className="hidden items-center gap-10 md:flex">
+        <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 md:flex">
           <a
             href="/#om-co-lab"
             className="text-sm font-medium text-ink-secondary transition hover:text-ink"
@@ -43,6 +41,7 @@ export async function Header() {
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="hidden items-center gap-2 sm:flex sm:gap-3">
+            {/* Hidden temporarily — restore by uncommenting
             <Button
               variant="outline"
               size="sm"
@@ -52,6 +51,7 @@ export async function Header() {
               <Play className="size-3.5" />
               Bli med i spill
             </Button>
+            */}
             {authed ? (
               <UserMenu />
             ) : (

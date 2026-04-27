@@ -26,6 +26,8 @@ export function UserMenu() {
       variant="compact"
       disabled={pending}
       onLogout={handleLogout}
+      triggerClassName="gap-3 pl-1.5 pr-4"
+      contentProps={{ className: "min-w-56" }}
     >
       <DropdownMenuItem render={<Link href="/lag-pastander" />}>
         <Sparkles className="size-4" />

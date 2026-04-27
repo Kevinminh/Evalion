@@ -17,7 +17,7 @@ export function Footer() {
               className="pointer-events-none absolute -right-4 -bottom-6 hidden h-[180px] w-auto opacity-90 md:block"
             />
             <div className="relative max-w-[480px]">
-              <h2 className="font-display text-[clamp(24px,2.6vw,32px)] leading-tight">
+              <h2 className="text-[clamp(24px,2.6vw,32px)] leading-tight">
                 Få beskjed når vi lanserer
               </h2>
               <p className="mt-3 text-sm text-ink-secondary">
@@ -37,7 +37,7 @@ export function Footer() {
             alt="CO-LAB"
             className="h-8 w-auto opacity-90"
           />
-          <p className="text-sm">Laget av lærere i Norge · CO-LAB AS</p>
+          <p className="text-sm">Tverrfaglighet med pedagogisk tyngde · CO-LAB AS</p>
           <nav className="mt-3 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm">
             <Link href="/teamet" className="hover:text-white">
               Teamet

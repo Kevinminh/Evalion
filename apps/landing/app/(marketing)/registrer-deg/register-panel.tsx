@@ -36,6 +36,7 @@ export function RegisterPanel() {
 
   return (
     <RegisterForm
+      className="max-w-md"
       logo={
         <img
           src="/assets/CO-LAB (Hoved) - uten skygge.png"

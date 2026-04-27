@@ -291,12 +291,9 @@
   color: #b6a8ff;
 }
 .demo-mobile-launch-title {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 22px;
   line-height: 1.2;
-  font-variation-settings:
-    "SOFT" 100,
-    "WONK" 1;
 }
 .demo-mobile-launch-desc {
   font-size: 14px;
@@ -344,15 +341,12 @@
 }
 .demo-header .section-heading .section-title {
   margin: 0;
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: clamp(24px, 6vw, 40px);
   font-weight: 400;
   line-height: 1.25;
   color: #fff;
   letter-spacing: -0.015em;
-  font-variation-settings:
-    "SOFT" 100,
-    "WONK" 1;
 }
 .demo-header .section-heading .section-title .accent {
   font-style: italic;

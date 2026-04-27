@@ -143,7 +143,7 @@ export function DemoSection() {
         <div className="section-heading">
           <span className="section-label">Prøv demo</span>
           <h2 className="section-title mt-3">
-            Utforsk <em className="accent font-display-italic">FagPrat</em>
+            Utforsk <em className="accent">FagPrat</em>
           </h2>
         </div>
         <div className="demo-header-controls">

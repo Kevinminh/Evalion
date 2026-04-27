@@ -1,12 +1,10 @@
 "use client";
 
-import { Menu, Play, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@workspace/ui/components/button";
-
-import { PLAY_URL } from "../lib/constants";
 
 const SECTION_LINKS = [
   { href: "/#om-co-lab", label: "Om CO-LAB" },
@@ -75,6 +73,7 @@ export function MobileMenu({ authed }: MobileMenuProps) {
               </Link>
             ))}
             <div className="mt-3 flex flex-col gap-2 border-t border-cl-border pt-4">
+              {/* Hidden temporarily — restore by uncommenting
               <Button
                 variant="outline"
                 size="sm"
@@ -84,6 +83,7 @@ export function MobileMenu({ authed }: MobileMenuProps) {
                 <Play className="size-3.5" />
                 Bli med i spill
               </Button>
+              */}
               {!authed && (
                 <>
                   <Button

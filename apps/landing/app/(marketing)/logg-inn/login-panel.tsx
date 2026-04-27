@@ -35,6 +35,7 @@ export function LoginPanel() {
 
   return (
     <LoginForm
+      className="max-w-md"
       logo={
         <img
           src="/assets/CO-LAB (Hoved) - uten skygge.png"

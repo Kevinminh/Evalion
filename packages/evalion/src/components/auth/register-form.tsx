@@ -37,8 +37,8 @@ function RegisterForm({
   terms,
 }: RegisterFormProps) {
   return (
-    <Card className={cn("w-full max-w-sm p-4", className)}>
-      <CardHeader>
+    <Card className={cn("w-full max-w-sm p-0", className)}>
+      <CardHeader className="px-4 pt-4">
         {logo}
         <CardTitle className="sr-only">Registrer</CardTitle>
         <CardDescription>{description}</CardDescription>
@@ -76,7 +76,7 @@ function RegisterForm({
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="-mx-4 flex-col items-center justify-center gap-2">
+      <CardFooter className="flex-col items-center justify-center gap-2">
         {footer}
         {terms && (
           <p className="text-center text-xs leading-relaxed text-muted-foreground [&_a]:underline [&_a:hover]:text-primary">

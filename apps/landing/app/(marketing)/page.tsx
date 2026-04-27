@@ -62,11 +62,11 @@ export default function Home() {
       {/* ─── HERO ─── */}
       <section
         id="hero"
-        className="relative flex flex-col overflow-hidden bg-cl-light lg:min-h-[calc(100svh-60px)]"
+        className="relative flex flex-col overflow-hidden bg-cl-light lg:min-h-[640px]"
       >
         <div className="flex flex-1 items-center px-4 pt-8 pb-16 sm:px-6 sm:pt-10 sm:pb-20 lg:py-12">
           <div className="mx-auto grid w-full max-w-[1180px] grid-cols-1 items-start gap-8 sm:gap-10 lg:grid-cols-[595px_1fr] lg:gap-12">
-            <div className="pt-2 lg:pt-[140px]">
+            <div className="pt-2 lg:pt-[60px]">
               <TypewriterHeadline />
               <div className="mt-6 inline-flex flex-col items-center gap-2">
                 <a href="#demo" className="cl-cta">
@@ -140,9 +140,9 @@ export default function Home() {
         </Link>
         <RevealOnScroll className="mx-auto max-w-[820px] text-center">
           <span className="section-label !text-white/60">Om CO-LAB</span>
-          <h2 className="font-display mt-3 text-[clamp(28px,3.5vw,42px)] leading-tight text-white">
+          <h2 className="mt-3 text-[clamp(28px,3.5vw,42px)] leading-tight text-white">
             En samtale der{" "}
-            <em className="font-display-italic text-purple-500">alle</em> får plass
+            <em className="text-purple-500">alle</em> får plass
           </h2>
           <p className="mx-auto mt-5 max-w-[640px] text-base text-white/70">
             CO-LAB er et lærerstyrt verktøy som gjennom sin første aktivitet – FagPrat – skal gjøre
@@ -161,7 +161,7 @@ export default function Home() {
               <div className="mb-[22px] aspect-[4/3] overflow-hidden rounded-[20px] bg-cl-light shadow-[0_10px_28px_rgba(0,0,0,0.2)] transition group-hover/card:-translate-y-1 group-hover/card:shadow-[0_18px_40px_rgba(0,0,0,0.32)]">
                 <img src={card.image} alt="" className="block h-full w-full object-cover" />
               </div>
-              <h3 className="font-display text-[22px] font-medium text-white">{card.title}</h3>
+              <h3 className="text-[22px] font-medium text-white">{card.title}</h3>
               <p className="mt-3 text-[15px] leading-[1.65] text-white/75">{card.text}</p>
             </RevealOnScroll>
           ))}
@@ -175,9 +175,9 @@ export default function Home() {
       >
         <RevealOnScroll className="mx-auto max-w-[820px] text-center">
           <span className="section-label">Slik fungerer FagPrat</span>
-          <h2 className="font-display mt-3 text-[clamp(28px,3.5vw,42px)] leading-tight">
-            Fra <em className="font-display-italic text-purple-500">påstand</em> til{" "}
-            <em className="font-display-italic text-purple-500">forståelse</em> på 6
+          <h2 className="mt-3 text-[clamp(28px,3.5vw,42px)] leading-tight">
+            Fra <em className="text-purple-500">påstand</em> til{" "}
+            <em className="text-purple-500">forståelse</em> på 6
             steg
           </h2>
           <p className="mx-auto mt-5 max-w-[640px] text-base text-ink-secondary">
@@ -199,10 +199,10 @@ export default function Home() {
               as="div"
               className="relative flex flex-col items-center text-center"
             >
-              <div className="font-display z-[2] mb-[18px] flex h-[56px] w-[56px] items-center justify-center rounded-full border-[1.5px] border-[rgba(11,56,64,0.18)] bg-white text-[22px] italic text-ink shadow-[0_6px_16px_rgba(11,56,64,0.12)] sm:h-[64px] sm:w-[64px] sm:text-[24px] lg:h-[72px] lg:w-[72px] lg:text-[28px]">
+              <div className="z-[2] mb-[18px] flex h-[56px] w-[56px] items-center justify-center rounded-full border-[1.5px] border-[rgba(11,56,64,0.18)] bg-white text-[22px] italic text-ink shadow-[0_6px_16px_rgba(11,56,64,0.12)] sm:h-[64px] sm:w-[64px] sm:text-[24px] lg:h-[72px] lg:w-[72px] lg:text-[28px]">
                 {i + 1}
               </div>
-              <h3 className="font-display mb-[10px] text-[17px] font-medium text-ink">
+              <h3 className="mb-[10px] text-[17px] font-medium text-ink">
                 {step.title}
               </h3>
               <p className="text-[13px] leading-[1.55] text-ink-secondary">
@@ -227,8 +227,8 @@ export default function Home() {
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
           <RevealOnScroll className="mb-10 text-center sm:mb-12">
             <span className="section-label">Vår påstandsgenerator</span>
-            <h2 className="font-display mt-3 text-[clamp(28px,3.5vw,42px)] leading-tight">
-              La <em className="font-display-italic text-purple-500">Reddi</em> lage
+            <h2 className="mt-3 text-[clamp(28px,3.5vw,42px)] leading-tight">
+              La <em className="text-purple-500">Reddi</em> lage
               påstandene for deg
             </h2>
           </RevealOnScroll>
@@ -266,7 +266,7 @@ export default function Home() {
                   Logg inn / Registrer deg
                 </Link>
                 <p className="text-[13px] text-ink-tertiary">
-                  Gratis tilgang fram til sommeren
+                  Gratis tilgang fram til 1.juli
                 </p>
               </div>
             </RevealOnScroll>

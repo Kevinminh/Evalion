@@ -23,9 +23,9 @@ export default function PersonvernOgVilkarPage() {
         {/* HERO */}
         <section className="text-center">
           <span className="section-label">Personvern og vilkår</span>
-          <h1 className="font-display mt-3 text-[clamp(32px,4.5vw,52px)] leading-tight">
+          <h1 className="mt-3 text-[clamp(32px,4.5vw,52px)] leading-tight">
             Hvordan vi tar vare på{" "}
-            <em className="font-display-italic text-purple-500">dataen din</em>
+            <em className="text-purple-500">dataen din</em>
           </h1>
           <p className="mx-auto mt-3 max-w-[560px] text-base text-ink-secondary">
             En ærlig og enkel forklaring av hva vi samler inn, hvorfor, og hva vi aldri gjør.
@@ -37,7 +37,7 @@ export default function PersonvernOgVilkarPage() {
 
         {/* TL;DR */}
         <section className="mt-10 rounded-[20px] border border-cl-border bg-white p-5 shadow-sm sm:p-7">
-          <h2 className="font-display text-xl font-semibold">Kort fortalt</h2>
+          <h2 className="text-xl font-semibold">Kort fortalt</h2>
           <ul className="mt-4 flex flex-col gap-2">
             {tldr.map((item) => (
               <li
@@ -69,7 +69,7 @@ export default function PersonvernOgVilkarPage() {
 
         {/* PERSONVERN */}
         <section id="personvern" className="mt-12 scroll-mt-24">
-          <h2 className="font-display border-b-2 border-cl-border pb-4 text-[clamp(26px,3vw,34px)] font-semibold">
+          <h2 className="border-b-2 border-cl-border pb-4 text-[clamp(26px,3vw,34px)] font-semibold">
             Personvernerklæring
           </h2>
 
@@ -256,14 +256,14 @@ export default function PersonvernOgVilkarPage() {
             aria-hidden="true"
             className="mx-auto mb-5 block h-0.5 w-20 rounded bg-purple-500"
           />
-          <span className="font-display-italic text-sm text-ink-tertiary">
+          <span className="italic text-sm text-ink-tertiary">
             Del 2 · Brukervilkår
           </span>
         </div>
 
         {/* BRUKERVILKÅR */}
         <section id="brukervilkar" className="scroll-mt-24">
-          <h2 className="font-display border-b-2 border-cl-border pb-4 text-[clamp(26px,3vw,34px)] font-semibold">
+          <h2 className="border-b-2 border-cl-border pb-4 text-[clamp(26px,3vw,34px)] font-semibold">
             Brukervilkår
           </h2>
 
@@ -364,7 +364,7 @@ export default function PersonvernOgVilkarPage() {
 
         {/* KONTAKT */}
         <section id="kontakt" className="mt-12 scroll-mt-24">
-          <h2 className="font-display border-b-2 border-cl-border pb-4 text-[clamp(26px,3vw,34px)] font-semibold">
+          <h2 className="border-b-2 border-cl-border pb-4 text-[clamp(26px,3vw,34px)] font-semibold">
             Kontakt oss
           </h2>
           <P>Har du spørsmål om personvern, vilkår, eller vil utøve rettighetene dine?</P>
@@ -398,7 +398,7 @@ export default function PersonvernOgVilkarPage() {
 
 function Heading({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="font-display mt-8 mb-3 text-xl font-semibold text-ink">
+    <h3 className="mt-8 mb-3 text-xl font-semibold text-ink">
       {children}
     </h3>
   );

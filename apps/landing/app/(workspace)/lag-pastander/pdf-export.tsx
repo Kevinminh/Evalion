@@ -2,6 +2,14 @@
 
 import { useEffect, useState } from "react";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select";
+
 import type { Card, Fasit } from "./pastand-card";
 
 const FAG_OPTIONS = ["Naturfag", "Matematikk", "Samfunnsfag", "Norsk", "Engelsk", "KRLE"];
@@ -114,43 +122,35 @@ export function PdfExport({
             <label className="field-label" htmlFor="pdf-fag-input">
               Fag
             </label>
-            <select
-              id="pdf-fag-input"
-              className="pdf-modal-select"
-              value={fag}
-              onChange={(e) => setFag(e.target.value)}
-              required
-            >
-              <option value="" disabled>
-                Velg fag
-              </option>
-              {FAG_OPTIONS.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
+            <Select value={fag} onValueChange={(v) => setFag(v ?? "")}>
+              <SelectTrigger id="pdf-fag-input" className="w-full">
+                <SelectValue placeholder="Velg fag" />
+              </SelectTrigger>
+              <SelectContent>
+                {FAG_OPTIONS.map((opt) => (
+                  <SelectItem key={opt} value={opt}>
+                    {opt}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="pdf-modal-field">
             <label className="field-label" htmlFor="pdf-trinn-input">
               Trinn
             </label>
-            <select
-              id="pdf-trinn-input"
-              className="pdf-modal-select"
-              value={trinn}
-              onChange={(e) => setTrinn(e.target.value)}
-              required
-            >
-              <option value="" disabled>
-                Velg trinn
-              </option>
-              {TRINN_OPTIONS.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
+            <Select value={trinn} onValueChange={(v) => setTrinn(v ?? "")}>
+              <SelectTrigger id="pdf-trinn-input" className="w-full">
+                <SelectValue placeholder="Velg trinn" />
+              </SelectTrigger>
+              <SelectContent>
+                {TRINN_OPTIONS.map((opt) => (
+                  <SelectItem key={opt} value={opt}>
+                    {opt}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="pdf-modal-field">
             <label className="field-label">Forkunnskaper</label>

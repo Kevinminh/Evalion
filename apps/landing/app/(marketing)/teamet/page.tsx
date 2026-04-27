@@ -56,9 +56,9 @@ export default function TeametPage() {
       <div className="mx-auto max-w-[1180px]">
         <div className="text-center">
           <span className="section-label">Møt teamet</span>
-          <h1 className="font-display mt-3 text-[clamp(28px,3.5vw,42px)] leading-tight">
+          <h1 className="mt-3 text-[clamp(28px,3.5vw,42px)] leading-tight">
             Tverrfaglighet med{" "}
-            <em className="font-display-italic text-purple-500">pedagogisk</em>{" "}
+            <em className="text-purple-500">pedagogisk</em>{" "}
             tyngde
           </h1>
         </div>
@@ -77,7 +77,7 @@ export default function TeametPage() {
                   style={member.style}
                 />
               </div>
-              <h2 className="font-display text-xl font-semibold">{member.name}</h2>
+              <h2 className="text-xl font-semibold">{member.name}</h2>
               <span className="mt-1 inline-block rounded-full bg-sage-50 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-purple-500">
                 {member.role}
               </span>
