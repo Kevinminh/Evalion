@@ -16,11 +16,27 @@ type GeneratedStatement = {
   explanation: string;
 };
 
+type Model =
+  | "gpt-4o"
+  | "gpt-4o-mini"
+  | "claude-opus-4-7"
+  | "claude-sonnet-4-6"
+  | "claude-haiku-4-5";
+
+const ALLOWED_MODELS: readonly Model[] = [
+  "gpt-4o",
+  "gpt-4o-mini",
+  "claude-opus-4-7",
+  "claude-sonnet-4-6",
+  "claude-haiku-4-5",
+];
+
 type GenerationParams = {
   topic: string;
   subject: string;
   level: string;
   type: "intro" | "oppsummering";
+  model?: Model;
 };
 
 function readParams(searchParams: URLSearchParams): GenerationParams | null {
@@ -30,7 +46,12 @@ function readParams(searchParams: URLSearchParams): GenerationParams | null {
   const type = searchParams.get("type");
   if (!fag || !trinn || !tema) return null;
   if (type !== "intro" && type !== "oppsummering") return null;
-  return { subject: fag, level: trinn, topic: tema, type };
+  const rawModel = searchParams.get("model");
+  const model =
+    rawModel && (ALLOWED_MODELS as readonly string[]).includes(rawModel)
+      ? (rawModel as Model)
+      : undefined;
+  return { subject: fag, level: trinn, topic: tema, type, ...(model ? { model } : {}) };
 }
 
 const PAGE_BASE = "mx-auto max-w-[1100px] px-6 pt-24 pb-32";
@@ -75,7 +96,7 @@ export function SelectionView() {
       setLoading(false);
       return;
     }
-    const key = `${params.subject}|${params.level}|${params.type}|${params.topic}`;
+    const key = `${params.subject}|${params.level}|${params.type}|${params.topic}|${params.model ?? ""}`;
     if (lastKeyRef.current === key) return;
     lastKeyRef.current = key;
     void runGeneration();

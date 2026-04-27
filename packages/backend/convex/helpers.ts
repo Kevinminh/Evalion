@@ -1,5 +1,6 @@
-import type { QueryCtx, MutationCtx } from "./_generated/server";
+import type { ActionCtx, QueryCtx, MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
+import { authComponent } from "./auth";
 
 /**
  * Returns the current user's identity or throws "Not authenticated".
@@ -10,6 +11,21 @@ export async function requireAuth(ctx: QueryCtx | MutationCtx) {
     throw new Error("Not authenticated");
   }
   return identity;
+}
+
+/**
+ * Throws "Not authorized" unless the current user has role "admin".
+ */
+export async function requireAdmin(ctx: QueryCtx | MutationCtx | ActionCtx) {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    throw new Error("Not authenticated");
+  }
+  const user = await authComponent.getAuthUser(ctx);
+  if (!user || user.role !== "admin") {
+    throw new Error("Not authorized");
+  }
+  return user;
 }
 
 /**

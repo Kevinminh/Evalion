@@ -90,6 +90,8 @@ When working on Convex code, **always read `packages/backend/convex/_generated/a
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — Google OAuth credentials
 - `COOKIE_DOMAIN` — Domain for auth cookies (production only)
 - `TRUSTED_ORIGINS` — Allowed CORS origins (production only)
+- `OPENAI_API_KEY` — OpenAI API key (used by `reddi.generateStatements`)
+- `ANTHROPIC_API_KEY` — Anthropic API key (used by `reddi.generateStatements` when an admin selects a Claude model)
 
 ### Frontend apps (`apps/web/.env.local`, `apps/dashboard/.env.local`)
 

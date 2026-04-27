@@ -28,6 +28,16 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     emailAndPassword: {
       enabled: true,
     },
+    user: {
+      additionalFields: {
+        role: {
+          type: "string",
+          required: false,
+          defaultValue: "user",
+          input: false,
+        },
+      },
+    },
     socialProviders: {
       google: {
         clientId: process.env.GOOGLE_CLIENT_ID!,

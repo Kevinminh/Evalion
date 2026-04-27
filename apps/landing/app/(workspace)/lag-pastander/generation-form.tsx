@@ -13,6 +13,8 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 
+import { authClient } from "../../lib/auth-client";
+
 const FAG_OPTIONS = ["Naturfag", "Matematikk", "Samfunnsfag", "Norsk", "Engelsk", "KRLE"];
 const TRINN_OPTIONS = [
   "5. trinn",
@@ -25,6 +27,15 @@ const TRINN_OPTIONS = [
   "VG2",
   "VG3",
 ];
+
+const DEFAULT_MODEL = "gpt-4o";
+
+type Provider = "openai" | "anthropic";
+
+const MODELS_BY_PROVIDER: Record<Provider, readonly string[]> = {
+  openai: ["gpt-4o", "gpt-4o-mini"],
+  anthropic: ["claude-opus-4-7", "claude-sonnet-4-6", "claude-haiku-4-5"],
+};
 
 type Forkunnskap = "intro" | "oppsummering";
 
@@ -39,11 +50,15 @@ export function GenerationForm({
 }) {
   const router = useRouter();
   const setLastParams = useMutation(api.pastandDrafts.setLastParams);
+  const { data: session } = authClient.useSession();
+  const isAdmin = (session?.user as { role?: string } | undefined)?.role === "admin";
 
   const [fag, setFag] = useState(initialFag);
   const [trinn, setTrinn] = useState(initialTrinn);
   const [forkunnskap, setForkunnskap] = useState<Forkunnskap | "">(initialForkunnskap ?? "");
   const [tema, setTema] = useState("");
+  const [provider, setProvider] = useState<Provider>("openai");
+  const [model, setModel] = useState<string>(DEFAULT_MODEL);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -86,7 +101,15 @@ export function GenerationForm({
       type: forkunnskap,
       tema: trimmedTema,
     });
+    if (isAdmin && model !== DEFAULT_MODEL) {
+      params.set("model", model);
+    }
     router.push(`/velg-pastander?${params.toString()}`);
+  }
+
+  function handleProviderChange(next: Provider) {
+    setProvider(next);
+    setModel(MODELS_BY_PROVIDER[next][0] ?? DEFAULT_MODEL);
   }
 
   return (
@@ -110,6 +133,45 @@ export function GenerationForm({
           </ol>
         </div>
       </div>
+
+      {isAdmin && (
+        <div className="gen-row" data-admin-only>
+          <div>
+            <label className="field-label" htmlFor="provider">
+              Admin: Leverandør
+            </label>
+            <Select
+              value={provider}
+              onValueChange={(v) => handleProviderChange((v ?? "openai") as Provider)}
+            >
+              <SelectTrigger id="provider" className="w-full">
+                <SelectValue placeholder="Velg leverandør" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="openai">OpenAI</SelectItem>
+                <SelectItem value="anthropic">Anthropic</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="field-label" htmlFor="model">
+              Admin: Modell
+            </label>
+            <Select value={model} onValueChange={(v) => setModel(v ?? DEFAULT_MODEL)}>
+              <SelectTrigger id="model" className="w-full">
+                <SelectValue placeholder="Velg modell" />
+              </SelectTrigger>
+              <SelectContent>
+                {MODELS_BY_PROVIDER[provider].map((opt) => (
+                  <SelectItem key={opt} value={opt}>
+                    {opt}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
 
       <div className="gen-row">
         <div>

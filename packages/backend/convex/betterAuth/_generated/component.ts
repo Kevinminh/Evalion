@@ -36,6 +36,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   emailVerified: boolean;
                   image?: null | string;
                   name: string;
+                  role?: "admin" | "user";
                   updatedAt: number;
                   userId?: null | string;
                 };
@@ -112,6 +113,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "role"
                     | "_id";
                   operator?:
                     | "lt"
@@ -300,6 +302,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "role"
                     | "_id";
                   operator?:
                     | "lt"
@@ -555,6 +558,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   emailVerified?: boolean;
                   image?: null | string;
                   name?: string;
+                  role?: "admin" | "user";
                   updatedAt?: number;
                   userId?: null | string;
                 };
@@ -568,6 +572,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "role"
                     | "_id";
                   operator?:
                     | "lt"
@@ -788,6 +793,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   emailVerified?: boolean;
                   image?: null | string;
                   name?: string;
+                  role?: "admin" | "user";
                   updatedAt?: number;
                   userId?: null | string;
                 };
@@ -801,6 +807,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "role"
                     | "_id";
                   operator?:
                     | "lt"
