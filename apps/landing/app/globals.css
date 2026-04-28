@@ -228,7 +228,7 @@
   align-items: center;
   justify-content: center;
   gap: 14px;
-  margin: 0 auto 24px;
+  margin: 0 auto 40px;
   width: 100%;
   max-width: 1400px;
   padding: 0 20px;
@@ -243,7 +243,7 @@
     align-items: center;
     gap: 18px;
     padding: 0 24px;
-    margin-bottom: 8px;
+    margin-bottom: 48px;
   }
 }
 .demo-header-controls {

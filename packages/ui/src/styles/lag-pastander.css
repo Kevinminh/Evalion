@@ -875,6 +875,66 @@
   box-shadow: 0 1px 0 var(--color-primary-700);
 }
 
+/* ─────────── PDF export – responsive ─────────── */
+@media (max-width: 820px) {
+  .pdf-export-screen {
+    grid-template-columns: 1fr;
+    grid-template-rows: 52px auto 1fr;
+    grid-template-areas:
+      "topbar"
+      "sidebar"
+      "canvas";
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .pdf-export-sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--color-neutral-200);
+    padding: 16px 16px 20px;
+    max-height: none;
+    overflow-y: visible;
+  }
+  .pdf-export-canvas {
+    padding: 20px 12px 60px;
+    overflow-y: visible;
+    overflow-x: hidden;
+  }
+  .pdf-export-canvas .pdf-page {
+    --pdf-scale: calc((100vw - 24px) / 794);
+    transform: scale(var(--pdf-scale));
+    transform-origin: top center;
+    margin-bottom: calc(297mm * (var(--pdf-scale) - 1));
+  }
+  .pdf-export-canvas #pdf-print-container {
+    width: 100%;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pdf-export-topbar {
+    padding: 0 12px;
+  }
+  .pdf-export-heading {
+    font-size: 14px;
+  }
+  .pdf-export-back {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+  .pdf-modal-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+  .pdf-export-sidebar .btn-cancel,
+  .pdf-export-sidebar .btn-primary-pdf {
+    width: 100%;
+  }
+  .pdf-forkunnskap-choice {
+    flex-direction: column;
+  }
+}
+
 /* ─────────── PDF print container ─────────── */
 .pdf-page {
   width: 210mm;
@@ -1021,31 +1081,34 @@
     size: A4 portrait;
     margin: 0;
   }
+  html,
   body {
     background: white !important;
-    margin: 0;
+    margin: 0 !important;
+    padding: 0 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-  .pdf-export-topbar,
-  .pdf-export-sidebar,
-  .pdf-empty-hint {
-    display: none !important;
+
+  body * {
+    visibility: hidden !important;
   }
-  .pdf-export-screen {
-    position: static;
-    background: white;
-    display: block;
+  #pdf-print-container,
+  #pdf-print-container * {
+    visibility: visible !important;
   }
-  .pdf-export-canvas {
-    padding: 0;
-    overflow: visible;
-    background: white;
-  }
-  .pdf-export-canvas #pdf-print-container {
+
+  #pdf-print-container {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
     gap: 0;
     align-items: stretch;
   }
+
   .pdf-page {
     margin: 0;
     box-shadow: none;

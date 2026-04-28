@@ -142,7 +142,7 @@ export default function Home() {
           <span className="section-label !text-white/60">Om CO-LAB</span>
           <h2 className="mt-3 text-[clamp(28px,3.5vw,42px)] leading-tight text-white">
             En samtale der{" "}
-            <em className="text-purple-500">alle</em> får plass
+            <em className="text-[#b6a8ff]">alle</em> får plass
           </h2>
           <p className="mx-auto mt-5 max-w-[640px] text-base text-white/70">
             CO-LAB er et lærerstyrt verktøy som gjennom sin første aktivitet – FagPrat – skal gjøre

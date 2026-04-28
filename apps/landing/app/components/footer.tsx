@@ -9,7 +9,7 @@ export function Footer() {
     <>
       <section id="signup" className="bg-section-dark px-4 py-16 sm:px-6 sm:py-20">
         <RevealOnScroll className="mx-auto max-w-[820px]">
-          <div className="relative overflow-hidden rounded-[24px] border border-cl-border bg-white p-6 shadow-xl sm:p-10 md:p-12">
+          <div className="relative overflow-hidden rounded-[24px] border border-cl-border bg-cl-light p-6 shadow-xl sm:p-10 md:p-12">
             <img
               src="/assets/Professoren (med skygge).png"
               alt=""

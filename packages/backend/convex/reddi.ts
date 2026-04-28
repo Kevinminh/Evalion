@@ -13,6 +13,30 @@ interface GeneratedStatement {
   explanation: string;
 }
 
+interface RawResponse {
+  sant?: unknown;
+  usant?: unknown;
+  delvis?: unknown;
+}
+
+function flatten(raw: RawResponse): GeneratedStatement[] {
+  const out: GeneratedStatement[] = [];
+  for (const fasit of ["sant", "usant", "delvis"] as const) {
+    const arr = raw[fasit];
+    if (!Array.isArray(arr)) {
+      throw new Error("Uventet respons fra AI. Prøv igjen.");
+    }
+    for (const item of arr) {
+      if (typeof item !== "string" || !item.trim()) continue;
+      out.push({ text: item.trim(), fasit, explanation: "" });
+    }
+  }
+  if (out.length === 0) {
+    throw new Error("Uventet respons fra AI. Prøv igjen.");
+  }
+  return out;
+}
+
 const DEFAULT_MODEL = "gpt-4o" as const;
 
 const modelValidator = v.union(
@@ -25,28 +49,92 @@ const modelValidator = v.union(
 
 type Model = typeof DEFAULT_MODEL | "gpt-4o-mini" | "claude-opus-4-7" | "claude-sonnet-4-6" | "claude-haiku-4-5";
 
-const SYSTEM_PROMPT = `Du er REDDI, en norsk pedagogisk AI-assistent som lager påstander for undervisningsverktøyet FagPrat. FagPrat brukes i norske klasserom der elever vurderer påstander som sanne, usanne eller delvis sanne.
+const SYSTEM_PROMPT = `Du er en erfaren faglærer som lager diskusjonsutløsende påstander til bruk i FagPrat.
 
-Du skal generere nøyaktig 9 påstander om et gitt tema:
-- 3 påstander som er SANNE (fasit: "sant")
-- 3 påstander som er USANNE (fasit: "usant")
-- 3 påstander som er DELVIS SANNE (fasit: "delvis")
+Målet er å fremme refleksjon og faglig resonnering, ikke definisjoner eller pugging.
 
-Regler:
-- Alle påstander skal være faglig korrekte og tilpasset elevens nivå
-- "Delvis sant"-påstander MÅ inneholde både sanne og usanne elementer — de skal ikke bare være vage
-- Usanne påstander skal være troverdige nok til å utfordre elevene, men tydelig feil faglig sett
-- Forklaringer skal være korte (1-3 setninger), skrevet for læreren, og forklare HVORFOR svaret er det det er
-- Skriv på norsk bokmål
-- Påstandene skal være varierte og dekke ulike aspekter av temaet
+Du mottar:
 
-Svar i JSON-format:
+Tema for FagPraten
+Fag
+Trinn
+Elevenes forkunnskaper
+
+=== KRITISK: JSON-RESPONSE ===
+
+Returner kun dette JSON-objektet:
+
 {
-  "statements": [
-    { "text": "...", "fasit": "sant", "explanation": "..." },
-    ...
-  ]
-}`;
+"sant": ["påstand1", "påstand2", "påstand3", "påstand4", "påstand5"],
+"usant": ["påstand1", "påstand2", "påstand3", "påstand4", "påstand5"],
+"delvis": ["påstand1", "påstand2", "påstand3", "påstand4", "påstand5"]
+}
+
+Ingen tekst utenfor JSON.
+
+=== KRAV ===
+
+Lag nøyaktig 15 påstander:
+
+5 faglig korrekte
+5 faglig feil
+5 faglig delvis korrekte
+
+Alle påstander skal være én kort setning.
+
+=== GENERELLE REGLER ===
+
+Påstandene skal:
+
+Bruk et tilgjengelig språk, unngå unødvendig kompleksitet og lange setninger.
+Tilpass begrepsbruk og abstraksjonsnivå til fag + trinn + forkunnskaper.
+Velg den enkleste formuleringen som bevarer faglig mening.
+Påstanden skal være umiddelbart forståelig for eleven og invitere til refleksjon eller diskusjon
+Maks én setning per påstand.
+Unngå unødvendige leddsetninger, omstendelige formuleringer og oppramsinger.
+Unngå metaforer og billedspråk som kan skape uklarhet.
+Unngå rene definisjoner og trivielle fakta.
+Ordvalg skal ikke gjøre fasit forutsigbar.
+
+=== NATURLIG SPRÅK OG TROVERDIGHET ===
+
+Unngå språklig avslørende formuleringer.
+Ikke bruk absolutte ord (f.eks. «alltid», «aldri», «alle», «bare») som hovedmekanisme for å gjøre påstander usanne eller delvis sanne.
+Feil og nyanser skal oppstå fra faglig innhold.
+Variér formuleringer naturlig.
+
+=== VARIASJON I PÅSTANDSTYPER ===
+
+Bruk en naturlig blanding av:
+
+hverdagslige situasjoner
+intuitive elevforestillinger
+faglige sammenhenger eller regler
+
+Flere påstander skal være forankret i situasjoner elever kan kjenne igjen.
+
+=== DELVIS SANT ===
+
+Delvis sanne påstander skal være plausible og faglig relevante.
+De skal fremstå som rimelige ved første lesning, men kreve nyansering eller presisering.
+En faglig sterk elev skal kunne argumentere for at påstanden virker riktig ved første vurdering.
+Delvis sant skal skyldes faglig innhold, ikke formuleringsteknikk.
+Eksempel på ønsket kvalitet (ikke kopier formulering):
+En påstand mange elever intuitivt vil være enige i, men som faglig sett krever nyansering.
+
+=== TILPASNING ===
+
+Tilpass språk og nivå til trinn og forkunnskaper.
+
+Prioriter klarhet fremfor kompleksitet.
+
+=== VERIFIKASJON ===
+
+Påstander under "sant" må være faglig korrekte.
+Påstander under "usant" må være faglig feil.
+Påstander under "delvis" må være faglig delvis korrekte.
+
+Returner kun JSON-objektet.`;
 
 function buildUserPrompt(args: {
   topic: string;
@@ -91,11 +179,7 @@ async function generateWithOpenAI(
     throw new Error("Fikk ingen respons fra AI. Prøv igjen.");
   }
 
-  const parsed = JSON.parse(content) as { statements?: GeneratedStatement[] };
-  if (!parsed.statements || !Array.isArray(parsed.statements)) {
-    throw new Error("Uventet respons fra AI. Prøv igjen.");
-  }
-  return parsed.statements;
+  return flatten(JSON.parse(content) as RawResponse);
 }
 
 async function generateWithAnthropic(
@@ -127,12 +211,7 @@ async function generateWithAnthropic(
   if (jsonStart === -1 || jsonEnd === -1) {
     throw new Error("Uventet respons fra AI. Prøv igjen.");
   }
-  const jsonText = text.slice(jsonStart, jsonEnd + 1);
-  const parsed = JSON.parse(jsonText) as { statements?: GeneratedStatement[] };
-  if (!parsed.statements || !Array.isArray(parsed.statements)) {
-    throw new Error("Uventet respons fra AI. Prøv igjen.");
-  }
-  return parsed.statements;
+  return flatten(JSON.parse(text.slice(jsonStart, jsonEnd + 1)) as RawResponse);
 }
 
 export const generateStatements = action({
