@@ -14,23 +14,35 @@ interface GeneratedStatement {
   explanation: string;
 }
 
-interface RawResponse {
-  sant?: unknown;
-  usant?: unknown;
-  delvis?: unknown;
+interface RawItem {
+  claim?: unknown;
+  answer?: unknown;
+  explanation?: unknown;
 }
 
+interface RawResponse {
+  statements?: unknown;
+}
+
+const FASIT_VALUES = ["sant", "usant", "delvis"] as const;
+type Fasit = (typeof FASIT_VALUES)[number];
+
 function flatten(raw: RawResponse): GeneratedStatement[] {
+  const list = Array.isArray(raw?.statements) ? (raw.statements as RawItem[]) : null;
+  if (!list) {
+    throw new Error("Uventet respons fra AI. Prøv igjen.");
+  }
+
   const out: GeneratedStatement[] = [];
-  for (const fasit of ["sant", "usant", "delvis"] as const) {
-    const arr = raw[fasit];
-    if (!Array.isArray(arr)) {
-      throw new Error("Uventet respons fra AI. Prøv igjen.");
-    }
-    for (const item of arr) {
-      if (typeof item !== "string" || !item.trim()) continue;
-      out.push({ text: item.trim(), fasit, explanation: "" });
-    }
+  for (const item of list) {
+    const claim = typeof item?.claim === "string" ? item.claim.trim() : "";
+    const answer =
+      typeof item?.answer === "string" ? item.answer.trim().toLowerCase() : "";
+    const explanation =
+      typeof item?.explanation === "string" ? item.explanation.trim() : "";
+    if (!claim) continue;
+    if (!FASIT_VALUES.includes(answer as Fasit)) continue;
+    out.push({ text: claim, fasit: answer as Fasit, explanation });
   }
   if (out.length === 0) {
     throw new Error("Uventet respons fra AI. Prøv igjen.");
@@ -70,15 +82,19 @@ Elevenes forkunnskaper
 
 DU MÅ ALLTID RETURNERE AKKURAT DENNE JSON-STRUKTUREN OG INGENTING ANNET:
 
-[
-  {
-    "claim": "Generert påstand",
-    "answer": "Generert fasit",
-    "explanation": "Generert forklaring"
-  }
-]
+{
+  "statements": [
+    {
+      "claim": "Generert påstand",
+      "answer": "sant" | "usant" | "delvis",
+      "explanation": "Generert forklaring"
+    }
+  ]
+}
 
-Returner BARE JSON-arrayen – ingenting annet.
+"answer" må være nøyaktig én av disse tre verdiene: "sant", "usant", "delvis".
+
+Returner BARE JSON-objektet – ingenting annet.
 
 === KRAV ===
 
@@ -167,7 +183,7 @@ function buildUserPrompt(args: {
       ? "Introduksjon — elevene har lite forkunnskap om temaet"
       : "Oppsummering — elevene har grunnleggende kunnskap om temaet";
 
-  return `Generer 9 påstander om: ${args.topic}
+  return `Generer 15 påstander om: ${args.topic}
 
 Fag: ${args.subject}
 Trinn: ${args.level}
