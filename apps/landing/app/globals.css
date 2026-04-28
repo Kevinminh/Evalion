@@ -188,7 +188,7 @@
 
 /* ─────────── Demo section (Prøv demo) ─────────── */
 .section-demo {
-  background: var(--gradient-light);
+  background: var(--gradient-dark);
   padding: 48px 0 56px;
   position: relative;
   overflow: hidden;
@@ -263,10 +263,10 @@
   max-width: 480px;
   margin: 0 auto;
   padding: 24px 22px;
-  background: #fff;
-  border: 1.5px solid var(--color-cl-border);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
   border-radius: 20px;
-  color: var(--color-ink);
+  color: #fff;
   text-decoration: none;
   transition:
     background 0.2s,
@@ -275,12 +275,12 @@
 }
 .demo-mobile-launch:hover,
 .demo-mobile-launch:focus-visible {
-  background: #fafaf7;
-  border-color: rgba(28, 26, 23, 0.28);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.32);
   transform: translateY(-1px);
 }
 .demo-mobile-launch:focus-visible {
-  outline: 3px solid rgba(108, 63, 197, 0.45);
+  outline: 3px solid rgba(182, 168, 255, 0.7);
   outline-offset: 4px;
 }
 .demo-mobile-launch-eyebrow {
@@ -288,7 +288,7 @@
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--color-purple-500);
+  color: #b6a8ff;
 }
 .demo-mobile-launch-title {
   font-family: var(--font-sans);
@@ -298,7 +298,7 @@
 .demo-mobile-launch-desc {
   font-size: 14px;
   line-height: 1.5;
-  color: var(--color-ink-secondary);
+  color: rgba(255, 255, 255, 0.7);
 }
 .demo-mobile-launch-cta {
   margin-top: 6px;
@@ -337,6 +337,7 @@
 .demo-header .section-heading .section-label {
   display: block;
   margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.5);
 }
 .demo-header .section-heading .section-title {
   margin: 0;
@@ -344,12 +345,12 @@
   font-size: clamp(24px, 6vw, 40px);
   font-weight: 400;
   line-height: 1.25;
-  color: var(--color-ink);
+  color: #fff;
   letter-spacing: -0.015em;
 }
 .demo-header .section-heading .section-title .accent {
   font-style: italic;
-  color: var(--color-purple-500);
+  color: #b6a8ff;
   font-weight: 500;
 }
 
@@ -361,10 +362,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(28, 26, 23, 0.06);
-  border: 1.5px solid rgba(28, 26, 23, 0.18);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
   border-radius: 10px;
-  color: var(--color-ink);
+  color: #fff;
   cursor: pointer;
   transition:
     background 0.15s,
@@ -385,8 +386,8 @@
   }
 }
 .demo-fullscreen-btn:hover {
-  background: rgba(28, 26, 23, 0.12);
-  border-color: rgba(28, 26, 23, 0.32);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.45);
   transform: scale(1.05);
 }
 @media (min-width: 768px) {

@@ -16,35 +16,82 @@ interface GeneratedStatement {
 
 interface RawItem {
   claim?: unknown;
+  text?: unknown;
   answer?: unknown;
+  fasit?: unknown;
   explanation?: unknown;
-}
-
-interface RawResponse {
-  statements?: unknown;
+  forklaring?: unknown;
 }
 
 const FASIT_VALUES = ["sant", "usant", "delvis"] as const;
 type Fasit = (typeof FASIT_VALUES)[number];
 
-function flatten(raw: RawResponse): GeneratedStatement[] {
-  const list = Array.isArray(raw?.statements) ? (raw.statements as RawItem[]) : null;
+function findItemsArray(raw: unknown): RawItem[] | null {
+  if (Array.isArray(raw)) return raw as RawItem[];
+  if (!raw || typeof raw !== "object") return null;
+
+  const obj = raw as Record<string, unknown>;
+  for (const key of ["statements", "påstander", "pastander", "data", "items", "result"]) {
+    const v = obj[key];
+    if (Array.isArray(v)) return v as RawItem[];
+  }
+
+  for (const v of Object.values(obj)) {
+    if (Array.isArray(v) && v.length > 0 && v[0] && typeof v[0] === "object") {
+      return v as RawItem[];
+    }
+  }
+
+  if (
+    Array.isArray(obj.sant) ||
+    Array.isArray(obj.usant) ||
+    Array.isArray(obj.delvis)
+  ) {
+    const merged: RawItem[] = [];
+    for (const fasit of FASIT_VALUES) {
+      const arr = obj[fasit];
+      if (!Array.isArray(arr)) continue;
+      for (const entry of arr) {
+        if (typeof entry === "string") {
+          merged.push({ claim: entry, answer: fasit });
+        } else if (entry && typeof entry === "object") {
+          merged.push({ ...(entry as RawItem), answer: fasit });
+        }
+      }
+    }
+    if (merged.length > 0) return merged;
+  }
+
+  return null;
+}
+
+function flatten(raw: unknown): GeneratedStatement[] {
+  const list = findItemsArray(raw);
   if (!list) {
+    console.warn("REDDI: unexpected AI response shape", JSON.stringify(raw)?.slice(0, 500));
     throw new Error("Uventet respons fra AI. Prøv igjen.");
   }
 
   const out: GeneratedStatement[] = [];
   for (const item of list) {
-    const claim = typeof item?.claim === "string" ? item.claim.trim() : "";
+    const claimRaw = typeof item?.claim === "string" ? item.claim : item?.text;
+    const claim = typeof claimRaw === "string" ? claimRaw.trim() : "";
+    const answerRaw = typeof item?.answer === "string" ? item.answer : item?.fasit;
     const answer =
-      typeof item?.answer === "string" ? item.answer.trim().toLowerCase() : "";
+      typeof answerRaw === "string" ? answerRaw.trim().toLowerCase() : "";
+    const explanationRaw =
+      typeof item?.explanation === "string" ? item.explanation : item?.forklaring;
     const explanation =
-      typeof item?.explanation === "string" ? item.explanation.trim() : "";
+      typeof explanationRaw === "string" ? explanationRaw.trim() : "";
     if (!claim) continue;
     if (!FASIT_VALUES.includes(answer as Fasit)) continue;
     out.push({ text: claim, fasit: answer as Fasit, explanation });
   }
   if (out.length === 0) {
+    console.warn(
+      "REDDI: no valid statements after parsing",
+      JSON.stringify(raw)?.slice(0, 500),
+    );
     throw new Error("Uventet respons fra AI. Prøv igjen.");
   }
   return out;
@@ -216,7 +263,7 @@ async function generateWithOpenAI(
     throw new Error("Fikk ingen respons fra AI. Prøv igjen.");
   }
 
-  return flatten(JSON.parse(content) as RawResponse);
+  return flatten(JSON.parse(content));
 }
 
 async function generateWithAnthropic(
@@ -244,12 +291,21 @@ async function generateWithAnthropic(
     throw new Error("Fikk ingen respons fra AI. Prøv igjen.");
   }
 
-  const jsonStart = text.indexOf("{");
-  const jsonEnd = text.lastIndexOf("}");
-  if (jsonStart === -1 || jsonEnd === -1) {
+  const objStart = text.indexOf("{");
+  const objEnd = text.lastIndexOf("}");
+  const arrStart = text.indexOf("[");
+  const arrEnd = text.lastIndexOf("]");
+
+  let slice: string | null = null;
+  if (objStart !== -1 && objEnd !== -1 && (arrStart === -1 || objStart < arrStart)) {
+    slice = text.slice(objStart, objEnd + 1);
+  } else if (arrStart !== -1 && arrEnd !== -1) {
+    slice = text.slice(arrStart, arrEnd + 1);
+  }
+  if (!slice) {
     throw new Error("Uventet respons fra AI. Prøv igjen.");
   }
-  return flatten(JSON.parse(text.slice(jsonStart, jsonEnd + 1)) as RawResponse);
+  return flatten(JSON.parse(slice));
 }
 
 export const generateStatements = action({
