@@ -16,6 +16,7 @@ import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
 import { Route as DashboardVelgPastanderRouteImport } from './routes/_dashboard/velg-pastander'
+import { Route as DashboardProfileRouteImport } from './routes/_dashboard/profile'
 import { Route as DashboardMinSamlingRouteImport } from './routes/_dashboard/min-samling'
 import { Route as DashboardLagreFagpratRouteImport } from './routes/_dashboard/lagre-fagprat'
 import { Route as DashboardLagFagpratRouteImport } from './routes/_dashboard/lag-fagprat'
@@ -58,6 +59,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
 const DashboardVelgPastanderRoute = DashboardVelgPastanderRouteImport.update({
   id: '/velg-pastander',
   path: '/velg-pastander',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardProfileRoute = DashboardProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardMinSamlingRoute = DashboardMinSamlingRouteImport.update({
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/lag-fagprat': typeof DashboardLagFagpratRoute
   '/lagre-fagprat': typeof DashboardLagreFagpratRoute
   '/min-samling': typeof DashboardMinSamlingRoute
+  '/profile': typeof DashboardProfileRoute
   '/velg-pastander': typeof DashboardVelgPastanderRoute
   '/analytics/$id': typeof AuthedAnalyticsIdRoute
   '/liveokt/$id': typeof AuthedLiveoktIdRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/lag-fagprat': typeof DashboardLagFagpratRoute
   '/lagre-fagprat': typeof DashboardLagreFagpratRoute
   '/min-samling': typeof DashboardMinSamlingRoute
+  '/profile': typeof DashboardProfileRoute
   '/velg-pastander': typeof DashboardVelgPastanderRoute
   '/analytics/$id': typeof AuthedAnalyticsIdRoute
   '/liveokt/$id': typeof AuthedLiveoktIdRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/_dashboard/lag-fagprat': typeof DashboardLagFagpratRoute
   '/_dashboard/lagre-fagprat': typeof DashboardLagreFagpratRoute
   '/_dashboard/min-samling': typeof DashboardMinSamlingRoute
+  '/_dashboard/profile': typeof DashboardProfileRoute
   '/_dashboard/velg-pastander': typeof DashboardVelgPastanderRoute
   '/_dashboard/': typeof DashboardIndexRoute
   '/_authed/analytics/$id': typeof AuthedAnalyticsIdRoute
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
     | '/lag-fagprat'
     | '/lagre-fagprat'
     | '/min-samling'
+    | '/profile'
     | '/velg-pastander'
     | '/analytics/$id'
     | '/liveokt/$id'
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/lag-fagprat'
     | '/lagre-fagprat'
     | '/min-samling'
+    | '/profile'
     | '/velg-pastander'
     | '/analytics/$id'
     | '/liveokt/$id'
@@ -213,6 +224,7 @@ export interface FileRouteTypes {
     | '/_dashboard/lag-fagprat'
     | '/_dashboard/lagre-fagprat'
     | '/_dashboard/min-samling'
+    | '/_dashboard/profile'
     | '/_dashboard/velg-pastander'
     | '/_dashboard/'
     | '/_authed/analytics/$id'
@@ -280,6 +292,13 @@ declare module '@tanstack/react-router' {
       path: '/velg-pastander'
       fullPath: '/velg-pastander'
       preLoaderRoute: typeof DashboardVelgPastanderRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/profile': {
+      id: '/_dashboard/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof DashboardProfileRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/min-samling': {
@@ -375,6 +394,7 @@ interface DashboardRouteChildren {
   DashboardLagFagpratRoute: typeof DashboardLagFagpratRoute
   DashboardLagreFagpratRoute: typeof DashboardLagreFagpratRoute
   DashboardMinSamlingRoute: typeof DashboardMinSamlingRoute
+  DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardVelgPastanderRoute: typeof DashboardVelgPastanderRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardFagpratIdRedigerRoute: typeof DashboardFagpratIdRedigerRoute
@@ -386,6 +406,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardLagFagpratRoute: DashboardLagFagpratRoute,
   DashboardLagreFagpratRoute: DashboardLagreFagpratRoute,
   DashboardMinSamlingRoute: DashboardMinSamlingRoute,
+  DashboardProfileRoute: DashboardProfileRoute,
   DashboardVelgPastanderRoute: DashboardVelgPastanderRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardFagpratIdRedigerRoute: DashboardFagpratIdRedigerRoute,
