@@ -2,7 +2,7 @@
 
 import { DropdownMenuItem } from "@workspace/ui/components/dropdown-menu";
 import { UserMenu as SharedUserMenu } from "@workspace/evalion/components/auth/user-menu";
-import { Sparkles } from "lucide-react";
+import { Sparkles, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useTransition } from "react";
 
@@ -32,6 +32,10 @@ export function UserMenu() {
       <DropdownMenuItem render={<Link href="/lag-pastander" />}>
         <Sparkles className="size-4" />
         Lag påstander
+      </DropdownMenuItem>
+      <DropdownMenuItem render={<Link href="/profile" />}>
+        <UserRound className="size-4" />
+        Min profil
       </DropdownMenuItem>
     </SharedUserMenu>
   );
