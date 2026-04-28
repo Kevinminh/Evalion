@@ -26,18 +26,40 @@ interface RawItem {
 const FASIT_VALUES = ["sant", "usant", "delvis"] as const;
 type Fasit = (typeof FASIT_VALUES)[number];
 
-function findItemsArray(raw: unknown): RawItem[] | null {
-  if (Array.isArray(raw)) return raw as RawItem[];
-  if (!raw || typeof raw !== "object") return null;
-
-  const obj = raw as Record<string, unknown>;
-  for (const key of ["statements", "påstander", "pastander", "data", "items", "result"]) {
-    const v = obj[key];
-    if (Array.isArray(v)) return v as RawItem[];
+function findItemsArray(raw: unknown, reqId: string): RawItem[] | null {
+  if (Array.isArray(raw)) {
+    console.log(`[REDDI ${reqId}] findItemsArray: top-level array`, {
+      length: raw.length,
+    });
+    return raw as RawItem[];
+  }
+  if (!raw || typeof raw !== "object") {
+    console.warn(`[REDDI ${reqId}] findItemsArray: raw is not an object`, {
+      type: typeof raw,
+      value: raw,
+    });
+    return null;
   }
 
-  for (const v of Object.values(obj)) {
+  const obj = raw as Record<string, unknown>;
+  const topKeys = Object.keys(obj);
+  for (const key of ["statements", "påstander", "pastander", "data", "items", "result"]) {
+    const v = obj[key];
+    if (Array.isArray(v)) {
+      console.log(`[REDDI ${reqId}] findItemsArray: matched key`, {
+        key,
+        length: v.length,
+      });
+      return v as RawItem[];
+    }
+  }
+
+  for (const [k, v] of Object.entries(obj)) {
     if (Array.isArray(v) && v.length > 0 && v[0] && typeof v[0] === "object") {
+      console.log(`[REDDI ${reqId}] findItemsArray: heuristic value-scan match`, {
+        key: k,
+        length: v.length,
+      });
       return v as RawItem[];
     }
   }
@@ -59,20 +81,35 @@ function findItemsArray(raw: unknown): RawItem[] | null {
         }
       }
     }
-    if (merged.length > 0) return merged;
+    if (merged.length > 0) {
+      console.log(`[REDDI ${reqId}] findItemsArray: grouped-by-fasit match`, {
+        length: merged.length,
+      });
+      return merged;
+    }
   }
 
+  console.warn(`[REDDI ${reqId}] findItemsArray: no recognized shape`, {
+    topKeys,
+  });
   return null;
 }
 
-function flatten(raw: unknown): GeneratedStatement[] {
-  const list = findItemsArray(raw);
+function flatten(raw: unknown, reqId: string): GeneratedStatement[] {
+  const list = findItemsArray(raw, reqId);
   if (!list) {
-    console.warn("REDDI: unexpected AI response shape", JSON.stringify(raw)?.slice(0, 500));
+    console.error(`[REDDI ${reqId}] flatten: unexpected AI response shape`, {
+      raw: JSON.stringify(raw),
+    });
     throw new Error("Uventet respons fra AI. Prøv igjen.");
   }
 
   const out: GeneratedStatement[] = [];
+  const skipped: { noClaim: number; invalidFasit: number } = {
+    noClaim: 0,
+    invalidFasit: 0,
+  };
+  const skippedSamples: Array<{ reason: string; item: unknown }> = [];
   for (const item of list) {
     const claimRaw = typeof item?.claim === "string" ? item.claim : item?.text;
     const claim = typeof claimRaw === "string" ? claimRaw.trim() : "";
@@ -83,15 +120,39 @@ function flatten(raw: unknown): GeneratedStatement[] {
       typeof item?.explanation === "string" ? item.explanation : item?.forklaring;
     const explanation =
       typeof explanationRaw === "string" ? explanationRaw.trim() : "";
-    if (!claim) continue;
-    if (!FASIT_VALUES.includes(answer as Fasit)) continue;
+    if (!claim) {
+      skipped.noClaim += 1;
+      if (skippedSamples.length < 3) {
+        skippedSamples.push({ reason: "noClaim", item });
+      }
+      continue;
+    }
+    if (!FASIT_VALUES.includes(answer as Fasit)) {
+      skipped.invalidFasit += 1;
+      if (skippedSamples.length < 3) {
+        skippedSamples.push({
+          reason: `invalidFasit(${JSON.stringify(answerRaw)})`,
+          item,
+        });
+      }
+      continue;
+    }
     out.push({ text: claim, fasit: answer as Fasit, explanation });
   }
+
+  console.log(`[REDDI ${reqId}] flatten: validation`, {
+    rawCount: list.length,
+    kept: out.length,
+    skipped,
+  });
+
   if (out.length === 0) {
-    console.warn(
-      "REDDI: no valid statements after parsing",
-      JSON.stringify(raw)?.slice(0, 500),
-    );
+    console.error(`[REDDI ${reqId}] flatten: zero valid statements`, {
+      rawCount: list.length,
+      skipped,
+      skippedSamples,
+      raw: JSON.stringify(raw),
+    });
     throw new Error("Uventet respons fra AI. Prøv igjen.");
   }
   return out;
@@ -241,8 +302,16 @@ async function generateWithOpenAI(
   model: Model,
   systemPrompt: string,
   userPrompt: string,
+  reqId: string,
 ): Promise<GeneratedStatement[]> {
   const apiKey = process.env.OPENAI_API_KEY;
+  console.log(`[REDDI ${reqId}] openai: prepare`, {
+    model,
+    hasApiKey: !!apiKey,
+    apiKeyPrefix: apiKey?.slice(0, 7),
+    systemPromptChars: systemPrompt.length,
+    userPromptChars: userPrompt.length,
+  });
   if (!apiKey) {
     throw new Error("OpenAI API-nøkkel er ikke konfigurert.");
   }
@@ -258,20 +327,56 @@ async function generateWithOpenAI(
     ],
   });
 
-  const content = response.choices[0]?.message?.content;
+  const choice = response.choices[0];
+  const content = choice?.message?.content;
+  console.log(`[REDDI ${reqId}] openai: response`, {
+    finishReason: choice?.finish_reason,
+    usage: response.usage,
+    contentChars: content?.length ?? 0,
+  });
   if (!content) {
+    console.error(`[REDDI ${reqId}] openai: empty content`, {
+      response: JSON.stringify(response),
+    });
     throw new Error("Fikk ingen respons fra AI. Prøv igjen.");
   }
 
-  return flatten(JSON.parse(content));
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch (err) {
+    console.error(`[REDDI ${reqId}] openai: JSON.parse failed`, {
+      message: err instanceof Error ? err.message : String(err),
+      content,
+    });
+    throw new Error("AI returnerte ugyldig JSON. Prøv igjen.");
+  }
+  console.log(`[REDDI ${reqId}] openai: parsed keys`, {
+    keys:
+      parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? Object.keys(parsed as Record<string, unknown>)
+        : Array.isArray(parsed)
+          ? `array(${(parsed as unknown[]).length})`
+          : typeof parsed,
+  });
+
+  return flatten(parsed, reqId);
 }
 
 async function generateWithAnthropic(
   model: Model,
   systemPrompt: string,
   userPrompt: string,
+  reqId: string,
 ): Promise<GeneratedStatement[]> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
+  console.log(`[REDDI ${reqId}] anthropic: prepare`, {
+    model,
+    hasApiKey: !!apiKey,
+    apiKeyPrefix: apiKey?.slice(0, 7),
+    systemPromptChars: systemPrompt.length,
+    userPromptChars: userPrompt.length,
+  });
   if (!apiKey) {
     throw new Error("Anthropic API-nøkkel er ikke konfigurert.");
   }
@@ -287,9 +392,21 @@ async function generateWithAnthropic(
 
   const block = response.content.find((b) => b.type === "text");
   const text = block && block.type === "text" ? block.text : "";
+  console.log(`[REDDI ${reqId}] anthropic: response`, {
+    stopReason: response.stop_reason,
+    usage: response.usage,
+    blockCount: response.content.length,
+    blockTypes: response.content.map((b) => b.type),
+    textChars: text.length,
+  });
   if (!text) {
+    console.error(`[REDDI ${reqId}] anthropic: empty text block`, {
+      content: JSON.stringify(response.content),
+    });
     throw new Error("Fikk ingen respons fra AI. Prøv igjen.");
   }
+
+  console.log(`[REDDI ${reqId}] anthropic: raw text`, { text });
 
   const objStart = text.indexOf("{");
   const objEnd = text.lastIndexOf("}");
@@ -303,9 +420,26 @@ async function generateWithAnthropic(
     slice = text.slice(arrStart, arrEnd + 1);
   }
   if (!slice) {
+    console.error(`[REDDI ${reqId}] anthropic: no JSON brackets found`, { text });
     throw new Error("Uventet respons fra AI. Prøv igjen.");
   }
-  return flatten(JSON.parse(slice));
+  console.log(`[REDDI ${reqId}] anthropic: extracted slice`, {
+    sliceChars: slice.length,
+    head: slice.slice(0, 100),
+    tail: slice.slice(-100),
+  });
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(slice);
+  } catch (err) {
+    console.error(`[REDDI ${reqId}] anthropic: JSON.parse failed`, {
+      message: err instanceof Error ? err.message : String(err),
+      slice,
+    });
+    throw new Error("AI returnerte ugyldig JSON. Prøv igjen.");
+  }
+  return flatten(parsed, reqId);
 }
 
 export const generateStatements = action({
@@ -327,6 +461,7 @@ export const generateStatements = action({
       explanation: string;
     }>
   > => {
+    const reqId = Math.random().toString(36).slice(2, 8);
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Du må være logget inn for å bruke REDDI.");
@@ -344,14 +479,33 @@ export const generateStatements = action({
     );
     const systemPrompt = storedPrompt ?? SYSTEM_PROMPT;
 
-    const statements = model.startsWith("gpt-")
-      ? await generateWithOpenAI(model, systemPrompt, userPrompt)
-      : await generateWithAnthropic(model, systemPrompt, userPrompt);
+    console.log(`[REDDI ${reqId}] start`, {
+      model,
+      type: args.type,
+      subject: args.subject,
+      level: args.level,
+      topic: args.topic.slice(0, 80),
+      hasStoredPrompt: !!storedPrompt,
+    });
+
+    let statements: GeneratedStatement[];
+    try {
+      statements = model.startsWith("gpt-")
+        ? await generateWithOpenAI(model, systemPrompt, userPrompt, reqId)
+        : await generateWithAnthropic(model, systemPrompt, userPrompt, reqId);
+    } catch (err) {
+      console.error(`[REDDI ${reqId}] generation failed`, {
+        model,
+        message: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+      });
+      throw err;
+    }
 
     const prefixes: Record<string, string> = { sant: "s", usant: "u", delvis: "d" };
     const counters: Record<string, number> = { sant: 0, usant: 0, delvis: 0 };
 
-    return statements.map((s) => {
+    const result = statements.map((s) => {
       const fasit = s.fasit as "sant" | "usant" | "delvis";
       counters[fasit] = (counters[fasit] ?? 0) + 1;
       return {
@@ -361,5 +515,14 @@ export const generateStatements = action({
         explanation: s.explanation,
       };
     });
+
+    console.log(`[REDDI ${reqId}] success`, {
+      count: result.length,
+      sant: counters.sant,
+      usant: counters.usant,
+      delvis: counters.delvis,
+    });
+
+    return result;
   },
 });
