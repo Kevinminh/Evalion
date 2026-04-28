@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -53,8 +53,10 @@ export function GenerationForm({
 }) {
   const router = useRouter();
   const setLastParams = useMutation(api.pastandDrafts.setLastParams);
+  const updateReddiPrompt = useMutation(api.aiPrompts.updateReddiSystemPrompt);
   const { data: session } = authClient.useSession();
   const isAdmin = (session?.user as { role?: string } | undefined)?.role === "admin";
+  const storedPrompt = useQuery(api.aiPrompts.getReddiSystemPrompt, isAdmin ? {} : "skip");
 
   const [fag, setFag] = useState(initialFag);
   const [trinn, setTrinn] = useState(initialTrinn);
@@ -64,6 +66,19 @@ export function GenerationForm({
   const [model, setModel] = useState<string>(DEFAULT_MODEL);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [promptDraft, setPromptDraft] = useState<string>("");
+  const [promptSeeded, setPromptSeeded] = useState(false);
+  const [savingPrompt, setSavingPrompt] = useState(false);
+  const [promptStatus, setPromptStatus] = useState<
+    { kind: "success" | "error"; message: string } | null
+  >(null);
+
+  useEffect(() => {
+    if (promptSeeded) return;
+    if (storedPrompt === undefined) return;
+    setPromptDraft(storedPrompt ?? "");
+    setPromptSeeded(true);
+  }, [storedPrompt, promptSeeded]);
 
   const seededRef = useRef(false);
   useEffect(() => {
@@ -115,6 +130,25 @@ export function GenerationForm({
     setModel(MODELS_BY_PROVIDER[next][0] ?? DEFAULT_MODEL);
   }
 
+  async function handleSavePrompt() {
+    setPromptStatus(null);
+    const trimmed = promptDraft.trim();
+    if (trimmed.length === 0) {
+      setPromptStatus({ kind: "error", message: "Prompten kan ikke være tom." });
+      return;
+    }
+    setSavingPrompt(true);
+    try {
+      await updateReddiPrompt({ content: promptDraft });
+      setPromptStatus({ kind: "success", message: "Prompten er lagret som standard." });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Kunne ikke lagre prompten.";
+      setPromptStatus({ kind: "error", message });
+    } finally {
+      setSavingPrompt(false);
+    }
+  }
+
   return (
     <form
       className="relative rounded-[22px] border-[2.5px] border-dashed border-purple-300 bg-purple-50 px-[22px] pt-3.5 pb-4 max-[560px]:px-[18px] max-[560px]:pt-5 max-[560px]:pb-[22px]"
@@ -158,43 +192,84 @@ export function GenerationForm({
       </div>
 
       {isAdmin && (
-        <div
-          className="mb-3.5 grid grid-cols-2 gap-2.5 max-[560px]:grid-cols-1"
-          data-admin-only
-        >
-          <div>
-            <label className={fieldLabel} htmlFor="provider">
-              Admin: Leverandør
-            </label>
-            <Select
-              value={provider}
-              onValueChange={(v) => handleProviderChange((v ?? "openai") as Provider)}
-            >
-              <SelectTrigger id="provider" className="w-full">
-                <SelectValue placeholder="Velg leverandør" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="openai">OpenAI</SelectItem>
-                <SelectItem value="anthropic">Anthropic</SelectItem>
-              </SelectContent>
-            </Select>
+        <div className="mb-3.5" data-admin-only>
+          <div className="mb-3.5 grid grid-cols-2 gap-2.5 max-[560px]:grid-cols-1">
+            <div>
+              <label className={fieldLabel} htmlFor="provider">
+                Admin: Leverandør
+              </label>
+              <Select
+                value={provider}
+                onValueChange={(v) => handleProviderChange((v ?? "openai") as Provider)}
+              >
+                <SelectTrigger id="provider" className="w-full">
+                  <SelectValue placeholder="Velg leverandør" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="openai">OpenAI</SelectItem>
+                  <SelectItem value="anthropic">Anthropic</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className={fieldLabel} htmlFor="model">
+                Admin: Modell
+              </label>
+              <Select value={model} onValueChange={(v) => setModel(v ?? DEFAULT_MODEL)}>
+                <SelectTrigger id="model" className="w-full">
+                  <SelectValue placeholder="Velg modell" />
+                </SelectTrigger>
+                <SelectContent>
+                  {MODELS_BY_PROVIDER[provider].map((opt) => (
+                    <SelectItem key={opt} value={opt}>
+                      {opt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+
           <div>
-            <label className={fieldLabel} htmlFor="model">
-              Admin: Modell
+            <label className={fieldLabel} htmlFor="system-prompt">
+              Admin: System-prompt
             </label>
-            <Select value={model} onValueChange={(v) => setModel(v ?? DEFAULT_MODEL)}>
-              <SelectTrigger id="model" className="w-full">
-                <SelectValue placeholder="Velg modell" />
-              </SelectTrigger>
-              <SelectContent>
-                {MODELS_BY_PROVIDER[provider].map((opt) => (
-                  <SelectItem key={opt} value={opt}>
-                    {opt}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <textarea
+              id="system-prompt"
+              className="block min-h-[160px] w-full resize-y rounded-xl border-[1.5px] border-neutral-300 bg-white px-3.5 py-[11px] font-mono text-[12.5px] leading-[1.4] text-ink outline-none transition-[border-color,box-shadow] duration-150 focus:border-purple-400 focus:shadow-[0_0_0_4px_var(--color-purple-100)]"
+              value={promptDraft}
+              onChange={(e) => {
+                setPromptDraft(e.target.value);
+                if (promptStatus) setPromptStatus(null);
+              }}
+              placeholder={
+                storedPrompt === null
+                  ? "Ingen lagret prompt — Reddi bruker standardprompten i koden."
+                  : ""
+              }
+              spellCheck={false}
+            />
+            <div className="mt-2 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleSavePrompt}
+                disabled={savingPrompt || promptDraft.trim().length === 0}
+                className="inline-flex cursor-pointer items-center justify-center rounded-full border-0 bg-purple-500 px-4 py-1.5 text-[12.5px] font-bold text-white shadow-[0_3px_0_var(--color-purple-700)] transition-[background-color,transform,box-shadow] duration-150 not-disabled:hover:-translate-y-px not-disabled:hover:bg-purple-400 not-disabled:active:translate-y-0.5 not-disabled:active:shadow-[0_1px_0_var(--color-purple-700)] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {savingPrompt ? "Lagrer …" : "Lagre som standard"}
+              </button>
+              {promptStatus && (
+                <span
+                  className={cn(
+                    "text-[12px] font-semibold",
+                    promptStatus.kind === "success" ? "text-sage-600" : "text-[#b71c1c]",
+                  )}
+                  role={promptStatus.kind === "error" ? "alert" : undefined}
+                >
+                  {promptStatus.message}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       )}

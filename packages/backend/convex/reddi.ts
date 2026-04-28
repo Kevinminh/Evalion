@@ -4,6 +4,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { v } from "convex/values";
 import OpenAI from "openai";
 
+import { internal } from "./_generated/api";
 import { action } from "./_generated/server";
 import { requireAdmin } from "./helpers";
 
@@ -156,6 +157,7 @@ Type: ${typeDescription}`;
 
 async function generateWithOpenAI(
   model: Model,
+  systemPrompt: string,
   userPrompt: string,
 ): Promise<GeneratedStatement[]> {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -169,7 +171,7 @@ async function generateWithOpenAI(
     response_format: { type: "json_object" },
     temperature: 0.8,
     messages: [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: systemPrompt },
       { role: "user", content: userPrompt },
     ],
   });
@@ -184,6 +186,7 @@ async function generateWithOpenAI(
 
 async function generateWithAnthropic(
   model: Model,
+  systemPrompt: string,
   userPrompt: string,
 ): Promise<GeneratedStatement[]> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -196,7 +199,7 @@ async function generateWithAnthropic(
     model,
     max_tokens: 4096,
     temperature: 0.8,
-    system: `${SYSTEM_PROMPT}\n\nVIKTIG: Svar KUN med rå JSON, ingen prosa, ingen markdown, ingen kodeblokker.`,
+    system: `${systemPrompt}\n\nVIKTIG: Svar KUN med rå JSON, ingen prosa, ingen markdown, ingen kodeblokker.`,
     messages: [{ role: "user", content: userPrompt }],
   });
 
@@ -222,7 +225,17 @@ export const generateStatements = action({
     type: v.union(v.literal("intro"), v.literal("oppsummering")),
     model: v.optional(modelValidator),
   },
-  handler: async (ctx, args) => {
+  handler: async (
+    ctx,
+    args,
+  ): Promise<
+    Array<{
+      id: string;
+      text: string;
+      fasit: "sant" | "usant" | "delvis";
+      explanation: string;
+    }>
+  > => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Du må være logget inn for å bruke REDDI.");
@@ -235,9 +248,14 @@ export const generateStatements = action({
     const model: Model = args.model ?? DEFAULT_MODEL;
     const userPrompt = buildUserPrompt(args);
 
+    const storedPrompt: string | null = await ctx.runQuery(
+      internal.aiPrompts.getReddiSystemPromptInternal,
+    );
+    const systemPrompt = storedPrompt ?? SYSTEM_PROMPT;
+
     const statements = model.startsWith("gpt-")
-      ? await generateWithOpenAI(model, userPrompt)
-      : await generateWithAnthropic(model, userPrompt);
+      ? await generateWithOpenAI(model, systemPrompt, userPrompt)
+      : await generateWithAnthropic(model, systemPrompt, userPrompt);
 
     const prefixes: Record<string, string> = { sant: "s", usant: "u", delvis: "d" };
     const counters: Record<string, number> = { sant: 0, usant: 0, delvis: 0 };

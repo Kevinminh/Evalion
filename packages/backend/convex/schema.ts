@@ -127,4 +127,11 @@ export default defineSchema({
     ),
     updatedAt: v.number(),
   }).index("by_user", ["userId"]),
+
+  aiPrompts: defineTable({
+    key: v.string(),
+    content: v.string(),
+    updatedAt: v.number(),
+    updatedBy: v.optional(v.string()),
+  }).index("by_key", ["key"]),
 });

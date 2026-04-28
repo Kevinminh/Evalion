@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ProfileContactCard } from "@workspace/ui/components/profile-contact-card";
+import { ProfileDangerZoneCard } from "@workspace/ui/components/profile-danger-zone-card";
 import {
   ProfileInfoCard,
   type ProfileInfoCardProps,
@@ -23,9 +24,12 @@ const legalLinks: ProfileLegalLink[] = [
 ];
 
 function ProfilePage() {
+  const navigate = useNavigate();
   const { data: session, isPending } = authClient.useSession();
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | undefined>(undefined);
 
   const handleSave: ProfileInfoCardProps["onSave"] = async ({ name }) => {
     setIsSaving(true);
@@ -44,6 +48,25 @@ function ProfilePage() {
       throw err;
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    setDeleteErrorMessage(undefined);
+    try {
+      const { error } = await authClient.deleteUser();
+      if (error) {
+        setDeleteErrorMessage(error.message ?? "Kunne ikke slette kontoen. Prøv igjen.");
+        return;
+      }
+      await navigate({ to: "/login" });
+    } catch (err) {
+      setDeleteErrorMessage(
+        err instanceof Error ? err.message : "Kunne ikke slette kontoen. Prøv igjen.",
+      );
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -74,6 +97,13 @@ function ProfilePage() {
       <ProfileLegalCard links={legalLinks} />
 
       <ProfileContactCard email={CONTACT_EMAIL} />
+
+      <ProfileDangerZoneCard
+        email={session.user.email ?? ""}
+        isDeleting={isDeleting}
+        errorMessage={deleteErrorMessage}
+        onConfirmDelete={handleDelete}
+      />
     </div>
   );
 }
