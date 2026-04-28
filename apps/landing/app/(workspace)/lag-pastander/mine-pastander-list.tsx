@@ -5,10 +5,30 @@ import { useEffect, useRef, useState } from "react";
 
 import { api } from "@workspace/backend/convex/_generated/api";
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
+import { cn } from "@workspace/ui/lib/utils";
 
 import { PastandCard, type Card } from "./pastand-card";
 
 const SYNC_DEBOUNCE_MS = 400;
+
+const btnPillBase =
+  "inline-flex cursor-pointer items-center gap-2 rounded-full border-2 px-[18px] py-2.5 text-sm font-bold transition-all duration-150";
+
+const btnOutline = cn(
+  btnPillBase,
+  "border-purple-400 bg-white text-purple-700 shadow-[0_4px_0_var(--color-purple-200)]",
+  "hover:-translate-y-px hover:border-purple-500 hover:bg-purple-50 hover:shadow-[0_5px_0_var(--color-purple-300)]",
+  "active:translate-y-0.5 active:shadow-[0_1px_0_var(--color-purple-200)]",
+);
+
+const btnFilled = cn(
+  btnPillBase,
+  "border-purple-500 bg-purple-500 text-white shadow-[0_4px_0_var(--color-purple-700)]",
+  "hover:-translate-y-px hover:border-purple-400 hover:bg-purple-400 hover:shadow-[0_5px_0_var(--color-purple-700)]",
+  "active:translate-y-0.5 active:shadow-[0_1px_0_var(--color-purple-700)]",
+);
+
+const btnIconOnly = "size-11 justify-center gap-0 p-0";
 
 function newClientId() {
   return `c_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
@@ -144,11 +164,18 @@ export function MinePastanderList({
 
   return (
     <>
-      <div className="mine-header">
-        <h2 className="mine-title">Mine påstander</h2>
-        <div className="mine-actions">
-          <button type="button" className="btn-add-pastand" onClick={addCard}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <div className="flex shrink-0 items-start justify-between gap-4 bg-transparent px-1 pb-4 max-[560px]:flex-col max-[560px]:items-start">
+        <h2 className="text-[26px] font-extrabold text-ink">Mine påstander</h2>
+        <div className="flex items-start gap-2.5">
+          <button type="button" className={btnOutline} onClick={addCard}>
+            <svg
+              className="size-3.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            >
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
@@ -156,11 +183,12 @@ export function MinePastanderList({
           </button>
           <button
             type="button"
-            className="btn-pdf"
+            className={btnFilled}
             onClick={onRequestPdf}
             disabled={list.length === 0}
           >
             <svg
+              className="size-[15px]"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -178,16 +206,19 @@ export function MinePastanderList({
         </div>
       </div>
 
-      <div className="mine-scroll" ref={scrollRef}>
+      <div
+        className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-1.5 pt-1.5 pr-3.5 pb-4 [scrollbar-gutter:stable] max-[1040px]:flex-none max-[1040px]:overflow-visible max-[1040px]:p-0"
+        ref={scrollRef}
+      >
         {cards === null ? (
-          <div className="empty-state">Henter samlingen din …</div>
+          <EmptyState>Henter samlingen din …</EmptyState>
         ) : list.length === 0 ? (
-          <div className="empty-state">
+          <EmptyState>
             Du har ingen påstander ennå. Bruk Reddi til å lage forslag, eller legg til en
             påstand manuelt.
-          </div>
+          </EmptyState>
         ) : (
-          <div className="pastand-list">
+          <div className="flex flex-col gap-3.5">
             {list.map((card, i) => (
               <PastandCard
                 key={card.clientId}
@@ -203,28 +234,36 @@ export function MinePastanderList({
         )}
       </div>
 
-      <div className="mine-footer">
+      <div className="flex shrink-0 justify-center gap-3.5 px-1 pt-3 pb-1">
         <button
           type="button"
-          className="btn-add-pastand btn-icon-only"
+          className={cn(btnOutline, btnIconOnly)}
           title="Legg til påstand"
           aria-label="Legg til påstand"
           onClick={addCard}
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+          <svg
+            className="size-[18px]"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          >
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
         </button>
         <button
           type="button"
-          className="btn-pdf btn-icon-only"
+          className={cn(btnFilled, btnIconOnly)}
           title="Lag PDF"
           aria-label="Lag PDF"
           onClick={onRequestPdf}
           disabled={list.length === 0}
         >
           <svg
+            className="size-[19px]"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -240,5 +279,13 @@ export function MinePastanderList({
         </button>
       </div>
     </>
+  );
+}
+
+function EmptyState({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-[18px] border-[1.5px] border-dashed border-neutral-300 bg-white px-6 py-8 text-center text-[14.5px] leading-[1.5] text-ink-secondary">
+      {children}
+    </div>
   );
 }

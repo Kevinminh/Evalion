@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
+import { cn } from "@workspace/ui/lib/utils";
 
 import { authClient } from "../../lib/auth-client";
 
@@ -38,6 +39,8 @@ const MODELS_BY_PROVIDER: Record<Provider, readonly string[]> = {
 };
 
 type Forkunnskap = "intro" | "oppsummering";
+
+const fieldLabel = "mb-[3px] block text-xs font-bold text-ink";
 
 export function GenerationForm({
   initialFag,
@@ -113,31 +116,54 @@ export function GenerationForm({
   }
 
   return (
-    <form className="gen-box" onSubmit={handleSubmit} noValidate>
-      <div className="gen-intro">
-        <img className="gen-intro-reddi" src="/assets/Reddi.png" alt="Reddi" />
-        <div className="gen-intro-text">
-          <ol className="gen-steps">
-            <li className="gen-step">
-              <span className="gen-step-num">1</span>
-              <span className="gen-step-text">Fyll ut alle feltene nedenfor</span>
+    <form
+      className="relative rounded-[22px] border-[2.5px] border-dashed border-purple-300 bg-purple-50 px-[22px] pt-3.5 pb-4 max-[560px]:px-[18px] max-[560px]:pt-5 max-[560px]:pb-[22px]"
+      onSubmit={handleSubmit}
+      noValidate
+    >
+      <div className="mb-4 flex flex-row-reverse items-center justify-center gap-4 border-b-[1.5px] border-dashed border-purple-300 pb-2.5 max-[560px]:flex-col-reverse max-[560px]:gap-2.5 max-[560px]:text-center">
+        <img
+          className="block size-[105px] shrink-0 object-contain drop-shadow-[0_6px_16px_rgba(108,63,197,0.22)] animate-[workspace-bounce-gentle_3s_ease-in-out_infinite] max-[560px]:size-20"
+          src="/assets/Reddi.png"
+          alt="Reddi"
+        />
+        <div className="min-w-0 text-left max-[560px]:text-center">
+          <ol className="m-0 flex list-none flex-col gap-[7px] p-0">
+            <li className="flex items-center gap-[9px]">
+              <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full border-2 border-purple-500 bg-transparent text-xs font-extrabold text-purple-700">
+                1
+              </span>
+              <span className="text-[13px] font-semibold leading-[1.25] text-ink max-[560px]:text-[12.5px]">
+                Fyll ut alle feltene nedenfor
+              </span>
             </li>
-            <li className="gen-step">
-              <span className="gen-step-num">2</span>
-              <span className="gen-step-text">Reddi lager 9 gode forslag</span>
+            <li className="flex items-center gap-[9px]">
+              <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full border-2 border-purple-500 bg-transparent text-xs font-extrabold text-purple-700">
+                2
+              </span>
+              <span className="text-[13px] font-semibold leading-[1.25] text-ink max-[560px]:text-[12.5px]">
+                Reddi lager 9 gode forslag
+              </span>
             </li>
-            <li className="gen-step">
-              <span className="gen-step-num">3</span>
-              <span className="gen-step-text">Velg påstandene du vil bruke</span>
+            <li className="flex items-center gap-[9px]">
+              <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full border-2 border-purple-500 bg-transparent text-xs font-extrabold text-purple-700">
+                3
+              </span>
+              <span className="text-[13px] font-semibold leading-[1.25] text-ink max-[560px]:text-[12.5px]">
+                Velg påstandene du vil bruke
+              </span>
             </li>
           </ol>
         </div>
       </div>
 
       {isAdmin && (
-        <div className="gen-row" data-admin-only>
+        <div
+          className="mb-3.5 grid grid-cols-2 gap-2.5 max-[560px]:grid-cols-1"
+          data-admin-only
+        >
           <div>
-            <label className="field-label" htmlFor="provider">
+            <label className={fieldLabel} htmlFor="provider">
               Admin: Leverandør
             </label>
             <Select
@@ -154,7 +180,7 @@ export function GenerationForm({
             </Select>
           </div>
           <div>
-            <label className="field-label" htmlFor="model">
+            <label className={fieldLabel} htmlFor="model">
               Admin: Modell
             </label>
             <Select value={model} onValueChange={(v) => setModel(v ?? DEFAULT_MODEL)}>
@@ -173,9 +199,9 @@ export function GenerationForm({
         </div>
       )}
 
-      <div className="gen-row">
+      <div className="mb-3.5 grid grid-cols-2 gap-2.5 max-[560px]:grid-cols-1">
         <div>
-          <label className="field-label" htmlFor="fag">
+          <label className={fieldLabel} htmlFor="fag">
             Fag
           </label>
           <Select value={fag} onValueChange={(v) => setFag(v ?? "")}>
@@ -192,7 +218,7 @@ export function GenerationForm({
           </Select>
         </div>
         <div>
-          <label className="field-label" htmlFor="trinn">
+          <label className={fieldLabel} htmlFor="trinn">
             Trinn
           </label>
           <Select value={trinn} onValueChange={(v) => setTrinn(v ?? "")}>
@@ -210,9 +236,9 @@ export function GenerationForm({
         </div>
       </div>
 
-      <div className="gen-single">
-        <div className="field-label">Forkunnskaper</div>
-        <div className="forkunnskap-row">
+      <div className="mb-3.5">
+        <div className={fieldLabel}>Forkunnskaper</div>
+        <div className="flex gap-2 max-[560px]:flex-col">
           <ForkunnskapButton
             kind="intro"
             title="Introduksjon"
@@ -230,13 +256,13 @@ export function GenerationForm({
         </div>
       </div>
 
-      <div className="gen-single">
-        <label className="field-label" htmlFor="tema">
+      <div className="mb-3.5">
+        <label className={fieldLabel} htmlFor="tema">
           Tema
         </label>
         <textarea
           ref={temaRef}
-          className="field-textarea"
+          className="block min-h-0 w-full resize-none overflow-hidden rounded-xl border-[1.5px] border-neutral-300 bg-white px-3.5 py-[11px] text-[14.5px] leading-[1.4] text-ink outline-none transition-[border-color,box-shadow] duration-150 focus:border-purple-400 focus:shadow-[0_0_0_4px_var(--color-purple-100)]"
           id="tema"
           rows={1}
           placeholder="F.eks. Newtons lover, brøkregning…"
@@ -246,14 +272,21 @@ export function GenerationForm({
         />
       </div>
 
-      <div className="gen-footer">
-        <button type="submit" className="generate-btn" disabled={submitting}>
+      <div className="mt-0.5 flex justify-center">
+        <button
+          type="submit"
+          className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border-0 bg-purple-500 px-6 py-[9px] text-[15px] font-extrabold text-white shadow-[0_4px_0_var(--color-purple-700)] transition-[background-color,transform,box-shadow] duration-150 not-disabled:hover:-translate-y-px not-disabled:hover:bg-purple-400 not-disabled:hover:shadow-[0_5px_0_var(--color-purple-700)] not-disabled:active:translate-y-0.5 not-disabled:active:shadow-[0_1px_0_var(--color-purple-700)] disabled:cursor-not-allowed disabled:opacity-70"
+          disabled={submitting}
+        >
           {submitting ? "Sender Reddi i sving …" : "Lag påstander ✨"}
         </button>
       </div>
 
       {error && (
-        <p className="gen-error" role="alert">
+        <p
+          className="mt-2.5 rounded-[10px] bg-[#ffebee] px-3 py-2 text-[13px] font-semibold text-[#b71c1c]"
+          role="alert"
+        >
           {error}
         </p>
       )}
@@ -274,16 +307,39 @@ function ForkunnskapButton({
   selected: boolean;
   onClick: () => void;
 }) {
+  const isIntro = kind === "intro";
+  const baseBtn =
+    "flex flex-1 cursor-pointer items-center gap-[9px] rounded-xl border-2 bg-white px-[11px] py-2 text-left shadow-[0_2px_0_rgba(0,0,0,0.06)] transition-all duration-150 min-w-0 active:translate-y-px";
+  const variantBtn = isIntro
+    ? cn(
+        "hover:-translate-y-px hover:border-sage-400 hover:bg-sage-50",
+        selected && "border-sage-400 bg-sage-50 shadow-[0_3px_0_var(--color-sage-200)]",
+        !selected && "border-neutral-300",
+      )
+    : cn(
+        "hover:-translate-y-px hover:border-[#f59e0b] hover:bg-[#fffbeb]",
+        selected && "border-[#f59e0b] bg-[#fffbeb] shadow-[0_3px_0_#fde68a]",
+        !selected && "border-neutral-300",
+      );
+  const iconColor = selected
+    ? isIntro
+      ? "text-sage-500"
+      : "text-[#d97706]"
+    : "text-ink-tertiary";
+  const titleColor = selected
+    ? isIntro
+      ? "text-sage-600"
+      : "text-[#b45309]"
+    : "text-ink";
+
   return (
-    <button
-      type="button"
-      className={`forkunnskap-btn${selected ? " selected" : ""}`}
-      data-forkunnskap={kind}
-      onClick={onClick}
-    >
-      {kind === "intro" ? (
+    <button type="button" className={cn(baseBtn, variantBtn)} onClick={onClick}>
+      {isIntro ? (
         <svg
-          className="forkunnskap-icon"
+          className={cn(
+            "size-[18px] shrink-0 transition-colors duration-150",
+            iconColor,
+          )}
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -299,7 +355,10 @@ function ForkunnskapButton({
         </svg>
       ) : (
         <svg
-          className="forkunnskap-icon"
+          className={cn(
+            "size-[18px] shrink-0 transition-colors duration-150",
+            iconColor,
+          )}
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -313,9 +372,11 @@ function ForkunnskapButton({
           <circle cx="12" cy="12" r="2" />
         </svg>
       )}
-      <div className="forkunnskap-text">
-        <div className="forkunnskap-title">{title}</div>
-        <div className="forkunnskap-desc">{desc}</div>
+      <div className="flex min-w-0 flex-col">
+        <div className={cn("text-[13px] font-bold leading-[1.15]", titleColor)}>
+          {title}
+        </div>
+        <div className="mt-px text-[10.5px] leading-[1.3] text-ink-tertiary">{desc}</div>
       </div>
     </button>
   );

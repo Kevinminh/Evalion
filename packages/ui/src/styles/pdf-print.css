@@ -1,0 +1,205 @@
+/* ─────────── PDF print container ─────────── */
+/* Scoped to the .pdf-page DOM produced by lag-pastander/pdf-export.tsx.       */
+/* Sizes use mm/pt because the same markup is reused for the printed output —  */
+/* expressing those as Tailwind arbitrary values would be noisy and wouldn't   */
+/* render predictably across browsers' print pipelines. The overlay chrome     */
+/* (topbar, sidebar, canvas) is styled with Tailwind utilities in the JSX.    */
+
+.pdf-page {
+  width: 210mm;
+  height: 297mm;
+  background: white;
+  overflow: hidden;
+  position: relative;
+  page-break-after: always;
+  display: flex;
+  flex-direction: column;
+  font-family: "Nunito", system-ui, sans-serif;
+  color: #1a2420;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+.pdf-page:last-of-type {
+  page-break-after: auto;
+}
+.pdf-page-header {
+  background: linear-gradient(135deg, #ecf3ee 0%, #f4efe4 100%);
+  margin: 16mm 16mm 0;
+  padding: 14mm 20mm 11mm;
+  text-align: center;
+  border-bottom: 1.5px solid #dde2de;
+  border-radius: 5mm;
+  flex-shrink: 0;
+}
+.pdf-page-logo {
+  height: 16mm;
+  display: block;
+  margin: 0 auto 5mm;
+}
+.pdf-page-title {
+  font-size: 22pt;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 4.5mm;
+  color: #1a2420;
+}
+.pdf-page-meta {
+  display: flex;
+  justify-content: center;
+  gap: 3mm;
+  flex-wrap: wrap;
+}
+.pdf-page-meta-item {
+  padding: 1.8mm 5mm;
+  background: white;
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  border-radius: 100px;
+  font-size: 9.5pt;
+  font-weight: 700;
+  color: #3e5048;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+.pdf-cards-list {
+  padding: 10mm 16mm 16mm;
+  display: flex;
+  flex-direction: column;
+  gap: 6mm;
+  flex: 1;
+}
+.pdf-card {
+  position: relative;
+  padding: 9mm 14mm;
+  background: white;
+  border: 1.5px solid #e5e8e5;
+  border-radius: 5mm;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.pdf-card-num {
+  position: absolute;
+  top: 4mm;
+  left: 6mm;
+  font-size: 11pt;
+  font-weight: 800;
+  color: #48208b;
+  line-height: 1;
+}
+.pdf-fasit-box {
+  display: inline-block;
+  min-width: 36mm;
+  padding: 2mm 5.5mm;
+  border-radius: 100px;
+  font-size: 9.5pt;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1.5px solid;
+  margin-bottom: 5mm;
+}
+.pdf-fasit-box.sant {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-color: #81c784;
+}
+.pdf-fasit-box.usant {
+  background: #ffebee;
+  color: #c62828;
+  border-color: #ef9a9a;
+}
+.pdf-fasit-box.delvis {
+  background: #fff3e0;
+  color: #b04a00;
+  border-color: #ffcc80;
+}
+.pdf-pastand-text {
+  font-size: 12pt;
+  font-weight: 700;
+  line-height: 1.35;
+  margin-bottom: 3mm;
+  color: #1a2420;
+}
+.pdf-forklaring-text {
+  font-size: 10pt;
+  line-height: 1.55;
+  color: #3e5048;
+}
+.pdf-page-title.is-placeholder,
+.pdf-page-meta-item.is-placeholder {
+  color: rgba(112, 133, 120, 0.5);
+}
+.pdf-empty-hint {
+  margin: auto;
+  padding: 16mm;
+  font-size: 11pt;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #708578;
+  text-align: center;
+}
+
+#pdf-print-container,
+#pdf-print-container * {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  color-adjust: exact;
+}
+
+/* Mobile preview: scale the A4 page to fit the viewport. Scoped to screen so */
+/* the rule never reaches the actual print pipeline (which uses A4 directly). */
+@media screen and (max-width: 820px) {
+  .pdf-page {
+    --pdf-scale: calc((100vw - 24px) / 794);
+    transform: scale(var(--pdf-scale));
+    transform-origin: top center;
+    margin-bottom: calc(297mm * (var(--pdf-scale) - 1));
+  }
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  html,
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+  #pdf-print-container,
+  #pdf-print-container * {
+    visibility: visible !important;
+  }
+
+  #pdf-print-container {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0;
+    align-items: stretch;
+  }
+
+  .pdf-page {
+    margin: 0;
+    box-shadow: none;
+    page-break-after: always;
+  }
+  .pdf-page:last-of-type {
+    page-break-after: auto;
+  }
+  .pdf-page-title.is-placeholder,
+  .pdf-page-meta-item.is-placeholder {
+    color: inherit;
+  }
+}
