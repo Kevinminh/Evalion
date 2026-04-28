@@ -15,7 +15,7 @@ export function Workspace() {
 
   return (
     <main className="mx-auto box-border grid h-[calc(100vh-64px)] max-h-[calc(100vh-64px)] w-full max-w-[1180px] flex-1 grid-cols-1 items-start gap-7 overflow-hidden px-6 pt-6 pb-4 max-[1040px]:h-auto max-[1040px]:max-h-none max-[1040px]:gap-7 max-[1040px]:overflow-visible max-[1040px]:px-6 max-[1040px]:pt-24 max-[1040px]:pb-12 min-[1041px]:grid-cols-[448px_1fr] min-[1041px]:gap-12">
-      <aside className="-ml-[30px] max-h-full min-h-0 self-stretch overflow-y-auto max-[1040px]:ml-0 max-[1040px]:max-h-none max-[1040px]:self-auto max-[1040px]:overflow-y-visible">
+      <aside className="max-h-full min-h-0 self-stretch overflow-y-auto max-[1040px]:max-h-none max-[1040px]:self-auto max-[1040px]:overflow-y-visible">
         <GenerationForm
           initialFag={draft?.lastFag ?? ""}
           initialTrinn={draft?.lastTrinn ?? ""}
