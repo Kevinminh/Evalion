@@ -2,7 +2,7 @@ import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { LoginForm } from "@workspace/evalion/components/auth/login-form";
 import { useState } from "react";
 
-import { authClient } from "@/lib/auth-client";
+import { authClient, signInWithGoogle } from "@/lib/auth-client";
 import { LANDING_URL } from "@/lib/env";
 
 export const Route = createFileRoute("/login")({
@@ -52,6 +52,7 @@ function LoginPage() {
         logo={<img src="/logo.png" alt="Evalion" className="mx-auto h-10" />}
         description="Logg inn på din FagPrat-konto"
         onSubmit={handleSubmit}
+        onGoogleSignIn={() => signInWithGoogle()}
         error={error}
         loading={loading}
       />

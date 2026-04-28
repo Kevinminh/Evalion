@@ -1,1 +1,1 @@
-export { authClient } from "@workspace/evalion/lib/auth-client";
+export { authClient, signInWithGoogle } from "@workspace/evalion/lib/auth-client";
