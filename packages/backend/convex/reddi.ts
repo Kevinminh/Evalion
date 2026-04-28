@@ -64,6 +64,16 @@ function findItemsArray(raw: unknown, reqId: string): RawItem[] | null {
     }
   }
 
+  const looksLikeSingleStatement =
+    (typeof obj.claim === "string" || typeof obj.text === "string") &&
+    (typeof obj.answer === "string" || typeof obj.fasit === "string");
+  if (looksLikeSingleStatement) {
+    console.log(`[REDDI ${reqId}] findItemsArray: single-statement object`, {
+      keys: topKeys,
+    });
+    return [obj as RawItem];
+  }
+
   if (
     Array.isArray(obj.sant) ||
     Array.isArray(obj.usant) ||
@@ -280,6 +290,27 @@ For «Sant»: bekreft kort hva som er korrekt.
 For «Usant»: forklar hva som faktisk er riktig.
 `;
 
+const STRUCTURAL_REQUIREMENTS = `=== KRITISK: RESPONSFORMAT (OVERSTYRER ALT ANNET) ===
+
+Du MÅ returnere ÉT enkelt JSON-objekt med EXAKT denne strukturen og ingenting annet (ingen markdown, ingen kodeblokker, ingen prosa, ingen forklarende tekst):
+
+{
+  "statements": [
+    {
+      "claim": "Generert påstand",
+      "answer": "sant",
+      "explanation": "Generert forklaring"
+    }
+  ]
+}
+
+KRAV:
+- Roten skal være et objekt med nøkkelen "statements" som inneholder en JSON-array.
+- Arrayet skal inneholde nøyaktig 15 elementer: 5 sanne, 5 usanne, og 5 delvis sanne.
+- Hvert element skal ha feltene "claim" (string), "answer" (string), og "explanation" (string).
+- "answer" må være nøyaktig én av de små bokstavene: "sant", "usant", eller "delvis". Ikke skriv det med stor forbokstav, ikke oversett til engelsk.
+- Returner BARE JSON-objektet — ingenting før eller etter.`;
+
 function buildUserPrompt(args: {
   topic: string;
   subject: string;
@@ -477,7 +508,8 @@ export const generateStatements = action({
     const storedPrompt: string | null = await ctx.runQuery(
       internal.aiPrompts.getReddiSystemPromptInternal,
     );
-    const systemPrompt = storedPrompt ?? SYSTEM_PROMPT;
+    const basePrompt = storedPrompt ?? SYSTEM_PROMPT;
+    const systemPrompt = `${basePrompt}\n\n${STRUCTURAL_REQUIREMENTS}`;
 
     console.log(`[REDDI ${reqId}] start`, {
       model,
@@ -486,6 +518,8 @@ export const generateStatements = action({
       level: args.level,
       topic: args.topic.slice(0, 80),
       hasStoredPrompt: !!storedPrompt,
+      basePromptChars: basePrompt.length,
+      systemPromptChars: systemPrompt.length,
     });
 
     let statements: GeneratedStatement[];

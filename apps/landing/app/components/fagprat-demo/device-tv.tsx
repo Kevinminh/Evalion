@@ -44,13 +44,13 @@ export function DeviceTV({ buffer, showRestart, onRestart }: DeviceTVProps) {
         <div ref={screenRef} className="fagprat-tv-screen">
           <iframe
             ref={buffer.refA}
-            className="fagprat-iframe-scaled front"
+            className="fagprat-iframe-scaled fagprat-tv-iframe front"
             src={LOBBY_LAPTOP}
             title="Lærervisning"
           />
           <iframe
             ref={buffer.refB}
-            className="fagprat-iframe-scaled back"
+            className="fagprat-iframe-scaled fagprat-tv-iframe back"
             src={LOBBY_LAPTOP}
             title=""
             aria-hidden="true"

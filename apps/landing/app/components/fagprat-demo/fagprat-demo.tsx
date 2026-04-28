@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   LOBBY_ELEV,
   LOBBY_LAPTOP,
-  NUM_PASTANDER,
   STEG,
   elevUrl,
   reddiKeyFor,
@@ -297,13 +296,12 @@ export function FagpratDemo({ onStepChange }: FagpratDemoProps) {
           return;
         }
         case "fagprat-student-vote": {
+          const explicitRound =
+            typeof data.round === "number" ? data.round : 0;
+          const stegNum = STEG[stegIdx]?.num ?? 0;
           const round =
-            (typeof data.round === "number" ? data.round : 0) ||
-            (STEG[stegIdx]?.num ?? 0) <= 1
-              ? 1
-              : (STEG[stegIdx]?.num ?? 0) === 3
-                ? 2
-                : 0;
+            explicitRound ||
+            (stegNum <= 1 ? 1 : stegNum === 3 ? 2 : 0);
           if (round === 1) {
             r1VoteRef.current = {
               vote: data.vote,
@@ -481,29 +479,18 @@ export function FagpratDemo({ onStepChange }: FagpratDemoProps) {
     phoneTabRef.current = "runde1";
     setPhoneDisabled(true);
     setViewMode("ipad");
+
+    const wasAtStart = stegIdx === 0 && pastandIdx === 0 && !inLobby;
+    setStegIdx(0);
     setPastandIdx(0);
-    // bump stegIdx to 0; if already 0, force the render effect via a tiny dance
-    setStegIdx((prev) => {
-      if (prev === 0) {
-        // Re-trigger the effect by toggling pastandIdx at end of update; here
-        // pastandIdx already set to 0 above. If both already 0, manually call.
-        firstRenderRef.current = false;
-      }
-      return 0;
-    });
-    // Defer to next tick so state has settled, then force a reload if needed.
-    queueMicrotask(() => {
-      // If both stegIdx and pastandIdx were already 0, the effect will not
-      // re-run; in that edge case, manually load fresh srcs.
-      if (firstRenderRef.current === false) {
-        const s = STEG[0]!;
-        tv.load(s.laptop, (frame) => hideLaptopNav(frame.contentDocument));
-        ipad.load(elevUrl(s.elev, null, null), (frame) =>
-          cleanIpadDoc(frame.contentDocument, nicknameRef.current),
-        );
-      }
-    });
-  }, [tv, ipad]);
+    if (wasAtStart) {
+      const s = STEG[0]!;
+      tv.load(s.laptop, (frame) => hideLaptopNav(frame.contentDocument));
+      ipad.load(elevUrl(s.elev, null, null), (frame) =>
+        cleanIpadDoc(frame.contentDocument, nicknameRef.current),
+      );
+    }
+  }, [tv, ipad, stegIdx, pastandIdx, inLobby]);
 
   // ── Stage layout ──
   return (
@@ -537,10 +524,6 @@ export function FagpratDemo({ onStepChange }: FagpratDemoProps) {
           </div>
         </div>
       </div>
-      {/* keep some unused symbols referenced for type-check tidiness */}
-      <span hidden aria-hidden="true">
-        {NUM_PASTANDER}
-      </span>
     </div>
   );
 }

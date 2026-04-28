@@ -1,7 +1,8 @@
 "use client";
 
 import { Maximize2, Minimize2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { FagpratDemo } from "@/components/fagprat-demo/fagprat-demo";
 
 const REDDI_MESSAGES: Record<string, string> = {
   lobby:
@@ -58,14 +59,8 @@ export function DemoSection() {
     return () => document.removeEventListener("fullscreenchange", sync);
   }, []);
 
-  useEffect(() => {
-    function onMessage(e: MessageEvent) {
-      const data = e.data as { type?: string; key?: string } | null;
-      if (!data || data.type !== "fagprat-demo-step" || !data.key) return;
-      setCurrentKey(data.key);
-    }
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
+  const handleStepChange = useCallback((key: string) => {
+    setCurrentKey(key);
   }, []);
 
   useEffect(() => {
@@ -197,12 +192,7 @@ export function DemoSection() {
         </div>
       </div>
       <div className="demo-embed">
-        <iframe
-          src="/demo/fagprat-demo.html#embedded"
-          title="FagPrat demo"
-          loading="lazy"
-          className="demo-embed-frame"
-        />
+        <FagpratDemo onStepChange={handleStepChange} />
       </div>
       <a
         href="/demo/fagprat-demo.html"
