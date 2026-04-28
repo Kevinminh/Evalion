@@ -58,7 +58,12 @@ function ProfileDangerZoneCard({
   };
 
   return (
-    <Card className={cn("gap-4 border-destructive/30", className)}>
+    <Card
+      className={cn(
+        "gap-4 border-destructive/30 hover:translate-y-0 hover:shadow-sm",
+        className,
+      )}
+    >
       <CardHeader>
         <CardTitle>Slett konto</CardTitle>
         <CardDescription>
