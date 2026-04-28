@@ -66,7 +66,7 @@ export default function Home() {
       >
         <div className="flex flex-1 items-center px-4 pt-8 pb-16 sm:px-6 sm:pt-10 sm:pb-20 lg:py-12">
           <div className="mx-auto grid w-full max-w-[1180px] grid-cols-1 items-start gap-8 sm:gap-10 lg:grid-cols-[595px_1fr] lg:gap-12">
-            <div className="pt-2 lg:pt-[60px]">
+            <div className="order-1 pt-2 lg:pt-[60px]">
               <TypewriterHeadline />
               <div className="mt-6 inline-flex flex-col items-center gap-2">
                 <a href="#demo" className="cl-cta">
@@ -76,11 +76,11 @@ export default function Home() {
                   Ingen innlogging kreves
                 </span>
               </div>
-              <div className="mt-12 sm:mt-16 lg:mt-24">
+              <div className="mt-24 hidden lg:block">
                 <span className="cl-launch-pill">Lanseres 18. mai 2026</span>
               </div>
             </div>
-            <div className="relative mt-2 min-h-[260px] sm:mt-6 sm:min-h-[360px] lg:mt-[30px] lg:min-h-[440px]">
+            <div className="relative order-2 mt-2 min-h-[260px] sm:mt-6 sm:min-h-[360px] lg:mt-[30px] lg:min-h-[440px]">
               <img
                 src="/assets/Digitale enheter.png"
                 alt="FagPrat på laptop, mobil og nettbrett"
@@ -92,6 +92,9 @@ export default function Home() {
                 aria-hidden="true"
                 className="cl-professor-float pointer-events-none absolute bottom-[8%] left-[2%] z-[3] h-auto w-[30%] max-w-[160px] drop-shadow-[0_4px_12px_rgba(28,26,23,0.12)] sm:bottom-[calc(8%+30px)] sm:left-[calc(-2%+40px)] sm:w-[28%] sm:max-w-none lg:bottom-[calc(8%+58px)] lg:left-[calc(-6%+86px)] lg:w-[26%]"
               />
+            </div>
+            <div className="order-3 mt-4 flex justify-center sm:mt-6 lg:hidden">
+              <span className="cl-launch-pill">Lanseres 18. mai 2026</span>
             </div>
           </div>
         </div>

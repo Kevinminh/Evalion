@@ -37,7 +37,6 @@
       padding: 14px 16px;
     }
     body:not(.embedded) .demo-bar .controls { position: static; transform: none; }
-    body:not(.embedded) .btn-lobby { position: static; transform: none; }
     body:not(.embedded) .stage {
       flex-direction: column;
       align-items: center;
@@ -107,20 +106,12 @@
     padding: 12px 24px; border-radius: 14px;
     border: none; cursor: pointer; transition: transform 0.1s;
   }
-  .demo-bar button:hover:not(:disabled):not(.btn-lobby) { transform: translateY(-1px); }
+  .demo-bar button:hover:not(:disabled) { transform: translateY(-1px); }
   .demo-bar button:disabled { opacity: 0.4; cursor: not-allowed; }
   .btn-prev { background: #fff; color: #2A1810; border: 1.5px solid #E5DDD5 !important; display: none; }
   .btn-next { background: #6C3FC5; color: #fff; display: none; }
   .btn-restart { display: none; }
   .step-indicator { display: none; }
-  .btn-lobby {
-    position: absolute; left: 28px; top: 50%; transform: translateY(-50%);
-    background: #2A1810; color: #fff; border: none;
-    font-family: inherit; font-weight: 800; font-size: 13px;
-    padding: 8px 16px; border-radius: 10px; cursor: pointer;
-    transition: opacity 0.15s;
-  }
-  .btn-lobby:hover { opacity: 0.85; }
 
   /* Restart button overlaid on TV top-bar (replaces hidden "Avslutt") */
   .tv-restart-btn {
@@ -284,7 +275,6 @@
 <body>
 
 <div class="demo-bar">
-  <button class="btn-lobby" id="btn-lobby">Lobby</button>
   <div class="demo-bar-center">
     <img src="assets/CO-LAB (Hoved).jpg" alt="CO-LAB" class="demo-logo">
     <span class="demo-badge">DEMO</span>
@@ -936,30 +926,6 @@ $('#btn-view-phone').addEventListener('click', function() {
   setTimeout(cleanPhoneDoc, 500);
 });
 
-// ── Lobby button ──
-$('#btn-lobby').addEventListener('click', function() {
-  state.inLobby = true;
-  state.selectedStmt = null;
-  state.fasit = null;
-  state.explanation = null;
-  state.r1Vote = null;
-  state.r2Vote = null;
-  // Switch back to iPad view (phone tab stays clickable in lobby)
-  $('#btn-view-ipad').classList.add('active');
-  $('#btn-view-phone').classList.remove('active');
-  $('.ipad-holder').style.display = '';
-  $('#phone-overlay').classList.remove('visible');
-  // Hide restart button in lobby
-  $('#btn-restart').style.display = 'none';
-  // Load lobby views
-  bufferLoad('laptop', 'fagprat-lobby.html', function(iframe) {
-    hideLaptopNav(iframe.contentDocument);
-  });
-  bufferLoad('ipad', 'Elevvisning/demo-lobby-elev.html', function(iframe) {
-    cleanIpadDoc(iframe.contentDocument);
-  });
-});
-
 // Hide external chrome inside statistics iframe (keep phone frame)
 function cleanPhoneDoc() {
   try {
@@ -1021,11 +987,6 @@ render = function() {
   _originalRender.apply(this, arguments);
   reportStepToParent();
 };
-
-// Lobby-klikk: rapporter etter at original handler har satt state.inLobby
-document.getElementById('btn-lobby').addEventListener('click', function() {
-  setTimeout(reportStepToParent, 50);
-});
 
 render();
 // Første rapport etter init (render ovenfor kaller også, men gjør en eksplisitt ekstra for robusthet)
