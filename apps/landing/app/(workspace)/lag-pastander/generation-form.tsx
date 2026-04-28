@@ -239,7 +239,7 @@ export function GenerationForm({
           className="field-textarea"
           id="tema"
           rows={1}
-          placeholder="F.eks. Newtons lover, fotosyntese, brøkregning…"
+          placeholder="F.eks. Newtons lover, brøkregning…"
           value={tema}
           onChange={(e) => setTema(e.target.value)}
           required

@@ -31,6 +31,8 @@ export function MinePastanderList({
   const skipNextSyncRef = useRef(false);
   const seededRef = useRef(false);
   const knownClientIdsRef = useRef<Set<string>>(new Set());
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const pendingScrollIdRef = useRef<string | null>(null);
 
   // Hydrate from server: seed once, then merge any newly-arrived clientIds.
   useEffect(() => {
@@ -120,9 +122,23 @@ export function MinePastanderList({
       const list = prev ?? [];
       const next: Card = emptyCard();
       knownClientIdsRef.current.add(next.clientId);
+      pendingScrollIdRef.current = next.clientId;
       return [...list, next];
     });
   }
+
+  useEffect(() => {
+    const pendingId = pendingScrollIdRef.current;
+    if (!pendingId) return;
+    const container = scrollRef.current;
+    if (!container) return;
+    const el = container.querySelector(
+      `[data-clientid="${pendingId}"]`,
+    ) as HTMLElement | null;
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "end" });
+    pendingScrollIdRef.current = null;
+  }, [cards]);
 
   const list = cards ?? [];
 
@@ -162,28 +178,30 @@ export function MinePastanderList({
         </div>
       </div>
 
-      {cards === null ? (
-        <div className="empty-state">Henter samlingen din …</div>
-      ) : list.length === 0 ? (
-        <div className="empty-state">
-          Du har ingen påstander ennå. Bruk Reddi til å lage forslag, eller legg til en påstand
-          manuelt.
-        </div>
-      ) : (
-        <div className="pastand-list">
-          {list.map((card, i) => (
-            <PastandCard
-              key={card.clientId}
-              card={card}
-              index={i}
-              total={list.length}
-              onChange={(patch) => updateCard(card.clientId, patch)}
-              onDelete={() => deleteCard(card.clientId)}
-              onReorder={(toIndex) => reorderCard(i, toIndex)}
-            />
-          ))}
-        </div>
-      )}
+      <div className="mine-scroll" ref={scrollRef}>
+        {cards === null ? (
+          <div className="empty-state">Henter samlingen din …</div>
+        ) : list.length === 0 ? (
+          <div className="empty-state">
+            Du har ingen påstander ennå. Bruk Reddi til å lage forslag, eller legg til en
+            påstand manuelt.
+          </div>
+        ) : (
+          <div className="pastand-list">
+            {list.map((card, i) => (
+              <PastandCard
+                key={card.clientId}
+                card={card}
+                index={i}
+                total={list.length}
+                onChange={(patch) => updateCard(card.clientId, patch)}
+                onDelete={() => deleteCard(card.clientId)}
+                onReorder={(toIndex) => reorderCard(i, toIndex)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="mine-footer">
         <button
