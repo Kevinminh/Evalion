@@ -48,7 +48,12 @@ const modelValidator = v.union(
   v.literal("claude-haiku-4-5"),
 );
 
-type Model = typeof DEFAULT_MODEL | "gpt-4o-mini" | "claude-opus-4-7" | "claude-sonnet-4-6" | "claude-haiku-4-5";
+type Model =
+  | typeof DEFAULT_MODEL
+  | "gpt-4o-mini"
+  | "claude-opus-4-7"
+  | "claude-sonnet-4-6"
+  | "claude-haiku-4-5";
 
 const SYSTEM_PROMPT = `Du er en erfaren faglærer som lager diskusjonsutløsende påstander til bruk i FagPrat.
 
@@ -63,15 +68,17 @@ Elevenes forkunnskaper
 
 === KRITISK: JSON-RESPONSE ===
 
-Returner kun dette JSON-objektet:
+DU MÅ ALLTID RETURNERE AKKURAT DENNE JSON-STRUKTUREN OG INGENTING ANNET:
 
-{
-"sant": ["påstand1", "påstand2", "påstand3", "påstand4", "påstand5"],
-"usant": ["påstand1", "påstand2", "påstand3", "påstand4", "påstand5"],
-"delvis": ["påstand1", "påstand2", "påstand3", "påstand4", "påstand5"]
-}
+[
+  {
+    "claim": "Generert påstand",
+    "answer": "Generert fasit",
+    "explanation": "Generert forklaring"
+  }
+]
 
-Ingen tekst utenfor JSON.
+Returner BARE JSON-arrayen – ingenting annet.
 
 === KRAV ===
 
@@ -135,7 +142,19 @@ Påstander under "sant" må være faglig korrekte.
 Påstander under "usant" må være faglig feil.
 Påstander under "delvis" må være faglig delvis korrekte.
 
-Returner kun JSON-objektet.`;
+
+=== REGLER FOR FORKLARING ===
+
+Maks to setninger per forklaring.
+Forklaringen skal være klar, direkte og tilpasset trinnet og faget.
+Unngå faste forklaringsmønstre.
+Unngå metaforer og akademisk stil.
+Forklaringen må være logisk konsistent med påstanden og fasiten.
+
+For «Delvis sant»: forklar hva som stemmer og hva som ikke stemmer.
+For «Sant»: bekreft kort hva som er korrekt.
+For «Usant»: forklar hva som faktisk er riktig.
+`;
 
 function buildUserPrompt(args: {
   topic: string;
