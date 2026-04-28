@@ -155,13 +155,13 @@ export function GenerationForm({
       onSubmit={handleSubmit}
       noValidate
     >
-      <div className="mb-4 flex flex-row-reverse items-center justify-center gap-4 border-b-[1.5px] border-dashed border-purple-300 pb-2.5 max-[560px]:flex-col-reverse max-[560px]:gap-2.5 max-[560px]:text-center">
+      <div className="mb-4 flex flex-row-reverse items-center justify-center gap-4 border-b-[1.5px] border-dashed border-purple-300 pb-2.5 max-[560px]:gap-3">
         <img
           className="block size-[105px] shrink-0 object-contain drop-shadow-[0_6px_16px_rgba(108,63,197,0.22)] animate-[workspace-bounce-gentle_3s_ease-in-out_infinite] max-[560px]:size-20"
           src="/assets/Reddi.png"
           alt="Reddi"
         />
-        <div className="min-w-0 text-left max-[560px]:text-center">
+        <div className="min-w-0 text-left">
           <ol className="m-0 flex list-none flex-col gap-[7px] p-0">
             <li className="flex items-center gap-[9px]">
               <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full border-2 border-purple-500 bg-transparent text-[12px] font-extrabold text-purple-700">

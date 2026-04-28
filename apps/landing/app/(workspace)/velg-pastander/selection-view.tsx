@@ -180,7 +180,7 @@ export function SelectionView() {
           <LoadingState />
         ) : (
           <>
-            <div className="mb-7 flex items-center justify-between gap-4">
+            <div className="mb-7 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h1 className="mb-1 text-[26px] font-extrabold text-ink">
                   Velg påstander

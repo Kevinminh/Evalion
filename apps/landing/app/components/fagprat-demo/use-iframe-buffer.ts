@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 type OnLoadFn = (iframe: HTMLIFrameElement) => void;
 
@@ -28,7 +28,6 @@ export function useIframeBuffer(opts: {
   const refB = useRef<HTMLIFrameElement | null>(null);
   const frontKey = useRef<"a" | "b">("a");
   const gen = useRef(0);
-  const [, force] = useState(0);
   const initialOnLoadRef = useRef(opts.onInitialLoad);
   initialOnLoadRef.current = opts.onInitialLoad;
 
@@ -77,9 +76,6 @@ export function useIframeBuffer(opts: {
           oldFront.style.visibility = "hidden";
         }
         frontKey.current = frontKey.current === "a" ? "b" : "a";
-        // Force a render so consumers reading getFront() in render get fresh refs;
-        // not strictly needed since refs are mutable, but keeps things tidy.
-        force((n) => n + 1);
       }
       back.addEventListener("load", handler);
       const sep = src.includes("?") ? "&" : "?";
@@ -88,5 +84,8 @@ export function useIframeBuffer(opts: {
     [getBack, getFront],
   );
 
-  return { refA, refB, getFront, getBack, load };
+  return useMemo(
+    () => ({ refA, refB, getFront, getBack, load }),
+    [getFront, getBack, load],
+  );
 }
