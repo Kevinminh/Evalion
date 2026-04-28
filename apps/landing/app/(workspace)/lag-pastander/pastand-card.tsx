@@ -167,7 +167,7 @@ export function PastandCard({
       </div>
 
       <div className="mb-3">
-        <label className="mb-[3px] block text-xs font-bold text-ink">Påstand</label>
+        <label className="mb-[3px] block text-[12px] font-bold text-ink">Påstand</label>
         <textarea
           ref={textRef}
           className={fieldTextarea}
@@ -179,7 +179,7 @@ export function PastandCard({
       </div>
 
       <div className="mb-3">
-        <label className="mb-[3px] block text-xs font-bold text-ink">Fasit</label>
+        <label className="mb-[3px] block text-[12px] font-bold text-ink">Fasit</label>
         <div className="flex flex-wrap gap-2 max-[560px]:w-full">
           {FASIT_OPTIONS.map((opt) => {
             const selected = card.fasit === opt.value;
@@ -205,7 +205,7 @@ export function PastandCard({
       </div>
 
       <div>
-        <label className="mb-[3px] block text-xs font-bold text-ink">Forklaring</label>
+        <label className="mb-[3px] block text-[12px] font-bold text-ink">Forklaring</label>
         <textarea
           ref={forklaringRef}
           className={fieldTextarea}

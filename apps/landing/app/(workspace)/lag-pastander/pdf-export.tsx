@@ -41,13 +41,13 @@ const FASIT_LABEL: Record<Fasit, string> = {
   delvis: "Delvis sant",
 };
 
-const fieldLabel = "mb-[3px] block text-xs font-bold text-ink";
+const fieldLabel = "mb-[3px] block text-[12px] font-bold text-ink";
 
 const modalInput =
   "w-full rounded-xl border-2 border-neutral-300 bg-white px-3.5 py-[11px] text-[14.5px] text-ink outline-none transition-[border-color,box-shadow] duration-150 focus:border-purple-400 focus:shadow-[0_0_0_4px_var(--color-purple-100)]";
 
 const actionPillBase =
-  "inline-flex cursor-pointer items-center justify-center rounded-full border-2 px-5 py-2.5 text-sm font-bold transition-all duration-150 max-[480px]:w-full";
+  "inline-flex cursor-pointer items-center justify-center rounded-full border-2 px-5 py-2.5 text-[14px] font-bold transition-all duration-150 max-[480px]:w-full";
 
 const actionOutline = cn(
   actionPillBase,
@@ -64,7 +64,7 @@ const actionFilled = cn(
 );
 
 const topbarBtn =
-  "cursor-pointer rounded-[10px] border-0 bg-transparent px-3 py-2 text-sm font-bold text-ink-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-ink";
+  "cursor-pointer rounded-[10px] border-0 bg-transparent px-3 py-2 text-[14px] font-bold text-ink-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-ink";
 
 export function PdfExport({
   pastander,
@@ -267,7 +267,7 @@ function ForkunnskapChoice({
     <button
       type="button"
       className={cn(
-        "flex-1 cursor-pointer rounded-xl border-2 bg-white px-3.5 py-2.5 text-sm font-bold transition-[background-color,border-color,color] duration-150 hover:border-purple-300",
+        "flex-1 cursor-pointer rounded-xl border-2 bg-white px-3.5 py-2.5 text-[14px] font-bold transition-[background-color,border-color,color] duration-150 hover:border-purple-300",
         selected
           ? "border-purple-500 bg-purple-50 text-purple-700"
           : "border-neutral-300 text-ink-secondary",

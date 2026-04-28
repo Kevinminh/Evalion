@@ -40,7 +40,7 @@ const MODELS_BY_PROVIDER: Record<Provider, readonly string[]> = {
 
 type Forkunnskap = "intro" | "oppsummering";
 
-const fieldLabel = "mb-[3px] block text-xs font-bold text-ink";
+const fieldLabel = "mb-[3px] block text-[12px] font-bold text-ink";
 
 export function GenerationForm({
   initialFag,
@@ -130,7 +130,7 @@ export function GenerationForm({
         <div className="min-w-0 text-left max-[560px]:text-center">
           <ol className="m-0 flex list-none flex-col gap-[7px] p-0">
             <li className="flex items-center gap-[9px]">
-              <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full border-2 border-purple-500 bg-transparent text-xs font-extrabold text-purple-700">
+              <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full border-2 border-purple-500 bg-transparent text-[12px] font-extrabold text-purple-700">
                 1
               </span>
               <span className="text-[13px] font-semibold leading-[1.25] text-ink max-[560px]:text-[12.5px]">
@@ -138,7 +138,7 @@ export function GenerationForm({
               </span>
             </li>
             <li className="flex items-center gap-[9px]">
-              <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full border-2 border-purple-500 bg-transparent text-xs font-extrabold text-purple-700">
+              <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full border-2 border-purple-500 bg-transparent text-[12px] font-extrabold text-purple-700">
                 2
               </span>
               <span className="text-[13px] font-semibold leading-[1.25] text-ink max-[560px]:text-[12.5px]">
@@ -146,7 +146,7 @@ export function GenerationForm({
               </span>
             </li>
             <li className="flex items-center gap-[9px]">
-              <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full border-2 border-purple-500 bg-transparent text-xs font-extrabold text-purple-700">
+              <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full border-2 border-purple-500 bg-transparent text-[12px] font-extrabold text-purple-700">
                 3
               </span>
               <span className="text-[13px] font-semibold leading-[1.25] text-ink max-[560px]:text-[12.5px]">

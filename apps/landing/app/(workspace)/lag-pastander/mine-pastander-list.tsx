@@ -12,7 +12,7 @@ import { PastandCard, type Card } from "./pastand-card";
 const SYNC_DEBOUNCE_MS = 400;
 
 const btnPillBase =
-  "inline-flex cursor-pointer items-center gap-2 rounded-full border-2 px-[18px] py-2.5 text-sm font-bold transition-all duration-150";
+  "inline-flex cursor-pointer items-center gap-2 rounded-full border-2 px-[18px] py-2.5 text-[14px] font-bold transition-all duration-150";
 
 const btnOutline = cn(
   btnPillBase,
