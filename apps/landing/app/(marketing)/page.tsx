@@ -62,7 +62,7 @@ export default function Home() {
       {/* ─── HERO ─── */}
       <section
         id="hero"
-        className="relative flex flex-col overflow-hidden bg-cl-light lg:min-h-[640px]"
+        className="relative flex flex-col overflow-hidden bg-cl-light lg:min-h-[clamp(680px,82vh,880px)]"
       >
         <div className="flex flex-1 items-center px-4 pt-8 pb-16 sm:px-6 sm:pt-10 sm:pb-20 lg:py-12">
           <div className="mx-auto grid w-full max-w-[1180px] grid-cols-1 items-start gap-y-8 sm:gap-y-10 lg:grid-cols-[595px_1fr] lg:gap-x-12 lg:gap-y-0">
@@ -82,7 +82,7 @@ export default function Home() {
                 className="cl-professor-float pointer-events-none absolute bottom-[8%] left-[2%] z-[3] h-auto w-[30%] max-w-[160px] drop-shadow-[0_4px_12px_rgba(28,26,23,0.12)] sm:bottom-[calc(8%+30px)] sm:left-[calc(-2%+40px)] sm:w-[28%] sm:max-w-none lg:bottom-[calc(8%+58px)] lg:left-[calc(-6%+86px)] lg:w-[26%]"
               />
             </div>
-            <div className="order-3 inline-flex flex-col items-center gap-2 lg:col-start-1 lg:row-start-2 lg:mt-6">
+            <div className="order-3 inline-flex flex-col items-center gap-2 lg:col-start-1 lg:row-start-2 lg:mt-6 lg:items-start">
               <a href="#demo" className="cl-cta">
                 Prøv demo →
               </a>
@@ -121,7 +121,7 @@ export default function Home() {
       {/* ─── VALUE CARDS ─── */}
       <section
         id="om-co-lab"
-        className="relative bg-cl-dark py-16 px-4 text-white sm:py-20 sm:px-6"
+        className="relative bg-cl-dark py-16 px-4 text-white sm:py-20 sm:px-6 lg:flex lg:min-h-[clamp(680px,82vh,880px)] lg:flex-col lg:justify-center"
       >
         <Link
           href="/teamet"
@@ -174,7 +174,7 @@ export default function Home() {
       {/* ─── HOW IT WORKS ─── */}
       <section
         id="slik-fungerer"
-        className="bg-cl-light py-16 px-4 text-ink sm:py-20 sm:px-6"
+        className="bg-cl-light py-16 px-4 text-ink sm:py-20 sm:px-6 lg:flex lg:min-h-[clamp(680px,82vh,880px)] lg:flex-col lg:justify-center"
       >
         <RevealOnScroll className="mx-auto max-w-[820px] text-center">
           <span className="section-label">Slik fungerer FagPrat</span>
@@ -220,7 +220,10 @@ export default function Home() {
       <DemoSection />
 
       {/* ─── PÅSTANDSGENERATOR ─── */}
-      <section id="generator" className="relative bg-cl-light py-12 sm:py-16">
+      <section
+        id="generator"
+        className="relative bg-cl-light py-12 sm:py-16 lg:flex lg:min-h-[clamp(680px,82vh,880px)] lg:flex-col lg:justify-center"
+      >
         <span
           aria-label="Få tilgang nå!"
           className="absolute top-[60px] right-[130px] z-[5] hidden rotate-[24deg] rounded-[6px] border-2 border-[#3E2E88] px-4 py-3 text-[15px] font-extrabold uppercase tracking-[0.09em] whitespace-nowrap text-[#3E2E88] outline-2 outline-offset-[5px] outline-[#3E2E88] transition-transform hover:rotate-[18deg] hover:scale-[1.03] lg:inline-block"

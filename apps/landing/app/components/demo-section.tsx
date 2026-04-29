@@ -1,6 +1,7 @@
 "use client";
 
 import { Maximize2, Minimize2 } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FagpratDemo } from "@/components/fagprat-demo/fagprat-demo";
 
@@ -194,23 +195,18 @@ export function DemoSection() {
       <div className="demo-embed">
         <FagpratDemo onStepChange={handleStepChange} />
       </div>
-      <a
-        href="/demo/fagprat-demo.html"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="demo-mobile-launch"
-      >
+      <Link href="/fagprat-demo" className="demo-mobile-launch">
         <span className="demo-mobile-launch-eyebrow">Interaktiv demo</span>
         <span className="demo-mobile-launch-title">Åpne FagPrat-demoen</span>
         <span className="demo-mobile-launch-desc">
-          Demoen er bygget for stor skjerm. Trykk for å åpne i ny fane – best opplevelse på nettbrett
-          eller PC.
+          Bytt mellom lærervisning, elevvisning og live-statistikk for å se hele flyten – fungerer
+          også på mobil.
         </span>
         <span className="demo-mobile-launch-cta">
           Åpne demo
           <Maximize2 className="size-4" />
         </span>
-      </a>
+      </Link>
     </section>
   );
 }

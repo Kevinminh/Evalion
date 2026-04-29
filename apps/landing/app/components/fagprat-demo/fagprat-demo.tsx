@@ -27,9 +27,21 @@ type StepInfo = {
 
 type FagpratDemoProps = {
   onStepChange?: (key: string, info: StepInfo) => void;
+  /**
+   * `embedded` (default) renders inside the landing demo section: TV + iPad
+   * column with the existing 2-way iPad/Phone toggle. `standalone` renders the
+   * full-screen mobile-friendly route variant — below `md` (768 px) only one
+   * device is shown at a time, picked via a 3-way toggle (TV / iPad / Phone).
+   */
+  layout?: "embedded" | "standalone";
 };
 
-export function FagpratDemo({ onStepChange }: FagpratDemoProps) {
+export function FagpratDemo({
+  onStepChange,
+  layout = "embedded",
+}: FagpratDemoProps) {
+  const standalone = layout === "standalone";
+
   // ── State that affects rendering ──
   const [stegIdx, setStegIdx] = useState(0);
   const [pastandIdx, setPastandIdx] = useState(0);
@@ -493,8 +505,30 @@ export function FagpratDemo({ onStepChange }: FagpratDemoProps) {
   }, [tv, ipad, stegIdx, pastandIdx, inLobby]);
 
   // ── Stage layout ──
+  // In standalone mode, below `md` (768 px) only one device is shown at a time
+  // — picked via the 3-way toggle. Visibility is controlled via custom CSS in
+  // globals.css (scoped to `.fagprat-demo-root--standalone[data-active-view]`)
+  // because the base `.fagprat-tv-col { display:flex }` rule has the same
+  // specificity as Tailwind's `.hidden` and beats it via source order.
   return (
-    <div className="fagprat-demo-root">
+    <div
+      className={
+        "fagprat-demo-root" +
+        (standalone ? " fagprat-demo-root--standalone" : "")
+      }
+      data-layout={layout}
+      data-active-view={standalone ? viewMode : undefined}
+    >
+      {standalone ? (
+        <div className="fagprat-standalone-toggle">
+          <ViewToggle
+            value={viewMode}
+            onChange={setViewMode}
+            phoneDisabled={phoneDisabled}
+            showTv
+          />
+        </div>
+      ) : null}
       <div className="fagprat-stage">
         <div className="fagprat-tv-col">
           <DeviceTV
@@ -504,14 +538,21 @@ export function FagpratDemo({ onStepChange }: FagpratDemoProps) {
           />
         </div>
         <div className="fagprat-ipad-col">
-          <div className="mb-3 flex justify-center">
+          <div className="fagprat-2way-toggle mb-3 flex justify-center">
             <ViewToggle
               value={viewMode}
               onChange={setViewMode}
               phoneDisabled={phoneDisabled}
             />
           </div>
-          <div className="fagprat-ipad-wrap">
+          <div
+            className={
+              "fagprat-ipad-wrap" +
+              (standalone && viewMode === "phone"
+                ? " fagprat-ipad-wrap--mobile-phone"
+                : "")
+            }
+          >
             <DeviceIpad
               buffer={ipad}
               nicknameRef={nicknameRef}
@@ -520,6 +561,7 @@ export function FagpratDemo({ onStepChange }: FagpratDemoProps) {
             <DevicePhoneOverlay
               visible={viewMode === "phone"}
               iframeRef={phoneIframeRef}
+              standalone={standalone}
             />
           </div>
         </div>

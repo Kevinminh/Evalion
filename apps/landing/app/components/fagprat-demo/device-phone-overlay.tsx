@@ -8,9 +8,17 @@ import { useFluidScale } from "./use-fluid-scale";
 type DevicePhoneOverlayProps = {
   visible: boolean;
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
+  /** When true, below `md` the phone is rendered as a full-width standalone
+   *  device (rather than absolutely-positioned overlay on top of the iPad).
+   *  Above `md` the overlay positioning is restored. */
+  standalone?: boolean;
 };
 
-export function DevicePhoneOverlay({ visible, iframeRef }: DevicePhoneOverlayProps) {
+export function DevicePhoneOverlay({
+  visible,
+  iframeRef,
+  standalone = false,
+}: DevicePhoneOverlayProps) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   // Intrinsic iframe width is 600px (statistikk page is rendered at that
   // viewport in the original).
@@ -33,6 +41,7 @@ export function DevicePhoneOverlay({ visible, iframeRef }: DevicePhoneOverlayPro
     <div
       ref={wrapRef}
       className="fagprat-phone-overlay"
+      data-standalone={standalone ? "true" : undefined}
       style={visible ? undefined : { display: "none" }}
     >
       <iframe

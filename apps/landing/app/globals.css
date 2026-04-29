@@ -199,7 +199,7 @@
 @media (min-width: 768px) {
   .section-demo {
     padding: 60px 0 0;
-    min-height: calc(100vh - 200px);
+    min-height: clamp(680px, 82vh, 880px);
     overflow: visible;
   }
 }
@@ -780,4 +780,71 @@
 .fagprat-tv-restart svg {
   width: 16px;
   height: 16px;
+}
+
+/* ─────────── Standalone mobile single-device layout ───────────
+   Used by the dedicated /fagprat-demo route. Below md (768px) only one device
+   is rendered at a time, picked via a 3-way toggle. Above md the existing
+   side-by-side layout is reused untouched. */
+.fagprat-demo-root--standalone {
+  width: 100%;
+  margin: 0 auto;
+}
+.fagprat-demo-root--standalone .fagprat-stage {
+  padding: 0 12px;
+}
+@media (min-width: 768px) {
+  .fagprat-demo-root--standalone .fagprat-stage {
+    padding: 0 24px;
+  }
+}
+
+/* 3-way toggle (TV / iPad / Phone): only visible on mobile in standalone. */
+.fagprat-standalone-toggle {
+  display: flex;
+  justify-content: center;
+  padding: 0 12px;
+  margin-bottom: 12px;
+}
+@media (min-width: 768px) {
+  .fagprat-standalone-toggle {
+    display: none;
+  }
+}
+
+/* Mobile single-device visibility: hide the inactive device(s).
+   Selector specificity (0,0,3,0) beats the base .fagprat-tv-col rule (0,0,1,0)
+   so we don't need !important. */
+@media (max-width: 767px) {
+  .fagprat-demo-root--standalone[data-active-view="ipad"] .fagprat-tv-col,
+  .fagprat-demo-root--standalone[data-active-view="phone"] .fagprat-tv-col {
+    display: none;
+  }
+  .fagprat-demo-root--standalone[data-active-view="tv"] .fagprat-ipad-col {
+    display: none;
+  }
+  /* The 2-way iPad/Phone toggle inside the iPad column is replaced on mobile
+     by the 3-way toggle at the top of the page. */
+  .fagprat-demo-root--standalone .fagprat-2way-toggle {
+    display: none;
+  }
+}
+
+/* In standalone mobile + phone mode, the iPad iframe is hidden and the phone
+   becomes the sole device. Drop the iPad's aspect-ratio so the wrap collapses
+   to the phone's natural height. Above md the overlay positioning is restored. */
+@media (max-width: 767px) {
+  .fagprat-ipad-wrap--mobile-phone {
+    aspect-ratio: auto;
+    min-height: 0;
+  }
+  .fagprat-phone-overlay[data-standalone="true"] {
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: none;
+    width: 100%;
+    max-width: min(360px, 100%);
+    margin: 0 auto;
+  }
 }
