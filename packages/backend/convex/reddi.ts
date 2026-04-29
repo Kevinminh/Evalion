@@ -536,6 +536,43 @@ export const generateStatements = action({
       throw err;
     }
 
+    const REQUIRED_PER_FASIT = 5;
+    const grouped: Record<Fasit, GeneratedStatement[]> = {
+      sant: [],
+      usant: [],
+      delvis: [],
+    };
+    for (const s of statements) {
+      grouped[s.fasit].push(s);
+    }
+    const groupCounts = {
+      sant: grouped.sant.length,
+      usant: grouped.usant.length,
+      delvis: grouped.delvis.length,
+    };
+    const short = FASIT_VALUES.filter(
+      (f) => grouped[f].length < REQUIRED_PER_FASIT,
+    );
+    if (short.length > 0) {
+      console.error(`[REDDI ${reqId}] balance check failed`, {
+        required: REQUIRED_PER_FASIT,
+        groupCounts,
+        short,
+      });
+      throw new Error(
+        "AI laget ikke nok påstander av hver type (5 sanne, 5 usanne, 5 delvis sanne). Prøv igjen.",
+      );
+    }
+    statements = [
+      ...grouped.sant.slice(0, REQUIRED_PER_FASIT),
+      ...grouped.usant.slice(0, REQUIRED_PER_FASIT),
+      ...grouped.delvis.slice(0, REQUIRED_PER_FASIT),
+    ];
+    console.log(`[REDDI ${reqId}] balanced`, {
+      groupCounts,
+      kept: statements.length,
+    });
+
     const prefixes: Record<string, string> = { sant: "s", usant: "u", delvis: "d" };
     const counters: Record<string, number> = { sant: 0, usant: 0, delvis: 0 };
 
