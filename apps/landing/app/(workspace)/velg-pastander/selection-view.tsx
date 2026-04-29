@@ -172,7 +172,7 @@ export function SelectionView() {
       <main
         className={
           loading
-            ? "mx-auto flex min-h-screen max-w-[1100px] items-center justify-center px-6"
+            ? "mx-auto flex min-h-[calc(100svh-64px)] max-w-[1100px] items-center justify-center px-6"
             : PAGE_BASE
         }
       >

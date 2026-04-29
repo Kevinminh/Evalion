@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation } from "convex/react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { api } from "@workspace/backend/convex/_generated/api";
@@ -8,6 +9,8 @@ import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { PastandCard, type Card } from "./pastand-card";
+
+const PDF_HREF = "/lag-pastander/pdf";
 
 const SYNC_DEBOUNCE_MS = 400;
 
@@ -40,10 +43,8 @@ function emptyCard(): Card {
 
 export function MinePastanderList({
   draft,
-  onRequestPdf,
 }: {
   draft: Doc<"pastandDrafts"> | null | undefined;
-  onRequestPdf: () => void;
 }) {
   const setPastander = useMutation(api.pastandDrafts.setPastander);
 
@@ -181,28 +182,43 @@ export function MinePastanderList({
             </svg>
             Legg til påstand
           </button>
-          <button
-            type="button"
-            className={btnFilled}
-            onClick={onRequestPdf}
-            disabled={list.length === 0}
-          >
-            <svg
-              className="size-[15px]"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-              <line x1="8" y1="13" x2="16" y2="13" />
-              <line x1="8" y1="17" x2="13" y2="17" />
-            </svg>
-            Lag PDF
-          </button>
+          {list.length === 0 ? (
+            <button type="button" className={btnFilled} disabled>
+              <svg
+                className="size-[15px]"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="8" y1="13" x2="16" y2="13" />
+                <line x1="8" y1="17" x2="13" y2="17" />
+              </svg>
+              Lag PDF
+            </button>
+          ) : (
+            <Link href={PDF_HREF} className={btnFilled}>
+              <svg
+                className="size-[15px]"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="8" y1="13" x2="16" y2="13" />
+                <line x1="8" y1="17" x2="13" y2="17" />
+              </svg>
+              Lag PDF
+            </Link>
+          )}
         </div>
       </div>
 
@@ -254,29 +270,52 @@ export function MinePastanderList({
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
         </button>
-        <button
-          type="button"
-          className={cn(btnFilled, btnIconOnly)}
-          title="Lag PDF"
-          aria-label="Lag PDF"
-          onClick={onRequestPdf}
-          disabled={list.length === 0}
-        >
-          <svg
-            className="size-[19px]"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        {list.length === 0 ? (
+          <button
+            type="button"
+            className={cn(btnFilled, btnIconOnly)}
+            title="Lag PDF"
+            aria-label="Lag PDF"
+            disabled
           >
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <polyline points="14 2 14 8 20 8" />
-            <line x1="8" y1="13" x2="16" y2="13" />
-            <line x1="8" y1="17" x2="13" y2="17" />
-          </svg>
-        </button>
+            <svg
+              className="size-[19px]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="8" y1="13" x2="16" y2="13" />
+              <line x1="8" y1="17" x2="13" y2="17" />
+            </svg>
+          </button>
+        ) : (
+          <Link
+            href={PDF_HREF}
+            className={cn(btnFilled, btnIconOnly)}
+            title="Lag PDF"
+            aria-label="Lag PDF"
+          >
+            <svg
+              className="size-[19px]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="8" y1="13" x2="16" y2="13" />
+              <line x1="8" y1="17" x2="13" y2="17" />
+            </svg>
+          </Link>
+        )}
       </div>
     </>
   );

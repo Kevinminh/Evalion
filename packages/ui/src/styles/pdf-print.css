@@ -65,9 +65,12 @@
   gap: 6mm;
   flex: 1;
 }
+.pdf-page:not(:first-of-type) .pdf-cards-list {
+  padding-top: 16mm;
+}
 .pdf-card {
   position: relative;
-  padding: 9mm 14mm;
+  padding: 7mm 12mm;
   background: white;
   border: 1.5px solid #e5e8e5;
   border-radius: 5mm;
@@ -76,6 +79,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
 }
 .pdf-card-num {
   position: absolute;
@@ -114,7 +120,7 @@
   border-color: #ffcc80;
 }
 .pdf-pastand-text {
-  font-size: 12pt;
+  font-size: 11.5pt;
   font-weight: 700;
   line-height: 1.35;
   margin-bottom: 3mm;

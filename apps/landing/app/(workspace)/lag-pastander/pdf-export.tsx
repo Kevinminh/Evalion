@@ -1,7 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "convex/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
+import { api } from "@workspace/backend/convex/_generated/api";
 import {
   Select,
   SelectContent,
@@ -41,6 +45,8 @@ const FASIT_LABEL: Record<Fasit, string> = {
   delvis: "Delvis sant",
 };
 
+const BACK_HREF = "/lag-pastander";
+
 const fieldLabel = "mb-[3px] block text-[12px] font-bold text-ink";
 
 const modalInput =
@@ -66,33 +72,35 @@ const actionFilled = cn(
 const topbarBtn =
   "cursor-pointer rounded-[10px] border-0 bg-transparent px-3 py-2 text-[14px] font-bold text-ink-secondary transition-colors duration-150 hover:bg-neutral-100 hover:text-ink";
 
-export function PdfExport({
-  pastander,
-  defaultFag,
-  defaultTrinn,
-  defaultForkunnskap,
-  onClose,
-}: {
-  pastander: Card[];
-  defaultFag: string;
-  defaultTrinn: string;
-  defaultForkunnskap?: Forkunnskap;
-  onClose: () => void;
-}) {
+export function PdfExport() {
+  const router = useRouter();
+  const draft = useQuery(api.pastandDrafts.get);
+
   const [title, setTitle] = useState("");
-  const [fag, setFag] = useState(defaultFag);
-  const [trinn, setTrinn] = useState(defaultTrinn);
-  const [forkunnskap, setForkunnskap] = useState<Forkunnskap | "">(defaultForkunnskap ?? "");
+  const [fag, setFag] = useState("");
+  const [trinn, setTrinn] = useState("");
+  const [forkunnskap, setForkunnskap] = useState<Forkunnskap | "">("");
   const [error, setError] = useState<string | null>(null);
+
+  const seededRef = useRef(false);
+  useEffect(() => {
+    if (seededRef.current) return;
+    if (draft === undefined) return;
+    seededRef.current = true;
+    setFag(draft?.lastFag ?? "");
+    setTrinn(draft?.lastTrinn ?? "");
+    setForkunnskap(draft?.lastForkunnskap ?? "");
+  }, [draft]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") router.push(BACK_HREF);
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [router]);
 
+  const pastander = draft?.pastander ?? [];
   const validPastander = pastander.filter(
     (p) =>
       p.text.trim().length > 0 &&
@@ -117,33 +125,30 @@ export function PdfExport({
 
   return (
     <div
-      className="fixed inset-0 z-[1000] grid grid-cols-[360px_1fr] grid-rows-[56px_1fr] bg-[#dde2de] font-sans max-[820px]:grid-cols-[1fr] max-[820px]:grid-rows-[52px_auto_1fr] max-[820px]:overflow-x-hidden max-[820px]:overflow-y-auto"
-      role="dialog"
-      aria-modal="true"
+      className="grid h-[calc(100vh-64px)] w-full grid-cols-[360px_1fr] grid-rows-[56px_1fr] bg-[#dde2de] font-sans max-[820px]:h-auto max-[820px]:min-h-[calc(100vh-64px)] max-[820px]:grid-cols-[1fr] max-[820px]:grid-rows-[52px_auto_1fr] max-[820px]:overflow-x-hidden"
+      role="region"
       aria-labelledby="pdf-export-heading"
     >
       <header className="col-span-2 flex items-center justify-between border-b border-neutral-200 bg-white px-[18px] max-[820px]:col-span-1 max-[480px]:px-3">
-        <button
-          type="button"
+        <Link
+          href={BACK_HREF}
           className={cn(topbarBtn, "max-[480px]:px-2 max-[480px]:py-1.5 max-[480px]:text-[13px]")}
-          onClick={onClose}
         >
           ← Tilbake
-        </button>
+        </Link>
         <h2
           id="pdf-export-heading"
           className="text-[15px] font-extrabold tracking-[0.02em] text-ink max-[480px]:text-sm"
         >
           Lag PDF
         </h2>
-        <button
-          type="button"
+        <Link
+          href={BACK_HREF}
           className={cn(topbarBtn, "px-3 py-1.5 text-base")}
-          onClick={onClose}
           aria-label="Lukk"
         >
           ✕
-        </button>
+        </Link>
       </header>
 
       <aside className="col-start-1 row-start-2 overflow-y-auto border-r border-neutral-200 bg-white px-[22px] pt-[22px] pb-7 max-[820px]:col-start-1 max-[820px]:row-start-2 max-[820px]:max-h-none max-[820px]:overflow-y-visible max-[820px]:border-r-0 max-[820px]:border-b max-[820px]:px-4 max-[820px]:pt-4 max-[820px]:pb-5">
@@ -231,9 +236,9 @@ export function PdfExport({
           )}
 
           <div className="mt-[22px] flex justify-end gap-2.5 max-[480px]:flex-col-reverse max-[480px]:items-stretch">
-            <button type="button" className={actionOutline} onClick={onClose}>
+            <Link href={BACK_HREF} className={actionOutline}>
               Avbryt
-            </button>
+            </Link>
             <button type="submit" className={actionFilled}>
               Lag PDF
             </button>
@@ -305,27 +310,29 @@ function PdfPagesPreview({
     >
       {pages.map((chunk, pageIdx) => (
         <article className="pdf-page" key={pageIdx}>
-          <header className="pdf-page-header">
-            <img
-              className="pdf-page-logo"
-              src="/assets/CO-LAB (Hoved) - uten skygge.png"
-              alt="CO-LAB"
-            />
-            <h1 className={`pdf-page-title${title ? "" : " is-placeholder"}`}>
-              {title || "Tittel"}
-            </h1>
-            <div className="pdf-page-meta">
-              <span className={`pdf-page-meta-item${fag ? "" : " is-placeholder"}`}>
-                {fag || "Fag"}
-              </span>
-              <span className={`pdf-page-meta-item${trinn ? "" : " is-placeholder"}`}>
-                {trinn || "Trinn"}
-              </span>
-              <span className={`pdf-page-meta-item${forkunnskap ? "" : " is-placeholder"}`}>
-                {forkunnskap || "Forkunnskap"}
-              </span>
-            </div>
-          </header>
+          {pageIdx === 0 && (
+            <header className="pdf-page-header">
+              <img
+                className="pdf-page-logo"
+                src="/assets/CO-LAB (Hoved) - uten skygge.png"
+                alt="CO-LAB"
+              />
+              <h1 className={`pdf-page-title${title ? "" : " is-placeholder"}`}>
+                {title || "Tittel"}
+              </h1>
+              <div className="pdf-page-meta">
+                <span className={`pdf-page-meta-item${fag ? "" : " is-placeholder"}`}>
+                  {fag || "Fag"}
+                </span>
+                <span className={`pdf-page-meta-item${trinn ? "" : " is-placeholder"}`}>
+                  {trinn || "Trinn"}
+                </span>
+                <span className={`pdf-page-meta-item${forkunnskap ? "" : " is-placeholder"}`}>
+                  {forkunnskap || "Forkunnskap"}
+                </span>
+              </div>
+            </header>
+          )}
           <div className="pdf-cards-list">
             {chunk.map((p, cardIdx) => {
               const fasit = p.fasit as Fasit;
