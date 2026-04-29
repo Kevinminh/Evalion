@@ -19,7 +19,7 @@ export async function Header() {
             className="h-8 w-auto sm:h-9"
           />
         </Link>
-        <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 md:flex">
+        <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 lg:flex">
           <a
             href="/#om-co-lab"
             className="text-sm font-medium text-ink-secondary transition hover:text-ink"
@@ -40,7 +40,7 @@ export async function Header() {
           </a>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="hidden items-center gap-2 sm:flex sm:gap-3">
+          <div className="hidden items-center gap-3 lg:flex">
             {/* Hidden temporarily — restore by uncommenting
             <Button
               variant="outline"
@@ -70,7 +70,7 @@ export async function Header() {
               </>
             )}
           </div>
-          {authed && <div className="sm:hidden"><UserMenu /></div>}
+          {authed && <div className="lg:hidden"><UserMenu /></div>}
           <MobileMenu authed={authed} />
         </div>
       </nav>

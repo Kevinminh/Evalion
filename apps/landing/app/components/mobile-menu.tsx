@@ -43,7 +43,7 @@ export function MobileMenu({ authed }: MobileMenuProps) {
   }, [open]);
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         ref={buttonRef}
         type="button"
