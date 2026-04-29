@@ -6,8 +6,8 @@ import { RevealOnScroll } from "./reveal-on-scroll";
 
 export function Footer() {
   return (
-    <>
-      <section id="signup" className="bg-cl-dark px-4 py-16 sm:px-6 sm:py-20">
+    <div className="bg-cl-dark">
+      <section id="signup" className="px-4 py-16 sm:px-6 sm:py-20">
         <RevealOnScroll className="mx-auto max-w-[820px]">
           <div className="relative overflow-hidden rounded-[24px] border border-cl-border bg-cl-light p-6 shadow-xl sm:p-10 md:p-12">
             <img
@@ -30,7 +30,7 @@ export function Footer() {
           </div>
         </RevealOnScroll>
       </section>
-      <footer className="bg-cl-dark text-white/80">
+      <footer className="text-white/80">
         <div className="mx-auto flex max-w-[1180px] flex-col items-center gap-3 px-4 py-10 text-center sm:px-6 sm:py-12">
           <img
             src="/assets/CO-LAB (Hoved) - uten skygge.png"
@@ -54,6 +54,6 @@ export function Footer() {
           </p>
         </div>
       </footer>
-    </>
+    </div>
   );
 }
