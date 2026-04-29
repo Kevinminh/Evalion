@@ -48,7 +48,6 @@ export function FagpratDemo({
   const [inLobby, setInLobby] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("ipad");
   const [phoneDisabled, setPhoneDisabled] = useState(true);
-  const [showRestart, setShowRestart] = useState(false);
 
   // ── State that doesn't need re-renders (relayed to iframes only) ──
   const selectedStmtRef = useRef<Stmt | null>(null);
@@ -372,7 +371,6 @@ export function FagpratDemo({
             setInLobby(false);
             setStegIdx(0);
             setPastandIdx(0);
-            setTimeout(() => setShowRestart(true), 150);
             return;
           }
           const idx = STEG.findIndex((st) => st.num === num);
@@ -481,29 +479,6 @@ export function FagpratDemo({
     return () => window.removeEventListener("message", onMessage);
   }, [tv, ipad, postToBoth, postToPhone, stegIdx, inLobby]);
 
-  // ── Action handlers ──
-  const handleRestart = useCallback(() => {
-    selectedStmtRef.current = null;
-    fasitRef.current = null;
-    explanationRef.current = null;
-    r1VoteRef.current = null;
-    r2VoteRef.current = null;
-    phoneTabRef.current = "runde1";
-    setPhoneDisabled(true);
-    setViewMode("ipad");
-
-    const wasAtStart = stegIdx === 0 && pastandIdx === 0 && !inLobby;
-    setStegIdx(0);
-    setPastandIdx(0);
-    if (wasAtStart) {
-      const s = STEG[0]!;
-      tv.load(s.laptop, (frame) => hideLaptopNav(frame.contentDocument));
-      ipad.load(elevUrl(s.elev, null, null), (frame) =>
-        cleanIpadDoc(frame.contentDocument, nicknameRef.current),
-      );
-    }
-  }, [tv, ipad, stegIdx, pastandIdx, inLobby]);
-
   // ── Stage layout ──
   // In standalone mode, below `md` (768 px) only one device is shown at a time
   // — picked via the 3-way toggle. Visibility is controlled via custom CSS in
@@ -531,11 +506,7 @@ export function FagpratDemo({
       ) : null}
       <div className="fagprat-stage">
         <div className="fagprat-tv-col">
-          <DeviceTV
-            buffer={tv}
-            showRestart={showRestart}
-            onRestart={handleRestart}
-          />
+          <DeviceTV buffer={tv} />
         </div>
         <div className="fagprat-ipad-col">
           <div className="fagprat-2way-toggle mb-3 flex justify-center">

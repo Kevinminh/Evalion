@@ -8,12 +8,14 @@ export const metadata: Metadata = {
 };
 
 const tldr = [
-  "Vi samler minimalt med data: e-post for varsling og innlogging for påstandsgeneratoren.",
-  "Input og genererte påstander lagres på profilen din så du finner dem igjen – du kan slette dem når som helst.",
-  "Vi trener ingen AI-modeller på din data. Det krever et eget, separat samtykke.",
+  "Vi samler inn nødvendige opplysninger for å levere tjenesten.",
+  "Innhold fra påstandsgeneratoren behandles og lagres for drift og forbedring av tjenesten.",
+  "Innholdet er ikke tilgjengelig som historikk for brukeren per i dag.",
+  "Vi bruker ikke dataen din til å trene AI-modeller.",
+  "Data kan brukes til å forbedre tjenesten.",
   "Azure OpenAI (EU-region) genererer påstander og trener ikke på det du sender inn.",
-  "All data håndteres etter personopplysningsloven og GDPR, lagret i EU/EØS.",
-  "Du har rett til innsyn, retting, sletting og klage til Datatilsynet.",
+  "All data håndteres i tråd med personopplysningsloven og GDPR, og lagres i EU/EØS.",
+  "Du har rett til innsyn, retting, sletting og å klage til Datatilsynet.",
 ];
 
 export default function PersonvernOgVilkarPage() {
@@ -24,14 +26,14 @@ export default function PersonvernOgVilkarPage() {
         <section className="text-center">
           <span className="section-label">Personvern og vilkår</span>
           <h1 className="mt-3 text-[clamp(32px,4.5vw,52px)] leading-tight">
-            Hvordan vi tar vare på{" "}
-            <em className="text-purple-500">dataen din</em>
+            Oppdatert brukervilkår og{" "}
+            <em className="text-purple-500">personvern</em>
           </h1>
           <p className="mx-auto mt-3 max-w-[560px] text-base text-ink-secondary">
             En ærlig og enkel forklaring av hva vi samler inn, hvorfor, og hva vi aldri gjør.
           </p>
           <p className="mt-5 text-sm text-ink-tertiary">
-            Sist oppdatert: 25. april 2026
+            Sist oppdatert: 29. april 2026
           </p>
         </section>
 
@@ -77,7 +79,7 @@ export default function PersonvernOgVilkarPage() {
           <P>
             <strong>CO-LAB AS</strong>
             <br />
-            Org.nr. [sett inn]
+            Org.nr. 935 324 602
             <br />
             Kontakt:{" "}
             <a
@@ -94,23 +96,22 @@ export default function PersonvernOgVilkarPage() {
           </P>
           <UL>
             <li>E-postadresse</li>
-            <li>(Valgfritt) navn og skole</li>
           </UL>
           <P>
             <strong>Ved opprettelse av konto for påstandsgeneratoren:</strong>
           </P>
           <UL>
+            <li>Navn</li>
             <li>E-postadresse</li>
             <li>Passord (lagret som kryptert hash – vi ser aldri passordet ditt)</li>
-            <li>(Valgfritt) navn og skole</li>
             <li>Innloggingslogger (tidspunkt, IP) for sikkerhet</li>
           </UL>
           <P>
             <strong>Ved bruk av påstandsgeneratoren:</strong>
           </P>
           <UL>
-            <li>Tekstinput (fag, tema, trinn)</li>
-            <li>Genererte påstander (lagres på din profil så du kan gjenbruke og eksportere)</li>
+            <li>Tekstinput (fag, trinn, forkunnskaper og tema)</li>
+            <li>Genererte påstander (påstander, fasit og forklaring)</li>
           </UL>
 
           <Heading>3. Hva som lagres, og hvor lenge</Heading>
@@ -119,13 +120,17 @@ export default function PersonvernOgVilkarPage() {
             rows={[
               ["E-postadresse", "Ja", "Til du melder deg av eller sletter kontoen"],
               ["Passord-hash", "Ja", "Til du sletter kontoen"],
-              ["Innloggingslogger", "Ja", "90 dager"],
+              ["Innloggingslogger", "Ja", "Opptil 90 dager"],
               [
                 "Input til påstandsgeneratoren",
                 "Ja",
-                "Koblet til profilen din, til du sletter",
+                "Lagres midlertidig for drift og forbedring av tjenesten (opptil 14 dager)",
               ],
-              ["Genererte påstander", "Ja", "Koblet til profilen din, til du sletter"],
+              [
+                "Genererte påstander",
+                "Ja",
+                "Lagres midlertidig for drift og forbedring av tjenesten (opptil 14 dager)",
+              ],
               ["Anonymisert og aggregert statistikk", "Ja", "Ubestemt (uten personidentifisering)"],
             ]}
           />
@@ -136,6 +141,10 @@ export default function PersonvernOgVilkarPage() {
             rows={[
               ["Varsle om lansering", "Samtykke (a)"],
               ["Drift av innlogging og påstandsgenerator", "Avtaleoppfyllelse (b)"],
+              [
+                "Midlertidig lagring av input og genererte påstander for drift og forbedring",
+                "Berettiget interesse (f)",
+              ],
               ["Sikkerhetslogger, misbrukshindring", "Berettiget interesse (f)"],
               ["Produktforbedring via anonymisert statistikk", "Berettiget interesse (f)"],
             ]}
@@ -144,31 +153,39 @@ export default function PersonvernOgVilkarPage() {
           <Heading>5. AI og maskinlæring</Heading>
           <P>
             Vi bruker <strong>Azure OpenAI</strong> (Microsofts hosting av OpenAI-modeller i
-            EU-region) til å generere påstander fra inputen din.
+            EU-region) til å generere påstander basert på inputen din.
           </P>
           <div className="legal-callout legal-callout--ai">
             <P>
               <strong>Hva vi gjør:</strong>
             </P>
             <UL>
-              <li>Lagrer input og genererte påstander på din konto så du finner dem igjen.</li>
+              <li>
+                Behandler og lagrer input og genererte påstander midlertidig for drift og forbedring
+                av tjenesten.
+              </li>
               <li>
                 Bruker anonymiserte, aggregerte data for å forstå bruksmønstre og forbedre
                 generatoren.
               </li>
-              <li>Retter feil og forbedrer prompter når vi ser at generatoren gir dårlige resultater.</li>
+              <li>
+                Forbedrer løpende oppsett og prompt basert på hvordan tjenesten fungerer i praksis.
+              </li>
             </UL>
             <P className="mt-3">
               <strong>Hva vi IKKE gjør:</strong>
             </P>
             <UL>
               <li>
-                Vi trener ingen egne AI-modeller på din data – dette krever et separat,
-                uttrykkelig samtykke vi eventuelt ber om senere.
+                Vi bruker ikke dataen din til å trene AI-modeller uten ditt uttrykkelige samtykke.
               </li>
               <li>
-                Azure OpenAI trener ikke modellene sine på det du sender inn (Microsofts
-                «no-training»-garanti for Azure OpenAI-tjenesten).
+                Azure OpenAI trener ikke modellene sine på det du sender inn (Microsofts «no
+                training»-garanti for tjenesten).
+              </li>
+              <li>
+                Innhold fra påstandsgeneratoren er ikke tilgjengelig som historikk for brukeren per
+                i dag.
               </li>
               <li>Vi deler aldri dine påstander offentlig uten ditt uttrykkelige samtykke.</li>
             </UL>
@@ -182,9 +199,8 @@ export default function PersonvernOgVilkarPage() {
           <Table
             head={["Leverandør", "Formål", "Lokasjon"]}
             rows={[
-              ["Azure OpenAI (Microsoft)", "AI-generering", "EU-region"],
-              ["Brevo (e-postutsendinger)", "Lanseringsvarsel", "EU"],
-              ["Convex / Hetzner / AWS EU", "Drift av nettside og database", "EU"],
+              ["Anthropic (Claude API)", "Generering av påstander", "USA / EU"],
+              ["Convex", "Drift av tjenesten (hosting og database)", "EU"],
             ]}
           />
           <div className="legal-callout">
@@ -194,10 +210,13 @@ export default function PersonvernOgVilkarPage() {
           </div>
 
           <Heading>7. Overføring utenfor EØS</Heading>
+          <P>Vi lagrer og behandler data innenfor EU/EØS der det er mulig.</P>
           <P>
-            Vi holder data i EU/EØS der det er mulig. Ved eventuell overføring utenfor EØS bruker
-            vi EUs standardkontrakter (Standard Contractual Clauses).
+            Dersom personopplysninger unntaksvis overføres utenfor EU/EØS, sørger vi for at dette
+            skjer i samsvar med gjeldende regelverk, for eksempel ved bruk av EUs
+            standardkontraktsklausuler (Standard Contractual Clauses).
           </P>
+          <P>Per i dag behandles data primært innenfor EU/EØS.</P>
 
           <Heading>8. Dine rettigheter</Heading>
           <UL>
@@ -211,10 +230,11 @@ export default function PersonvernOgVilkarPage() {
               <strong>Sletting</strong> av opplysningene dine («retten til å bli glemt»)
             </li>
             <li>
-              <strong>Dataportabilitet</strong> – få utlevert dataen din i et maskinlesbart format
+              <strong>Dataportabilitet</strong> – få utlevert dataene dine i et maskinlesbart format
             </li>
             <li>
-              <strong>Trekke samtykke</strong> tilbake når som helst
+              <strong>Trekke samtykke</strong> tilbake når som helst (der behandlingen er basert på
+              samtykke)
             </li>
             <li>
               <strong>Klage til Datatilsynet</strong> (
@@ -232,21 +252,22 @@ export default function PersonvernOgVilkarPage() {
 
           <Heading>9. Informasjonskapsler</Heading>
           <P>
-            Vi bruker kun nødvendige cookies (innlogging og sikkerhet). Eventuelle analyse-cookies
-            vil kreve samtykke via en banner.
+            Vi bruker kun nødvendige informasjonskapsler (cookies) for innlogging og sikkerhet.
+            Eventuelle analyse- eller statistikk-cookies vil kun tas i bruk etter samtykke via en
+            cookie-banner.
           </P>
 
           <Heading>10. Sikkerhet</Heading>
           <UL>
-            <li>Alle forbindelser krypteres med TLS (HTTPS).</li>
-            <li>Passord lagres som sikre hasher (bcrypt/argon2).</li>
-            <li>Tilgangskontroll begrenser hvem som kan se dataen.</li>
+            <li>All kommunikasjon mellom deg og tjenesten er kryptert (TLS/HTTPS).</li>
+            <li>Passord lagres som sikre hasher (f.eks. bcrypt eller Argon2).</li>
+            <li>Tilgangskontroll begrenser hvem som har tilgang til personopplysninger.</li>
           </UL>
 
           <Heading>11. Endringer i personvernerklæringen</Heading>
           <P>
-            Vesentlige endringer varsles via e-post til registrerte brukere, minst 14 dager før de
-            trer i kraft.
+            Vi kan oppdatere denne personvernerklæringen ved behov. Vesentlige endringer vil bli
+            varslet via e-post til registrerte brukere minst 14 dager før de trer i kraft.
           </P>
         </section>
 
@@ -305,7 +326,6 @@ export default function PersonvernOgVilkarPage() {
           </P>
           <UL>
             <li>Generere påstander til egen undervisning</li>
-            <li>Finne igjen tidligere genereringer i «Min historikk»</li>
             <li>Eksportere påstander som PDF</li>
             <li>Bruke påstandene fritt i din egen undervisning</li>
           </UL>
@@ -314,36 +334,40 @@ export default function PersonvernOgVilkarPage() {
           </P>
           <UL>
             <li>Bruke tjenesten til ulovlig, trakasserende eller skadelig innhold</li>
-            <li>Legge inn personidentifiserende elev-informasjon i input</li>
-            <li>Forsøke å reversere, «hacke» eller overbelaste tjenesten</li>
-            <li>Videreselge eller distribuere påstander som om de var CO-LAB-produkter</li>
+            <li>Legge inn personopplysninger om elever eller andre personer i input</li>
+            <li>Forsøke å få uautorisert tilgang til, manipulere eller overbelaste tjenesten</li>
+            <li>Videreselge eller distribuere innhold som eget kommersielt produkt</li>
           </UL>
 
           <Heading>5. Innhold og eierskap</Heading>
           <UL>
-            <li>Påstandene du genererer er dine å bruke fritt i undervisning.</li>
-            <li>CO-LAB har ingen rettighetskrav på påstandene du lager.</li>
+            <li>Du står fritt til å bruke påstandene i egen undervisning.</li>
             <li>
-              <strong>AI-generert innhold kan være unøyaktig</strong> – du har ansvar for å
-              kvalitetssjekke før bruk i klasserommet.
+              CO-LAB gjør ikke krav på eierskap til påstandene, men kan bruke anonymiserte data til
+              å forbedre tjenesten.
+            </li>
+            <li>
+              <strong>AI-generert innhold kan være feil eller mangelfullt.</strong> Du er ansvarlig
+              for å kvalitetssikre innholdet før bruk i undervisning.
             </li>
           </UL>
 
-          <Heading>6. Gratis i pre-launch</Heading>
+          <Heading>6. Gratis tilgang fram til sommeren 2026</Heading>
           <P>
-            Pre-launch-tilgangen er gratis fram til offisiell lansering. Vi forbeholder oss retten
-            til å innføre betaling eller endre tilgangsnivåer etter lansering, med rimelig varsel
-            på forhånd.
+            Løsningen er helt gratis fram til <strong>1. juli 2026</strong>. Vi forbeholder oss
+            retten til å innføre betaling eller endre tilgangsnivåer etter denne datoen, med rimelig
+            varsel på forhånd.
           </P>
 
           <Heading>7. Ansvarsfraskrivelse</Heading>
           <UL>
             <li>Tjenesten leveres «som den er» i pre-launch-fasen.</li>
             <li>
-              Vi gir ingen garanti for oppetid, nøyaktighet av AI-generert innhold eller
-              tilgjengelighet.
+              Vi gir ingen garanti for oppetid, tilgjengelighet eller nøyaktighet av AI-generert
+              innhold.
             </li>
             <li>CO-LAB er ikke ansvarlig for hvordan påstandene brukes i klasserommet.</li>
+            <li>Vi er ikke ansvarlige for direkte eller indirekte tap som følge av bruk av tjenesten.</li>
           </UL>
 
           <Heading>8. Oppsigelse</Heading>
@@ -353,7 +377,10 @@ export default function PersonvernOgVilkarPage() {
           </UL>
 
           <Heading>9. Endringer i vilkårene</Heading>
-          <P>Vi kan oppdatere vilkårene. Vesentlige endringer varsles 14 dager før de trer i kraft.</P>
+          <P>
+            Vi kan oppdatere vilkårene ved behov. Vesentlige endringer varsles via e-post til
+            registrerte brukere minst 14 dager før de trer i kraft.
+          </P>
 
           <Heading>10. Lovvalg og verneting</Heading>
           <P>

@@ -8,11 +8,9 @@ import type { IframeBuffer } from "./use-iframe-buffer";
 
 type DeviceTVProps = {
   buffer: IframeBuffer;
-  showRestart: boolean;
-  onRestart: () => void;
 };
 
-export function DeviceTV({ buffer, showRestart, onRestart }: DeviceTVProps) {
+export function DeviceTV({ buffer }: DeviceTVProps) {
   const screenRef = useRef<HTMLDivElement | null>(null);
   useFluidScale(screenRef, 1280);
 
@@ -55,27 +53,6 @@ export function DeviceTV({ buffer, showRestart, onRestart }: DeviceTVProps) {
             title=""
             aria-hidden="true"
           />
-          {showRestart ? (
-            <button
-              type="button"
-              className="fagprat-tv-restart"
-              onClick={onRestart}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <polyline points="1 4 1 10 7 10" />
-                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-              </svg>
-              Start på nytt
-            </button>
-          ) : null}
         </div>
       </div>
     </div>
