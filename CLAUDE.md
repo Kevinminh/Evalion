@@ -40,9 +40,9 @@ This is a **pnpm monorepo** orchestrated by **Turborepo**. Node >=20, pnpm 9.15.
 
 ### Apps
 
-- **`apps/web`** (`play.evalion.no`) — Student game client. TanStack Start + React 19 + Vite. Students join live sessions via 6-character code, vote on statements (sant/usant/delvis), discuss in groups, and receive feedback. File-based routing via TanStack Router (`src/routes/`). Path alias `@/*` maps to `./src/*`. Dev port: 3000.
-- **`apps/dashboard`** (`dashboard.evalion.no`) — Teacher dashboard. Same stack as web. Teachers create/manage FagPrat question sets, launch live sessions, view student analytics and session history. Path alias `@/*` maps to `./src/*`. Dev port: 3001.
-- **`apps/landing`** (`evalion.no`) — Marketing/landing site. Next.js 15 App Router + Turbopack. Pricing, FAQ, help center, legal pages. Path alias `@/*` maps to `./app/*`. Dev port: 3002.
+- **`apps/web`** (`play.co-lab.no`) — Student game client. TanStack Start + React 19 + Vite. Students join live sessions via 6-character code, vote on statements (sant/usant/delvis), discuss in groups, and receive feedback. File-based routing via TanStack Router (`src/routes/`). Path alias `@/*` maps to `./src/*`. Dev port: 3000.
+- **`apps/dashboard`** (`dashboard.co-lab.no`) — Teacher dashboard. Same stack as web. Teachers create/manage FagPrat question sets, launch live sessions, view student analytics and session history. Path alias `@/*` maps to `./src/*`. Dev port: 3001.
+- **`apps/landing`** (`co-lab.no`) — Marketing/landing site. Next.js 15 App Router + Turbopack. Pricing, FAQ, help center, legal pages. Path alias `@/*` maps to `./app/*`. Dev port: 3002.
 
 ### Packages
 
