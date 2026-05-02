@@ -50,6 +50,9 @@ function asStats(value: unknown): StatsSlice | null {
   ) {
     return null;
   }
+  // Treat empty stats (e.g. iframe just loaded, trickle hasn't started) as
+  // missing so the fallback fixture is used instead of "0 av 0".
+  if (c.sant + c.delvis + c.usant === 0) return null;
   return {
     counts: { sant: c.sant, delvis: c.delvis, usant: c.usant },
     avgTotal: typeof v.avgTotal === "number" ? v.avgTotal : 0,
