@@ -64,16 +64,16 @@ export default function Home() {
         id="hero"
         className="relative flex flex-col overflow-hidden bg-cl-light lg:min-h-[clamp(680px,82vh,880px)]"
       >
-        <div className="flex flex-1 items-center px-4 pt-8 pb-16 sm:px-6 sm:pt-10 sm:pb-20 lg:py-12">
+        <div className="flex flex-1 items-center px-4 pt-8 pb-16 sm:px-6 sm:pt-10 sm:pb-20 lg:pt-4 lg:pb-12">
           <div className="mx-auto grid w-full max-w-[1180px] grid-cols-1 items-start gap-y-8 sm:gap-y-10 lg:grid-cols-[595px_1fr] lg:gap-x-12 lg:gap-y-0">
-            <div className="order-1 pt-2 lg:col-start-1 lg:row-start-1 lg:pt-[60px]">
+            <div className="order-1 pt-2 lg:col-start-1 lg:row-start-1 lg:pt-0">
               <TypewriterHeadline />
             </div>
-            <div className="relative order-2 mt-2 min-h-[260px] sm:mt-6 sm:min-h-[360px] lg:order-none lg:col-start-2 lg:row-start-1 lg:row-span-3 lg:mt-[30px] lg:min-h-[440px]">
+            <div className="relative order-2 mt-2 min-h-[260px] sm:mt-6 sm:min-h-[360px] lg:order-none lg:col-start-2 lg:row-start-1 lg:row-span-3 lg:-mt-16 lg:min-h-[440px]">
               <img
                 src="/assets/Digitale enheter.png"
                 alt="FagPrat på laptop, mobil og nettbrett"
-                className="mt-6 block h-auto w-full max-w-none drop-shadow-[0_8px_32px_rgba(28,26,23,0.10)] sm:mt-10 lg:w-[104.5%]"
+                className="mt-6 block h-auto w-full max-w-none drop-shadow-[0_8px_32px_rgba(28,26,23,0.10)] sm:mt-10 lg:mt-0 lg:w-[104.5%]"
               />
               <img
                 src="/assets/Professoren (med skygge).png"
@@ -82,7 +82,7 @@ export default function Home() {
                 className="cl-professor-float pointer-events-none absolute bottom-[8%] left-[2%] z-[3] h-auto w-[30%] max-w-[160px] drop-shadow-[0_4px_12px_rgba(28,26,23,0.12)] sm:bottom-[calc(8%+30px)] sm:left-[calc(-2%+40px)] sm:w-[28%] sm:max-w-none lg:bottom-[calc(8%+58px)] lg:left-[calc(-6%+86px)] lg:w-[26%]"
               />
             </div>
-            <div className="order-3 inline-flex flex-col items-center gap-2 lg:col-start-1 lg:row-start-2 lg:mt-6 lg:items-start">
+            <div className="order-3 inline-flex w-fit flex-col items-center gap-2 lg:col-start-1 lg:row-start-2 lg:mt-6 lg:justify-self-start">
               <a href="#demo" className="cl-cta">
                 Prøv demo →
               </a>
@@ -125,7 +125,7 @@ export default function Home() {
       >
         <Link
           href="/teamet"
-          className="group/team absolute top-7 right-[max(24px,calc((100vw-1180px)/2+24px))] z-[3] hidden items-center gap-2 rounded-full border-[1.5px] border-white/30 bg-white/[0.08] px-4 py-[9px] text-[13px] font-bold text-white/90 backdrop-blur-[4px] transition hover:-translate-y-0.5 hover:border-white/55 hover:bg-white/15 hover:text-white sm:inline-flex"
+          className="group/team absolute top-20 right-[max(24px,calc((100vw-1180px)/2+24px))] z-[3] hidden items-center gap-2 rounded-full border-[1.5px] border-white/30 bg-white/[0.08] px-4 py-[9px] text-[13px] font-bold text-white/90 backdrop-blur-[4px] transition hover:-translate-y-0.5 hover:border-white/55 hover:bg-white/15 hover:text-white sm:inline-flex"
         >
           Møt teamet
           <svg

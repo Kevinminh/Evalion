@@ -2,6 +2,10 @@
 @import "@fontsource-variable/fraunces";
 @import "@fontsource-variable/nunito";
 
+html {
+  scrollbar-gutter: stable;
+}
+
 /* ─────────── CO-LAB landing namespace ─────────── */
 /* Aliases mapping landing's CL-* names to the unified tokens in @workspace/ui's @theme. */
 /* Page-level setup (gradient bg, ink color, body font) is also applied here. */
