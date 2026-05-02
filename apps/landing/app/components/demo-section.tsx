@@ -3,7 +3,7 @@
 import { ChevronLeft, ChevronRight, ExternalLinkIcon, Maximize2, Minimize2 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FagpratDemo } from "@/components/fagprat-demo/fagprat-demo";
+import { FagpratDemo, type LiveStatsSnapshot } from "@/components/fagprat-demo/fagprat-demo";
 
 type StepInfo = {
   stegNum: number | "lobby";
@@ -11,7 +11,82 @@ type StepInfo = {
   inLobby: boolean;
 };
 
-const REDDI_MESSAGES: Record<string, string[]> = {
+type Vote = "sant" | "delvis" | "usant";
+type Counts = { sant: number; delvis: number; usant: number };
+
+type StatsSlice = {
+  counts: Counts;
+  avgTotal: number;
+};
+
+type ResultatSlice = { avgConf: number };
+
+// Index 0..3 maps to the four påstander rendered by the demo. Source of truth
+// is statistikk.html (stmtData[i].fasit at lines 840, 874, 909, 943).
+const FASIT_BY_PASTAND: readonly Vote[] = ["sant", "usant", "usant", "delvis"];
+
+function totalOf(c: Counts): number {
+  return c.sant + c.delvis + c.usant;
+}
+
+function pctOf(num: number, denom: number): number {
+  if (denom <= 0) return 0;
+  return Math.round((num / denom) * 100);
+}
+
+function fmtAvg(n: number): string {
+  return n.toFixed(1).replace(".", ",");
+}
+
+function asStats(value: unknown): StatsSlice | null {
+  if (!value || typeof value !== "object") return null;
+  const v = value as { counts?: unknown; avgTotal?: unknown };
+  if (!v.counts || typeof v.counts !== "object") return null;
+  const c = v.counts as Record<string, unknown>;
+  if (
+    typeof c.sant !== "number" ||
+    typeof c.delvis !== "number" ||
+    typeof c.usant !== "number"
+  ) {
+    return null;
+  }
+  return {
+    counts: { sant: c.sant, delvis: c.delvis, usant: c.usant },
+    avgTotal: typeof v.avgTotal === "number" ? v.avgTotal : 0,
+  };
+}
+
+function asResultat(value: unknown): ResultatSlice | null {
+  if (!value || typeof value !== "object") return null;
+  const v = value as { avgConf?: unknown };
+  if (typeof v.avgConf !== "number") return null;
+  return { avgConf: v.avgConf };
+}
+
+// Mirrors the 21-student stmtData fixture in Statistikk/statistikk.html so
+// Reddi has sensible numbers before the iframe has had a chance to broadcast.
+const FALLBACK_R1: readonly StatsSlice[] = [
+  { counts: { sant: 15, delvis: 3, usant: 3 }, avgTotal: 80 / 21 },
+  { counts: { sant: 10, delvis: 5, usant: 6 }, avgTotal: 84 / 21 },
+  { counts: { sant: 9, delvis: 2, usant: 10 }, avgTotal: 53 / 21 },
+  { counts: { sant: 7, delvis: 9, usant: 5 }, avgTotal: 62 / 21 },
+];
+
+const FALLBACK_R2: readonly StatsSlice[] = [
+  { counts: { sant: 18, delvis: 2, usant: 1 }, avgTotal: 84 / 21 },
+  { counts: { sant: 8, delvis: 3, usant: 10 }, avgTotal: 76 / 21 },
+  { counts: { sant: 5, delvis: 1, usant: 15 }, avgTotal: 74 / 21 },
+  { counts: { sant: 6, delvis: 11, usant: 4 }, avgTotal: 64 / 21 },
+];
+
+const FALLBACK_RESULTAT: readonly ResultatSlice[] = [
+  { avgConf: 4.2 },
+  { avgConf: 3.1 },
+  { avgConf: 3.8 },
+  { avgConf: 2.7 },
+];
+
+const STATIC_MESSAGES: Record<string, string[]> = {
   lobby: [
     "<p>Hei, jeg er Reddi. Jeg lyser opp når jeg har et godt tips – men du kan utforske helt fritt.</p>" +
       "<p>Dette er venterommet. Her dukker elevene opp når de skanner QR-koden eller skriver inn koden. Meld deg på som elev og gjør deg klar til din første FagPrat.</p>",
@@ -28,18 +103,6 @@ const REDDI_MESSAGES: Record<string, string[]> = {
     "<p>Nå diskuterer elevene med hverandre. Samtidig kan du analysere live-statistikken og gjøre deg klar til klassediskusjon.</p>" +
       "<p>Se gjennom elevbegrunnelser, stemmefordeling og gjennomsnittlig sikkerhet i <strong>lærerpanelet</strong> sammen med elevene om du vil. Du kan også fremheve konkrete elevbidrag under <strong>Live-statistikk for lærer</strong> ved å trykke på dem.</p>",
   ],
-  steg2_p0: [
-    "<p>Statistikken viser at <strong>15 av 21</strong> elever har riktig svar (71 %), og at gjennomsnittlig sikkerhet er <strong>3,8</strong>. Her kan det være naturlig å utfordre elevenes begrunnelser og løfte fram elever med gode forklaringer fra kategorien «Riktig svar – Lav sikkerhet».</p>",
-  ],
-  steg2_p1: [
-    "<p>Statistikken viser at <strong>15 av 21</strong> elever har feil svar (71 %), samtidig som sikkerheten er høy (<strong>4,0</strong>). Dette tyder på en kollektiv misoppfatning. Her bør du løfte fram begrunnelser som utfordrer tanken om at elbiler er helt utslippsfrie.</p>",
-  ],
-  steg2_p2: [
-    "<p>Statistikken viser at klassen er delt, med <strong>10 av 21</strong> elever riktig (48 %) og <strong>11</strong> elever feil (52 %). Sikkerheten er lav (<strong>2,5</strong>). Dette tyder på at elevene er usikre. Her kan du la elevene utforske ulike svar før du styrer diskusjonen videre.</p>",
-  ],
-  steg2_p3: [
-    "<p>Statistikken viser en jevn fordeling, med <strong>9 av 21</strong> elever riktig (43 %) og <strong>12</strong> elever feil (57 %). Sikkerheten er <strong>3,0</strong>. Noen elever er også sikre på feil svar. Her bør du være bevisst på hvilke argumenter som løftes fram.</p>",
-  ],
   steg3: [
     "<p>Elevene stemmer på nytt individuelt – og nå uten begrunnelse. Velg tenketid og trykk <strong>Start</strong>.</p>" +
       "<p>Følg med på endringene i live-statistikken samtidig som elevene svarer.</p>",
@@ -48,18 +111,6 @@ const REDDI_MESSAGES: Record<string, string[]> = {
     "<p>Fasiten er avslørt. La elevene forklare hvorfor til hverandre og i plenum.</p>" +
       "<p>Under <strong>Live-statistikk for lærer</strong> og i <strong>lærerpanelet</strong> ser du endringer på klasse- og individnivå, delt i fire kategorier. Se spesielt etter elever som har gått fra feil til riktig svar – eller motsatt.</p>",
   ],
-  steg4_p0: [
-    "<p>På denne påstanden kan det se ut som at diskusjonen har gitt god effekt. Andelen riktige svar har økt fra <strong>15 til 18</strong> elever (71 % → 86 %), og sikkerheten har økt fra <strong>3,8 til 4,0</strong>.</p>",
-  ],
-  steg4_p1: [
-    "<p>Flere elever har endret til riktig svar (fra <strong>6 til 10</strong>, 29 % → 48 %). Samtidig har sikkerheten gått fra <strong>4,0 til 3,6</strong>. Dette kan tyde på at elevene har blitt mer usikre og begynt å reflektere mer.</p>",
-  ],
-  steg4_p2: [
-    "<p>Diskusjonen har gitt god effekt. Antall riktige svar har økt fra <strong>10 til 15</strong> elever (48 % → 71 %), og sikkerheten har økt fra <strong>2,5 til 3,5</strong>.</p>",
-  ],
-  steg4_p3: [
-    "<p>Her ser vi en negativ utvikling. Antall riktige svar har gått fra <strong>9 til 7</strong> elever (43 % → 33 %), samtidig som sikkerheten har gått fra <strong>3,0 til 3,3</strong>. Dette tyder på at noen elever har blitt mer sikre på feil svar.</p>",
-  ],
   steg5: [
     "<p><strong>Professoren</strong> gir en presis forklaring. En god elevbegrunnelse blir løftet frem i <strong>lærerpanelet</strong>.</p>",
   ],
@@ -67,29 +118,149 @@ const REDDI_MESSAGES: Record<string, string[]> = {
     "<p>Elevene vurderer egen forståelse individuelt.</p>" +
       "<p>Du ser nå både forståelse og stemmefordeling fra begge rundene i <strong>lærerpanelet</strong> og under <strong>Live-statistikk for lærer</strong>.</p>",
   ],
-  steg6_p0: [
-    "<p>Basert på egenvurderingene (snitt <strong>4,2</strong>) kan det virke som at elevene forstår denne påstanden godt nå, og at det ikke er nødvendig å bruke mye tid på det etter aktiviteten.</p>",
-  ],
-  steg6_p1: [
-    "<p>Forståelsen er noe varierende (snitt <strong>3,1</strong>). Dette kan være nyttig å følge opp senere.</p>",
-  ],
-  steg6_p2: [
-    "<p>Forståelsen er blitt bedre (snitt <strong>3,8</strong>). Dette er en påstand som er enkel å rydde opp i, og det er ikke nødvendig å bruke mye tid på dette senere.</p>",
-  ],
-  steg6_p3: [
-    "<p>Forståelsen er fortsatt variert (snitt <strong>2,7</strong>). Dette tyder på at elevene trenger mer tid på temaet.</p>",
-  ],
 };
+
+// Per-påstand narrative is kept static — Markus's single vote out of ~22 does
+// not shift the macro framing. Edge case on steg4_p3: if Markus votes
+// correctly in R2, the 9→7 trend may flip to 9→8, weakening the negative
+// framing slightly. Acceptable for a demo.
+
+function buildSteg2Tip(pastandIdx: number, stats: StatsSlice): string {
+  const fasit = FASIT_BY_PASTAND[pastandIdx] ?? "sant";
+  const total = totalOf(stats.counts);
+  const correct = stats.counts[fasit];
+  const wrong = total - correct;
+  const cPct = pctOf(correct, total);
+  const wPct = pctOf(wrong, total);
+  const avg = fmtAvg(stats.avgTotal);
+
+  switch (pastandIdx) {
+    case 0:
+      return (
+        `<p>Statistikken viser at <strong>${correct} av ${total}</strong> elever har riktig svar (${cPct} %), ` +
+        `og at gjennomsnittlig sikkerhet er <strong>${avg}</strong>. ` +
+        `Her kan det være naturlig å utfordre elevenes begrunnelser og løfte fram elever med gode forklaringer ` +
+        `fra kategorien «Riktig svar – Lav sikkerhet».</p>`
+      );
+    case 1:
+      return (
+        `<p>Statistikken viser at <strong>${wrong} av ${total}</strong> elever har feil svar (${wPct} %), ` +
+        `samtidig som sikkerheten er høy (<strong>${avg}</strong>). Dette tyder på en kollektiv misoppfatning. ` +
+        `Her bør du løfte fram begrunnelser som utfordrer tanken om at elbiler er helt utslippsfrie.</p>`
+      );
+    case 2:
+      return (
+        `<p>Statistikken viser at klassen er delt, med <strong>${correct} av ${total}</strong> elever riktig (${cPct} %) ` +
+        `og <strong>${wrong}</strong> elever feil (${wPct} %). Sikkerheten er lav (<strong>${avg}</strong>). ` +
+        `Dette tyder på at elevene er usikre. Her kan du la elevene utforske ulike svar før du styrer diskusjonen videre.</p>`
+      );
+    default:
+      return (
+        `<p>Statistikken viser en jevn fordeling, med <strong>${correct} av ${total}</strong> elever riktig (${cPct} %) ` +
+        `og <strong>${wrong}</strong> elever feil (${wPct} %). Sikkerheten er <strong>${avg}</strong>. ` +
+        `Noen elever er også sikre på feil svar. Her bør du være bevisst på hvilke argumenter som løftes fram.</p>`
+      );
+  }
+}
+
+function buildSteg4Tip(
+  pastandIdx: number,
+  r1: StatsSlice,
+  r2: StatsSlice,
+): string {
+  const fasit = FASIT_BY_PASTAND[pastandIdx] ?? "sant";
+  const r1Total = totalOf(r1.counts);
+  const r2Total = totalOf(r2.counts);
+  const r1Correct = r1.counts[fasit];
+  const r2Correct = r2.counts[fasit];
+  const r1Pct = pctOf(r1Correct, r1Total);
+  const r2Pct = pctOf(r2Correct, r2Total);
+  const r1Avg = fmtAvg(r1.avgTotal);
+  const r2Avg = fmtAvg(r2.avgTotal);
+
+  switch (pastandIdx) {
+    case 0:
+      return (
+        `<p>På denne påstanden kan det se ut som at diskusjonen har gitt god effekt. ` +
+        `Andelen riktige svar har gått fra <strong>${r1Correct} til ${r2Correct}</strong> elever ` +
+        `(${r1Pct} % → ${r2Pct} %), og sikkerheten har gått fra <strong>${r1Avg} til ${r2Avg}</strong>.</p>`
+      );
+    case 1:
+      return (
+        `<p>Flere elever har endret til riktig svar (fra <strong>${r1Correct} til ${r2Correct}</strong>, ` +
+        `${r1Pct} % → ${r2Pct} %). Samtidig har sikkerheten gått fra <strong>${r1Avg} til ${r2Avg}</strong>. ` +
+        `Dette kan tyde på at elevene har blitt mer usikre og begynt å reflektere mer.</p>`
+      );
+    case 2:
+      return (
+        `<p>Diskusjonen har gitt god effekt. Antall riktige svar har gått fra ` +
+        `<strong>${r1Correct} til ${r2Correct}</strong> elever (${r1Pct} % → ${r2Pct} %), ` +
+        `og sikkerheten har gått fra <strong>${r1Avg} til ${r2Avg}</strong>.</p>`
+      );
+    default:
+      return (
+        `<p>Her er det verdt å merke seg utviklingen. Antall riktige svar har gått fra ` +
+        `<strong>${r1Correct} til ${r2Correct}</strong> elever (${r1Pct} % → ${r2Pct} %), ` +
+        `samtidig som sikkerheten har gått fra <strong>${r1Avg} til ${r2Avg}</strong>. ` +
+        `Vær bevisst på hvilke argumenter som løftes fram.</p>`
+      );
+  }
+}
+
+function buildSteg6Tip(pastandIdx: number, resultat: ResultatSlice): string {
+  const avg = fmtAvg(resultat.avgConf);
+  switch (pastandIdx) {
+    case 0:
+      return (
+        `<p>Basert på egenvurderingene (snitt <strong>${avg}</strong>) kan det virke som at elevene ` +
+        `forstår denne påstanden godt nå, og at det ikke er nødvendig å bruke mye tid på det etter aktiviteten.</p>`
+      );
+    case 1:
+      return (
+        `<p>Forståelsen er noe varierende (snitt <strong>${avg}</strong>). ` +
+        `Dette kan være nyttig å følge opp senere.</p>`
+      );
+    case 2:
+      return (
+        `<p>Forståelsen er blitt bedre (snitt <strong>${avg}</strong>). Dette er en påstand som er enkel å rydde opp i, ` +
+        `og det er ikke nødvendig å bruke mye tid på dette senere.</p>`
+      );
+    default:
+      return (
+        `<p>Forståelsen er fortsatt variert (snitt <strong>${avg}</strong>). ` +
+        `Dette tyder på at elevene trenger mer tid på temaet.</p>`
+      );
+  }
+}
 
 const PER_PASTAND_STEPS = new Set(["steg2", "steg4", "steg6"]);
 
-function messagesFor(key: string, pastandIdx: number): string[] {
-  if (key.startsWith("steg1-p")) return REDDI_MESSAGES.steg1 ?? [];
-  const base = REDDI_MESSAGES[key];
+function messagesFor(
+  key: string,
+  pastandIdx: number,
+  snapshot: LiveStatsSnapshot,
+): string[] {
+  if (key.startsWith("steg1-p")) return STATIC_MESSAGES.steg1 ?? [];
+
+  const base = STATIC_MESSAGES[key];
   if (!base) return [];
-  if (PER_PASTAND_STEPS.has(key)) {
-    const extra = REDDI_MESSAGES[`${key}_p${pastandIdx}`];
-    if (extra) return [...base, ...extra];
+
+  if (!PER_PASTAND_STEPS.has(key)) return base;
+
+  const idx = Math.max(0, Math.min(pastandIdx, FASIT_BY_PASTAND.length - 1));
+
+  if (key === "steg2") {
+    const stats = asStats(snapshot.stats) ?? FALLBACK_R1[idx]!;
+    return [...base, buildSteg2Tip(idx, stats)];
+  }
+  if (key === "steg4") {
+    const r1 = asStats(snapshot.r1Stats) ?? FALLBACK_R1[idx]!;
+    const r2 = asStats(snapshot.stats) ?? FALLBACK_R2[idx]!;
+    return [...base, buildSteg4Tip(idx, r1, r2)];
+  }
+  if (key === "steg6") {
+    const resultat = asResultat(snapshot.resultat) ?? FALLBACK_RESULTAT[idx]!;
+    return [...base, buildSteg6Tip(idx, resultat)];
   }
   return base;
 }
@@ -98,6 +269,13 @@ function identityFor(key: string, pastandIdx: number): string {
   if (PER_PASTAND_STEPS.has(key)) return `${key}|p${pastandIdx}`;
   return key;
 }
+
+const EMPTY_SNAPSHOT: LiveStatsSnapshot = {
+  stats: null,
+  r1Stats: null,
+  changes: null,
+  resultat: null,
+};
 
 export function DemoSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -113,6 +291,7 @@ export function DemoSection() {
   const [bubbleOpen, setBubbleOpen] = useState(false);
   const [msgIdx, setMsgIdx] = useState(0);
   const [shown, setShown] = useState<Set<string>>(() => new Set());
+  const [liveStats, setLiveStats] = useState<LiveStatsSnapshot>(EMPTY_SNAPSHOT);
 
   useEffect(() => {
     currentKeyRef.current = currentKey;
@@ -158,19 +337,6 @@ export function DemoSection() {
   }, []);
 
   useEffect(() => {
-    if (!bubbleOpen) return;
-    function onPointerDown(e: PointerEvent) {
-      const target = e.target as Node | null;
-      if (!target) return;
-      if (avatarRef.current?.contains(target)) return;
-      if (bubbleRef.current?.contains(target)) return;
-      setBubbleOpen(false);
-    }
-    document.addEventListener("pointerdown", onPointerDown);
-    return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [bubbleOpen]);
-
-  useEffect(() => {
     const node = sectionRef.current;
     if (!node) return;
     const observer = new IntersectionObserver(
@@ -191,7 +357,7 @@ export function DemoSection() {
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [markShown]);
 
   function toggleFullscreen() {
     const node = sectionRef.current;
@@ -203,7 +369,7 @@ export function DemoSection() {
     }
   }
 
-  const messages = messagesFor(currentKey, pastandIdx);
+  const messages = messagesFor(currentKey, pastandIdx, liveStats);
   const id = identityFor(currentKey, pastandIdx);
   const safeMsgIdx = Math.min(msgIdx, Math.max(messages.length - 1, 0));
 
@@ -330,7 +496,7 @@ export function DemoSection() {
         </div>
       </div>
       <div className="demo-embed">
-        <FagpratDemo onStepChange={handleStepChange} />
+        <FagpratDemo onStepChange={handleStepChange} onLiveStats={setLiveStats} />
       </div>
       <Link href="/fagprat-demo" className="demo-mobile-launch">
         <span className="demo-mobile-launch-eyebrow">Interaktiv demo</span>
