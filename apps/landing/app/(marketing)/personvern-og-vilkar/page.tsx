@@ -24,9 +24,8 @@ export default function PersonvernOgVilkarPage() {
       <div className="mx-auto max-w-[820px]">
         {/* HERO */}
         <section className="text-center">
-          <span className="section-label">Personvern og vilkår</span>
-          <h1 className="mt-3 text-[clamp(32px,4.5vw,52px)] leading-tight">
-            Oppdatert brukervilkår og <em className="text-purple-500">personvern</em>
+          <h1 className="text-[clamp(32px,4.5vw,52px)] leading-tight">
+            Personvern og vilkår
           </h1>
           <p className="mx-auto mt-3 max-w-[560px] text-base text-ink-secondary">
             En ærlig og enkel forklaring av hva vi samler inn, hvorfor, og hva vi aldri gjør.
