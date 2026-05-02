@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLinkIcon, Maximize2, Minimize2 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FagpratDemo } from "@/components/fagprat-demo/fagprat-demo";
@@ -341,7 +341,7 @@ export function DemoSection() {
         </span>
         <span className="demo-mobile-launch-cta">
           Åpne demo
-          <Maximize2 className="size-4" />
+          <ExternalLinkIcon className="size-4" />
         </span>
       </Link>
     </section>

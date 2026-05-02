@@ -14,7 +14,7 @@ export default async function RegistrerDegPage() {
     redirect("/lag-pastander");
   }
   return (
-    <div className="flex min-h-[100svh] items-center justify-center px-4 py-10 sm:px-6 sm:py-12 md:items-start md:pt-20">
+    <div className="flex min-h-[100svh] items-start justify-center px-4 pt-12 pb-10 sm:px-6 sm:pt-16 sm:pb-12 md:pt-20">
       <RegisterPanel />
     </div>
   );

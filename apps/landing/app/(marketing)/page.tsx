@@ -82,7 +82,7 @@ export default function Home() {
                 className="cl-professor-float pointer-events-none absolute bottom-[8%] left-[2%] z-[3] h-auto w-[30%] max-w-[160px] drop-shadow-[0_4px_12px_rgba(28,26,23,0.12)] sm:bottom-[calc(8%+30px)] sm:left-[calc(-2%+40px)] sm:w-[28%] sm:max-w-none lg:bottom-[calc(8%+58px)] lg:left-[calc(-6%+86px)] lg:w-[26%]"
               />
             </div>
-            <div className="order-3 inline-flex w-fit flex-col items-center gap-2 lg:col-start-1 lg:row-start-2 lg:mt-6 lg:justify-self-start">
+            <div className="order-3 inline-flex w-fit flex-col items-center gap-2 justify-self-center lg:col-start-1 lg:row-start-2 lg:mt-6 lg:justify-self-start">
               <a href="#demo" className="cl-cta">
                 Prøv demo →
               </a>

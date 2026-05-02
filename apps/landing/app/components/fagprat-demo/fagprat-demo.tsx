@@ -25,8 +25,16 @@ type StepInfo = {
   inLobby: boolean;
 };
 
+export type LiveStatsSnapshot = {
+  stats: unknown | null;
+  r1Stats: unknown | null;
+  changes: unknown | null;
+  resultat: unknown | null;
+};
+
 type FagpratDemoProps = {
   onStepChange?: (key: string, info: StepInfo) => void;
+  onLiveStats?: (snapshot: LiveStatsSnapshot) => void;
   /**
    * `embedded` (default) renders inside the landing demo section: TV + iPad
    * column with the existing 2-way iPad/Phone toggle. `standalone` renders the
@@ -38,6 +46,7 @@ type FagpratDemoProps = {
 
 export function FagpratDemo({
   onStepChange,
+  onLiveStats,
   layout = "embedded",
 }: FagpratDemoProps) {
   const standalone = layout === "standalone";
@@ -46,7 +55,10 @@ export function FagpratDemo({
   const [stegIdx, setStegIdx] = useState(0);
   const [pastandIdx, setPastandIdx] = useState(0);
   const [inLobby, setInLobby] = useState(true);
-  const [viewMode, setViewMode] = useState<ViewMode>("ipad");
+  // Standalone (mobile-only route) shows one device at a time. Default to the
+  // teacher TV view so visitors land on the FagPrat overview, not the empty
+  // student lobby.
+  const [viewMode, setViewMode] = useState<ViewMode>(standalone ? "tv" : "ipad");
   const [phoneDisabled, setPhoneDisabled] = useState(true);
 
   // ── State that doesn't need re-renders (relayed to iframes only) ──
@@ -67,6 +79,17 @@ export function FagpratDemo({
   const currentResultatRef = useRef<unknown>(null);
   const onStepChangeRef = useRef(onStepChange);
   onStepChangeRef.current = onStepChange;
+  const onLiveStatsRef = useRef(onLiveStats);
+  onLiveStatsRef.current = onLiveStats;
+
+  const emitLiveStats = useCallback(() => {
+    onLiveStatsRef.current?.({
+      stats: currentStatsRef.current ?? null,
+      r1Stats: currentR1StatsRef.current ?? null,
+      changes: currentChangesRef.current ?? null,
+      resultat: currentResultatRef.current ?? null,
+    });
+  }, []);
 
   // ── Iframe buffers ──
   const tv = useIframeBuffer({
@@ -214,7 +237,7 @@ export function FagpratDemo({
 
     if (s.num === 0) {
       setPhoneDisabled(true);
-      setViewMode("ipad");
+      setViewMode(standalone ? "tv" : "ipad");
     }
   }, [stegIdx, pastandIdx, inLobby, tv, ipad, postToPhone]);
 
@@ -257,6 +280,14 @@ export function FagpratDemo({
               /* no-op */
             }
           }
+          // Drop captured stats so consumers don't render last påstand's numbers
+          // for the new one until the iframe rebroadcasts.
+          currentReasonsRef.current = null;
+          currentStatsRef.current = null;
+          currentR1StatsRef.current = null;
+          currentChangesRef.current = null;
+          currentResultatRef.current = null;
+          emitLiveStats();
           setPhoneDisabled(false);
           try {
             tv.getFront()?.contentWindow?.postMessage(data, "*");
@@ -277,6 +308,7 @@ export function FagpratDemo({
           currentStatsRef.current = data.stats ?? null;
           currentChangesRef.current = data.changes ?? null;
           postToBoth(tv, data);
+          emitLiveStats();
           return;
         }
         case "fagprat-highlight-reason": {
@@ -290,6 +322,7 @@ export function FagpratDemo({
         case "fagprat-resultat-update": {
           currentResultatRef.current = data;
           postToBoth(tv, data);
+          emitLiveStats();
           return;
         }
         case "fagprat-student-ev": {
@@ -482,7 +515,7 @@ export function FagpratDemo({
     }
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [tv, ipad, postToBoth, postToPhone, stegIdx, inLobby]);
+  }, [tv, ipad, postToBoth, postToPhone, stegIdx, inLobby, emitLiveStats]);
 
   // ── Stage layout ──
   // In standalone mode, below `md` (768 px) only one device is shown at a time
