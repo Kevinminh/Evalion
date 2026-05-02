@@ -26,15 +26,12 @@ export default function PersonvernOgVilkarPage() {
         <section className="text-center">
           <span className="section-label">Personvern og vilkår</span>
           <h1 className="mt-3 text-[clamp(32px,4.5vw,52px)] leading-tight">
-            Oppdatert brukervilkår og{" "}
-            <em className="text-purple-500">personvern</em>
+            Oppdatert brukervilkår og <em className="text-purple-500">personvern</em>
           </h1>
           <p className="mx-auto mt-3 max-w-[560px] text-base text-ink-secondary">
             En ærlig og enkel forklaring av hva vi samler inn, hvorfor, og hva vi aldri gjør.
           </p>
-          <p className="mt-5 text-sm text-ink-tertiary">
-            Sist oppdatert: 29. april 2026
-          </p>
+          <p className="mt-5 text-sm text-ink-tertiary">Sist oppdatert: 29. april 2026</p>
         </section>
 
         {/* TL;DR */}
@@ -271,17 +268,6 @@ export default function PersonvernOgVilkarPage() {
           </P>
         </section>
 
-        {/* DIVIDER */}
-        <div className="my-20 text-center">
-          <span
-            aria-hidden="true"
-            className="mx-auto mb-5 block h-0.5 w-20 rounded bg-purple-500"
-          />
-          <span className="italic text-sm text-ink-tertiary">
-            Del 2 · Brukervilkår
-          </span>
-        </div>
-
         {/* BRUKERVILKÅR */}
         <section id="brukervilkar" className="scroll-mt-24">
           <h2 className="border-b-2 border-cl-border pb-4 text-[clamp(26px,3vw,34px)] font-semibold">
@@ -367,12 +353,16 @@ export default function PersonvernOgVilkarPage() {
               innhold.
             </li>
             <li>CO-LAB er ikke ansvarlig for hvordan påstandene brukes i klasserommet.</li>
-            <li>Vi er ikke ansvarlige for direkte eller indirekte tap som følge av bruk av tjenesten.</li>
+            <li>
+              Vi er ikke ansvarlige for direkte eller indirekte tap som følge av bruk av tjenesten.
+            </li>
           </UL>
 
           <Heading>8. Oppsigelse</Heading>
           <UL>
-            <li>Du kan slette kontoen din når som helst via innstillinger eller ved å kontakte oss.</li>
+            <li>
+              Du kan slette kontoen din når som helst via innstillinger eller ved å kontakte oss.
+            </li>
             <li>Vi forbeholder oss retten til å suspendere kontoer som bryter vilkårene.</li>
           </UL>
 
@@ -424,11 +414,7 @@ export default function PersonvernOgVilkarPage() {
 }
 
 function Heading({ children }: { children: React.ReactNode }) {
-  return (
-    <h3 className="mt-8 mb-3 text-xl font-semibold text-ink">
-      {children}
-    </h3>
-  );
+  return <h3 className="mt-8 mb-3 text-xl font-semibold text-ink">{children}</h3>;
 }
 
 function P({ children, className }: { children: React.ReactNode; className?: string }) {
