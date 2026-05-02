@@ -395,6 +395,13 @@ export function FagpratDemo({
               postToBoth(ipad, clearMsg);
               setPhoneDisabled(true);
               setViewMode("ipad");
+              // Going back to the påstand picker — clear the forward-only
+              // stegIdx ratchet so the iPad and Reddi tips don't stay stuck on
+              // the previous påstand's last step. (Don't touch pastandIdx
+              // here: this branch also fires when the TV iframe re-announces
+              // steg=0 after a reload, and clobbering pastandIdx would undo
+              // the user's just-made påstand pick.)
+              setStegIdx(0);
             }
 
             ipad.load(
