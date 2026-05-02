@@ -499,11 +499,9 @@ export function DemoSection() {
         <FagpratDemo onStepChange={handleStepChange} onLiveStats={setLiveStats} />
       </div>
       <Link href="/fagprat-demo" className="demo-mobile-launch">
-        <span className="demo-mobile-launch-eyebrow">Interaktiv demo</span>
-        <span className="demo-mobile-launch-title">Åpne FagPrat-demoen</span>
         <span className="demo-mobile-launch-desc">
-          Bytt mellom lærervisning, elevvisning og live-statistikk for å se hele flyten – fungerer
-          også på mobil.
+          Bytt mellom lærervisning, elevvisning og live-statistikk – og se hvordan dialogen utvikler
+          seg i sanntid. Best på PC, men fungerer også på mobil og nettbrett.
         </span>
         <span className="demo-mobile-launch-cta">
           Åpne demo

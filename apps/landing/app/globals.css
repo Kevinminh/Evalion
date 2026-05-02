@@ -262,16 +262,18 @@ html {
 .demo-mobile-launch {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  gap: 18px;
   width: calc(100% - 32px);
   max-width: 480px;
   margin: 0 auto;
-  padding: 24px 22px;
+  padding: 28px 24px;
   background: rgba(255, 255, 255, 0.06);
   border: 1.5px solid rgba(255, 255, 255, 0.18);
   border-radius: 20px;
   color: #fff;
   text-decoration: none;
+  text-align: center;
   transition:
     background 0.2s,
     border-color 0.2s,
@@ -287,34 +289,21 @@ html {
   outline: 3px solid rgba(182, 168, 255, 0.7);
   outline-offset: 4px;
 }
-.demo-mobile-launch-eyebrow {
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #b6a8ff;
-}
-.demo-mobile-launch-title {
-  font-family: var(--font-sans);
-  font-size: 22px;
-  line-height: 1.2;
-}
 .demo-mobile-launch-desc {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.78);
 }
 .demo-mobile-launch-cta {
-  margin-top: 6px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  align-self: flex-start;
+  align-self: center;
   background: var(--color-purple-500);
   color: #fff;
   font-weight: 700;
-  font-size: 14px;
-  padding: 10px 18px;
+  font-size: 15px;
+  padding: 11px 22px;
   border-radius: 999px;
   box-shadow: 0 8px 20px rgba(108, 63, 197, 0.35);
 }
