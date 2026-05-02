@@ -202,7 +202,7 @@ html {
 }
 @media (min-width: 1024px) {
   .section-demo {
-    padding: 60px 0 0;
+    padding: 60px 0 clamp(140px, 18vh, 220px);
     min-height: clamp(680px, 82vh, 880px);
     overflow: visible;
   }
