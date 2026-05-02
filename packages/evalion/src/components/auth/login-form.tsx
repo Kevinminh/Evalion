@@ -61,9 +61,7 @@ function LoginForm({
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Logger inn..." : "Logg inn"}
           </Button>
-          <FieldSeparator className="[&>[data-slot=field-separator-content]]:bg-card">
-            eller
-          </FieldSeparator>
+          <FieldSeparator>eller</FieldSeparator>
           <Button type="button" variant="outline" className="w-full" onClick={onGoogleSignIn}>
             <GoogleIcon />
             Fortsett med Google
