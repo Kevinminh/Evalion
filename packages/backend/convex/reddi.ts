@@ -168,7 +168,7 @@ function flatten(raw: unknown, reqId: string): GeneratedStatement[] {
   return out;
 }
 
-const DEFAULT_MODEL = "gpt-4o" as const;
+const DEFAULT_MODEL = "claude-sonnet-4-6" as const;
 
 const modelValidator = v.union(
   v.literal("gpt-4o"),
@@ -179,7 +179,7 @@ const modelValidator = v.union(
 );
 
 type Model =
-  | typeof DEFAULT_MODEL
+  | "gpt-4o"
   | "gpt-4o-mini"
   | "claude-opus-4-7"
   | "claude-sonnet-4-6"

@@ -29,13 +29,13 @@ const TRINN_OPTIONS = [
   "VG3",
 ];
 
-const DEFAULT_MODEL = "gpt-4o";
+const DEFAULT_MODEL = "claude-sonnet-4-6";
 
 type Provider = "openai" | "anthropic";
 
 const MODELS_BY_PROVIDER: Record<Provider, readonly string[]> = {
   openai: ["gpt-4o", "gpt-4o-mini"],
-  anthropic: ["claude-opus-4-7", "claude-sonnet-4-6", "claude-haiku-4-5"],
+  anthropic: ["claude-sonnet-4-6", "claude-opus-4-7", "claude-haiku-4-5"],
 };
 
 type Forkunnskap = "intro" | "oppsummering";
@@ -62,7 +62,7 @@ export function GenerationForm({
   const [trinn, setTrinn] = useState(initialTrinn);
   const [forkunnskap, setForkunnskap] = useState<Forkunnskap | "">(initialForkunnskap ?? "");
   const [tema, setTema] = useState("");
-  const [provider, setProvider] = useState<Provider>("openai");
+  const [provider, setProvider] = useState<Provider>("anthropic");
   const [model, setModel] = useState<string>(DEFAULT_MODEL);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
