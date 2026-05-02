@@ -251,16 +251,20 @@
   html {
     @apply font-sans;
   }
-  /* Prevent iOS Safari from auto-zooming on input focus. Safari triggers zoom
-     when a focused control's font-size is < 16px. Pin form controls to 16px on
-     handheld viewports (Tailwind components are free to upscale to text-sm at
-     md+ where zoom isn't an issue). */
-  @media (max-width: 767px) {
-    input,
-    select,
-    textarea {
-      font-size: 16px;
-    }
+}
+
+/* Prevent iOS Safari from auto-zooming on input focus. Safari triggers zoom
+   when a focused control's computed font-size is < 16px. Pin form controls to
+   16px on handheld viewports.
+
+   Intentionally unlayered (not wrapped in @layer base) and using !important so
+   it wins against Tailwind utilities like `text-sm` / `text-xs` that may be
+   applied to inputs and textareas in shared components. */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  select,
+  textarea {
+    font-size: 16px !important;
   }
 }
 
