@@ -435,10 +435,7 @@ export function FagpratDemo({
             }
             postToPhone({ type: "fagprat-steg-num", num });
 
-            // Trigger Reddi tips update via the step-change effect.
-            // We sync stegIdx if laptop has advanced past it (matches next()'s
-            // logic).
-            setStegIdx((prev) => (idx > prev ? idx : prev));
+            setStegIdx(idx);
 
             if (num === 2 || num === 4) {
               setTimeout(() => {
