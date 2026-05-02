@@ -54,26 +54,6 @@ function findItemsArray(raw: unknown, reqId: string): RawItem[] | null {
     }
   }
 
-  for (const [k, v] of Object.entries(obj)) {
-    if (Array.isArray(v) && v.length > 0 && v[0] && typeof v[0] === "object") {
-      console.log(`[REDDI ${reqId}] findItemsArray: heuristic value-scan match`, {
-        key: k,
-        length: v.length,
-      });
-      return v as RawItem[];
-    }
-  }
-
-  const looksLikeSingleStatement =
-    (typeof obj.claim === "string" || typeof obj.text === "string") &&
-    (typeof obj.answer === "string" || typeof obj.fasit === "string");
-  if (looksLikeSingleStatement) {
-    console.log(`[REDDI ${reqId}] findItemsArray: single-statement object`, {
-      keys: topKeys,
-    });
-    return [obj as RawItem];
-  }
-
   if (
     Array.isArray(obj.sant) ||
     Array.isArray(obj.usant) ||
@@ -97,6 +77,26 @@ function findItemsArray(raw: unknown, reqId: string): RawItem[] | null {
       });
       return merged;
     }
+  }
+
+  for (const [k, v] of Object.entries(obj)) {
+    if (Array.isArray(v) && v.length > 0 && v[0] && typeof v[0] === "object") {
+      console.log(`[REDDI ${reqId}] findItemsArray: heuristic value-scan match`, {
+        key: k,
+        length: v.length,
+      });
+      return v as RawItem[];
+    }
+  }
+
+  const looksLikeSingleStatement =
+    (typeof obj.claim === "string" || typeof obj.text === "string") &&
+    (typeof obj.answer === "string" || typeof obj.fasit === "string");
+  if (looksLikeSingleStatement) {
+    console.log(`[REDDI ${reqId}] findItemsArray: single-statement object`, {
+      keys: topKeys,
+    });
+    return [obj as RawItem];
   }
 
   console.warn(`[REDDI ${reqId}] findItemsArray: no recognized shape`, {
@@ -201,26 +201,28 @@ Elevenes forkunnskaper
 DU MÅ ALLTID RETURNERE AKKURAT DENNE JSON-STRUKTUREN OG INGENTING ANNET:
 
 {
-  "statements": [
-    {
-      "claim": "Generert påstand",
-      "answer": "sant" | "usant" | "delvis",
-      "explanation": "Generert forklaring"
-    }
+  "sant": [
+    { "claim": "Generert sann påstand", "explanation": "Generert forklaring" }
+  ],
+  "usant": [
+    { "claim": "Generert usann påstand", "explanation": "Generert forklaring" }
+  ],
+  "delvis": [
+    { "claim": "Generert delvis sann påstand", "explanation": "Generert forklaring" }
   ]
 }
 
-"answer" må være nøyaktig én av disse tre verdiene: "sant", "usant", "delvis".
+Hvert av de tre arrayene ("sant", "usant", "delvis") skal inneholde NØYAKTIG 5 elementer.
 
 Returner BARE JSON-objektet – ingenting annet.
 
 === KRAV ===
 
-Lag nøyaktig 15 påstander:
+Lag nøyaktig 15 påstander fordelt på de tre arrayene:
 
-5 faglig korrekte
-5 faglig feil
-5 faglig delvis korrekte
+5 faglig korrekte (i "sant"-arrayet)
+5 faglig feil (i "usant"-arrayet)
+5 faglig delvis korrekte (i "delvis"-arrayet)
 
 Alle påstander skal være én kort setning.
 
@@ -295,20 +297,35 @@ const STRUCTURAL_REQUIREMENTS = `=== KRITISK: RESPONSFORMAT (OVERSTYRER ALT ANNE
 Du MÅ returnere ÉT enkelt JSON-objekt med EXAKT denne strukturen og ingenting annet (ingen markdown, ingen kodeblokker, ingen prosa, ingen forklarende tekst):
 
 {
-  "statements": [
-    {
-      "claim": "Generert påstand",
-      "answer": "sant",
-      "explanation": "Generert forklaring"
-    }
+  "sant": [
+    { "claim": "Påstand 1", "explanation": "Forklaring 1" },
+    { "claim": "Påstand 2", "explanation": "Forklaring 2" },
+    { "claim": "Påstand 3", "explanation": "Forklaring 3" },
+    { "claim": "Påstand 4", "explanation": "Forklaring 4" },
+    { "claim": "Påstand 5", "explanation": "Forklaring 5" }
+  ],
+  "usant": [
+    { "claim": "Påstand 1", "explanation": "Forklaring 1" },
+    { "claim": "Påstand 2", "explanation": "Forklaring 2" },
+    { "claim": "Påstand 3", "explanation": "Forklaring 3" },
+    { "claim": "Påstand 4", "explanation": "Forklaring 4" },
+    { "claim": "Påstand 5", "explanation": "Forklaring 5" }
+  ],
+  "delvis": [
+    { "claim": "Påstand 1", "explanation": "Forklaring 1" },
+    { "claim": "Påstand 2", "explanation": "Forklaring 2" },
+    { "claim": "Påstand 3", "explanation": "Forklaring 3" },
+    { "claim": "Påstand 4", "explanation": "Forklaring 4" },
+    { "claim": "Påstand 5", "explanation": "Forklaring 5" }
   ]
 }
 
 KRAV:
-- Roten skal være et objekt med nøkkelen "statements" som inneholder en JSON-array.
-- Arrayet skal inneholde nøyaktig 15 elementer: 5 sanne, 5 usanne, og 5 delvis sanne.
-- Hvert element skal ha feltene "claim" (string), "answer" (string), og "explanation" (string).
-- "answer" må være nøyaktig én av de små bokstavene: "sant", "usant", eller "delvis". Ikke skriv det med stor forbokstav, ikke oversett til engelsk.
+- Roten skal være et objekt med nøyaktig disse tre nøklene: "sant", "usant", "delvis".
+- Hvert array skal inneholde NØYAKTIG 5 elementer — ikke færre, ikke flere. Tell etter hvert element du skriver.
+- Hvert element skal ha feltene "claim" (string) og "explanation" (string).
+- Ikke inkluder et "answer"-felt; kategoritilhørighet er gitt av hvilket array elementet ligger i.
+- Nøklene "sant", "usant" og "delvis" må være på små bokstaver, ikke oversettes til engelsk.
 - Returner BARE JSON-objektet — ingenting før eller etter.`;
 
 function buildUserPrompt(args: {
@@ -522,56 +539,71 @@ export const generateStatements = action({
       systemPromptChars: systemPrompt.length,
     });
 
-    let statements: GeneratedStatement[];
-    try {
-      statements = model.startsWith("gpt-")
-        ? await generateWithOpenAI(model, systemPrompt, userPrompt, reqId)
-        : await generateWithAnthropic(model, systemPrompt, userPrompt, reqId);
-    } catch (err) {
-      console.error(`[REDDI ${reqId}] generation failed`, {
-        model,
-        message: err instanceof Error ? err.message : String(err),
-        stack: err instanceof Error ? err.stack : undefined,
-      });
-      throw err;
-    }
-
     const REQUIRED_PER_FASIT = 5;
-    const grouped: Record<Fasit, GeneratedStatement[]> = {
-      sant: [],
-      usant: [],
-      delvis: [],
-    };
-    for (const s of statements) {
-      grouped[s.fasit].push(s);
-    }
-    const groupCounts = {
-      sant: grouped.sant.length,
-      usant: grouped.usant.length,
-      delvis: grouped.delvis.length,
-    };
-    const short = FASIT_VALUES.filter(
-      (f) => grouped[f].length < REQUIRED_PER_FASIT,
-    );
-    if (short.length > 0) {
-      console.error(`[REDDI ${reqId}] balance check failed`, {
+    const MAX_ATTEMPTS = 2;
+    let balanced: GeneratedStatement[] | null = null;
+
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      let raw: GeneratedStatement[];
+      try {
+        raw = model.startsWith("gpt-")
+          ? await generateWithOpenAI(model, systemPrompt, userPrompt, reqId)
+          : await generateWithAnthropic(model, systemPrompt, userPrompt, reqId);
+      } catch (err) {
+        console.error(`[REDDI ${reqId}] generation failed`, {
+          attempt,
+          model,
+          message: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
+        throw err;
+      }
+
+      const grouped: Record<Fasit, GeneratedStatement[]> = {
+        sant: [],
+        usant: [],
+        delvis: [],
+      };
+      for (const s of raw) {
+        grouped[s.fasit].push(s);
+      }
+      const groupCounts = {
+        sant: grouped.sant.length,
+        usant: grouped.usant.length,
+        delvis: grouped.delvis.length,
+      };
+      const short = FASIT_VALUES.filter(
+        (f) => grouped[f].length < REQUIRED_PER_FASIT,
+      );
+
+      if (short.length === 0) {
+        balanced = [
+          ...grouped.sant.slice(0, REQUIRED_PER_FASIT),
+          ...grouped.usant.slice(0, REQUIRED_PER_FASIT),
+          ...grouped.delvis.slice(0, REQUIRED_PER_FASIT),
+        ];
+        console.log(`[REDDI ${reqId}] balanced`, {
+          attempt,
+          groupCounts,
+          kept: balanced.length,
+        });
+        break;
+      }
+
+      console.warn(`[REDDI ${reqId}] balance check failed`, {
+        attempt,
         required: REQUIRED_PER_FASIT,
         groupCounts,
         short,
       });
+    }
+
+    if (!balanced) {
       throw new Error(
         "AI laget ikke nok påstander av hver type (5 sanne, 5 usanne, 5 delvis sanne). Prøv igjen.",
       );
     }
-    statements = [
-      ...grouped.sant.slice(0, REQUIRED_PER_FASIT),
-      ...grouped.usant.slice(0, REQUIRED_PER_FASIT),
-      ...grouped.delvis.slice(0, REQUIRED_PER_FASIT),
-    ];
-    console.log(`[REDDI ${reqId}] balanced`, {
-      groupCounts,
-      kept: statements.length,
-    });
+    const statements = balanced;
 
     const prefixes: Record<string, string> = { sant: "s", usant: "u", delvis: "d" };
     const counters: Record<string, number> = { sant: 0, usant: 0, delvis: 0 };
