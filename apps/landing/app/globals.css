@@ -606,6 +606,56 @@
   font-weight: 700;
   color: #1c1810;
 }
+.reddi-bubble-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #ece4d9;
+}
+.reddi-bubble-nav-btn {
+  background: #f3ece1;
+  border: none;
+  color: #1c1810;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
+}
+.reddi-bubble-nav-btn:hover:not(:disabled) {
+  background: var(--color-purple-500);
+  color: #fff;
+}
+.reddi-bubble-nav-btn:focus-visible {
+  outline: 2px solid var(--color-purple-500);
+  outline-offset: 2px;
+}
+.reddi-bubble-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.reddi-bubble-nav-btn svg {
+  width: 16px;
+  height: 16px;
+}
+.reddi-bubble-counter {
+  font-size: 12px;
+  font-weight: 700;
+  color: #8a7a6f;
+  letter-spacing: 0.4px;
+  font-variant-numeric: tabular-nums;
+  min-width: 32px;
+  text-align: center;
+}
 
 /* ─────────── Fagprat React demo (replaces /demo/fagprat-demo.html iframe) ─────────── */
 .fagprat-demo-root {

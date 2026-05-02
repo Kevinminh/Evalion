@@ -250,6 +250,7 @@ export function FagpratDemo({
           }
           if (typeof data.fasit === "string") fasitRef.current = data.fasit;
           if (typeof data.index === "number") {
+            setPastandIdx(data.index);
             try {
               localStorage.setItem("fagprat-demo-statement", String(data.index));
             } catch {
