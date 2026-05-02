@@ -23,14 +23,14 @@ const team = [
   {
     name: "Asbjørn Lerø Kongsnes",
     role: "Pedagogisk rådgiver",
-    bio: "Medforfatter av læreverket Matemagisk 5–10 og kjent fra podkasten «SnakkeMatte». Bringer unik didaktisk og pedagogisk kompetanse.",
+    bio: "Medforfatter av læreverket Matemagisk 5–10 og kjent fra podkasten «Snakke matte». Bringer unik didaktisk og pedagogisk kompetanse.",
     image: "/assets/Asbjørn (teamet).png",
     style: { objectPosition: "center top", transform: "scale(0.995) translateY(-3px)" },
   },
   {
     name: "Martin Sørdal",
     role: "Pedagogisk rådgiver",
-    bio: "Medforfatter av læreverket Matemagisk 5–7. Kombinerer pedagogikk, økonomi og teknisk innsikt i sin arbeidshverdag.",
+    bio: "Medforfatter av læreverket Matemagisk 5–7. En viktig bidragsyter i utviklingen av CO-LAB med sin erfaring fra pedagogikk, økonomi og teknologi.",
     image: "/assets/Martin (teamet).png",
     style: { objectPosition: "center top", transform: "translateY(15px) scale(1.4)" },
   },

@@ -149,8 +149,8 @@ export default function Home() {
           </h2>
           <p className="mx-auto mt-5 max-w-[640px] text-base text-white/70">
             CO-LAB er et lærerstyrt verktøy som gjennom sin første aktivitet – FagPrat – skal gjøre
-            klassesamtalen engasjerende og tilgjengelig for alle elevene, samtidig som læreren
-            fanger opp verdifull innsikt.
+            klassesamtalen engasjerende og tilgjengelig for alle elevene, samtidig som læreren får
+            verdifull innsikt i hva elevene kan underveis.
           </p>
         </RevealOnScroll>
         <div className="mx-auto mt-12 grid max-w-[1180px] grid-cols-1 gap-6 sm:grid-cols-2 sm:px-3 md:grid-cols-3">
@@ -186,8 +186,8 @@ export default function Home() {
           <p className="mx-auto mt-5 max-w-[640px] text-base text-ink-secondary">
             FagPrat er en muntlig aktivitet hvor elevene tar stilling til påstander – sant, delvis
             sant eller usant – før de diskuterer med hverandre og reflekterer over egen forståelse.
-            Læreren styrer samtalen og fremdriften gjennom seks strukturerte steg, og kan velge
-            mellom flere måter å organisere samtalene på.
+            Ved hjelp av 6 strukturerte steg ledes læreren og elevene trygt gjennom utforskende
+            klassesamtaler.
           </p>
         </RevealOnScroll>
         <div className="relative mx-auto mt-12 grid max-w-[1180px] grid-cols-1 gap-6 sm:mt-16 sm:grid-cols-2 sm:gap-8 md:grid-cols-3 lg:grid-cols-6">
@@ -241,9 +241,9 @@ export default function Home() {
           <div className="grid grid-cols-1 items-stretch gap-8 sm:gap-10 lg:grid-cols-2 lg:gap-12">
             <RevealOnScroll className="flex flex-col">
               <p className="text-[16px] leading-[1.55] text-ink">
-                Med hjelp fra Reddi kan du enkelt lage gode påstander som virkelig setter i gang
-                diskusjonen i klassen. Gi Reddi tema, fag og trinn – så lager han 9 påstander, tre
-                i hver fasitkategori, som du kan velge fritt mellom og redigere til ditt behov.
+                Med Reddi på laget kan du enkelt lage påstander som setter i gang gode diskusjoner
+                i klassen. Gi tema, fag, trinn og elevenes forkunnskaper – så får du 15 forslag
+                fordelt på tre fasitkategorier, som du kan velge mellom og tilpasse.
               </p>
               <p className="mt-5 mb-3 text-[16px] leading-[1.55] text-ink">
                 Reddi sine påstander:
