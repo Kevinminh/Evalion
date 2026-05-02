@@ -805,7 +805,7 @@ html {
   margin: 0 auto;
 }
 .fagprat-demo-root--standalone .fagprat-stage {
-  padding: 0 12px;
+  padding: 0 4px;
 }
 @media (min-width: 768px) {
   .fagprat-demo-root--standalone .fagprat-stage {
@@ -858,7 +858,13 @@ html {
     left: 0;
     transform: none;
     width: 100%;
-    max-width: min(360px, 100%);
+    max-width: min(260px, 78%);
     margin: 0 auto;
+  }
+  /* Standalone iPad: drop the column padding and let the bezel span edge-to-
+     edge so the inner elev content scales up and reads at a comfortable size
+     on phones, instead of being squeezed by the surrounding gutters. */
+  .fagprat-demo-root--standalone .fagprat-ipad-col {
+    max-width: none;
   }
 }
