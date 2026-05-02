@@ -49,7 +49,7 @@ export function cleanIpadDoc(
       ".ipad-portrait{display:none !important;}",
       ".device-col:has(.ipad-portrait){display:none !important;}",
       ".device-label{display:none !important;}",
-      ".devices-row{display:flex !important;justify-content:center !important;align-items:flex-start !important;gap:0 !important;padding:0 !important;margin:0 !important;background:transparent !important;}",
+      ".devices-row{display:flex !important;flex-direction:row !important;justify-content:center !important;align-items:flex-start !important;gap:0 !important;padding:0 !important;margin:0 !important;background:transparent !important;}",
       ".device-col{background:transparent !important;padding:0 !important;margin:0 !important;}",
       ".sv-disclaimer{display:none !important;}",
     ].join("");
