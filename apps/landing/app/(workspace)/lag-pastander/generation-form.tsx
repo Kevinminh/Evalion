@@ -16,9 +16,8 @@ import { cn } from "@workspace/ui/lib/utils";
 
 import { authClient } from "../../lib/auth-client";
 
+import { FAG_OPTIONS } from "./fag-options";
 import { TRINN_OPTIONS, normalizeTrinn } from "./trinn-options";
-
-const FAG_OPTIONS = ["Naturfag", "Matematikk", "Samfunnsfag", "Norsk", "Engelsk", "KRLE"];
 
 const DEFAULT_MODEL = "claude-sonnet-4-6";
 

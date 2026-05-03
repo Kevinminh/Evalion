@@ -18,9 +18,8 @@ import { cn } from "@workspace/ui/lib/utils";
 import "@workspace/ui/styles/pdf-print.css";
 
 import type { Card, Fasit } from "./pastand-card";
+import { FAG_OPTIONS } from "./fag-options";
 import { TRINN_OPTIONS, normalizeTrinn } from "./trinn-options";
-
-const FAG_OPTIONS = ["Naturfag", "Matematikk", "Samfunnsfag", "Norsk", "Engelsk", "KRLE"];
 
 const PASTANDER_PER_PDF_PAGE = 6;
 
@@ -80,7 +79,7 @@ export function PdfExport() {
     if (draft === undefined) return;
     seededRef.current = true;
     setFag(draft?.lastFag ?? "");
-    setTrinn(draft?.lastTrinn ?? "");
+    setTrinn(normalizeTrinn(draft?.lastTrinn ?? ""));
     setForkunnskap(draft?.lastForkunnskap ?? "");
   }, [draft]);
 
