@@ -1,10 +1,5 @@
 "use client";
 
-import { useQuery } from "convex/react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-
 import { api } from "@workspace/backend/convex/_generated/api";
 import {
   Select,
@@ -14,14 +9,18 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import { cn } from "@workspace/ui/lib/utils";
+import { useQuery } from "convex/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import "@workspace/ui/styles/pdf-print.css";
-
-import type { Card, Fasit } from "./pastand-card";
 import { FAG_OPTIONS } from "./fag-options";
+import type { Card, Fasit } from "./pastand-card";
 import { TRINN_OPTIONS, normalizeTrinn } from "./trinn-options";
 
-const PASTANDER_PER_PDF_PAGE = 6;
+const PASTANDER_PER_FIRST_PAGE = 6;
+const PASTANDER_PER_OTHER_PAGE = 4;
 
 type Forkunnskap = "intro" | "oppsummering";
 
@@ -133,11 +132,7 @@ export function PdfExport() {
         >
           Lag PDF
         </h2>
-        <Link
-          href={BACK_HREF}
-          className={cn(topbarBtn, "px-3 py-1.5 text-base")}
-          aria-label="Lukk"
-        >
+        <Link href={BACK_HREF} className={cn(topbarBtn, "px-3 py-1.5 text-base")} aria-label="Lukk">
           ✕
         </Link>
       </header>
@@ -289,10 +284,39 @@ function PdfPagesPreview({
   pastander: Card[];
 }) {
   const chunks: Card[][] = [];
-  for (let i = 0; i < pastander.length; i += PASTANDER_PER_PDF_PAGE) {
-    chunks.push(pastander.slice(i, i + PASTANDER_PER_PDF_PAGE));
+  if (pastander.length === 0) {
+    chunks.push([]);
+  } else {
+    chunks.push(pastander.slice(0, PASTANDER_PER_FIRST_PAGE));
+    for (let i = PASTANDER_PER_FIRST_PAGE; i < pastander.length; i += PASTANDER_PER_OTHER_PAGE) {
+      chunks.push(pastander.slice(i, i + PASTANDER_PER_OTHER_PAGE));
+    }
   }
-  const pages = chunks.length > 0 ? chunks : [[]];
+  const pages = chunks;
+  const pageOffsets = chunks.map((_, idx) =>
+    idx === 0 ? 0 : PASTANDER_PER_FIRST_PAGE + (idx - 1) * PASTANDER_PER_OTHER_PAGE,
+  );
+
+  // Auto-shrink card text when the rendered content overflows the fixed-height
+  // card box. Runs after each render so it re-measures whenever påstander, the
+  // header, or layout (e.g. mobile scale recalc) changes.
+  useLayoutEffect(() => {
+    const container = document.getElementById("pdf-print-container");
+    if (!container) return;
+    const cards = container.querySelectorAll<HTMLElement>(".pdf-card");
+    cards.forEach((card) => {
+      const text = card.querySelector<HTMLElement>(".pdf-pastand-text");
+      const forklar = card.querySelector<HTMLElement>(".pdf-forklaring-text");
+      if (text) text.style.fontSize = "";
+      if (forklar) forklar.style.fontSize = "";
+      let scale = 1;
+      while (card.scrollHeight > card.clientHeight + 0.5 && scale > 0.55) {
+        scale -= 0.05;
+        if (text) text.style.fontSize = `${(11.5 * scale).toFixed(2)}pt`;
+        if (forklar) forklar.style.fontSize = `${(10 * scale).toFixed(2)}pt`;
+      }
+    });
+  }, [pastander, title, fag, trinn, forkunnskap]);
 
   return (
     <div
@@ -329,14 +353,10 @@ function PdfPagesPreview({
               const fasit = p.fasit as Fasit;
               return (
                 <article className="pdf-card" key={p.clientId}>
-                  <span className="pdf-card-num">
-                    {pageIdx * PASTANDER_PER_PDF_PAGE + cardIdx + 1}
-                  </span>
+                  <span className="pdf-card-num">{(pageOffsets[pageIdx] ?? 0) + cardIdx + 1}</span>
                   <div className={`pdf-fasit-box ${fasit}`}>{FASIT_LABEL[fasit]}</div>
                   <p className="pdf-pastand-text">{p.text}</p>
-                  {p.forklaring.trim() && (
-                    <p className="pdf-forklaring-text">{p.forklaring}</p>
-                  )}
+                  {p.forklaring.trim() && <p className="pdf-forklaring-text">{p.forklaring}</p>}
                 </article>
               );
             })}
