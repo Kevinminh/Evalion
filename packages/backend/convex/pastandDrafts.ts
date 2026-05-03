@@ -24,6 +24,14 @@ const forkunnskapValidator = v.union(
   v.literal("oppsummering"),
 );
 
+function isEmptyPastand(p: {
+  text: string;
+  forklaring: string;
+  fasit?: "sant" | "usant" | "delvis";
+}) {
+  return p.text.trim() === "" && p.forklaring.trim() === "" && p.fasit === undefined;
+}
+
 function validatePastander(pastander: { text: string; forklaring: string }[]) {
   if (pastander.length > MAX_PASTANDER) {
     throw new Error(`For mange påstander (maks ${MAX_PASTANDER}).`);
@@ -101,7 +109,8 @@ export const appendStatements = mutation({
       .unique();
 
     if (existing) {
-      const merged = [...existing.pastander, ...additions];
+      const kept = existing.pastander.filter((p) => !isEmptyPastand(p));
+      const merged = [...kept, ...additions];
       validatePastander(merged);
       await ctx.db.patch(existing._id, {
         pastander: merged,
