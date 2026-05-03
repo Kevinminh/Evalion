@@ -441,6 +441,29 @@ html {
     transform: translateY(-50%);
   }
 }
+@media (min-width: 1024px) {
+  .reddi-corner--navbar {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+  }
+  .reddi-corner--navbar .reddi-avatar-btn {
+    width: 56px;
+    height: 56px;
+  }
+}
+.reddi-corner--navbar .reddi-bubble {
+  left: 50%;
+  transform: translate(-50%, -10px);
+}
+.reddi-corner--navbar .reddi-bubble.visible {
+  transform: translate(-50%, 0);
+}
+.reddi-corner--navbar .reddi-bubble::before {
+  left: 50%;
+  transform: translateX(-50%);
+}
 .reddi-avatar-btn {
   position: relative;
   width: 56px;
