@@ -114,14 +114,6 @@ export function MinePastanderList({
   function deleteCard(clientId: string) {
     setCards((prev) => {
       const list = prev ?? [];
-      if (list.length <= 1) {
-        // Match mockup: clear fields rather than remove the last card.
-        return list.map((c) =>
-          c.clientId === clientId
-            ? { clientId: c.clientId, text: "", forklaring: "", fasit: undefined }
-            : c,
-        );
-      }
       knownClientIdsRef.current.delete(clientId);
       return list.filter((c) => c.clientId !== clientId);
     });
