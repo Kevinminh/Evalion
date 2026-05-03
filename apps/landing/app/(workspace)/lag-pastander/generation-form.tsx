@@ -16,18 +16,9 @@ import { cn } from "@workspace/ui/lib/utils";
 
 import { authClient } from "../../lib/auth-client";
 
+import { TRINN_OPTIONS, normalizeTrinn } from "./trinn-options";
+
 const FAG_OPTIONS = ["Naturfag", "Matematikk", "Samfunnsfag", "Norsk", "Engelsk", "KRLE"];
-const TRINN_OPTIONS = [
-  "5. trinn",
-  "6. trinn",
-  "7. trinn",
-  "8. trinn",
-  "9. trinn",
-  "10. trinn",
-  "VG1",
-  "VG2",
-  "VG3",
-];
 
 const DEFAULT_MODEL = "claude-sonnet-4-6";
 
@@ -59,7 +50,7 @@ export function GenerationForm({
   const storedPrompt = useQuery(api.aiPrompts.getReddiSystemPrompt, isAdmin ? {} : "skip");
 
   const [fag, setFag] = useState(initialFag);
-  const [trinn, setTrinn] = useState(initialTrinn);
+  const [trinn, setTrinn] = useState(() => normalizeTrinn(initialTrinn));
   const [forkunnskap, setForkunnskap] = useState<Forkunnskap | "">(initialForkunnskap ?? "");
   const [tema, setTema] = useState("");
   const [provider, setProvider] = useState<Provider>("anthropic");
@@ -86,7 +77,7 @@ export function GenerationForm({
     if (!initialFag && !initialTrinn && !initialForkunnskap) return;
     seededRef.current = true;
     if (initialFag) setFag(initialFag);
-    if (initialTrinn) setTrinn(initialTrinn);
+    if (initialTrinn) setTrinn(normalizeTrinn(initialTrinn));
     if (initialForkunnskap) setForkunnskap(initialForkunnskap);
   }, [initialFag, initialTrinn, initialForkunnskap]);
 
@@ -95,8 +86,7 @@ export function GenerationForm({
     autoGrow(temaRef.current);
   }, [tema]);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  const runSubmit = async () => {
     setError(null);
     if (!fag) return setError("Velg fag.");
     if (!trinn) return setError("Velg trinn.");
@@ -123,7 +113,21 @@ export function GenerationForm({
       params.set("model", model);
     }
     router.push(`/velg-pastander?${params.toString()}`);
-  }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    void runSubmit();
+  };
+
+  const handleTemaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key !== "Enter") return;
+    if (e.shiftKey) return;
+    if (e.nativeEvent.isComposing) return;
+    e.preventDefault();
+    if (submitting) return;
+    void runSubmit();
+  };
 
   function handleProviderChange(next: Provider) {
     setProvider(next);
@@ -343,6 +347,7 @@ export function GenerationForm({
           placeholder="F.eks. Newtons lover, brøkregning…"
           value={tema}
           onChange={(e) => setTema(e.target.value)}
+          onKeyDown={handleTemaKeyDown}
           required
         />
       </div>

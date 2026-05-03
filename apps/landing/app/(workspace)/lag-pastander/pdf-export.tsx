@@ -18,19 +18,11 @@ import { cn } from "@workspace/ui/lib/utils";
 import "@workspace/ui/styles/pdf-print.css";
 
 import type { Card, Fasit } from "./pastand-card";
+import { TRINN_OPTIONS, normalizeTrinn } from "./trinn-options";
 
 const FAG_OPTIONS = ["Naturfag", "Matematikk", "Samfunnsfag", "Norsk", "Engelsk", "KRLE"];
-const TRINN_OPTIONS = [
-  "5. trinn",
-  "6. trinn",
-  "7. trinn",
-  "8. trinn",
-  "9. trinn",
-  "10. trinn",
-  "VG1",
-  "VG2",
-  "VG3",
-];
+
+const PASTANDER_PER_PDF_PAGE = 6;
 
 type Forkunnskap = "intro" | "oppsummering";
 
@@ -298,8 +290,8 @@ function PdfPagesPreview({
   pastander: Card[];
 }) {
   const chunks: Card[][] = [];
-  for (let i = 0; i < pastander.length; i += 3) {
-    chunks.push(pastander.slice(i, i + 3));
+  for (let i = 0; i < pastander.length; i += PASTANDER_PER_PDF_PAGE) {
+    chunks.push(pastander.slice(i, i + PASTANDER_PER_PDF_PAGE));
   }
   const pages = chunks.length > 0 ? chunks : [[]];
 
@@ -338,7 +330,9 @@ function PdfPagesPreview({
               const fasit = p.fasit as Fasit;
               return (
                 <article className="pdf-card" key={p.clientId}>
-                  <span className="pdf-card-num">{pageIdx * 3 + cardIdx + 1}</span>
+                  <span className="pdf-card-num">
+                    {pageIdx * PASTANDER_PER_PDF_PAGE + cardIdx + 1}
+                  </span>
                   <div className={`pdf-fasit-box ${fasit}`}>{FASIT_LABEL[fasit]}</div>
                   <p className="pdf-pastand-text">{p.text}</p>
                   {p.forklaring.trim() && (
