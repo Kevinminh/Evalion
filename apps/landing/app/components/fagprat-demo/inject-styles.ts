@@ -52,6 +52,14 @@ export function cleanIpadDoc(
       ".devices-row{display:flex !important;flex-direction:row !important;justify-content:center !important;align-items:flex-start !important;gap:0 !important;padding:0 !important;margin:0 !important;background:transparent !important;}",
       ".device-col{background:transparent !important;padding:0 !important;margin:0 !important;}",
       ".sv-disclaimer{display:none !important;}",
+      // Compact the steg-1/steg-3 voting layout so the submit button fits inside
+      // the iPad screen at all viewport widths. The per-steg HTML already trims
+      // landscape paddings; these overrides reclaim ~50px more of vertical room.
+      ".ipad-landscape .sv-body{padding-top:var(--space-2) !important;padding-bottom:var(--space-2) !important;}",
+      ".ipad-landscape .sv-content{gap:var(--space-3) !important;}",
+      ".ipad-landscape .sv-stmt-card{min-height:56px !important;font-size:15px !important;padding:var(--space-2) var(--space-4) !important;}",
+      ".ipad-landscape .sv-reasoning-box{min-height:36px !important;}",
+      ".ipad-landscape .sv-submit-btn{margin-bottom:var(--space-3) !important;}",
     ].join("");
     doc.head.appendChild(style);
   } catch {
