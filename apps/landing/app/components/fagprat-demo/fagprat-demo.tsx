@@ -59,7 +59,11 @@ export function FagpratDemo({
   // teacher TV view so visitors land on the FagPrat overview, not the empty
   // student lobby.
   const [viewMode, setViewMode] = useState<ViewMode>(standalone ? "tv" : "ipad");
-  const [phoneDisabled, setPhoneDisabled] = useState(true);
+  // Live-statistikk is locked while in the lobby or on the påstand picker
+  // (steg 0). As soon as a påstand becomes active (steg 1–6) it unlocks. We
+  // derive this rather than tracking it via postMessage so the toggle never
+  // gets stuck disabled because a `fagprat-statement` didn't arrive.
+  const phoneDisabled = inLobby || (STEG[stegIdx]?.num ?? 0) === 0;
 
   // ── State that doesn't need re-renders (relayed to iframes only) ──
   const selectedStmtRef = useRef<Stmt | null>(null);
@@ -236,7 +240,6 @@ export function FagpratDemo({
     postToPhone({ type: "fagprat-steg-num", num: s.num });
 
     if (s.num === 0) {
-      setPhoneDisabled(true);
       setViewMode(standalone ? "tv" : "ipad");
     }
   }, [stegIdx, pastandIdx, inLobby, tv, ipad, postToPhone]);
@@ -288,7 +291,6 @@ export function FagpratDemo({
           currentChangesRef.current = null;
           currentResultatRef.current = null;
           emitLiveStats();
-          setPhoneDisabled(false);
           try {
             tv.getFront()?.contentWindow?.postMessage(data, "*");
           } catch {
@@ -426,7 +428,6 @@ export function FagpratDemo({
               r2VoteRef.current = null;
               const clearMsg = { type: "fagprat-my-votes", r1: null, r2: null };
               postToBoth(ipad, clearMsg);
-              setPhoneDisabled(true);
               setViewMode("ipad");
               // Going back to the påstand picker — clear the forward-only
               // stegIdx ratchet so the iPad and Reddi tips don't stay stuck on

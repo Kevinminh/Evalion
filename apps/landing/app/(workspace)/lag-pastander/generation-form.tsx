@@ -286,7 +286,7 @@ export function GenerationForm({
             <SelectTrigger id="fag" className="w-full">
               <SelectValue placeholder="Velg fag" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-h-64">
               {FAG_OPTIONS.map((opt) => (
                 <SelectItem key={opt} value={opt}>
                   {opt}
@@ -303,7 +303,7 @@ export function GenerationForm({
             <SelectTrigger id="trinn" className="w-full">
               <SelectValue placeholder="Velg trinn" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-h-64">
               {TRINN_OPTIONS.map((opt) => (
                 <SelectItem key={opt} value={opt}>
                   {opt}
