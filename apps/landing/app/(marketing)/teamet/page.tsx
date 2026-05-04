@@ -44,7 +44,7 @@ const team = [
   {
     name: "Kevin Minh",
     role: "Teknisk rådgiver",
-    bio: "Fullstack-utvikler fra Gyldendal med verdifull kjennskap til både tekniske og pedagogiske krav innen utdanning.",
+    bio: "Fullstack-utvikler med verdifull kjennskap til tekniske løsninger. Har erfaring med utvikling fra Gyldendal.",
     image: "/assets/Kevin (teamet).png",
     style: { objectPosition: "center 15%", transform: "translateY(20px) scale(1.5)" },
   },
