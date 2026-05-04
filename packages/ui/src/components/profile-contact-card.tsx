@@ -17,7 +17,7 @@ export type ProfileContactCardProps = {
 };
 
 function ProfileContactCard({
-  email = "post@co-lab.no",
+  email = "kontakt@co-lab.no",
   title = "Kontakt oss",
   description = "Har du spørsmål eller tilbakemeldinger? Vi hører gjerne fra deg.",
   className,

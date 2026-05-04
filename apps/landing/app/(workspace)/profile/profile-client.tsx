@@ -18,7 +18,7 @@ import { CONTACT_EMAIL } from "@/lib/constants";
 
 const legalLinks: ProfileLegalLink[] = [
   { label: "Personvern og vilkår", href: "/personvern-og-vilkar" },
-  { label: "Om Evalion", href: "/teamet" },
+  { label: "Om Co-lab", href: "/teamet" },
 ];
 
 export function ProfileClient() {

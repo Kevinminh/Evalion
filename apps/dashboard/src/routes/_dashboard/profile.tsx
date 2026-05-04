@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_dashboard/profile")({
 
 const legalLinks: ProfileLegalLink[] = [
   { label: "Personvern og vilkår", href: PERSONVERN_URL, external: true },
-  { label: "Om Evalion", href: OM_EVALION_URL, external: true },
+  { label: "Om Co-lab", href: OM_EVALION_URL, external: true },
 ];
 
 function ProfilePage() {

@@ -239,10 +239,10 @@ export function FagpratDemo({
     }
     postToPhone({ type: "fagprat-steg-num", num: s.num });
 
-    if (s.num === 0) {
-      setViewMode(standalone ? "tv" : "ipad");
+    if (s.num === 0 && !standalone) {
+      setViewMode("ipad");
     }
-  }, [stegIdx, pastandIdx, inLobby, tv, ipad, postToPhone]);
+  }, [stegIdx, pastandIdx, inLobby, tv, ipad, postToPhone, standalone]);
 
   // ── Step-change reporting (Reddi tips driver) ──
   useEffect(() => {
@@ -428,7 +428,9 @@ export function FagpratDemo({
               r2VoteRef.current = null;
               const clearMsg = { type: "fagprat-my-votes", r1: null, r2: null };
               postToBoth(ipad, clearMsg);
-              setViewMode("ipad");
+              if (!standalone) {
+                setViewMode("ipad");
+              }
               // Going back to the påstand picker — clear the forward-only
               // stegIdx ratchet so the iPad and Reddi tips don't stay stuck on
               // the previous påstand's last step. (Don't touch pastandIdx
@@ -516,7 +518,7 @@ export function FagpratDemo({
     }
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [tv, ipad, postToBoth, postToPhone, stegIdx, inLobby, emitLiveStats]);
+  }, [tv, ipad, postToBoth, postToPhone, stegIdx, inLobby, emitLiveStats, standalone]);
 
   // ── Stage layout ──
   // In standalone mode, below `md` (768 px) only one device is shown at a time
