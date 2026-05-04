@@ -156,8 +156,8 @@ function buildSteg2Tip(pastandIdx: number, stats: StatsSlice): string {
       );
     case 1:
       return (
-        `<p>Statistikken viser at <strong>${wrong} av ${total}</strong> elever har feil svar (${wPct} %), ` +
-        `samtidig som sikkerheten er høy (<strong>${avg}</strong>). Dette tyder på en kollektiv misoppfatning. ` +
+        `<p>Kun <strong>${cPct} %</strong> av elevene har svart riktig, samtidig som sikkerheten er høy (<strong>${avg}</strong>). ` +
+        `Dette tyder på en kollektiv misoppfatning. ` +
         `Her bør du løfte fram begrunnelser som utfordrer tanken om at elbiler er helt utslippsfrie.</p>`
       );
     case 2:
