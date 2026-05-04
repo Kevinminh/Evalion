@@ -19,7 +19,7 @@ import { FAG_OPTIONS } from "./fag-options";
 import type { Card, Fasit } from "./pastand-card";
 import { TRINN_OPTIONS, normalizeTrinn } from "./trinn-options";
 
-const PASTANDER_PER_FIRST_PAGE = 6;
+const PASTANDER_PER_FIRST_PAGE = 3;
 const PASTANDER_PER_OTHER_PAGE = 4;
 
 type Forkunnskap = "intro" | "oppsummering";
