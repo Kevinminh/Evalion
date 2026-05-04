@@ -86,15 +86,13 @@ export default function Home() {
               <a href="#demo" className="cl-cta">
                 Prøv demo →
               </a>
-              <span className="text-xs text-ink-tertiary">
-                Ingen innlogging kreves
-              </span>
+              <span className="text-xs text-ink-tertiary">Ingen innlogging kreves</span>
             </div>
             <div className="order-5 hidden lg:order-none lg:col-start-1 lg:row-start-3 lg:mt-24 lg:block">
-              <span className="cl-launch-pill">Lanseres 18. mai 2026</span>
+              <span className="cl-launch-pill">Lanseres 24. mai 2026</span>
             </div>
             <div className="order-4 mt-4 flex justify-center sm:mt-6 lg:hidden">
-              <span className="cl-launch-pill">Lanseres 18. mai 2026</span>
+              <span className="cl-launch-pill">Lanseres 24. mai 2026</span>
             </div>
           </div>
         </div>
@@ -144,8 +142,7 @@ export default function Home() {
         <RevealOnScroll className="mx-auto max-w-[820px] text-center">
           <span className="section-label !text-white/60">Om CO-LAB</span>
           <h2 className="mt-3 text-[clamp(28px,3.5vw,42px)] leading-tight text-white">
-            En samtale der{" "}
-            <em className="text-[#b6a8ff]">alle</em> får plass
+            En samtale der <em className="text-[#b6a8ff]">alle</em> får plass
           </h2>
           <p className="mx-auto mt-5 max-w-[640px] text-base text-white/70">
             CO-LAB er et lærerstyrt verktøy som gjennom sin første aktivitet – FagPrat – skal gjøre
@@ -180,8 +177,7 @@ export default function Home() {
           <span className="section-label">Slik fungerer FagPrat</span>
           <h2 className="mt-3 text-[clamp(28px,3.5vw,42px)] leading-tight">
             Fra <em className="text-purple-500">påstand</em> til{" "}
-            <em className="text-purple-500">forståelse</em> på 6
-            steg
+            <em className="text-purple-500">forståelse</em> på 6 steg
           </h2>
           <p className="mx-auto mt-5 max-w-[640px] text-base text-ink-secondary">
             FagPrat er en muntlig aktivitet hvor elevene tar stilling til påstander – sant, delvis
@@ -205,12 +201,8 @@ export default function Home() {
               <div className="z-[2] mb-[18px] flex h-[56px] w-[56px] items-center justify-center rounded-full border-[1.5px] border-[rgba(11,56,64,0.18)] bg-white text-[22px] italic text-ink shadow-[0_6px_16px_rgba(11,56,64,0.12)] sm:h-[64px] sm:w-[64px] sm:text-[24px] lg:h-[72px] lg:w-[72px] lg:text-[28px]">
                 {i + 1}
               </div>
-              <h3 className="mb-[10px] text-[17px] font-medium text-ink">
-                {step.title}
-              </h3>
-              <p className="text-[13px] leading-[1.55] text-ink-secondary">
-                {step.desc}
-              </p>
+              <h3 className="mb-[10px] text-[17px] font-medium text-ink">{step.title}</h3>
+              <p className="text-[13px] leading-[1.55] text-ink-secondary">{step.desc}</p>
             </RevealOnScroll>
           ))}
         </div>
@@ -234,20 +226,17 @@ export default function Home() {
           <RevealOnScroll className="mb-10 text-center sm:mb-12">
             <span className="section-label">Vår påstandsgenerator</span>
             <h2 className="mt-3 text-[clamp(28px,3.5vw,42px)] leading-tight">
-              La <em className="text-purple-500">Reddi</em> lage
-              påstandene for deg
+              La <em className="text-purple-500">Reddi</em> lage påstandene for deg
             </h2>
           </RevealOnScroll>
           <div className="grid grid-cols-1 items-stretch gap-8 sm:gap-10 lg:grid-cols-2 lg:gap-12">
             <RevealOnScroll className="flex flex-col">
               <p className="text-[16px] leading-[1.55] text-ink">
-                Med Reddi på laget kan du enkelt lage påstander som setter i gang gode diskusjoner
-                i klassen. Gi tema, fag, trinn og elevenes forkunnskaper – så får du 15 forslag
+                Med Reddi på laget kan du enkelt lage påstander som setter i gang gode diskusjoner i
+                klassen. Gi tema, fag, trinn og elevenes forkunnskaper – så får du 15 forslag
                 fordelt på tre fasitkategorier, som du kan velge mellom og tilpasse.
               </p>
-              <p className="mt-5 mb-3 text-[16px] leading-[1.55] text-ink">
-                Reddi sine påstander:
-              </p>
+              <p className="mt-5 mb-3 text-[16px] leading-[1.55] text-ink">Reddi sine påstander:</p>
               <ul className="mb-6 grid grid-cols-1 gap-2 sm:grid-cols-3">
                 {generatorCriteria.map((c) => (
                   <li
@@ -271,9 +260,7 @@ export default function Home() {
                 <Link href="/logg-inn" className="cl-cta cl-cta--md">
                   Logg inn / Registrer deg
                 </Link>
-                <p className="text-[13px] text-ink-tertiary">
-                  Gratis tilgang fram til 1.juli
-                </p>
+                <p className="text-[13px] text-ink-tertiary">Gratis tilgang fram til 1.juli</p>
               </div>
             </RevealOnScroll>
             <RevealOnScroll delay={100} className="flex min-h-full flex-col">

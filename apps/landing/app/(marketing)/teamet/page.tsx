@@ -37,7 +37,7 @@ const team = [
   {
     name: "Per Erlend Mathisen",
     role: "Strategisk rådgiver",
-    bio: "Siviløkonom og en del av gründerteamet bak Qtime. Bred erfaring med oppstart og skalering av teknologibedrifter.",
+    bio: "Siviløkonom med bakgrunn som IT- og strategikonsulent. En del av gründerteamet bak Qtime. Bred erfaring fra rådgivning, oppstart og skalering av teknologibedrifter.",
     image: "/assets/Per Erlend (teamet).png",
     style: { transform: "translateY(-5px) scale(1.3)" },
   },
@@ -57,9 +57,7 @@ export default function TeametPage() {
         <div className="text-center">
           <span className="section-label">Møt teamet</span>
           <h1 className="mt-3 text-[clamp(28px,3.5vw,42px)] leading-tight">
-            Tverrfaglighet med{" "}
-            <em className="text-purple-500">pedagogisk</em>{" "}
-            tyngde
+            Tverrfaglighet med <em className="text-purple-500">pedagogisk</em> tyngde
           </h1>
         </div>
 
@@ -81,9 +79,7 @@ export default function TeametPage() {
               <span className="mt-1 inline-block rounded-full bg-sage-50 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-purple-500">
                 {member.role}
               </span>
-              <p className="mt-4 text-sm leading-relaxed text-ink-secondary">
-                {member.bio}
-              </p>
+              <p className="mt-4 text-sm leading-relaxed text-ink-secondary">{member.bio}</p>
             </article>
           ))}
         </div>
