@@ -74,6 +74,12 @@ export function FagpratDemo({
   const nicknameRef = useRef<string>("Markus");
   const phoneTabRef = useRef<PhoneTab>("runde1");
   const timerRunningRef = useRef(false);
+  // Whether each voting round was actually opened (timer started) for the
+  // current påstand. When the viewer jumps past a round without opening it,
+  // we fast-forward the phone iframe so the pre-set 21-student fallback
+  // statistics are still visible downstream.
+  const r1OpenedRef = useRef(false);
+  const r2OpenedRef = useRef(false);
   const actualLaptopIdxRef = useRef(0);
   const prevLaptopStegRef = useRef(-1);
   const currentReasonsRef = useRef<unknown[] | null>(null);
@@ -290,6 +296,9 @@ export function FagpratDemo({
           currentR1StatsRef.current = null;
           currentChangesRef.current = null;
           currentResultatRef.current = null;
+          // New påstand → both voting rounds start unopened again.
+          r1OpenedRef.current = false;
+          r2OpenedRef.current = false;
           emitLiveStats();
           try {
             tv.getFront()?.contentWindow?.postMessage(data, "*");
@@ -391,8 +400,13 @@ export function FagpratDemo({
           return;
         }
         case "fagprat-timer": {
-          if (data.action === "start") timerRunningRef.current = true;
-          else if (data.action === "stop" || data.action === "finish")
+          if (data.action === "start") {
+            timerRunningRef.current = true;
+            // Mark the round opened so we don't fast-forward it later.
+            const stegNum = STEG[stegIdx]?.num ?? 0;
+            if (stegNum === 1) r1OpenedRef.current = true;
+            else if (stegNum === 3) r2OpenedRef.current = true;
+          } else if (data.action === "stop" || data.action === "finish")
             timerRunningRef.current = false;
           postToBoth(ipad, data);
           postToPhone(data);
@@ -422,6 +436,20 @@ export function FagpratDemo({
             }
             actualLaptopIdxRef.current = idx;
             prevLaptopStegRef.current = num;
+
+            // Fast-forward any voting rounds the viewer has skipped past
+            // without opening (no timer ever started). This populates the
+            // phone iframe's pre-set 21-student fallback stats so steg 2/4/5/6
+            // and the live-statistikk view aren't blank. R1 must run before
+            // R2 so R2's broadcast can reference _r1FinalStats.
+            if (num >= 2 && !r1OpenedRef.current) {
+              r1OpenedRef.current = true;
+              postToPhone({ type: "fagprat-fast-forward", round: 1 });
+            }
+            if (num >= 4 && !r2OpenedRef.current) {
+              r2OpenedRef.current = true;
+              postToPhone({ type: "fagprat-fast-forward", round: 2 });
+            }
 
             if (num === 0) {
               r1VoteRef.current = null;

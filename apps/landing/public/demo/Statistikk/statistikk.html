@@ -286,6 +286,20 @@
       font-style: italic;
     }
 
+    /* Tap-to-explore hint shown below the matrix card */
+    .matrix-tap-hint {
+      margin-top: 12px;
+      padding: 14px 16px;
+      background: var(--color-primary-50, #f4f1ff);
+      border: 1px solid var(--color-primary-200, #e3dcff);
+      border-radius: 14px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: var(--font-semibold);
+      color: var(--color-text-secondary);
+      line-height: 1.4;
+    }
+
     /* Boks som viser hvor mange som har endret mening */
     .endret-mening-box {
       display: flex; align-items: center; justify-content: center;
@@ -608,6 +622,11 @@
                 </div>
               </div>
             </div>
+
+            <!-- Tap-to-explore hint (mirrors matrix visibility) -->
+            <div class="matrix-tap-hint" id="matrix-tap-hint-r1" style="display:none;">
+              Trykk på kategoriene for å se de individuelle elevbidragene
+            </div>
           </div>
         </div>
 
@@ -716,6 +735,11 @@
                   <div id="matrix-students-list-r2"></div>
                 </div>
               </div>
+            </div>
+
+            <!-- Tap-to-explore hint (mirrors matrix visibility) -->
+            <div class="matrix-tap-hint" id="matrix-tap-hint-r2" style="display:none;">
+              Trykk på kategoriene for å se de individuelle elevbidragene
             </div>
           </div>
         </div>
@@ -1392,6 +1416,7 @@
       var waitingEl = document.getElementById('stats-waiting-r1');
       var statsContentEl = document.getElementById('stats-content-r1');
       var statsMatrixEl = document.getElementById('stats-matrix-r1');
+      var matrixHintEl = document.getElementById('matrix-tap-hint-r1');
       var colItems = tab.querySelectorAll('.col-item');
       var statusCount = tab.querySelector('.status-count');
       var statusBtn = tab.querySelector('.status-active-btn');
@@ -1416,12 +1441,14 @@
         waitingEl.classList.remove('hidden');
         statsContentEl.classList.remove('visible');
         statsMatrixEl.style.display = 'none';
+        if (matrixHintEl) matrixHintEl.style.display = 'none';
       }
 
       function showStats() {
         waitingEl.classList.add('hidden');
         statsContentEl.classList.add('visible');
         statsMatrixEl.style.display = '';
+        if (matrixHintEl) matrixHintEl.style.display = '';
       }
 
       function computeAndRender() {
@@ -1701,6 +1728,14 @@
           } // end else (R1 active)
         }
 
+        // Fast-forward: skip the timer and reveal all 21 auto-students at once.
+        // Used when the demo viewer jumps past Runde 1 without opening the
+        // voting round, so the fallback class stats are still visible.
+        if (e.data.type === 'fagprat-fast-forward' && e.data.round === 1) {
+          showFinished();
+          return;
+        }
+
         // Student (Markus) voted from iPad — use current fasit
         if (e.data.type === 'fagprat-student-vote') {
           if (studentInserted) return;
@@ -1790,6 +1825,7 @@
       var waitingEl = document.getElementById('stats-waiting-r2');
       var statsContentEl = document.getElementById('stats-content-r2');
       var statsMatrixEl = document.getElementById('stats-matrix-r2');
+      var matrixHintEl = document.getElementById('matrix-tap-hint-r2');
       var colItems = tab.querySelectorAll('.col-item');
 
       // Helper: position pct label inside or above bar
@@ -1820,12 +1856,14 @@
         waitingEl.classList.remove('hidden');
         statsContentEl.classList.remove('visible');
         statsMatrixEl.style.display = 'none';
+        if (matrixHintEl) matrixHintEl.style.display = 'none';
       }
 
       function showStats() {
         waitingEl.classList.add('hidden');
         statsContentEl.classList.add('visible');
         statsMatrixEl.style.display = '';
+        if (matrixHintEl) matrixHintEl.style.display = '';
       }
 
       function computeAndRender() {
@@ -2202,6 +2240,13 @@
               }, '*');
             }
           }
+        }
+
+        // Fast-forward: reveal all 21 R2 auto-students at once when the demo
+        // viewer jumps past Runde 2 without opening the voting round.
+        if (e.data.type === 'fagprat-fast-forward' && e.data.round === 2) {
+          showFinished();
+          return;
         }
 
         // Student (Markus) voted from iPad in R2
