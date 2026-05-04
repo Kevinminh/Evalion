@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
 } from "react";
+
 import type { LiveStatsSnapshot } from "@/components/fagprat-demo/fagprat-demo";
 
 export type StepInfo = {
@@ -63,11 +64,7 @@ function asStats(value: unknown): StatsSlice | null {
   const v = value as { counts?: unknown; avgTotal?: unknown };
   if (!v.counts || typeof v.counts !== "object") return null;
   const c = v.counts as Record<string, unknown>;
-  if (
-    typeof c.sant !== "number" ||
-    typeof c.delvis !== "number" ||
-    typeof c.usant !== "number"
-  ) {
+  if (typeof c.sant !== "number" || typeof c.delvis !== "number" || typeof c.usant !== "number") {
     return null;
   }
   if (c.sant + c.delvis + c.usant === 0) return null;
@@ -109,7 +106,7 @@ const STATIC_MESSAGES: Record<string, string[]> = {
   lobby: [
     "<p>Hei, jeg heter Reddi. Jeg lyser opp når jeg har et godt tips - men du kan utforske helt fritt om du vil det.</p>" +
       "<p>Dette er venterommet. Her dukker elevene opp når de skanner QR-koden eller skriver inn koden på sin digitale enhet.</p>" +
-      "<p>Denne FagPraten er i naturfag om <strong>klima og bærekraft</strong>, og er laget som en oppsummering for elever på 10. trinn med gode forkunnskaper. Meld deg på elev og gjør deg klar til din første FagPrat.</p>",
+      "<p>Denne FagPraten er i naturfag om <strong>klima og bærekraft</strong>, og er laget som en oppsummering for elever på 10. trinn med gode forkunnskaper. Meld deg på som elev og gjør deg klar til din første FagPrat.</p>",
   ],
   steg0: [
     "<p>Dette er oversikten over påstandene i denne FagPraten. Påstandene er enten <strong>sant</strong>, <strong>delvis sant</strong> eller <strong>usant</strong>. Læreren velger en og en påstand som klassen skal diskutere.</p>",
@@ -178,11 +175,7 @@ function buildSteg2Tip(pastandIdx: number, stats: StatsSlice): string {
   }
 }
 
-function buildSteg4Tip(
-  pastandIdx: number,
-  r1: StatsSlice,
-  r2: StatsSlice,
-): string {
+function buildSteg4Tip(pastandIdx: number, r1: StatsSlice, r2: StatsSlice): string {
   const fasit = FASIT_BY_PASTAND[pastandIdx] ?? "sant";
   const r1Total = totalOf(r1.counts);
   const r2Total = totalOf(r2.counts);
@@ -250,11 +243,7 @@ function buildSteg6Tip(pastandIdx: number, resultat: ResultatSlice): string {
 
 const PER_PASTAND_STEPS = new Set(["steg2", "steg4", "steg6"]);
 
-function messagesFor(
-  key: string,
-  pastandIdx: number,
-  snapshot: LiveStatsSnapshot,
-): string[] {
+function messagesFor(key: string, pastandIdx: number, snapshot: LiveStatsSnapshot): string[] {
   if (key.startsWith("steg1-p")) return STATIC_MESSAGES.steg1 ?? [];
 
   const base = STATIC_MESSAGES[key];
@@ -419,14 +408,11 @@ export const ReddiTips = forwardRef<ReddiTipsHandle, Props>(function ReddiTips(
   }
 
   const hasTip =
-    !bubbleOpen &&
-    messages.length > 0 &&
-    messages.some((_, i) => !shown.has(`${id}|m${i}`));
+    !bubbleOpen && messages.length > 0 && messages.some((_, i) => !shown.has(`${id}|m${i}`));
   const reading = bubbleOpen;
   const bubbleHtml = messages[safeMsgIdx] ?? "";
   const showNav = messages.length > 1;
-  const cornerClass =
-    variant === "navbar" ? "reddi-corner reddi-corner--navbar" : "reddi-corner";
+  const cornerClass = variant === "navbar" ? "reddi-corner reddi-corner--navbar" : "reddi-corner";
 
   return (
     <div className={cornerClass}>
