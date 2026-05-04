@@ -269,8 +269,12 @@ function messagesFor(key: string, pastandIdx: number, snapshot: LiveStatsSnapsho
   return base;
 }
 
-function identityFor(key: string, pastandIdx: number): string {
-  if (PER_PASTAND_STEPS.has(key)) return `${key}|p${pastandIdx}`;
+function identityFor(key: string): string {
+  // Read tracking is per-step (not per-påstand): once the user has seen
+  // message N at a given step, it stays "seen" when they switch to another
+  // påstand on the same step, so the avatar doesn't blink for content they
+  // have already read. Display still varies per påstand via messagesFor.
+  if (key.startsWith("steg1-p")) return "steg1";
   return key;
 }
 
@@ -289,7 +293,6 @@ export const ReddiTips = forwardRef<ReddiTipsHandle, Props>(function ReddiTips(
   const bubbleRef = useRef<HTMLDivElement>(null);
   const autoShownRef = useRef(false);
   const currentKeyRef = useRef("lobby");
-  const pastandIdxRef = useRef(0);
 
   const [currentKey, setCurrentKey] = useState("lobby");
   const [pastandIdx, setPastandIdx] = useState(0);
@@ -301,10 +304,6 @@ export const ReddiTips = forwardRef<ReddiTipsHandle, Props>(function ReddiTips(
   useEffect(() => {
     currentKeyRef.current = currentKey;
   }, [currentKey]);
-
-  useEffect(() => {
-    pastandIdxRef.current = pastandIdx;
-  }, [pastandIdx]);
 
   const markShown = useCallback((identity: string, idx: number) => {
     setShown((prev) => {
@@ -344,7 +343,7 @@ export const ReddiTips = forwardRef<ReddiTipsHandle, Props>(function ReddiTips(
     if (autoShownRef.current) return;
     autoShownRef.current = true;
     setMsgIdx(0);
-    markShown(identityFor(currentKeyRef.current, pastandIdxRef.current), 0);
+    markShown(identityFor(currentKeyRef.current), 0);
     setBubbleOpen(true);
   }, [markShown]);
 
@@ -374,7 +373,7 @@ export const ReddiTips = forwardRef<ReddiTipsHandle, Props>(function ReddiTips(
   }, [autoShow, triggerOpen]);
 
   const messages = messagesFor(currentKey, pastandIdx, liveStats);
-  const id = identityFor(currentKey, pastandIdx);
+  const id = identityFor(currentKey);
   const safeMsgIdx = Math.min(msgIdx, Math.max(messages.length - 1, 0));
 
   function toggleBubble() {
