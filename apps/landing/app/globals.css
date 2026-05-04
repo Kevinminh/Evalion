@@ -712,6 +712,7 @@ html {
   .fagprat-tv-col {
     flex: 1.6 1 0;
     max-width: 1040px;
+    margin-top: 56px;
   }
 }
 
