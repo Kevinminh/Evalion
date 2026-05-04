@@ -216,12 +216,13 @@ export default function Home() {
         id="generator"
         className="relative bg-cl-light py-12 sm:py-16 lg:flex lg:min-h-[clamp(680px,82vh,880px)] lg:flex-col lg:justify-center"
       >
-        <span
+        <Link
+          href="/lag-pastander"
           aria-label="Få tilgang nå!"
           className="absolute top-[60px] right-[130px] z-[5] hidden rotate-[24deg] rounded-[6px] border-2 border-[#3E2E88] px-4 py-3 text-[15px] font-extrabold uppercase tracking-[0.09em] whitespace-nowrap text-[#3E2E88] outline-2 outline-offset-[5px] outline-[#3E2E88] transition-transform hover:rotate-[18deg] hover:scale-[1.03] lg:inline-block"
         >
           Få tilgang nå!
-        </span>
+        </Link>
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
           <RevealOnScroll className="mb-10 text-center sm:mb-12">
             <span className="section-label">Vår påstandsgenerator</span>
