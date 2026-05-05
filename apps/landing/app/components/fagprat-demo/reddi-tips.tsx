@@ -270,12 +270,19 @@ function messagesFor(key: string, pastandIdx: number, snapshot: LiveStatsSnapsho
 }
 
 function identityFor(key: string): string {
-  // Read tracking is per-step (not per-påstand): once the user has seen
-  // message N at a given step, it stays "seen" when they switch to another
-  // påstand on the same step, so the avatar doesn't blink for content they
-  // have already read. Display still varies per påstand via messagesFor.
   if (key.startsWith("steg1-p")) return "steg1";
   return key;
+}
+
+// On per-påstand steps, m0 is the static base (same across påstands) but
+// m1+ is a different statistics tip per påstand — so m0 stays shared while
+// m1+ tracks per-påstand, otherwise a new påstand's new tip would be
+// silently treated as already read.
+function shownKeyFor(key: string, pastandIdx: number, msgIdx: number): string {
+  if (PER_PASTAND_STEPS.has(key) && msgIdx >= 1) {
+    return `${key}|p${pastandIdx}|m${msgIdx}`;
+  }
+  return `${identityFor(key)}|m${msgIdx}`;
 }
 
 const EMPTY_SNAPSHOT: LiveStatsSnapshot = {
@@ -305,12 +312,11 @@ export const ReddiTips = forwardRef<ReddiTipsHandle, Props>(function ReddiTips(
     currentKeyRef.current = currentKey;
   }, [currentKey]);
 
-  const markShown = useCallback((identity: string, idx: number) => {
+  const markShown = useCallback((shownKey: string) => {
     setShown((prev) => {
-      const k = `${identity}|m${idx}`;
-      if (prev.has(k)) return prev;
+      if (prev.has(shownKey)) return prev;
       const next = new Set(prev);
-      next.add(k);
+      next.add(shownKey);
       return next;
     });
   }, []);
@@ -343,7 +349,7 @@ export const ReddiTips = forwardRef<ReddiTipsHandle, Props>(function ReddiTips(
     if (autoShownRef.current) return;
     autoShownRef.current = true;
     setMsgIdx(0);
-    markShown(identityFor(currentKeyRef.current), 0);
+    markShown(shownKeyFor(currentKeyRef.current, 0, 0));
     setBubbleOpen(true);
   }, [markShown]);
 
@@ -373,7 +379,6 @@ export const ReddiTips = forwardRef<ReddiTipsHandle, Props>(function ReddiTips(
   }, [autoShow, triggerOpen]);
 
   const messages = messagesFor(currentKey, pastandIdx, liveStats);
-  const id = identityFor(currentKey);
   const safeMsgIdx = Math.min(msgIdx, Math.max(messages.length - 1, 0));
 
   function toggleBubble() {
@@ -384,30 +389,32 @@ export const ReddiTips = forwardRef<ReddiTipsHandle, Props>(function ReddiTips(
     if (messages.length === 0) return;
     let nextIdx = safeMsgIdx;
     for (let i = 0; i < messages.length; i++) {
-      if (!shown.has(`${id}|m${i}`)) {
+      if (!shown.has(shownKeyFor(currentKey, pastandIdx, i))) {
         nextIdx = i;
         break;
       }
     }
     setMsgIdx(nextIdx);
-    markShown(id, nextIdx);
+    markShown(shownKeyFor(currentKey, pastandIdx, nextIdx));
     setBubbleOpen(true);
   }
 
   function showPrev() {
     const nextIdx = Math.max(0, safeMsgIdx - 1);
     setMsgIdx(nextIdx);
-    markShown(id, nextIdx);
+    markShown(shownKeyFor(currentKey, pastandIdx, nextIdx));
   }
 
   function showNext() {
     const nextIdx = Math.min(messages.length - 1, safeMsgIdx + 1);
     setMsgIdx(nextIdx);
-    markShown(id, nextIdx);
+    markShown(shownKeyFor(currentKey, pastandIdx, nextIdx));
   }
 
   const hasTip =
-    !bubbleOpen && messages.length > 0 && messages.some((_, i) => !shown.has(`${id}|m${i}`));
+    !bubbleOpen &&
+    messages.length > 0 &&
+    messages.some((_, i) => !shown.has(shownKeyFor(currentKey, pastandIdx, i)));
   const reading = bubbleOpen;
   const bubbleHtml = messages[safeMsgIdx] ?? "";
   const showNav = messages.length > 1;
