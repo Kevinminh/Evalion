@@ -1,9 +1,5 @@
 "use client";
 
-import { useMutation, useQuery } from "convex/react";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-
 import { api } from "@workspace/backend/convex/_generated/api";
 import {
   Select,
@@ -13,9 +9,11 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import { cn } from "@workspace/ui/lib/utils";
+import { useMutation, useQuery } from "convex/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 import { authClient } from "../../lib/auth-client";
-
 import { FAG_OPTIONS } from "./fag-options";
 import { TRINN_OPTIONS, normalizeTrinn } from "./trinn-options";
 
@@ -59,9 +57,10 @@ export function GenerationForm({
   const [promptDraft, setPromptDraft] = useState<string>("");
   const [promptSeeded, setPromptSeeded] = useState(false);
   const [savingPrompt, setSavingPrompt] = useState(false);
-  const [promptStatus, setPromptStatus] = useState<
-    { kind: "success" | "error"; message: string } | null
-  >(null);
+  const [promptStatus, setPromptStatus] = useState<{
+    kind: "success" | "error";
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
     if (promptSeeded) return;
@@ -179,7 +178,7 @@ export function GenerationForm({
                 2
               </span>
               <span className="text-[13px] font-semibold leading-[1.25] text-ink max-[560px]:text-[12.5px]">
-                Reddi lager 9 gode forslag
+                Reddi lager 15 gode forslag
               </span>
             </li>
             <li className="flex items-center gap-[9px]">
@@ -400,25 +399,14 @@ function ForkunnskapButton({
         selected && "border-[#f59e0b] bg-[#fffbeb] shadow-[0_3px_0_#fde68a]",
         !selected && "border-neutral-300",
       );
-  const iconColor = selected
-    ? isIntro
-      ? "text-sage-500"
-      : "text-[#d97706]"
-    : "text-ink-tertiary";
-  const titleColor = selected
-    ? isIntro
-      ? "text-sage-600"
-      : "text-[#b45309]"
-    : "text-ink";
+  const iconColor = selected ? (isIntro ? "text-sage-500" : "text-[#d97706]") : "text-ink-tertiary";
+  const titleColor = selected ? (isIntro ? "text-sage-600" : "text-[#b45309]") : "text-ink";
 
   return (
     <button type="button" className={cn(baseBtn, variantBtn)} onClick={onClick}>
       {isIntro ? (
         <svg
-          className={cn(
-            "size-[18px] shrink-0 transition-colors duration-150",
-            iconColor,
-          )}
+          className={cn("size-[18px] shrink-0 transition-colors duration-150", iconColor)}
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -434,10 +422,7 @@ function ForkunnskapButton({
         </svg>
       ) : (
         <svg
-          className={cn(
-            "size-[18px] shrink-0 transition-colors duration-150",
-            iconColor,
-          )}
+          className={cn("size-[18px] shrink-0 transition-colors duration-150", iconColor)}
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -452,9 +437,7 @@ function ForkunnskapButton({
         </svg>
       )}
       <div className="flex min-w-0 flex-col">
-        <div className={cn("text-[13px] font-bold leading-[1.15]", titleColor)}>
-          {title}
-        </div>
+        <div className={cn("text-[13px] font-bold leading-[1.15]", titleColor)}>{title}</div>
         <div className="mt-px text-[10.5px] leading-[1.3] text-ink-tertiary">{desc}</div>
       </div>
     </button>
