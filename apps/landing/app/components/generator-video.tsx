@@ -1,36 +1,36 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
+
+const YOUTUBE_ID = "TVLBiGdJ_FU";
 
 export function GeneratorVideo() {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
-
-  function handlePlay() {
-    const v = videoRef.current;
-    if (!v) return;
-    setPlaying(true);
-    void v.play();
-  }
 
   return (
     <div
       className={`group/video relative flex w-full flex-1 items-center justify-center rounded-[24px] bg-[#2A2722] shadow-[0_18px_50px_rgba(0,0,0,0.18)] aspect-video lg:aspect-auto lg:min-h-[340px] ${playing ? "is-playing" : ""}`}
     >
-      <video
-        ref={videoRef}
-        src="/assets/Påstandsgenerator.mp4"
-        controls={playing}
-        playsInline
-        preload="metadata"
-        aria-label="Demonstrasjon av påstandsgeneratoren"
-        className="absolute inset-0 z-[1] h-full w-full rounded-[inherit] bg-black object-cover"
-      />
-      {!playing && (
+      {playing ? (
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${YOUTUBE_ID}?autoplay=1&rel=0&modestbranding=1`}
+          title="Demonstrasjon av påstandsgeneratoren"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+          className="absolute inset-0 z-[1] h-full w-full rounded-[inherit] border-0 bg-black"
+        />
+      ) : (
         <>
+          <img
+            src={`https://i.ytimg.com/vi/${YOUTUBE_ID}/maxresdefault.jpg`}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 z-[1] h-full w-full rounded-[inherit] object-cover"
+          />
           <button
             type="button"
-            onClick={handlePlay}
+            onClick={() => setPlaying(true)}
             aria-label="Spill av demonstrasjonsvideo"
             className="absolute inset-0 z-[3] grid cursor-pointer place-items-center rounded-[inherit] border-0 bg-[rgba(28,24,16,0.22)] p-4 backdrop-blur-[4px] backdrop-saturate-[1.05] transition focus-visible:outline-3 focus-visible:-outline-offset-6 focus-visible:outline-white/70 sm:p-6"
           >
