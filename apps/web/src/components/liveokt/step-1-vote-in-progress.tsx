@@ -47,5 +47,5 @@ export function useStep1(): TeacherStep {
     </div>
   );
 
-  return { main, panel };
+  return { main, panel, panelFooter: null };
 }

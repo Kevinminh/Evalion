@@ -146,7 +146,11 @@ function TeacherSessionLayout() {
         {teacherStep && (
           <TeacherPanel
             defaultOpen={step !== 5}
-            footer={<PanelFooter footer={teacherStep.panelFooter} />}
+            footer={
+              teacherStep.panelFooter === null ? null : (
+                <PanelFooter footer={teacherStep.panelFooter} />
+              )
+            }
             onOpenChange={setPanelOpen}
           >
             {teacherStep.panel}
@@ -194,6 +198,7 @@ function useCurrentStep(): TeacherStep | null {
 function PanelFooter({ footer }: { footer: TeacherStep["panelFooter"] }) {
   const { step, goToStep } = useTeacherSession();
 
+  if (footer === null) return null;
   if (footer) return <>{footer}</>;
   if (step === 0) return null;
 
