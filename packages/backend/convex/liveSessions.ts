@@ -372,6 +372,26 @@ export const createGroups = mutation({
   },
 });
 
+export const clearGroups = mutation({
+  args: {
+    sessionId: v.id("liveSessions"),
+  },
+  handler: async (ctx, args) => {
+    await requireSessionOwner(ctx, args.sessionId);
+
+    const students = await ctx.db
+      .query("sessionStudents")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
+      .collect();
+
+    for (const student of students) {
+      if (student.groupIndex !== undefined) {
+        await ctx.db.patch(student._id, { groupIndex: undefined });
+      }
+    }
+  },
+});
+
 // ── Vote queries & mutations ──
 
 export const getVotes = query({

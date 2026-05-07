@@ -15,6 +15,7 @@ export function useLobbyActions({ sessionId, groupCount }: LobbyActionsArgs) {
   const navigate = useNavigate();
   const removeStudentMutation = useMutation(api.liveSessions.removeStudent);
   const createGroupsMutation = useMutation(api.liveSessions.createGroups);
+  const clearGroupsMutation = useMutation(api.liveSessions.clearGroups);
   const updateStepMutation = useMutation(api.liveSessions.updateStep);
   const endSessionMutation = useMutation(api.liveSessions.end);
 
@@ -47,7 +48,15 @@ export function useLobbyActions({ sessionId, groupCount }: LobbyActionsArgs) {
     }
   };
 
+  const clearGroups = async () => {
+    try {
+      await clearGroupsMutation({ sessionId });
+    } catch {
+      toast.error("Kunne ikke slette grupper. Prøv igjen.");
+    }
+  };
+
   const removeStudent = (id: Id<"sessionStudents">) => removeStudentMutation({ id });
 
-  return { start, end, createGroups, removeStudent };
+  return { start, end, createGroups, clearGroups, removeStudent };
 }

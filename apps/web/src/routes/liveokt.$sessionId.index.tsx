@@ -73,17 +73,28 @@ function TeacherLobbyPage() {
 
   const studentList = students ?? [];
   const hasGroups = studentList.some((s) => s.groupIndex !== undefined);
-  const showGroupButton = session.groupsEnabled && !hasGroups;
+  const showCreateGroupsButton = session.groupsEnabled && !hasGroups;
+  const showClearGroupsButton = session.groupsEnabled && hasGroups;
   const joinUrl = `${window.location.origin}/delta?code=${session.joinCode}`;
 
   return (
     <div className="flex min-h-svh flex-col bg-[var(--color-bg-warm)]">
       <SessionTopBar title={fagprat.title}>
-        {showGroupButton && (
+        {showCreateGroupsButton && (
           <PrimaryActionButton onClick={lobby.createGroups}>
             <Users className="size-4" />
             Opprett grupper
           </PrimaryActionButton>
+        )}
+        {showClearGroupsButton && (
+          <button
+            type="button"
+            onClick={lobby.clearGroups}
+            className="inline-flex items-center gap-2 rounded-xl bg-neutral-100 px-5 py-2 text-sm font-bold text-neutral-700 shadow-[0_3px_0_oklch(0.85_0_0)] transition-all hover:-translate-y-px hover:bg-neutral-50 hover:shadow-[0_4px_0_oklch(0.85_0_0)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.85_0_0)]"
+          >
+            <Users className="size-4" />
+            Slett grupper
+          </button>
         )}
         <PrimaryActionButton variant="sant" onClick={lobby.start}>
           Start aktiviteten
