@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-r
 import { UserAvatar } from "@workspace/evalion/components/auth/user-menu";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
+import { useConvexAuth } from "convex/react";
 import { Play, LogOut, User, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -15,6 +16,8 @@ export const Route = createFileRoute("/")({ component: App });
 function App() {
   const { isAuthenticated } = useRouteContext({ from: "/" });
   const { data: session } = authClient.useSession();
+  const convexAuth = useConvexAuth();
+  console.log("[index] convex auth", convexAuth);
   const navigate = useNavigate();
 
   const [code, setCode] = useState("");
