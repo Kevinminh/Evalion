@@ -3,7 +3,6 @@ import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-r
 import { UserAvatar } from "@workspace/evalion/components/auth/user-menu";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
-import { useConvexAuth } from "convex/react";
 import { Play, LogOut, User, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -16,8 +15,6 @@ export const Route = createFileRoute("/")({ component: App });
 function App() {
   const { isAuthenticated } = useRouteContext({ from: "/" });
   const { data: session } = authClient.useSession();
-  const convexAuth = useConvexAuth();
-  console.log("[index] convex auth", convexAuth);
   const navigate = useNavigate();
 
   const [code, setCode] = useState("");
@@ -44,7 +41,6 @@ function App() {
     e.preventDefault();
     setError("");
     const cleaned = sanitizeCode(code);
-    console.log("[index] submit", { raw: code, cleaned });
     if (!/^[A-Z0-9]{6}$/.test(cleaned)) {
       setError("Koden må være 6 tegn (bokstaver og tall)");
       return;
@@ -55,7 +51,6 @@ function App() {
 
   // React to query result via useEffect (not in render body)
   useEffect(() => {
-    console.log("[index] effect", { checking, isFetching, submittedCode, foundSession });
     if (!checking || isFetching || !submittedCode) return;
     if (foundSession && (foundSession.status === "lobby" || foundSession.status === "active")) {
       navigate({ to: "/delta", search: { code: submittedCode } });

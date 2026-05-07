@@ -80,20 +80,16 @@ Use `_authed` for "must be logged in but no shared chrome" (live console, analyt
 
 ## Guest sessions on `apps/web`
 
-Students join sessions without an account. The Convex client is created with `expectAuth: true`, which means it blocks queries until `setAuth` or `clearAuth` is called. For unauthenticated visitors we explicitly call `clearAuth()`:
+The web app supports both **guest students** (join by 6-character code) and **authenticated teachers** (run live sessions). For that reason its `ConvexQueryClient` is created **without** `expectAuth: true` — guests need queries to flow before any auth resolution happens.
 
-```tsx
-function ClearAuthForGuests() {
-  const { isLoading, isAuthenticated } = useConvexAuth();
-  const client = useConvex();
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) client.clearAuth();
-  }, [isLoading, isAuthenticated, client]);
-  return null;
-}
+```ts
+// apps/web/src/router.tsx
+const convexQueryClient = new ConvexQueryClient(convexUrl);
 ```
 
-This component is mounted inside `ConvexBetterAuthProvider` in `apps/web/src/routes/__root.tsx`. Don't remove it — without it, students hang forever waiting for an auth token that never arrives.
+Reserve `expectAuth: true` for fully auth-gated apps like `apps/dashboard` where every route redirects unauthenticated visitors to `/login`. Setting it on the web app would pause the WebSocket at construction; for guests, neither `setAuth` nor `clearAuth` ever resumes it (the underlying `convex` client only calls `resumeSocket()` from `setAuth`'s code path), so students would hang forever on join lookup.
+
+Teacher mutations on the web app (`liveSessions.create`, `start`, `setStep`, etc.) still call `requireAuth(ctx)` and only fire on click — by then `ConvexBetterAuthProvider` has resolved the session, so they always run with auth. Teacher route segments (`liveokt.$sessionId`) additionally redirect unauthenticated visitors via `beforeLoad`.
 
 ## Landing app middleware
 

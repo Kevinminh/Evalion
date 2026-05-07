@@ -53,7 +53,7 @@ Auth lives in three layers:
    - `getCurrentUser` query — exposes `ctx.auth.getUserIdentity()` to clients.
 4. **`http.ts`** — `authComponent.registerRoutes(http, createAuth)` exposes `/api/auth/*` over Convex HTTP.
 
-Frontends authenticate via `@convex-dev/better-auth/react` (`ConvexBetterAuthProvider`). On TanStack apps the root route's `beforeLoad` reads the cookie via a server function and calls `convexQueryClient.serverHttpClient?.setAuth(token)` so loaders see the authenticated identity. Guest students (apps/web join-by-code flow) require an explicit `client.clearAuth()` call — see the `ClearAuthForGuests` workaround in `apps/web/src/routes/__root.tsx`.
+Frontends authenticate via `@convex-dev/better-auth/react` (`ConvexBetterAuthProvider`). On TanStack apps the root route's `beforeLoad` reads the cookie via a server function and calls `convexQueryClient.serverHttpClient?.setAuth(token)` so loaders see the authenticated identity. The web app omits `expectAuth: true` from its `ConvexQueryClient` so guest students (join-by-code flow) can issue queries before any auth resolves — see [`auth.md`](auth.md).
 
 ## AI generation (`reddi.ts`)
 

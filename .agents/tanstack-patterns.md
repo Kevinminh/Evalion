@@ -26,6 +26,8 @@ export function getRouter() {
   }
 
   const convexUrl = import.meta.env?.VITE_CONVEX_URL ?? process.env.VITE_CONVEX_URL!;
+  // Dashboard sets `{ expectAuth: true }` since every route is auth-gated; the
+  // web app omits it because it serves guest students before any auth resolves.
   const convexQueryClient = new ConvexQueryClient(convexUrl, { expectAuth: true });
 
   const queryClient = new QueryClient({
@@ -54,7 +56,7 @@ declare module "@tanstack/react-router" {
 }
 ```
 
-`expectAuth: true` means the Convex client blocks queries until `setAuth`/`clearAuth` is called — see the guest-session note in [`auth.md`](auth.md).
+`expectAuth: true` pauses the Convex WebSocket until `setAuth` is called with a real token, so use it only on apps where every route requires auth (the dashboard). The web app must omit it — guest students need queries to flow before any auth resolves. See the guest-session note in [`auth.md`](auth.md).
 
 ## Root Route Structure
 
