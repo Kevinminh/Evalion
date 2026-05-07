@@ -1,44 +1,95 @@
+import { BackButton } from "@workspace/evalion/components/live/back-button";
 import { BegrunnelseCard } from "@workspace/evalion/components/live/begrunnelse-card";
-import { ExplanationCard } from "@workspace/evalion/components/live/explanation-card";
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
+import { resolveStatementHex } from "@workspace/evalion/lib/constants";
 
 import type { TeacherStep } from "@/types/teacher-step";
 import { useTeacherSession } from "./teacher-session-context";
 
 export function useStep5(): TeacherStep {
-  const { statement, r2CorrectCount, r2Total, begrunnelser, students } = useTeacherSession();
+  const { statement, r2CorrectCount, r2Total, begrunnelser, students, selectedIdx, goToStep } =
+    useTeacherSession();
   const highlightedBegrunnelse = begrunnelser?.find((b) => b.highlighted);
   const highlightedStudent = highlightedBegrunnelse
     ? students.find((s) => s._id === highlightedBegrunnelse.studentId)
     : null;
 
+  const statementColor = resolveStatementHex(statement?.color, selectedIdx);
+  const correctPct = r2Total > 0 ? Math.round((r2CorrectCount / r2Total) * 100) : 0;
+
   const main = (
-    <div className="mx-auto flex h-full max-w-2xl flex-col items-center justify-center gap-4">
-      {statement && <FasitBadge fasit={statement.fasit} />}
+    <div className="flex h-full min-h-0 w-full flex-col items-center px-8 py-5">
+      <div className="flex w-full">
+        <BackButton onClick={() => goToStep(0)} />
+      </div>
+      <div className="flex-1" />
       {statement && (
-        <div className="max-h-[392px] w-full overflow-y-auto animate-[fadeInUp_0.5s_ease_0.2s_both]">
-          <ExplanationCard
-            statementText={statement.text}
-            explanation={statement.explanation}
-            size="lg"
-          />
+        <div className="relative flex w-full max-w-[760px] animate-[fadeInUp_0.5s_ease_0.2s_both] flex-col items-center">
+          <div className="z-[5] -mb-4">
+            <FasitBadge fasit={statement.fasit} size="lg" />
+          </div>
+          <div
+            className="w-full overflow-hidden rounded-[24px] border-2 shadow-[0_10px_15px_rgba(0,0,0,0.08),0_4px_6px_rgba(0,0,0,0.04)]"
+            style={{ borderColor: statementColor.border }}
+          >
+            <div
+              className="border-b-[1.5px] px-8 pt-8 pb-6 text-center"
+              style={{
+                background: `linear-gradient(135deg, ${statementColor.bg}, ${statementColor.bg2})`,
+                borderColor: statementColor.border,
+              }}
+            >
+              <p
+                className="text-2xl font-bold leading-relaxed"
+                style={{ color: statementColor.text }}
+              >
+                {statement.text}
+              </p>
+            </div>
+            <div className="flex items-center gap-4 bg-white px-6 py-4">
+              <img
+                src="/professoren.png"
+                alt="Professoren"
+                className="size-24 shrink-0 rounded-full object-cover"
+                style={{
+                  border: "3px solid #C2A9FF",
+                  backgroundColor: "var(--color-bg-tertiary)",
+                }}
+              />
+              <p className="flex-1 text-base font-medium leading-relaxed text-[#212121]">
+                {statement.explanation}
+              </p>
+            </div>
+          </div>
         </div>
       )}
+      <div className="flex-[2]" />
+      <div className="flex-[1.5]" />
     </div>
   );
 
   const panel = (
-    <div className="space-y-4">
-      <div className="rounded-xl bg-sant/10 p-4">
-        <div className="text-xs font-bold uppercase tracking-wider text-sant">Svarte riktig</div>
-        <p className="text-lg font-extrabold text-sant tabular-nums">
-          {r2CorrectCount}/{r2Total}
-        </p>
-      </div>
-      <div>
-        <div className="mb-2 text-xs font-bold uppercase tracking-wider text-primary/70">
-          Fremhevet begrunnelse
+    <div className="flex h-full min-h-0 flex-col gap-3">
+      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[#616161]">
+        Professorens forklaring
+      </p>
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-2xl bg-white p-3 shadow-[0_4px_6px_rgba(0,0,0,0.07),0_2px_4px_rgba(0,0,0,0.04)]">
+        {/* Antall riktig */}
+        <div className="flex items-center justify-center gap-2 rounded-xl bg-[#E8F5E9] px-3 py-2">
+          <span className="shrink-0 font-mono text-xl font-extrabold leading-none tabular-nums text-[#4CAF50]">
+            {r2CorrectCount}/{r2Total}
+          </span>
+          <div className="flex min-w-0 flex-col gap-px">
+            <span className="text-xs font-semibold text-[#616161]">
+              svarte riktig ({correctPct}%)
+            </span>
+          </div>
         </div>
+
+        <p className="mt-2 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[#616161]">
+          Fremhevet begrunnelse
+        </p>
+
         {highlightedBegrunnelse ? (
           <BegrunnelseCard
             text={highlightedBegrunnelse.text}
@@ -46,15 +97,13 @@ export function useStep5(): TeacherStep {
             highlighted
           />
         ) : (
-          <div className="rounded-2xl border border-primary/15 bg-primary/[0.04] p-5">
-            <p className="text-sm italic text-muted-foreground">
-              Ingen fremhevet begrunnelse ennå.
-            </p>
+          <div className="rounded-l-none rounded-r-xl border-l-[3px] border-[#A37EFF] bg-[#F3EEFF] px-5 py-4 text-base font-medium italic leading-relaxed text-[#9E9E9E]">
+            Ingen fremhevet begrunnelse ennå.
           </div>
         )}
       </div>
     </div>
   );
 
-  return { main, panel };
+  return { main, panel, panelFooter: null };
 }

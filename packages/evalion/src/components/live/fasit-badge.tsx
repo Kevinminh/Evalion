@@ -10,7 +10,7 @@ const FASIT_CONFIG: Record<Fasit, { label: string; bg: string }> = {
 const SIZE_CLASS = {
   sm: "px-3 py-0.5 text-xs",
   md: "px-4 py-1 text-xs",
-  lg: "px-6 py-2 text-base",
+  lg: "px-8 py-2.5 text-2xl shadow-lg",
 } as const;
 
 interface FasitBadgeProps {
@@ -31,7 +31,7 @@ export function FasitBadge({
   return (
     <span
       className={cn(
-        "inline-block rounded-full font-bold uppercase text-white shadow-sm",
+        "inline-block rounded-full font-extrabold uppercase text-white",
         SIZE_CLASS[size],
         bg,
         className,

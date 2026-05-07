@@ -10,21 +10,30 @@ import type { TeacherStep } from "@/types/teacher-step";
 
 import { useTeacherSession } from "./teacher-session-context";
 
+const STEP1_PRESETS = [
+  { seconds: 30, label: "30s" },
+  { seconds: 60, label: "1m" },
+  { seconds: 120, label: "2m" },
+];
+
 export function useStep1(): TeacherStep {
   const { statement, students, activeRoundVotes, timer, goToStep, selectedIdx } =
     useTeacherSession();
 
   const statementColor = resolveStatementHex(statement?.color, selectedIdx);
+  const timerRunning = timer.startedAt !== undefined;
 
   const main = (
     <TeacherStepLayout
       top={
         <div className="flex w-full items-center justify-between">
           <BackButton onClick={() => goToStep(0)} />
-          <div className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-border px-4 py-2 text-sm font-semibold text-muted-foreground">
-            <Users className="size-4 text-primary/60" />
-            {activeRoundVotes.length} / {students.length} har stemt
-          </div>
+          {timerRunning && (
+            <div className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[#E0E0E0] px-4 py-2 text-sm font-semibold text-[#616161]">
+              <Users className="size-4 text-[#8554F6]" />
+              {activeRoundVotes.length} / {students.length} har stemt
+            </div>
+          )}
         </div>
       }
       statement={
@@ -45,9 +54,16 @@ export function useStep1(): TeacherStep {
   );
 
   const panel = (
-    <div className="flex h-full flex-col justify-center gap-3">
-      <TimerCard {...timer} onNextStep={() => goToStep(2)} nextStepLabel="Gå til diskusjon" />
-    </div>
+    <TimerCard
+      {...timer}
+      presets={STEP1_PRESETS}
+      sliderMin={10}
+      sliderMax={180}
+      initialDuration={60}
+      sectionLabel="Nedtelling"
+      onNextStep={() => goToStep(2)}
+      nextStepLabel="Gå til diskusjon"
+    />
   );
 
   return { main, panel, panelFooter: null };

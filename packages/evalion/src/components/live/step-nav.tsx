@@ -18,48 +18,56 @@ interface StepNavProps {
 export function StepNav({ currentStep, completedSteps = [], onStepClick }: StepNavProps) {
   const allDisabled = currentStep === 0;
   return (
-    <div className="fixed right-0 bottom-0 left-0 z-40 flex w-full items-stretch gap-2 border-t border-border/80 bg-card px-4 py-2 sm:h-[100px] sm:px-6 sm:py-3">
-      {steps.map((step) => {
-        const isActive = step.num === currentStep;
-        const isCompleted = completedSteps.includes(step.num);
-        const isInactive = !isActive && !isCompleted;
-        return (
-          <button
-            key={step.num}
-            type="button"
-            onClick={() => onStepClick(step.num)}
-            disabled={allDisabled}
-            className={cn(
-              "flex flex-1 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl px-2 py-2 text-center transition-all sm:py-3",
-              isActive && "bg-primary/10",
-              isInactive && !allDisabled && "hover:bg-muted/60",
-              allDisabled && "pointer-events-none cursor-not-allowed opacity-40 saturate-50",
-            )}
-          >
-            <span
+    <nav className="fixed right-0 bottom-0 left-0 z-40 flex h-[100px] min-h-[100px] items-center justify-center border-t-[1.5px] border-[#EEEEEE] bg-white px-6">
+      <div className="flex w-full items-stretch gap-2">
+        {steps.map((step) => {
+          const isActive = step.num === currentStep;
+          const isCompleted = completedSteps.includes(step.num);
+          const isInactive = !isActive && !isCompleted;
+          return (
+            <button
+              key={step.num}
+              type="button"
+              onClick={() => onStepClick(step.num)}
+              disabled={allDisabled}
               className={cn(
-                "flex size-7 items-center justify-center rounded-full text-sm font-extrabold sm:size-8",
-                isActive && "bg-primary text-primary-foreground",
-                isCompleted && "text-white",
-                isInactive && "bg-muted text-muted-foreground",
-              )}
-              style={isCompleted ? { backgroundColor: "#4CAF50" } : undefined}
-            >
-              {step.num}
-            </span>
-            <span
-              className={cn(
-                "text-[11px] font-bold leading-tight sm:text-xs",
-                isActive && "text-primary",
-                isCompleted && "text-foreground/80",
-                isInactive && "text-muted-foreground",
+                "flex flex-1 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-3 text-center transition-all",
+                isActive && "bg-[#E0D4FF]",
+                isInactive && !allDisabled && "hover:bg-[#F5F5F5]",
+                allDisabled && "pointer-events-none cursor-not-allowed opacity-40 saturate-50",
               )}
             >
-              {step.label}
-            </span>
-          </button>
-        );
-      })}
-    </div>
+              <span
+                className={cn(
+                  "flex size-8 items-center justify-center rounded-full text-sm font-extrabold leading-none",
+                  isActive && "text-white",
+                  isCompleted && "text-white",
+                  isInactive && "text-[#9E9E9E]",
+                )}
+                style={{
+                  backgroundColor: isActive
+                    ? "#6C3FC5"
+                    : isCompleted
+                      ? "#4CAF50"
+                      : "#EEEEEE",
+                }}
+              >
+                {step.num}
+              </span>
+              <span
+                className={cn(
+                  "text-xs font-bold leading-tight",
+                  isActive && "text-[#48208B]",
+                  isCompleted && "text-[#616161]",
+                  isInactive && "text-[#9E9E9E]",
+                )}
+              >
+                {step.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </nav>
   );
 }

@@ -15,11 +15,10 @@ interface TeacherStepLayoutProps {
 }
 
 /**
- * Mirrors the demo mock's `.student-area` flex distribution:
+ * Mirrors the demo mock's `.student-area` flex distribution exactly:
  *   top → spacer(1) → statement → spacer(2) → professor → spacer(1.5) → extras
  *
- * On phone (< sm) the spacers collapse to fixed gaps so the layout doesn't
- * spread thin on narrow viewports.
+ * Padding matches `.student-area { padding: var(--space-5) var(--space-8); }`.
  */
 export function TeacherStepLayout({
   top,
@@ -29,20 +28,24 @@ export function TeacherStepLayout({
   className,
 }: TeacherStepLayoutProps) {
   return (
-    <div className={cn("flex h-full w-full flex-col items-center", className)}>
+    <div
+      className={cn(
+        "flex h-full min-h-0 w-full flex-col items-center px-8 py-5",
+        className,
+      )}
+    >
       {top && <div className="w-full">{top}</div>}
-      <div className="hidden sm:block sm:flex-1" />
-      {statement && <div className="w-full max-w-3xl">{statement}</div>}
-      <div className="my-6 hidden sm:my-0 sm:block sm:flex-[2]" />
-      {!statement && professor && <div className="my-6 sm:my-0" />}
+      <div className="flex-1" />
+      {statement && <div className="w-full max-w-[760px]">{statement}</div>}
+      <div className="flex-[2]" />
       {professor && <div className="w-full">{professor}</div>}
       {extras && (
         <>
-          <div className="my-4 sm:my-0 sm:flex-1" />
+          <div className="flex-1" />
           <div className="w-full">{extras}</div>
         </>
       )}
-      <div className="hidden sm:block sm:flex-[1.5]" />
+      <div className="flex-[1.5]" />
     </div>
   );
 }

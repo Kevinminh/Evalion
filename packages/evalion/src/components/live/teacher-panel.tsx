@@ -1,12 +1,12 @@
 import { cn } from "@workspace/ui/lib/utils";
-import { PanelRightClose, PanelRightOpen } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 
 const STORAGE_KEY = "fagprat-panel-collapsed";
 const MD_BREAKPOINT = 768;
 const PANEL_WIDTH_PX = 340;
-const TOPBAR_HEIGHT_PX = 80; // matches sm:h-20 on SessionTopBar
-const STEPNAV_HEIGHT_PX = 100; // matches sm:h-[100px] on StepNav
+const TOPBAR_HEIGHT_PX = 80;
+const STEPNAV_HEIGHT_PX = 100;
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(
@@ -69,26 +69,36 @@ export function TeacherPanel({
   };
 
   const shouldPulse = !open && attentionWhenClosed;
-  // Note: `display` intentionally omitted from inline style so the responsive
-  // Tailwind classes (`hidden md:inline-flex` / `md:hidden`) on each button
-  // can control visibility per breakpoint without inline-style overriding.
+
+  // Toggle dimensions: default 28×64; pulses to 42×80 when attention-flipped
+  // (matches `.panel-toggle.flipped` styling in the demo HTML).
   const desktopToggleStyle: CSSProperties = {
     position: "fixed",
     right: open ? PANEL_WIDTH_PX : 0,
-    top: "6rem",
+    top: "50%",
+    transform: "translateY(-50%)",
     zIndex: 30,
-    padding: "0.5rem",
-    background: "var(--card)",
-    border: "1.5px solid var(--border)",
+    width: shouldPulse ? 42 : 28,
+    height: shouldPulse ? 80 : 64,
+    borderTopLeftRadius: 14,
+    borderBottomLeftRadius: 14,
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+    border: "1.5px solid",
+    borderColor: shouldPulse ? "#6C3FC5" : "#EEEEEE",
     borderRight: "none",
-    borderTopLeftRadius: 8,
-    borderBottomLeftRadius: 8,
-    color: shouldPulse ? "var(--primary)" : "var(--muted-foreground)",
-    boxShadow: "0 1px 2px rgba(0,0,0,0.06)",
-    transition: "right 0.3s ease, background 0.2s ease, color 0.2s ease",
+    background: shouldPulse ? "#6C3FC5" : "#FAFAFA",
+    color: shouldPulse ? "#FFFFFF" : "#6C3FC5",
+    transition:
+      "right 0.35s ease, width 0.2s ease, height 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease",
     cursor: "pointer",
+    display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    padding: 0,
+    boxShadow: shouldPulse
+      ? "0 3px 0 #48208B, -4px 0 18px rgba(108, 63, 197, 0.35)"
+      : "0 1px 2px rgba(0,0,0,0.04)",
     animation: shouldPulse ? "panel-tab-attention 2.4s ease-in-out infinite" : undefined,
   };
 
@@ -100,9 +110,9 @@ export function TeacherPanel({
     width: 40,
     height: 40,
     borderRadius: 9999,
-    background: "var(--card)",
-    border: "1px solid var(--border)",
-    color: "var(--muted-foreground)",
+    background: "#FFFFFF",
+    border: "1px solid #EEEEEE",
+    color: "#6C3FC5",
     boxShadow: "0 4px 8px rgba(0,0,0,0.12)",
     cursor: "pointer",
     alignItems: "center",
@@ -122,15 +132,19 @@ export function TeacherPanel({
     top: TOPBAR_HEIGHT_PX,
     bottom: STEPNAV_HEIGHT_PX,
     zIndex: 20,
-    width: isMobile ? "85vw" : PANEL_WIDTH_PX,
+    width: open ? (isMobile ? "85vw" : PANEL_WIDTH_PX) : 0,
     maxWidth: PANEL_WIDTH_PX,
-    background: "var(--card)",
-    borderLeft: "1px solid var(--border)",
-    transform: open ? "translateX(0)" : "translateX(100%)",
-    transition: "transform 0.3s ease",
+    background: "#FAFAFA",
+    borderLeft: "1.5px solid #EEEEEE",
+    opacity: open ? 1 : 0,
+    pointerEvents: open ? "auto" : "none",
+    overflow: "hidden",
+    transition: "width 0.35s ease, opacity 0.25s ease",
     display: "flex",
     flexDirection: "column",
   };
+
+  const Icon = open ? ChevronRight : ChevronLeft;
 
   return (
     <>
@@ -138,10 +152,14 @@ export function TeacherPanel({
       <button
         onClick={toggle}
         aria-label={open ? "Skjul panel" : "Vis panel"}
+        title="Skjul/vis lærerpanel"
         className={cn("hidden md:inline-flex")}
         style={desktopToggleStyle}
       >
-        {open ? <PanelRightClose className="size-4" /> : <PanelRightOpen className="size-4" />}
+        <Icon
+          className={shouldPulse ? "size-5" : "size-4"}
+          strokeWidth={2.5}
+        />
       </button>
       {/* Mobile toggle */}
       <button
@@ -150,15 +168,17 @@ export function TeacherPanel({
         className={cn("md:hidden")}
         style={mobileToggleStyle}
       >
-        {open ? <PanelRightClose className="size-4" /> : <PanelRightOpen className="size-4" />}
+        <Icon className="size-5" strokeWidth={2.5} />
       </button>
       {/* Backdrop on mobile when open */}
       {isMobile && open && (
         <div className={cn("md:hidden")} style={backdropStyle} onClick={toggle} />
       )}
       <div style={panelStyle}>
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pt-3 pb-4">{children}</div>
-        {footer && <div className="shrink-0 border-t border-border p-3 sm:p-4">{footer}</div>}
+        <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
+          {children}
+        </div>
+        {footer && <div className="shrink-0 border-t-[1.5px] border-[#EEEEEE] p-4">{footer}</div>}
       </div>
     </>
   );

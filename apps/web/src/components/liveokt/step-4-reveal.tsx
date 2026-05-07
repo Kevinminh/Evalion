@@ -1,3 +1,4 @@
+import { BackButton } from "@workspace/evalion/components/live/back-button";
 import { CountdownOverlay } from "@workspace/evalion/components/live/countdown-overlay";
 import { DistributionChart } from "@workspace/evalion/components/live/distribution-chart";
 import { EndringerCard } from "@workspace/evalion/components/live/endringer-card";
@@ -32,6 +33,7 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
     selectedIdx,
     avgConfidenceR1,
     avgConfidenceR2,
+    goToStep,
   } = useTeacherSession();
   const endringerTab = panelTab === "default" || panelTab === "endringer";
 
@@ -42,11 +44,12 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
       <CountdownOverlay visible={showCountdown} number={countdownNumber} />
       <TeacherStepLayout
         top={
-          countdownDone && statement ? (
-            <div className="flex w-full justify-center">
+          <div className="flex w-full items-center justify-between">
+            <BackButton onClick={() => goToStep(0)} />
+            {countdownDone && statement && (
               <FasitBadge fasit={statement.fasit} animated size="lg" />
-            </div>
-          ) : undefined
+            )}
+          </div>
         }
         statement={
           statement && (
@@ -66,42 +69,67 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
                 </>
               }
             />
-          ) : undefined
+          ) : (
+            <Professor
+              size="md"
+              bordered
+              animate
+              textSize="lg"
+              text={
+                <>
+                  Har du endret mening etter diskusjonen?
+                  <br />
+                  Stem på nytt!
+                </>
+              }
+            />
+          )
         }
       />
     </>
   );
 
   const panel = (
-    <PanelTabs
-      tabs={[
-        { key: "endringer", label: "Endringer" },
-        { key: "stemmefordeling", label: "Stemmefordeling" },
-      ]}
-      activeTab={endringerTab ? "endringer" : "stemmefordeling"}
-      onTabChange={setPanelTab}
-    >
-      {endringerTab ? (
-        <EndringerCard
-          correctCount={r2CorrectCount}
-          totalVotes={r2Total}
-          changedToCorrect={changedToCorrect}
-          changedToIncorrect={changedToIncorrect}
-          avgConfidenceR1={avgConfidenceR1}
-          avgConfidenceR2={avgConfidenceR2}
-        />
-      ) : (
-        <div className="space-y-4">
-          <DistributionChart
-            key={`s${selectedIdx}-reveal`}
-            bars={buildVoteBars(r2Votes)}
-            total={r2Total}
-            correctKey={statement?.fasit}
-          />
-        </div>
-      )}
-    </PanelTabs>
+    <div className="flex h-full min-h-0 flex-col gap-3">
+      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[#616161]">
+        Elevsvar – Andre stemmerunde
+      </p>
+      <PanelTabs
+        tabs={[
+          { key: "endringer", label: "Endringer" },
+          { key: "stemmefordeling", label: "Stemmefordeling" },
+        ]}
+        activeTab={endringerTab ? "endringer" : "stemmefordeling"}
+        onTabChange={setPanelTab}
+      >
+        {endringerTab ? (
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto py-1">
+            <EndringerCard
+              correctCount={r2CorrectCount}
+              totalVotes={r2Total}
+              changedToCorrect={changedToCorrect}
+              changedToIncorrect={changedToIncorrect}
+              avgConfidenceR1={avgConfidenceR1}
+              avgConfidenceR2={avgConfidenceR2}
+            />
+          </div>
+        ) : (
+          <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto rounded-2xl bg-white p-3 shadow-[0_4px_6px_rgba(0,0,0,0.07),0_2px_4px_rgba(0,0,0,0.04)]">
+            <div className="flex h-full flex-col gap-2">
+              <div className="flex-1 min-h-0 py-2">
+                <DistributionChart
+                  key={`s${selectedIdx}-reveal`}
+                  bars={buildVoteBars(r2Votes)}
+                  total={r2Total}
+                  correctKey={statement?.fasit}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </PanelTabs>
+    </div>
   );
 
-  return { main, panel };
+  return { main, panel, panelFooter: null };
 }

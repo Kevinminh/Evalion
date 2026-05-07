@@ -27,7 +27,7 @@ const sizePx: Record<ProfessorSize, number> = {
 export function Professor({
   size = "md",
   text,
-  textSize = "base",
+  textSize = "lg",
   label,
   animate = true,
   bordered = false,
@@ -40,17 +40,23 @@ export function Professor({
     width: px,
     height: px,
     flexShrink: 0,
+    backgroundColor: bordered ? "var(--color-bg-tertiary)" : undefined,
     ...(bordered
       ? {
           borderWidth: 3,
           borderStyle: "solid",
-          borderColor: "var(--color-purple-200)",
+          borderColor: "#C2A9FF",
         }
       : {}),
   };
 
   return (
-    <div className={cn("flex items-center gap-4", className)}>
+    <div
+      className={cn(
+        "mx-auto flex w-full max-w-[640px] items-center gap-4",
+        className,
+      )}
+    >
       <div className="flex shrink-0 flex-col items-center gap-2">
         <img
           src="/professoren.png"
@@ -65,23 +71,23 @@ export function Professor({
         {label && <span className="text-sm font-medium text-muted-foreground">{label}</span>}
       </div>
       {text && (
-        <div className="relative flex items-center">
+        <div className="relative flex flex-1 items-center">
           <div
             className="absolute -left-[10px] size-0 border-y-[10px] border-r-[10px] border-y-transparent border-r-white"
             style={{ filter: "drop-shadow(-2px 0 1px rgba(0,0,0,0.04))" }}
           />
           <div
             className={cn(
-              "rounded-2xl border-[1.5px] border-border bg-white px-6 py-5 shadow-md",
+              "flex-1 rounded-[24px] border-[1.5px] border-[#EEEEEE] bg-white px-6 py-5 shadow-[0_4px_6px_rgba(0,0,0,0.07),0_2px_4px_rgba(0,0,0,0.04)]",
               animate && "animate-[fadeInUp_0.5s_ease_0.2s_both]",
             )}
           >
             <p
               className={cn(
-                "text-center font-medium leading-relaxed text-foreground",
+                "text-center font-medium leading-relaxed text-[#212121]",
                 textSize === "sm" && "text-sm",
+                textSize === "base" && "text-base",
                 textSize === "lg" && "text-xl",
-                (textSize === "base" || textSize === undefined) && "text-base",
               )}
             >
               {text}

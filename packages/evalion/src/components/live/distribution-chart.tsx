@@ -1,21 +1,35 @@
-import { Check } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 
 interface DistributionBar {
   label: string;
   value: number;
-  color: string;
-  /** Bar key to compare against the chart's `correctKey` (e.g. the fasit). */
+  /** Identifier for matching against `correctKey`, e.g. "sant" / "delvis" / "usant". */
   key?: string;
+  /** Domain key driving the bar fill color. */
+  variant?: "sant" | "delvis" | "usant";
+  /** Optional Tailwind class color used as a fallback when `variant` is missing. */
+  color?: string;
 }
 
 interface DistributionChartProps {
   bars: DistributionBar[];
   total: number;
   height?: number;
-  /** Marks the bar whose `key` matches as the correct answer (✓ + bold). */
+  /** Marks the bar whose `key` matches as the correct answer (extrabold + accent). */
   correctKey?: string;
 }
+
+const FILL_HEX: Record<string, string> = {
+  sant: "#4CAF50",
+  delvis: "#FF9800",
+  usant: "#EF5350",
+};
+
+const CORRECT_TEXT_HEX: Record<string, string> = {
+  sant: "#2E7D32",
+  delvis: "#B8860B",
+  usant: "#C62828",
+};
 
 export function DistributionChart({
   bars,
@@ -23,47 +37,58 @@ export function DistributionChart({
   height = 160,
   correctKey,
 }: DistributionChartProps) {
-  const maxValue = Math.max(...bars.map((b) => b.value), 1);
-
   return (
-    <div className="flex items-end justify-center gap-4" style={{ height }}>
+    <div className="flex w-full" style={{ height, gap: 16 }}>
       {bars.map((bar) => {
         const pct = total > 0 ? Math.round((bar.value / total) * 100) : 0;
-        const barHeight = total > 0 ? (bar.value / maxValue) * (height - 40) : 0;
         const isCorrect = correctKey !== undefined && bar.key === correctKey;
+        const variantKey = bar.variant ?? bar.key ?? "";
+        const fill = FILL_HEX[variantKey] ?? "#9E9E9E";
+        const correctText = CORRECT_TEXT_HEX[variantKey] ?? "#212121";
+
         return (
-          <div key={bar.label} className="flex flex-col items-center gap-1">
+          <div
+            key={bar.label}
+            className="flex flex-1 min-h-0 flex-col items-center gap-1.5"
+          >
             <span
               className={cn(
-                "tabular-nums",
-                isCorrect
-                  ? "text-sm font-extrabold text-foreground"
-                  : "text-xs font-bold text-foreground",
+                "text-xs leading-none tabular-nums",
+                isCorrect ? "font-extrabold" : "font-bold",
               )}
+              style={{ color: isCorrect ? correctText : "#212121" }}
             >
-              {bar.value}
+              {bar.value} stk
             </span>
-            <span className="text-[10px] font-semibold text-muted-foreground tabular-nums">
-              {pct}%
-            </span>
-            <div
-              className={cn(
-                "rounded-t-lg",
-                bar.color,
-                isCorrect ? "w-14 ring-2 ring-sant ring-offset-1" : "w-12",
-              )}
-              style={{
-                height: Math.max(barHeight, 4),
-                transition: "height 600ms cubic-bezier(0.25, 0.1, 0.25, 1)",
-              }}
-            />
+            <div className="flex w-full flex-1 min-h-0 flex-col items-center justify-end rounded-xl bg-[#F5F5F5]">
+              <div
+                className="flex w-full items-center justify-center rounded-xl transition-[height] duration-[600ms]"
+                style={{
+                  backgroundColor: fill,
+                  height: `${pct}%`,
+                  minHeight: pct > 0 ? 0 : 0,
+                }}
+              >
+                {pct > 0 && (
+                  <span
+                    className={cn(
+                      "leading-none text-white tabular-nums",
+                      isCorrect ? "font-extrabold" : "font-bold",
+                    )}
+                    style={{ fontSize: 11 }}
+                  >
+                    {pct}%
+                  </span>
+                )}
+              </div>
+            </div>
             <span
               className={cn(
-                "inline-flex items-center gap-1",
-                isCorrect ? "text-xs font-extrabold text-sant" : "text-xs font-semibold text-muted-foreground",
+                "text-xs leading-tight",
+                isCorrect ? "font-extrabold" : "font-bold",
               )}
+              style={{ color: isCorrect ? correctText : "#616161" }}
             >
-              {isCorrect && <Check className="size-3" strokeWidth={3} />}
               {bar.label}
             </span>
           </div>

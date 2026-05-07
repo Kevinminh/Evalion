@@ -3,6 +3,8 @@ import type { CSSProperties } from "react";
 
 interface StatementColor {
   bg: string;
+  /** Optional second gradient stop. Falls back to a light tint of `bg`. */
+  bg2?: string;
   border: string;
   text: string;
 }
@@ -26,7 +28,9 @@ export function StatementCard({
   const cardStyle: CSSProperties | undefined = color
     ? {
         background: gradient
-          ? `linear-gradient(135deg, ${color.bg}, color-mix(in srgb, ${color.bg} 70%, #ffffff))`
+          ? `linear-gradient(135deg, ${color.bg}, ${
+              color.bg2 ?? `color-mix(in srgb, ${color.bg} 70%, #ffffff)`
+            })`
           : color.bg,
         borderColor: color.border,
       }
@@ -40,9 +44,13 @@ export function StatementCard({
   return (
     <div
       className={cn(
-        "mx-auto w-full rounded-2xl",
+        "mx-auto flex w-full items-center justify-center rounded-[24px]",
         hasColor ? "border-2" : "border-[1.5px] border-blue-200 bg-blue-50",
-        isLg ? (hasColor ? "max-w-3xl px-10 py-8" : "max-w-2xl p-6") : "max-w-md p-5",
+        isLg
+          ? hasColor
+            ? "max-w-[760px] px-10 py-8"
+            : "max-w-2xl p-6"
+          : "max-w-md p-5",
         className,
       )}
       style={cardStyle}

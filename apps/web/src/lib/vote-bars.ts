@@ -13,7 +13,7 @@ export function buildVoteBars(votes: Doc<"sessionVotes">[]): VoteBar[] {
   for (const v of votes) counts[v.vote]++;
   return [
     { label: "Sant", value: counts.sant, color: "bg-sant", key: "sant" },
+    { label: "Delvis sant", value: counts.delvis, color: "bg-delvis", key: "delvis" },
     { label: "Usant", value: counts.usant, color: "bg-usant", key: "usant" },
-    { label: "Delvis", value: counts.delvis, color: "bg-delvis", key: "delvis" },
   ];
 }

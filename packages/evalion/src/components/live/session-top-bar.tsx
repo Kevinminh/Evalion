@@ -9,24 +9,26 @@ interface SessionTopBarProps {
 
 export function SessionTopBar({ title, onExit, center, children }: SessionTopBarProps) {
   return (
-    <div className="fixed top-0 right-0 left-0 z-40 flex h-14 items-center justify-between border-b border-border/80 bg-card px-3 sm:h-20 sm:px-8">
-      <div className="flex items-center gap-2 sm:gap-4">
-        <img src="/fagprat-logo.png" alt="FagPrat" className="h-8 object-contain sm:h-12" />
-        <div className="hidden h-8 w-[1.5px] bg-border sm:block" />
-        <span className="hidden text-base font-bold text-foreground sm:inline sm:text-lg">
-          {title}
-        </span>
+    <div className="fixed top-0 right-0 left-0 z-40 flex h-20 min-h-20 items-center justify-between border-b-[1.5px] border-[#EEEEEE] bg-white px-8">
+      <div className="flex items-center gap-4">
+        <img src="/fagprat-logo.png" alt="FagPrat" className="h-12 object-contain" />
+        <div className="h-8 w-[1.5px] bg-[#E0E0E0]" />
+        <span className="text-lg font-bold text-[#212121]">{title}</span>
       </div>
-      {center && <div className="absolute left-1/2 hidden -translate-x-1/2 md:block">{center}</div>}
-      <div className="flex items-center gap-2 sm:gap-3">
+      {center && (
+        <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div className="pointer-events-auto">{center}</div>
+        </div>
+      )}
+      <div className="flex items-center gap-4">
         {children}
         {onExit && (
           <button
             onClick={onExit}
-            className="inline-flex items-center gap-1.5 rounded-xl border-2 border-destructive/30 px-3 py-1.5 text-xs font-bold text-destructive transition-all hover:bg-destructive/10 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
+            className="inline-flex items-center gap-2 rounded-full bg-[#EF5350] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#D32F2F]"
           >
-            <X className="size-4" />
-            <span className="hidden sm:inline">Avslutt</span>
+            <X className="size-[18px]" strokeWidth={2} />
+            Avslutt aktiviteten
           </button>
         )}
       </div>

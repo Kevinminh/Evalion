@@ -129,13 +129,14 @@ export const STATEMENT_COLORS = [
 ] as const;
 
 /** Hex variant of statement colors for inline styles (teacher card). For the
- * student variant, use STATEMENT_COLORS_STUDENT_HEX. */
+ * student variant, use STATEMENT_COLORS_STUDENT_HEX. `bg2` is the second stop
+ * of the 135° gradient on the teacher card (matches the landing demo). */
 export const STATEMENT_COLORS_HEX = [
-  { bg: "#FFFDE7", border: "#FFE082", text: "#8D6E00" },
-  { bg: "#E3F1FC", border: "#90CAF9", text: "#2C5F8A" },
-  { bg: "#FFF3E0", border: "#FFCC80", text: "#B35C00" },
-  { bg: "#F3EEFF", border: "#CE93D8", text: "#6A1B9A" },
-  { bg: "#FFEBEE", border: "#EF9A9A", text: "#C62828" },
+  { bg: "#FFF8E1", bg2: "#FFF3CD", border: "#FFD54F", text: "#5D4037" },
+  { bg: "#E3F1FC", bg2: "#D6ECFA", border: "#B8DAF0", text: "#2C5F8A" },
+  { bg: "#FFF3E0", bg2: "#FFE0B2", border: "#FFB74D", text: "#BF360C" },
+  { bg: "#F3E5F5", bg2: "#E8D5F0", border: "#CE93D8", text: "#6A1B9A" },
+  { bg: "#FFEBEE", bg2: "#FFCDD2", border: "#EF9A9A", text: "#B71C1C" },
 ] as const;
 
 /** Student card variants — slightly warmer bg/border than the teacher set. */

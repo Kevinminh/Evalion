@@ -1,3 +1,4 @@
+import { BackButton } from "@workspace/evalion/components/live/back-button";
 import { BegrunnelseCard } from "@workspace/evalion/components/live/begrunnelse-card";
 import { DistributionChart } from "@workspace/evalion/components/live/distribution-chart";
 import { PanelTabs } from "@workspace/evalion/components/live/panel-tabs";
@@ -22,6 +23,7 @@ export function useStep2(): TeacherStep {
     totalVotes,
     activeRoundVotes,
     selectedIdx,
+    goToStep,
   } = useTeacherSession();
   const begrunnelseTab = panelTab === "default" || panelTab === "begrunnelser";
 
@@ -29,6 +31,11 @@ export function useStep2(): TeacherStep {
 
   const main = (
     <TeacherStepLayout
+      top={
+        <div className="flex w-full items-center justify-between">
+          <BackButton onClick={() => goToStep(0)} />
+        </div>
+      }
       statement={
         statement && (
           <StatementCard statement={statement} size="lg" color={statementColor} gradient />
@@ -61,7 +68,7 @@ export function useStep2(): TeacherStep {
 
   const panel = (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      <p className="shrink-0 text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[#616161]">
         Elevsvar – Første stemmerunde
       </p>
       <PanelTabs
@@ -72,48 +79,51 @@ export function useStep2(): TeacherStep {
         activeTab={begrunnelseTab ? "begrunnelser" : "stemmefordeling"}
         onTabChange={setPanelTab}
       >
-        {begrunnelseTab ? (
-          highlighted ? (
-            <div className="space-y-2">
-              <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-primary">
-                Fremhevet
-              </p>
-              <BegrunnelseCard
-                text={highlighted.text}
-                studentName={highlightedStudent?.name}
-                vote={highlightedVote}
-                highlighted
-              />
-            </div>
-          ) : (
-            <div className="flex flex-1 items-center justify-center">
-              <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-card/40 px-5 py-6 text-center">
-                <Smartphone className="size-9 text-muted-foreground/40" />
-                <p className="text-xs italic leading-relaxed text-muted-foreground">
+        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto rounded-2xl bg-white p-3 shadow-[0_4px_6px_rgba(0,0,0,0.07),0_2px_4px_rgba(0,0,0,0.04)]">
+          {begrunnelseTab ? (
+            highlighted ? (
+              <div className="flex flex-col gap-2">
+                <p className="px-1 text-xs font-bold uppercase tracking-[0.08em] text-[#6C3FC5]">
+                  Fremhevet
+                </p>
+                <BegrunnelseCard
+                  text={highlighted.text}
+                  studentName={highlightedStudent?.name}
+                  vote={highlightedVote}
+                  highlighted
+                />
+              </div>
+            ) : (
+              <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-6 text-center">
+                <Smartphone className="size-9 text-[#E0E0E0]" strokeWidth={1.5} />
+                <p className="max-w-[240px] text-sm leading-relaxed text-[#9E9E9E]">
                   Trykk på begrunnelser i live-statistikken på din eksterne enhet for å fremheve
                   dem her.
                 </p>
               </div>
+            )
+          ) : (
+            <div className="flex h-full flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <span className="flex-1 text-sm font-semibold text-[#616161]">
+                  Gjennomsnittlig sikkerhet:
+                </span>
+                <span className="font-mono text-xl font-extrabold leading-none tabular-nums text-[#1FA89F]">
+                  {avgConfidence !== null ? avgConfidence.toFixed(1).replace(".", ",") : "–"}
+                </span>
+              </div>
+              <div className="h-px bg-[#EEEEEE]" />
+              <div className="flex-1 min-h-0 py-2">
+                <DistributionChart
+                  key={`s${selectedIdx}-discussion`}
+                  bars={voteBars}
+                  total={totalVotes}
+                  correctKey={statement?.fasit}
+                />
+              </div>
             </div>
-          )
-        ) : (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between rounded-xl border border-border px-4 py-3">
-              <span className="text-sm font-semibold text-muted-foreground">
-                Gjennomsnittlig sikkerhet
-              </span>
-              <span className="text-lg font-bold tabular-nums text-primary">
-                {avgConfidence !== null ? avgConfidence.toFixed(1).replace(".", ",") : "–"}
-              </span>
-            </div>
-            <DistributionChart
-              key={`s${selectedIdx}-discussion`}
-              bars={voteBars}
-              total={totalVotes}
-              correctKey={statement?.fasit}
-            />
-          </div>
-        )}
+          )}
+        </div>
       </PanelTabs>
     </div>
   );

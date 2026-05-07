@@ -16,7 +16,6 @@ import { parseSessionId, placeholderConvexId } from "@/lib/route-params";
 import { useStep4Countdown } from "@/hooks/use-step4-countdown";
 
 import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
-import { DestructiveButton } from "@workspace/ui/components/destructive-button";
 import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
 import { RecordingButton } from "@/components/liveokt/recording-button";
 import { StatementPicker } from "@/components/liveokt/statement-picker";
@@ -151,9 +150,10 @@ function TeacherSessionLayout() {
   const showTopbarTimer = timerIsRunning && !panelOpen;
 
   return (
-    <div className="min-h-svh bg-[var(--color-bg-warm)]">
+    <div className="flex h-svh flex-col overflow-hidden bg-[var(--color-bg-primary)]">
       <SessionTopBar
         title={fagprat.title}
+        onExit={endSession}
         center={
           showTopbarTimer ? (
             <TopBarTimer
@@ -166,18 +166,11 @@ function TeacherSessionLayout() {
         }
       >
         {session.transcriptionEnabled && <RecordingButton />}
-        <a
-          href={DASHBOARD_URL}
-          className="inline-flex items-center gap-2 rounded-xl border-2 border-border px-4 py-2 text-sm font-bold text-muted-foreground transition-all hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
-        >
-          Gå til dashboard
-        </a>
-        <DestructiveButton onClick={endSession}>Avslutt</DestructiveButton>
       </SessionTopBar>
 
-      <div className="flex min-h-svh pt-14 pb-14 sm:pt-20 sm:pb-[100px]">
+      <div className="flex min-h-0 flex-1 pt-20 pb-[100px]">
         <main
-          className="flex min-h-0 flex-1 flex-col px-4 py-6 transition-[margin] duration-300 sm:px-8 sm:py-5 md:[margin-right:var(--panel-margin)]"
+          className="flex min-h-0 flex-1 flex-col transition-[margin] duration-300 md:[margin-right:var(--panel-margin)]"
           style={cssVars({ "--panel-margin": teacherStep && panelOpen ? "340px" : "0px" })}
         >
           {teacherStep ? teacherStep.main : <StatementPicker />}
