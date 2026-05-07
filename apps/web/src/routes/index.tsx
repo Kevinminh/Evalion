@@ -41,6 +41,7 @@ function App() {
     e.preventDefault();
     setError("");
     const cleaned = sanitizeCode(code);
+    console.log("[index] submit", { raw: code, cleaned });
     if (!/^[A-Z0-9]{6}$/.test(cleaned)) {
       setError("Koden må være 6 tegn (bokstaver og tall)");
       return;
@@ -51,6 +52,7 @@ function App() {
 
   // React to query result via useEffect (not in render body)
   useEffect(() => {
+    console.log("[index] effect", { checking, isFetching, submittedCode, foundSession });
     if (!checking || isFetching || !submittedCode) return;
     if (foundSession && (foundSession.status === "lobby" || foundSession.status === "active")) {
       navigate({ to: "/delta", search: { code: submittedCode } });
