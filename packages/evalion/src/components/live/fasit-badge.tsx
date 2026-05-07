@@ -31,15 +31,12 @@ export function FasitBadge({
   return (
     <span
       className={cn(
-        "inline-block rounded-full font-extrabold uppercase text-white",
+        "inline-block rounded-full font-extrabold uppercase tracking-wider text-white",
         SIZE_CLASS[size],
         bg,
+        animated && "animate-fasit-pulse",
         className,
       )}
-      style={{
-        letterSpacing: "0.05em",
-        animation: animated ? "var(--animate-fasit-pulse)" : undefined,
-      }}
     >
       {label}
     </span>

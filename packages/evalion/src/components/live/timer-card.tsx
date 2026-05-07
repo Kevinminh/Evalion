@@ -137,7 +137,7 @@ export function TimerCard({
       )}
       style={{
         backgroundColor: "var(--color-neutral-0)",
-        boxShadow: "0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04)",
+        boxShadow: "var(--shadow-card-soft)",
       }}
     >
       <div
@@ -147,7 +147,7 @@ export function TimerCard({
           isRunning ? "text-[36px]" : "text-[48px]",
         )}
         style={{
-          color: isUrgent ? "#EF5350" : "#212121",
+          color: isUrgent ? "var(--color-error)" : "var(--color-text-ink-strong)",
           animation: isUrgent ? "var(--animate-timer-pulse)" : undefined,
         }}
       >
@@ -281,42 +281,6 @@ export function TimerCard({
           <ArrowRight className="size-[18px]" />
         </button>
       )}
-      <style>{`
-        input[type="range"].timer-range {
-          -webkit-appearance: none;
-          appearance: none;
-          height: 8px;
-          border-radius: 9999px;
-          background: linear-gradient(
-            90deg,
-            var(--color-primary-300) 0%,
-            var(--color-primary-300) var(--timer-pct, 0%),
-            var(--color-neutral-200) var(--timer-pct, 0%)
-          );
-          outline: none;
-          cursor: pointer;
-        }
-        input[type="range"].timer-range::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 22px;
-          height: 22px;
-          border-radius: 50%;
-          background: var(--color-primary-500);
-          border: 3px solid var(--color-neutral-0);
-          box-shadow: 0 2px 8px rgba(108, 63, 197, 0.35);
-          cursor: pointer;
-        }
-        input[type="range"].timer-range::-moz-range-thumb {
-          width: 22px;
-          height: 22px;
-          border-radius: 50%;
-          background: var(--color-primary-500);
-          border: 3px solid var(--color-neutral-0);
-          box-shadow: 0 2px 8px rgba(108, 63, 197, 0.35);
-          cursor: pointer;
-        }
-      `}</style>
     </div>
   );
 }

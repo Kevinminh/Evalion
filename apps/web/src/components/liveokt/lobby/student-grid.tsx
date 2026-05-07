@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 
 import { pastelFor } from "@/lib/avatar";
 import type { Id } from "@/lib/convex";
+import { cssVars } from "@/lib/css-vars";
 
 interface StudentGridProps {
   students: Doc<"sessionStudents">[];
@@ -25,11 +26,8 @@ export function StudentGrid({ students, groupCount, hasGroups, onRemove }: Stude
       {groups.map((group, gi) => (
         <div
           key={gi}
-          className="w-full min-w-[140px] sm:w-[180px]"
-          style={{
-            animation: "groupFadeIn 0.4s ease both",
-            animationDelay: `${gi * 0.08}s`,
-          }}
+          className="w-full min-w-[140px] animate-group-fade-in sm:w-[180px]"
+          style={{ animationDelay: `${gi * 0.08}s` }}
         >
           <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Gruppe {gi + 1}
@@ -38,8 +36,8 @@ export function StudentGrid({ students, groupCount, hasGroups, onRemove }: Stude
             {group.map((student) => (
               <div key={student._id} className="flex items-center gap-2">
                 <div
-                  className="flex size-7 shrink-0 items-center justify-center rounded-full text-base leading-none"
-                  style={{ background: pastelFor(student._id) }}
+                  className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[var(--avatar-bg)] text-base leading-none"
+                  style={cssVars({ "--avatar-bg": pastelFor(student._id) })}
                 >
                   {student.avatarEmoji ?? student.name[0]}
                 </div>
@@ -65,12 +63,11 @@ function UngroupedList({
       {students.map((student) => (
         <div
           key={student._id}
-          className="flex items-center gap-2 rounded-xl border-[1.5px] border-border bg-card p-2 pr-3 shadow-xs"
-          style={{ animation: "cardIn 0.3s ease" }}
+          className="flex animate-card-in items-center gap-2 rounded-xl border-[1.5px] border-border bg-card p-2 pr-3 shadow-xs"
         >
           <div
-            className="flex size-8 shrink-0 items-center justify-center rounded-full text-lg leading-none"
-            style={{ background: pastelFor(student._id) }}
+            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--avatar-bg)] text-lg leading-none"
+            style={cssVars({ "--avatar-bg": pastelFor(student._id) })}
           >
             {student.avatarEmoji ?? student.name[0]}
           </div>

@@ -130,17 +130,6 @@ function TeacherLobbyPage() {
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes cardIn {
-          from { opacity: 0; transform: scale(0.9) translateY(4px); }
-          to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        @keyframes groupFadeIn {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }

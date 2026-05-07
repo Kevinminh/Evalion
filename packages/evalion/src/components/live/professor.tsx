@@ -74,17 +74,17 @@ export function Professor({
         <div className="relative flex flex-1 items-center">
           <div
             className="absolute -left-[10px] size-0 border-y-[10px] border-r-[10px] border-y-transparent border-r-white"
-            style={{ filter: "drop-shadow(-2px 0 1px rgba(0,0,0,0.04))" }}
+            style={{ filter: "var(--shadow-chevron-soft)" }}
           />
           <div
             className={cn(
-              "flex-1 rounded-[24px] border-[1.5px] border-[#EEEEEE] bg-white px-6 py-5 shadow-[0_4px_6px_rgba(0,0,0,0.07),0_2px_4px_rgba(0,0,0,0.04)]",
+              "flex-1 rounded-[24px] border-[1.5px] border-[var(--color-divider-soft)] bg-white px-6 py-5 shadow-[var(--shadow-card-soft)]",
               animate && "animate-[fadeInUp_0.5s_ease_0.2s_both]",
             )}
           >
             <p
               className={cn(
-                "text-center font-medium leading-relaxed text-[#212121]",
+                "text-center font-medium leading-relaxed text-[var(--color-text-ink-strong)]",
                 textSize === "sm" && "text-sm",
                 textSize === "base" && "text-base",
                 textSize === "lg" && "text-xl",

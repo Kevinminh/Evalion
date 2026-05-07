@@ -11,28 +11,29 @@ import { useState } from "react";
 
 import { DestructiveButton } from "@workspace/ui/components/destructive-button";
 import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
+import { cssVars } from "@/lib/css-vars";
 import type { TeacherStep } from "@/types/teacher-step";
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
 import { useTeacherSession } from "./teacher-session-context";
 
 const CIRCLE_STYLE: { border: string; text: string }[] = [
-  { border: "#EF5350", text: "#EF5350" },
-  { border: "#FF9800", text: "#FF9800" },
-  { border: "#FDD835", text: "#b8a000" },
-  { border: "#66BB6A", text: "#66BB6A" },
-  { border: "#2E7D32", text: "#2E7D32" },
+  { border: "var(--color-rating-1)", text: "var(--color-rating-1)" },
+  { border: "var(--color-rating-2)", text: "var(--color-rating-2)" },
+  { border: "var(--color-rating-3)", text: "var(--color-rating-3-text)" },
+  { border: "var(--color-rating-4)", text: "var(--color-rating-4)" },
+  { border: "var(--color-rating-5)", text: "var(--color-rating-5)" },
 ];
 
 const CORRECT_FILL: Record<Fasit, string> = {
-  sant: "#66BB6A",
-  delvis: "#FF9800",
-  usant: "#EF5350",
+  sant: "var(--color-vote-sant)",
+  delvis: "var(--color-vote-delvis)",
+  usant: "var(--color-vote-usant)",
 };
 
 const CORRECT_TEXT: Record<Fasit, string> = {
-  sant: "#2E7D32",
-  delvis: "#b8860b",
-  usant: "#C62828",
+  sant: "var(--color-vote-sant-text)",
+  delvis: "var(--color-vote-delvis-text)",
+  usant: "var(--color-vote-usant-text)",
 };
 
 const VOTE_LABELS: Record<Fasit, string> = {
@@ -61,10 +62,7 @@ function DualDistColumn({ title, votes, correctKey }: DualDistColumnProps) {
 
   return (
     <div className="flex flex-1 flex-col gap-1">
-      <div
-        className="text-center text-[11px] font-bold uppercase text-[#616161]"
-        style={{ letterSpacing: "0.4px" }}
-      >
+      <div className="text-center text-[11px] font-bold uppercase tracking-[0.4px] text-[var(--color-text-ink-soft)]">
         {title}
       </div>
       <div className="flex items-end justify-center gap-2 px-0 py-1">
@@ -73,28 +71,27 @@ function DualDistColumn({ title, votes, correctKey }: DualDistColumnProps) {
           const pct = total > 0 ? Math.round((count / total) * 100) : 0;
           const fillHeight = total > 0 ? (count / maxCount) * 100 : 0;
           const isCorrect = key === correctKey;
-          const fillBg = isCorrect ? CORRECT_FILL[key] : "#E0E0E0";
-          const textColor = isCorrect ? CORRECT_TEXT[key] : "#9E9E9E";
+          const fillBg = isCorrect ? CORRECT_FILL[key] : "var(--color-vote-empty-fill)";
+          const textColor = isCorrect ? CORRECT_TEXT[key] : "var(--color-vote-empty-text)";
 
           return (
             <div
               key={key}
               className="flex max-w-[90px] flex-1 flex-col items-center gap-0.5"
+              style={cssVars({ "--c-text": textColor, "--c-bar-bg": fillBg })}
             >
               <span
                 className={cn(
-                  "text-[10px] tabular-nums",
+                  "text-[10px] tabular-nums text-[var(--c-text)]",
                   isCorrect ? "font-extrabold" : "font-semibold",
                 )}
-                style={{ color: textColor }}
               >
                 {count} stk
               </span>
-              <div className="relative flex h-[55px] w-full items-end overflow-hidden rounded-md bg-[#F5F5F5]">
+              <div className="relative flex h-[55px] w-full items-end overflow-hidden rounded-md bg-[var(--color-rating-bar-track)]">
                 <div
-                  className="flex w-full items-center justify-center rounded-b-md transition-[height] duration-[400ms]"
+                  className="flex w-full items-center justify-center rounded-b-md bg-[var(--c-bar-bg)] transition-[height] duration-[400ms]"
                   style={{
-                    backgroundColor: fillBg,
                     height: `${Math.max(fillHeight, count > 0 ? 30 : 0)}%`,
                     minHeight: count > 0 ? 16 : 0,
                   }}
@@ -103,7 +100,9 @@ function DualDistColumn({ title, votes, correctKey }: DualDistColumnProps) {
                     <span
                       className={cn(
                         "text-[9px] tabular-nums",
-                        isCorrect ? "font-extrabold text-white" : "font-semibold text-[#616161]",
+                        isCorrect
+                          ? "font-extrabold text-white"
+                          : "font-semibold text-[var(--color-text-ink-soft)]",
                       )}
                     >
                       {pct}%
@@ -113,10 +112,9 @@ function DualDistColumn({ title, votes, correctKey }: DualDistColumnProps) {
               </div>
               <span
                 className={cn(
-                  "mt-0.5 text-[10px]",
+                  "mt-0.5 text-[10px] text-[var(--c-text)]",
                   isCorrect ? "font-extrabold" : "font-semibold",
                 )}
-                style={{ color: textColor }}
               >
                 {VOTE_LABELS[key]}
               </span>
@@ -175,19 +173,16 @@ export function useStep6(): TeacherStep {
 
   const panel = (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[#616161]">
+      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-text-ink-soft)]">
         Resultat
       </p>
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-2xl bg-white p-3 shadow-[0_4px_6px_rgba(0,0,0,0.07),0_2px_4px_rgba(0,0,0,0.04)]">
         {/* conf-summary-row */}
         <div className="flex flex-wrap items-center gap-2 px-3 py-2">
-          <span className="text-xs font-semibold text-[#9E9E9E]">
+          <span className="text-xs font-semibold text-[var(--color-text-ink-faint)]">
             Gjennomsnittlig forståelse:
           </span>
-          <span
-            className="font-mono font-extrabold leading-none text-[#1FA89F] tabular-nums"
-            style={{ fontSize: 22 }}
-          >
+          <span className="font-mono text-[22px] font-extrabold leading-none tabular-nums text-[var(--color-turkis-500)]">
             {avgRating !== undefined ? avgRating.toFixed(1).replace(".", ",") : "–"}
           </span>
           <button
@@ -197,8 +192,8 @@ export function useStep6(): TeacherStep {
             className={cn(
               "ml-auto flex size-8 items-center justify-center rounded-lg border-[1.5px] transition-all",
               confDetailOpen
-                ? "border-[#A37EFF] bg-[#F3EEFF] text-[#6C3FC5]"
-                : "border-[#EEEEEE] bg-white text-[#9E9E9E] hover:bg-[#F5F5F5]",
+                ? "border-[var(--color-highlight-strip)] bg-[var(--color-highlight-strip-bg)] text-[var(--color-highlight-strip-text)]"
+                : "border-[var(--color-divider-soft)] bg-white text-[var(--color-text-ink-faint)] hover:bg-[var(--color-rating-bar-track)]",
             )}
           >
             <BarChart3 className="size-4" strokeWidth={2.5} />
@@ -207,19 +202,20 @@ export function useStep6(): TeacherStep {
 
         {/* conf-detail (collapsible) */}
         {confDetailOpen && (
-          <div className="border-t border-[#F5F5F5] px-3 pt-2.5 pb-1">
+          <div className="border-t border-[var(--color-rating-bar-track)] px-3 pt-2.5 pb-1">
             <div className="flex justify-center gap-4">
               {ratingDistribution.map((d, i) => {
                 const style = CIRCLE_STYLE[i] ?? CIRCLE_STYLE[0]!;
                 return (
-                  <div key={d.score} className="flex flex-col items-center gap-1.5">
-                    <div
-                      className="flex size-7 items-center justify-center rounded-full border-[2.5px] bg-transparent text-[11px] font-extrabold leading-none"
-                      style={{ borderColor: style.border, color: style.text }}
-                    >
+                  <div
+                    key={d.score}
+                    className="flex flex-col items-center gap-1.5"
+                    style={cssVars({ "--c-border": style.border, "--c-text": style.text })}
+                  >
+                    <div className="flex size-7 items-center justify-center rounded-full border-[2.5px] border-[var(--c-border)] bg-transparent text-[11px] font-extrabold leading-none text-[var(--c-text)]">
                       {d.score}
                     </div>
-                    <span className="text-[11px] font-extrabold leading-none text-[#212121]">
+                    <span className="text-[11px] font-extrabold leading-none text-[var(--color-text-ink-strong)]">
                       {d.count} stk
                     </span>
                   </div>
@@ -230,7 +226,9 @@ export function useStep6(): TeacherStep {
         )}
 
         {/* chart-sublabel */}
-        <p className="px-3 pt-3 text-[10px] font-semibold text-[#9E9E9E]">Stemmefordeling</p>
+        <p className="px-3 pt-3 text-[10px] font-semibold text-[var(--color-text-ink-faint)]">
+          Stemmefordeling
+        </p>
 
         {/* dual-dist (Runde 1 + Runde 2) */}
         <div className="flex flex-col gap-3.5 px-3 pt-2 pb-1">
@@ -239,7 +237,7 @@ export function useStep6(): TeacherStep {
         </div>
 
         {totalRatings === 0 && (
-          <p className="px-3 pb-2 text-center text-xs italic text-[#9E9E9E]">
+          <p className="px-3 pb-2 text-center text-xs italic text-[var(--color-text-ink-faint)]">
             Venter på elevenes vurderinger…
           </p>
         )}

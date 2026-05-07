@@ -5,13 +5,7 @@ import { CheckCircle2 } from "lucide-react";
 export function WaitingScreen() {
   return (
     <div className="flex flex-col items-center gap-6 py-8">
-      <span
-        className="inline-flex items-center gap-2 rounded-full bg-sant/15 px-4 py-1.5 text-sm font-bold uppercase tracking-wider text-sant"
-        style={{
-          letterSpacing: "0.05em",
-          animation: "var(--animate-fasit-pulse)",
-        }}
-      >
+      <span className="inline-flex animate-fasit-pulse items-center gap-2 rounded-full bg-sant/15 px-4 py-1.5 text-sm font-bold uppercase tracking-wider text-sant">
         <CheckCircle2 className="size-4" />
         Stemmen registrert
       </span>

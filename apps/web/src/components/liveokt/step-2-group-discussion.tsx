@@ -68,7 +68,7 @@ export function useStep2(): TeacherStep {
 
   const panel = (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[#616161]">
+      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-text-ink-soft)]">
         Elevsvar – Første stemmerunde
       </p>
       <PanelTabs
@@ -83,7 +83,7 @@ export function useStep2(): TeacherStep {
           {begrunnelseTab ? (
             highlighted ? (
               <div className="flex flex-col gap-2">
-                <p className="px-1 text-xs font-bold uppercase tracking-[0.08em] text-[#6C3FC5]">
+                <p className="px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-highlight-strip-text)]">
                   Fremhevet
                 </p>
                 <BegrunnelseCard
@@ -95,8 +95,8 @@ export function useStep2(): TeacherStep {
               </div>
             ) : (
               <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-6 text-center">
-                <Smartphone className="size-9 text-[#E0E0E0]" strokeWidth={1.5} />
-                <p className="max-w-[240px] text-sm leading-relaxed text-[#9E9E9E]">
+                <Smartphone className="size-9 text-[var(--color-vote-empty-fill)]" strokeWidth={1.5} />
+                <p className="max-w-[240px] text-sm leading-relaxed text-[var(--color-text-ink-faint)]">
                   Trykk på begrunnelser i live-statistikken på din eksterne enhet for å fremheve
                   dem her.
                 </p>
@@ -105,14 +105,14 @@ export function useStep2(): TeacherStep {
           ) : (
             <div className="flex h-full flex-col gap-2">
               <div className="flex items-center gap-2">
-                <span className="flex-1 text-sm font-semibold text-[#616161]">
+                <span className="flex-1 text-sm font-semibold text-[var(--color-text-ink-soft)]">
                   Gjennomsnittlig sikkerhet:
                 </span>
-                <span className="font-mono text-xl font-extrabold leading-none tabular-nums text-[#1FA89F]">
+                <span className="font-mono text-xl font-extrabold leading-none tabular-nums text-[var(--color-turkis-500)]">
                   {avgConfidence !== null ? avgConfidence.toFixed(1).replace(".", ",") : "–"}
                 </span>
               </div>
-              <div className="h-px bg-[#EEEEEE]" />
+              <div className="h-px bg-[var(--color-divider-soft)]" />
               <div className="flex-1 min-h-0 py-2">
                 <DistributionChart
                   key={`s${selectedIdx}-discussion`}

@@ -3,6 +3,7 @@ import { BegrunnelseCard } from "@workspace/evalion/components/live/begrunnelse-
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { resolveStatementHex } from "@workspace/evalion/lib/constants";
 
+import { cssVars } from "@/lib/css-vars";
 import type { TeacherStep } from "@/types/teacher-step";
 import { useTeacherSession } from "./teacher-session-context";
 
@@ -24,25 +25,21 @@ export function useStep5(): TeacherStep {
       </div>
       <div className="flex-1" />
       {statement && (
-        <div className="relative flex w-full max-w-[760px] animate-[fadeInUp_0.5s_ease_0.2s_both] flex-col items-center">
+        <div
+          className="relative flex w-full max-w-[760px] animate-[fadeInUp_0.5s_ease_0.2s_both] flex-col items-center"
+          style={cssVars({
+            "--c-border": statementColor.border,
+            "--c-bg": statementColor.bg,
+            "--c-bg2": statementColor.bg2,
+            "--c-text": statementColor.text,
+          })}
+        >
           <div className="z-[5] -mb-4">
             <FasitBadge fasit={statement.fasit} size="lg" />
           </div>
-          <div
-            className="w-full overflow-hidden rounded-[24px] border-2 shadow-[0_10px_15px_rgba(0,0,0,0.08),0_4px_6px_rgba(0,0,0,0.04)]"
-            style={{ borderColor: statementColor.border }}
-          >
-            <div
-              className="border-b-[1.5px] px-8 pt-8 pb-6 text-center"
-              style={{
-                background: `linear-gradient(135deg, ${statementColor.bg}, ${statementColor.bg2})`,
-                borderColor: statementColor.border,
-              }}
-            >
-              <p
-                className="text-2xl font-bold leading-relaxed"
-                style={{ color: statementColor.text }}
-              >
+          <div className="w-full overflow-hidden rounded-[24px] border-2 border-[var(--c-border)] shadow-[0_10px_15px_rgba(0,0,0,0.08),0_4px_6px_rgba(0,0,0,0.04)]">
+            <div className="border-b-[1.5px] border-[var(--c-border)] bg-[linear-gradient(135deg,var(--c-bg),var(--c-bg2))] px-8 pt-8 pb-6 text-center">
+              <p className="text-2xl font-bold leading-relaxed text-[var(--c-text)]">
                 {statement.text}
               </p>
             </div>
@@ -50,13 +47,9 @@ export function useStep5(): TeacherStep {
               <img
                 src="/professoren.png"
                 alt="Professoren"
-                className="size-24 shrink-0 rounded-full object-cover"
-                style={{
-                  border: "3px solid #C2A9FF",
-                  backgroundColor: "var(--color-bg-tertiary)",
-                }}
+                className="size-24 shrink-0 rounded-full border-[3px] border-[var(--color-professor-border)] bg-[var(--color-bg-tertiary)] object-cover"
               />
-              <p className="flex-1 text-base font-medium leading-relaxed text-[#212121]">
+              <p className="flex-1 text-base font-medium leading-relaxed text-[var(--color-text-ink-strong)]">
                 {statement.explanation}
               </p>
             </div>
@@ -70,23 +63,23 @@ export function useStep5(): TeacherStep {
 
   const panel = (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[#616161]">
+      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-text-ink-soft)]">
         Professorens forklaring
       </p>
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-2xl bg-white p-3 shadow-[0_4px_6px_rgba(0,0,0,0.07),0_2px_4px_rgba(0,0,0,0.04)]">
         {/* Antall riktig */}
-        <div className="flex items-center justify-center gap-2 rounded-xl bg-[#E8F5E9] px-3 py-2">
-          <span className="shrink-0 font-mono text-xl font-extrabold leading-none tabular-nums text-[#4CAF50]">
+        <div className="flex items-center justify-center gap-2 rounded-xl bg-[var(--color-fasit-correct-bg)] px-3 py-2">
+          <span className="shrink-0 font-mono text-xl font-extrabold leading-none tabular-nums text-[var(--color-fasit-correct-text)]">
             {r2CorrectCount}/{r2Total}
           </span>
           <div className="flex min-w-0 flex-col gap-px">
-            <span className="text-xs font-semibold text-[#616161]">
+            <span className="text-xs font-semibold text-[var(--color-text-ink-soft)]">
               svarte riktig ({correctPct}%)
             </span>
           </div>
         </div>
 
-        <p className="mt-2 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[#616161]">
+        <p className="mt-2 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-text-ink-soft)]">
           Fremhevet begrunnelse
         </p>
 
@@ -97,7 +90,7 @@ export function useStep5(): TeacherStep {
             highlighted
           />
         ) : (
-          <div className="rounded-l-none rounded-r-xl border-l-[3px] border-[#A37EFF] bg-[#F3EEFF] px-5 py-4 text-base font-medium italic leading-relaxed text-[#9E9E9E]">
+          <div className="rounded-l-none rounded-r-xl border-l-[3px] border-[var(--color-highlight-strip)] bg-[var(--color-highlight-strip-bg)] px-5 py-4 text-base font-medium italic leading-relaxed text-[var(--color-text-ink-faint)]">
             Ingen fremhevet begrunnelse ennå.
           </div>
         )}

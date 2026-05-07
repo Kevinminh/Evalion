@@ -85,10 +85,10 @@ export function TeacherPanel({
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0,
     border: "1.5px solid",
-    borderColor: shouldPulse ? "#6C3FC5" : "#EEEEEE",
+    borderColor: shouldPulse ? "var(--color-purple-500)" : "var(--color-divider-soft)",
     borderRight: "none",
-    background: shouldPulse ? "#6C3FC5" : "#FAFAFA",
-    color: shouldPulse ? "#FFFFFF" : "#6C3FC5",
+    background: shouldPulse ? "var(--color-purple-500)" : "var(--color-bg-tertiary)",
+    color: shouldPulse ? "#fff" : "var(--color-purple-500)",
     transition:
       "right 0.35s ease, width 0.2s ease, height 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease",
     cursor: "pointer",
@@ -96,34 +96,15 @@ export function TeacherPanel({
     alignItems: "center",
     justifyContent: "center",
     padding: 0,
-    boxShadow: shouldPulse
-      ? "0 3px 0 #48208B, -4px 0 18px rgba(108, 63, 197, 0.35)"
-      : "0 1px 2px rgba(0,0,0,0.04)",
+    boxShadow: shouldPulse ? "var(--shadow-panel-pulse)" : "var(--shadow-panel-rest)",
     animation: shouldPulse ? "panel-tab-attention 2.4s ease-in-out infinite" : undefined,
-  };
-
-  const mobileToggleStyle: CSSProperties = {
-    position: "fixed",
-    right: "0.75rem",
-    bottom: "4rem",
-    zIndex: 30,
-    width: 40,
-    height: 40,
-    borderRadius: 9999,
-    background: "#FFFFFF",
-    border: "1px solid #EEEEEE",
-    color: "#6C3FC5",
-    boxShadow: "0 4px 8px rgba(0,0,0,0.12)",
-    cursor: "pointer",
-    alignItems: "center",
-    justifyContent: "center",
   };
 
   const backdropStyle: CSSProperties = {
     position: "fixed",
     inset: 0,
     zIndex: 10,
-    background: "rgba(0,0,0,0.4)",
+    background: "var(--color-overlay-dark)",
   };
 
   const panelStyle: CSSProperties = {
@@ -134,8 +115,8 @@ export function TeacherPanel({
     zIndex: 20,
     width: open ? (isMobile ? "85vw" : PANEL_WIDTH_PX) : 0,
     maxWidth: PANEL_WIDTH_PX,
-    background: "#FAFAFA",
-    borderLeft: "1.5px solid #EEEEEE",
+    background: "var(--color-bg-tertiary)",
+    borderLeft: "1.5px solid var(--color-divider-soft)",
     opacity: open ? 1 : 0,
     pointerEvents: open ? "auto" : "none",
     overflow: "hidden",
@@ -161,15 +142,6 @@ export function TeacherPanel({
           strokeWidth={2.5}
         />
       </button>
-      {/* Mobile toggle */}
-      <button
-        onClick={toggle}
-        aria-label={open ? "Skjul panel" : "Vis panel"}
-        className={cn("md:hidden")}
-        style={mobileToggleStyle}
-      >
-        <Icon className="size-5" strokeWidth={2.5} />
-      </button>
       {/* Backdrop on mobile when open */}
       {isMobile && open && (
         <div className={cn("md:hidden")} style={backdropStyle} onClick={toggle} />
@@ -178,7 +150,11 @@ export function TeacherPanel({
         <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
           {children}
         </div>
-        {footer && <div className="shrink-0 border-t-[1.5px] border-[#EEEEEE] p-4">{footer}</div>}
+        {footer && (
+          <div className="shrink-0 border-t-[1.5px] border-[var(--color-divider-soft)] p-4">
+            {footer}
+          </div>
+        )}
       </div>
     </>
   );

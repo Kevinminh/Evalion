@@ -10,11 +10,11 @@ interface SessionTopBarProps {
 
 export function SessionTopBar({ title, onExit, center, children }: SessionTopBarProps) {
   return (
-    <div className="fixed top-0 right-0 left-0 z-40 flex h-20 min-h-20 items-center justify-between border-b-[1.5px] border-[#EEEEEE] bg-white px-8">
+    <div className="fixed top-0 right-0 left-0 z-40 flex h-20 min-h-20 items-center justify-between border-b-[1.5px] border-[var(--color-divider-soft)] bg-white px-8">
       <div className="flex items-center gap-4">
         <img src="/co-lab-logo.png" alt="CO-LAB" className="h-12 object-contain" />
         <Separator orientation="vertical" />
-        <span className="text-lg font-bold text-[#212121]">{title}</span>
+        <span className="text-lg font-bold text-[var(--color-text-ink-strong)]">{title}</span>
       </div>
       {center && (
         <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -26,7 +26,7 @@ export function SessionTopBar({ title, onExit, center, children }: SessionTopBar
         {onExit && (
           <button
             onClick={onExit}
-            className="inline-flex items-center gap-2 rounded-full bg-[#EF5350] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#D32F2F]"
+            className="inline-flex items-center gap-2 rounded-full bg-[var(--color-error)] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[var(--color-error-hover)]"
           >
             <X className="size-[18px]" strokeWidth={2} />
             Avslutt aktiviteten

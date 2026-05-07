@@ -14,7 +14,7 @@ function SectionLabel({ children, className }: { children: React.ReactNode; clas
   return (
     <span
       className={cn(
-        "text-center text-xs font-bold uppercase tracking-[0.08em] text-[#9E9E9E]",
+        "text-center text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-text-ink-faint)]",
         className,
       )}
     >
@@ -42,12 +42,12 @@ export function EndringerCard({
       <SectionLabel>Stemmemønster</SectionLabel>
 
       {/* Primary headline: svarte riktig */}
-      <div className="flex items-center justify-center gap-2 rounded-2xl bg-[#E8F5E9] px-3 py-2">
-        <span className="shrink-0 font-mono text-xl font-extrabold leading-none tabular-nums text-[#4CAF50]">
+      <div className="flex items-center justify-center gap-2 rounded-2xl bg-[var(--color-fasit-correct-bg)] px-3 py-2">
+        <span className="shrink-0 font-mono text-xl font-extrabold leading-none tabular-nums text-[var(--color-fasit-correct-text)]">
           {correctCount}/{totalVotes}
         </span>
         <div className="flex min-w-0 flex-col gap-px">
-          <span className="text-xs font-semibold text-[#616161]">
+          <span className="text-xs font-semibold text-[var(--color-text-ink-soft)]">
             svarte riktig ({correctPct}%)
           </span>
         </div>
@@ -55,12 +55,12 @@ export function EndringerCard({
 
       {/* Secondary headline: endret fra feil til riktig */}
       {changedToCorrect > 0 && (
-        <div className="flex items-center justify-center gap-2 rounded-2xl bg-[#F5F5F5] px-3 py-2">
-          <span className="shrink-0 font-mono text-lg font-extrabold leading-none tabular-nums text-[#1FA89F]">
+        <div className="flex items-center justify-center gap-2 rounded-2xl bg-[var(--color-rating-bar-track)] px-3 py-2">
+          <span className="shrink-0 font-mono text-lg font-extrabold leading-none tabular-nums text-[var(--color-turkis-500)]">
             {changedToCorrect}
           </span>
           <div className="flex min-w-0 flex-col gap-px">
-            <span className="text-xs font-semibold text-[#616161]">
+            <span className="text-xs font-semibold text-[var(--color-text-ink-soft)]">
               endret fra feil til riktig svar
             </span>
           </div>
@@ -69,12 +69,12 @@ export function EndringerCard({
 
       {/* Warning: changed from correct to incorrect */}
       {changedToIncorrect > 0 && (
-        <div className="flex items-center justify-center gap-2 rounded-2xl border-[1.5px] border-[rgba(244,67,54,0.2)] bg-[#FFEBEE] px-3 py-2">
-          <AlertTriangle className="size-[18px] shrink-0 text-[#EF5350]" strokeWidth={2} />
-          <span className="font-mono text-base font-extrabold leading-none tabular-nums text-[#EF5350]">
+        <div className="flex items-center justify-center gap-2 rounded-2xl border-[1.5px] border-[var(--color-error-border-light)] bg-[var(--color-error-bg-light)] px-3 py-2">
+          <AlertTriangle className="size-[18px] shrink-0 text-[var(--color-error)]" strokeWidth={2} />
+          <span className="font-mono text-base font-extrabold leading-none tabular-nums text-[var(--color-error)]">
             {changedToIncorrect}
           </span>
-          <span className="text-xs font-semibold text-[#616161]">
+          <span className="text-xs font-semibold text-[var(--color-text-ink-soft)]">
             endret fra riktig til feil
           </span>
         </div>
@@ -84,12 +84,12 @@ export function EndringerCard({
       {hasConfDelta && (
         <>
           <SectionLabel className="-mb-2 mt-2">Gjennomsnittlig sikkerhet</SectionLabel>
-          <div className="flex items-center justify-center gap-3 rounded-2xl bg-[#F3EEFF] px-3 py-2">
-            <span className="font-mono text-xl font-extrabold leading-none tabular-nums text-[#9E9E9E]">
+          <div className="flex items-center justify-center gap-3 rounded-2xl bg-[var(--color-highlight-strip-bg)] px-3 py-2">
+            <span className="font-mono text-xl font-extrabold leading-none tabular-nums text-[var(--color-text-ink-faint)]">
               {avgConfidenceR1!.toFixed(1).replace(".", ",")}
             </span>
-            <ArrowRight className="size-[14px] text-[#9E9E9E]" strokeWidth={2.5} />
-            <span className="font-mono text-xl font-extrabold leading-none tabular-nums text-[#1FA89F]">
+            <ArrowRight className="size-[14px] text-[var(--color-text-ink-faint)]" strokeWidth={2.5} />
+            <span className="font-mono text-xl font-extrabold leading-none tabular-nums text-[var(--color-turkis-500)]">
               {avgConfidenceR2!.toFixed(1).replace(".", ",")}
             </span>
             {showConfDelta && (
@@ -97,8 +97,8 @@ export function EndringerCard({
                 className={cn(
                   "rounded-full px-1.5 py-0.5 font-mono text-xs font-bold tabular-nums",
                   confDelta > 0
-                    ? "bg-[#E8F5E9] text-[#4CAF50]"
-                    : "bg-[#FFEBEE] text-[#EF5350]",
+                    ? "bg-[var(--color-fasit-correct-bg)] text-[var(--color-fasit-correct-text)]"
+                    : "bg-[var(--color-error-bg-light)] text-[var(--color-error)]",
                 )}
               >
                 {confDelta > 0 ? "+" : ""}

@@ -20,15 +20,15 @@ interface DistributionChartProps {
 }
 
 const FILL_HEX: Record<string, string> = {
-  sant: "#4CAF50",
-  delvis: "#FF9800",
-  usant: "#EF5350",
+  sant: "var(--color-fasit-correct-text)",
+  delvis: "var(--color-vote-delvis)",
+  usant: "var(--color-error)",
 };
 
 const CORRECT_TEXT_HEX: Record<string, string> = {
-  sant: "#2E7D32",
-  delvis: "#B8860B",
-  usant: "#C62828",
+  sant: "var(--color-vote-sant-text)",
+  delvis: "var(--color-vote-delvis-text)",
+  usant: "var(--color-vote-usant-text)",
 };
 
 export function DistributionChart({
@@ -38,13 +38,13 @@ export function DistributionChart({
   correctKey,
 }: DistributionChartProps) {
   return (
-    <div className="flex w-full" style={{ height, gap: 16 }}>
+    <div className="flex w-full gap-4" style={{ height }}>
       {bars.map((bar) => {
         const pct = total > 0 ? Math.round((bar.value / total) * 100) : 0;
         const isCorrect = correctKey !== undefined && bar.key === correctKey;
         const variantKey = bar.variant ?? bar.key ?? "";
-        const fill = FILL_HEX[variantKey] ?? "#9E9E9E";
-        const correctText = CORRECT_TEXT_HEX[variantKey] ?? "#212121";
+        const fill = FILL_HEX[variantKey] ?? "var(--color-text-ink-faint)";
+        const correctText = CORRECT_TEXT_HEX[variantKey] ?? "var(--color-text-ink-strong)";
 
         return (
           <div
@@ -56,11 +56,13 @@ export function DistributionChart({
                 "text-xs leading-none tabular-nums",
                 isCorrect ? "font-extrabold" : "font-bold",
               )}
-              style={{ color: isCorrect ? correctText : "#212121" }}
+              style={{
+                color: isCorrect ? correctText : "var(--color-text-ink-strong)",
+              }}
             >
               {bar.value} stk
             </span>
-            <div className="flex w-full flex-1 min-h-0 flex-col items-center justify-end rounded-xl bg-[#F5F5F5]">
+            <div className="flex w-full flex-1 min-h-0 flex-col items-center justify-end rounded-xl bg-[var(--color-rating-bar-track)]">
               <div
                 className="flex w-full items-center justify-center rounded-xl transition-[height] duration-[600ms]"
                 style={{
@@ -72,10 +74,9 @@ export function DistributionChart({
                 {pct > 0 && (
                   <span
                     className={cn(
-                      "leading-none text-white tabular-nums",
+                      "text-[11px] leading-none text-white tabular-nums",
                       isCorrect ? "font-extrabold" : "font-bold",
                     )}
-                    style={{ fontSize: 11 }}
                   >
                     {pct}%
                   </span>
@@ -87,7 +88,9 @@ export function DistributionChart({
                 "text-xs leading-tight",
                 isCorrect ? "font-extrabold" : "font-bold",
               )}
-              style={{ color: isCorrect ? correctText : "#616161" }}
+              style={{
+                color: isCorrect ? correctText : "var(--color-text-ink-soft)",
+              }}
             >
               {bar.label}
             </span>

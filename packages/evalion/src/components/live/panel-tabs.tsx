@@ -16,7 +16,7 @@ interface PanelTabsProps {
 export function PanelTabs({ tabs, activeTab, onTabChange, children }: PanelTabsProps) {
   return (
     <div className="flex h-full min-h-0 flex-col gap-2.5">
-      <div className="flex shrink-0 gap-[3px] rounded-xl bg-[#EEEEEE] p-[3px]">
+      <div className="flex shrink-0 gap-[3px] rounded-xl bg-[var(--color-divider-soft)] p-[3px]">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -24,8 +24,8 @@ export function PanelTabs({ tabs, activeTab, onTabChange, children }: PanelTabsP
             className={cn(
               "flex-1 rounded-md px-2 py-2 text-center text-xs font-bold transition-all",
               activeTab === tab.key
-                ? "bg-white text-[#212121] shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]"
-                : "text-[#9E9E9E] hover:text-[#616161]",
+                ? "bg-white text-[var(--color-text-ink-strong)] shadow-[var(--shadow-tab-active)]"
+                : "text-[var(--color-text-ink-faint)] hover:text-[var(--color-text-ink-soft)]",
             )}
           >
             {tab.label}
