@@ -1,47 +1,33 @@
-import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
+import { CountdownOverlay } from "@workspace/evalion/components/live/countdown-overlay";
 import { DistributionChart } from "@workspace/evalion/components/live/distribution-chart";
 import { EndringerCard } from "@workspace/evalion/components/live/endringer-card";
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { PanelTabs } from "@workspace/evalion/components/live/panel-tabs";
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { FASIT_TEXT } from "@workspace/evalion/lib/constants";
-import type { ReactNode } from "react";
+import { StatementCard } from "@workspace/ui/components/statement-card";
 
-type Statement = Doc<"fagprats">["statements"][number];
+import { buildVoteBars } from "@/lib/vote-bars";
+
+import { useTeacherSession } from "./teacher-session-context";
 
 interface Step4MainProps {
-  statementCard: ReactNode;
-  statement: Statement | undefined;
   showCountdown: boolean;
   countdownNumber: number;
   countdownDone: boolean;
 }
 
-export function Step4Main({
-  statementCard,
-  statement,
-  showCountdown,
-  countdownNumber,
-  countdownDone,
-}: Step4MainProps) {
+export function Step4Main({ showCountdown, countdownNumber, countdownDone }: Step4MainProps) {
+  const { statement } = useTeacherSession();
   return (
     <>
-      {showCountdown && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
-          <span
-            key={countdownNumber}
-            className="text-[160px] font-extrabold text-white animate-[countdown-pop_0.8s_ease_both]"
-          >
-            {countdownNumber}
-          </span>
-        </div>
-      )}
+      <CountdownOverlay visible={showCountdown} number={countdownNumber} />
       <div className="flex flex-col items-center gap-6 pt-8">
         {countdownDone && statement && <FasitBadge fasit={statement.fasit} animated />}
-        {statementCard}
+        {statement && <StatementCard statement={statement} size="lg" />}
         {countdownDone && statement && (
           <Professor
-            size="sm"
+            size="md"
             text={
               <>
                 Hvorfor er denne påstanden <strong>{FASIT_TEXT[statement.fasit]}</strong>?
@@ -54,26 +40,18 @@ export function Step4Main({
   );
 }
 
-interface Step4PanelProps {
-  panelTab: string;
-  onPanelTabChange: (tab: string) => void;
-  r2CorrectCount: number;
-  r2Total: number;
-  changedToCorrect: number;
-  changedToIncorrect: number;
-  r2Votes: Doc<"sessionVotes">[];
-}
-
-export function Step4Panel({
-  panelTab,
-  onPanelTabChange,
-  r2CorrectCount,
-  r2Total,
-  changedToCorrect,
-  changedToIncorrect,
-  r2Votes,
-}: Step4PanelProps) {
+export function Step4Panel() {
+  const {
+    panelTab,
+    setPanelTab,
+    r2CorrectCount,
+    r2Total,
+    changedToCorrect,
+    changedToIncorrect,
+    r2Votes,
+  } = useTeacherSession();
   const endringerTab = panelTab === "default" || panelTab === "endringer";
+
   return (
     <PanelTabs
       tabs={[
@@ -81,7 +59,7 @@ export function Step4Panel({
         { key: "stemmefordeling", label: "Stemmefordeling" },
       ]}
       activeTab={endringerTab ? "endringer" : "stemmefordeling"}
-      onTabChange={onPanelTabChange}
+      onTabChange={setPanelTab}
     >
       {endringerTab ? (
         <EndringerCard
@@ -92,26 +70,7 @@ export function Step4Panel({
         />
       ) : (
         <div className="space-y-4">
-          <DistributionChart
-            bars={[
-              {
-                label: "Sant",
-                value: r2Votes.filter((v) => v.vote === "sant").length,
-                color: "bg-sant",
-              },
-              {
-                label: "Usant",
-                value: r2Votes.filter((v) => v.vote === "usant").length,
-                color: "bg-usant",
-              },
-              {
-                label: "Delvis",
-                value: r2Votes.filter((v) => v.vote === "delvis").length,
-                color: "bg-delvis",
-              },
-            ]}
-            total={r2Total}
-          />
+          <DistributionChart bars={buildVoteBars(r2Votes)} total={r2Total} />
         </div>
       )}
     </PanelTabs>

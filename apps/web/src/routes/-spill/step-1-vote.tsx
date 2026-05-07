@@ -1,36 +1,31 @@
 import { useState } from "react";
 import { cn } from "@workspace/ui/lib/utils";
 import { STUDENT_VOTE_OPTIONS } from "@workspace/evalion/lib/constants";
+import type { Fasit } from "@workspace/evalion/lib/types";
 import { toast } from "sonner";
+
+import { useBegrunnelseDraft } from "@/lib/use-begrunnelse-draft";
 
 import { ConfidenceScale } from "./confidence-scale";
 import { StatementCard } from "@workspace/ui/components/statement-card";
+import { useStudentGame } from "./student-game-context";
 import { SubmitButton } from "./submit-button";
 import { WaitingScreen } from "./waiting-screen";
 
-interface Step1VoteProps {
-  statement: { text: string };
-  onSubmit: (data: {
-    vote: "sant" | "usant" | "delvis";
-    confidence: number;
-    begrunnelse: string;
-  }) => Promise<void>;
-  hasVoted: boolean;
-  begrunnelseText: string;
-  setBegrunnelseText: (text: string) => void;
-}
+export function Step1Vote() {
+  const { statement, hasVoted, session, student, statementIndex, castVote, submitBegrunnelse } =
+    useStudentGame();
+  const {
+    text: begrunnelseText,
+    setText: setBegrunnelseText,
+    clear: clearBegrunnelseDraft,
+  } = useBegrunnelseDraft(session._id, student._id, statementIndex);
 
-export function Step1Vote({
-  statement,
-  onSubmit,
-  hasVoted,
-  begrunnelseText,
-  setBegrunnelseText,
-}: Step1VoteProps) {
-  const [selectedVote, setSelectedVote] = useState<"sant" | "usant" | "delvis" | null>(null);
+  const [selectedVote, setSelectedVote] = useState<Fasit | null>(null);
   const [selectedConfidence, setSelectedConfidence] = useState<number | null>(null);
   const [sent, setSent] = useState(false);
 
+  if (!statement) return null;
   if (hasVoted || sent) {
     return <WaitingScreen />;
   }
@@ -40,12 +35,13 @@ export function Step1Vote({
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setSent(true);
+    const trimmed = begrunnelseText.trim();
     try {
-      await onSubmit({
-        vote: selectedVote!,
-        confidence: selectedConfidence!,
-        begrunnelse: begrunnelseText,
-      });
+      await Promise.all([
+        castVote({ round: 1, vote: selectedVote!, confidence: selectedConfidence! }),
+        trimmed ? submitBegrunnelse({ round: 1, text: trimmed }) : Promise.resolve(),
+      ]);
+      if (trimmed) clearBegrunnelseDraft();
     } catch {
       setSent(false);
       toast.error("Svaret ble ikke sendt. Prøv igjen.");

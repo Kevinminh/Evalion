@@ -3,14 +3,9 @@ import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { toast } from "sonner";
 
 import { StatementCard } from "@workspace/ui/components/statement-card";
+import { useStudentGame } from "./student-game-context";
 import { SubmitButton } from "./submit-button";
 import { WaitingScreen } from "./waiting-screen";
-
-interface Step6RatingProps {
-  statement: { text: string; fasit: "sant" | "usant" | "delvis" };
-  ratingSent: boolean;
-  onRate: (rating: number) => Promise<void>;
-}
 
 const RATING_COLORS = [
   "bg-red-400",
@@ -20,11 +15,13 @@ const RATING_COLORS = [
   "bg-green-500",
 ];
 
-export function Step6Rating({ statement, ratingSent, onRate }: Step6RatingProps) {
+export function Step6Rating() {
+  const { statement, submitRating } = useStudentGame();
   const [selected, setSelected] = useState<number | null>(null);
   const [sent, setSent] = useState(false);
 
-  if (ratingSent || sent) {
+  if (!statement) return null;
+  if (sent) {
     return <WaitingScreen />;
   }
 
@@ -32,7 +29,7 @@ export function Step6Rating({ statement, ratingSent, onRate }: Step6RatingProps)
     if (selected === null) return;
     setSent(true);
     try {
-      await onRate(selected);
+      await submitRating(selected);
     } catch {
       setSent(false);
       toast.error("Vurderingen ble ikke sendt. Prøv igjen.");

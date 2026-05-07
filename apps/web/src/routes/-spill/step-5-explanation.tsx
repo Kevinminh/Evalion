@@ -1,25 +1,20 @@
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 
-interface Step5ExplanationProps {
-  statement: {
-    text: string;
-    fasit: "sant" | "usant" | "delvis";
-    explanation: string;
-  };
-}
+import { useStudentGame } from "./student-game-context";
 
-export function Step5Explanation({ statement }: Step5ExplanationProps) {
+export function Step5Explanation() {
+  const { statement } = useStudentGame();
+  if (!statement) return null;
+
   return (
     <div className="flex w-full flex-col items-center gap-4">
       <FasitBadge fasit={statement.fasit} />
 
       <div className="w-full max-w-md overflow-hidden rounded-2xl border-[1.5px] border-blue-200">
-        {/* Statement section — blue gradient */}
         <div className="bg-gradient-to-br from-blue-100 to-blue-50 p-5">
           <p className="text-center text-base font-bold text-foreground">{statement.text}</p>
         </div>
 
-        {/* Explanation section — white with professor */}
         <div className="bg-white p-5">
           <div className="flex gap-3">
             <div className="size-12 shrink-0 overflow-hidden rounded-full border-2 border-primary/20">
