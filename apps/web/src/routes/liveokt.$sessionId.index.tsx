@@ -74,7 +74,7 @@ function TeacherLobbyPage() {
         </PrimaryActionButton>
         <a
           href={DASHBOARD_URL}
-          className="inline-flex items-center gap-2 rounded-xl border-2 border-border px-4 py-2 text-sm font-bold text-muted-foreground transition-all hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+          className="inline-flex items-center gap-2 rounded-xl bg-neutral-100 px-5 py-2 text-sm font-bold text-neutral-700 shadow-[0_3px_0_oklch(0.85_0_0)] transition-all hover:-translate-y-px hover:bg-neutral-50 hover:shadow-[0_4px_0_oklch(0.85_0_0)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.85_0_0)]"
         >
           Gå til dashboard
         </a>

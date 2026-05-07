@@ -12,7 +12,7 @@ interface PrimaryActionButtonProps extends ButtonHTMLAttributes<HTMLButtonElemen
 
 const VARIANTS: Record<Variant, string> = {
   primary:
-    "bg-primary text-primary-foreground shadow-[0_2px_0_oklch(0.35_0.16_295)] hover:-translate-y-px",
+    "bg-primary text-primary-foreground shadow-[0_3px_0_oklch(0.35_0.16_295)] hover:-translate-y-0.5 hover:shadow-[0_5px_0_oklch(0.35_0.16_295)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.35_0.16_295)]",
   sant: "bg-sant text-white shadow-[0_3px_0_oklch(0.45_0.14_142)] hover:-translate-y-0.5 hover:shadow-[0_5px_0_oklch(0.45_0.14_142)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.45_0.14_142)]",
 };
 

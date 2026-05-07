@@ -72,7 +72,7 @@ function AnalyticsPage() {
       <div className="sticky top-0 z-40 border-b border-neutral-200 bg-white px-4 pb-2.5 pt-3">
         <div className="mx-auto flex max-w-lg items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-1.5">
-            <img src="/fagprat-logo.png" alt="FagPrat" className="h-5 object-contain" />
+            <img src="/co-lab-logo.png" alt="CO-LAB" className="h-5 object-contain" />
             <div className="h-3.5 w-px bg-neutral-300" />
             <span className="text-xs font-bold text-foreground">Live-statistikk</span>
           </div>
