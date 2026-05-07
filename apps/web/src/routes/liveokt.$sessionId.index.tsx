@@ -6,6 +6,7 @@ import { TeacherLobbySkeleton } from "@workspace/evalion/components/skeletons/te
 import { DestructiveButton } from "@workspace/ui/components/destructive-button";
 import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
 import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
+import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 import { Users } from "lucide-react";
 

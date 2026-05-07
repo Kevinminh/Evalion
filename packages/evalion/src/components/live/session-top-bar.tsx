@@ -10,10 +10,10 @@ interface SessionTopBarProps {
 
 export function SessionTopBar({ title, onExit, center, children }: SessionTopBarProps) {
   return (
-    <div className="fixed top-0 right-0 left-0 z-40 flex h-16 min-h-16 py-2 items-center justify-between border-b-[1.5px] border-[#EEEEEE] bg-white px-8">
+    <div className="fixed top-0 right-0 left-0 z-40 flex h-16 min-h-16 py-3 items-center justify-between border-b-[1.5px] border-[#EEEEEE] bg-white px-8">
       <div className="flex items-center gap-4">
         <img src="/co-lab-logo.png" alt="CO-LAB" className="h-7 object-contain" />
-        <Separator orientation="vertical" className="h-full" />
+        <Separator orientation="vertical" className="h-8" />
         <span className="text-lg font-bold text-[#212121]">{title}</span>
       </div>
       {center && (
