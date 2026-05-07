@@ -98,7 +98,7 @@ function TeacherLobbyPage() {
             />
           </div>
 
-          <div className="flex shrink-0 items-center justify-between border-t border-border px-6 py-3">
+          <div className="flex shrink-0 items-center justify-between px-6 py-3">
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               Venter på at elever kobler til
               <WaitingDots />
