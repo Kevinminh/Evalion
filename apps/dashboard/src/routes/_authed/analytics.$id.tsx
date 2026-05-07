@@ -5,9 +5,7 @@ import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-bo
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
-import { cn } from "@workspace/ui/lib/utils";
 import { useMutation } from "convex/react";
-import { useEffect, useState } from "react";
 
 import { ResultatTab } from "@/components/analytics/resultat-tab";
 import { RoundAnalytics } from "@/components/analytics/round-analytics";
@@ -20,12 +18,6 @@ export const Route = createFileRoute("/_authed/analytics/$id")({
 });
 
 type TabId = "runde1" | "runde2" | "resultat";
-
-const TABS: { id: TabId; label: string }[] = [
-  { id: "runde1", label: "Runde 1" },
-  { id: "runde2", label: "Runde 2" },
-  { id: "resultat", label: "Resultat" },
-];
 
 const BADGE_LABELS: Record<TabId, string> = {
   runde1: "Første stemmerunde",
@@ -52,25 +44,12 @@ function AnalyticsPage() {
     isError: sessionError,
   } = useQuery(liveSessionQueries.getSessionWithFagprat(sessionId));
 
-  const [activeTab, setActiveTab] = useState<TabId>("runde1");
-  const [selectedStatement, setSelectedStatement] = useState(0);
+  // The analytics view passively follows the live session — no manual
+  // statement selector or round/resultat tabs. The current påstand and
+  // current step are read straight off the session document.
+  const selectedStatement = session?.currentStatementIndex ?? 0;
+  const activeTab: TabId = STEP_TO_TAB[session?.currentStep ?? 1] ?? "runde1";
 
-  const serverStatementIndex = session?.currentStatementIndex;
-  const serverStep = session?.currentStep;
-
-  useEffect(() => {
-    if (serverStatementIndex !== undefined) {
-      setSelectedStatement(serverStatementIndex);
-    }
-  }, [serverStatementIndex]);
-
-  useEffect(() => {
-    if (serverStep && STEP_TO_TAB[serverStep]) {
-      setActiveTab(STEP_TO_TAB[serverStep]);
-    }
-  }, [serverStep]);
-
-  // Fetch analytics for the selected statement (always called — sessionId is from route params)
   const { data: analytics } = useQuery(
     liveSessionQueries.getVoteAnalytics(sessionId, selectedStatement),
   );
@@ -85,63 +64,33 @@ function AnalyticsPage() {
   const fasit = session.statements[selectedStatement]?.fasit ?? "sant";
   const totalStudents = session.studentCount;
   const sessionActive = session.status === "active";
+  const totalStatements = session.statements.length;
 
   return (
     <div className="flex min-h-svh flex-col bg-neutral-100">
       {/* Header */}
       <div className="sticky top-0 z-40 border-b border-neutral-200 bg-white px-4 pb-2.5 pt-3">
-        <div className="mx-auto flex max-w-lg items-center justify-between">
-          <div className="flex items-center gap-1.5">
+        <div className="mx-auto flex max-w-lg items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-1.5">
             <img src="/fagprat-logo.png" alt="FagPrat" className="h-5 object-contain" />
             <div className="h-3.5 w-px bg-neutral-300" />
             <span className="text-xs font-bold text-foreground">Live-statistikk</span>
           </div>
-          <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
-            {BADGE_LABELS[activeTab]}
-          </span>
-        </div>
-
-        {/* Statement selector (if multiple) */}
-        {session.statements.length > 1 && (
-          <div className="mx-auto mt-2 flex max-w-lg gap-1.5 overflow-x-auto">
-            {session.statements.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setSelectedStatement(i)}
-                className={cn(
-                  "shrink-0 rounded-full px-3 py-1 text-[11px] font-bold transition-all",
-                  selectedStatement === i
-                    ? "bg-primary text-white"
-                    : "bg-neutral-100 text-muted-foreground hover:bg-neutral-200",
-                )}
-              >
-                Påstand {i + 1}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Tab bar */}
-      <div className="flex justify-center gap-2 bg-neutral-100 px-4 py-3">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={cn(
-              "rounded-full px-5 py-2 text-[13px] font-bold transition-all",
-              activeTab === tab.id
-                ? "bg-primary text-white"
-                : "border-[1.5px] border-neutral-200 bg-white text-muted-foreground hover:border-neutral-300",
+          <div className="flex items-center gap-1.5">
+            {totalStatements > 1 && (
+              <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+                Påstand {selectedStatement + 1} av {totalStatements}
+              </span>
             )}
-          >
-            {tab.label}
-          </button>
-        ))}
+            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary">
+              {BADGE_LABELS[activeTab]}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Tab content */}
-      <div className="mx-auto w-full max-w-lg flex-1 px-4 pb-8">
+      <div className="mx-auto w-full max-w-lg flex-1 px-4 pt-4 pb-8">
         {!analytics ? (
           <div className="flex flex-col gap-4 pt-4">
             <Skeleton className="h-64 rounded-[16px]" />

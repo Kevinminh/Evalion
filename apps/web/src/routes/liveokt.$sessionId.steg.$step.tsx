@@ -4,8 +4,10 @@ import { LiveStepSkeleton } from "@workspace/evalion/components/skeletons/live-s
 import { SessionTopBar } from "@workspace/evalion/components/live/session-top-bar";
 import { StepNav } from "@workspace/evalion/components/live/step-nav";
 import { TeacherPanel } from "@workspace/evalion/components/live/teacher-panel";
+import { TopBarTimer } from "@workspace/evalion/components/live/top-bar-timer";
 import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
 import { ArrowRight } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import { cssVars } from "@/lib/css-vars";
@@ -117,16 +119,53 @@ function LiveStepPage() {
 }
 
 function TeacherSessionLayout() {
-  const { fagprat, session, step, panelOpen, setPanelOpen, completedSteps, goToStep, endSession } =
-    useTeacherSession();
+  const {
+    fagprat,
+    session,
+    step,
+    panelOpen,
+    setPanelOpen,
+    completedSteps,
+    goToStep,
+    endSession,
+    timer,
+  } = useTeacherSession();
   const teacherStep = useCurrentStep();
+
+  // Auto-collapse the panel when the timer transitions from idle → running so
+  // the teacher's screen mirrors the demo's classroom-presentation flow. We
+  // track the last-seen startedAt: any change to a defined value is a fresh
+  // start. Manual re-opens are preserved because the effect only fires on
+  // startedAt transitions, not on every render.
+  const lastSeenStartedAtRef = useRef<number | undefined>(timer.startedAt);
+  useEffect(() => {
+    const last = lastSeenStartedAtRef.current;
+    if (timer.startedAt && timer.startedAt !== last) {
+      setPanelOpen(false);
+    }
+    lastSeenStartedAtRef.current = timer.startedAt;
+  }, [timer.startedAt, setPanelOpen]);
+
+  const timerIsRunning =
+    timer.startedAt !== undefined && timer.pausedAt === undefined;
+  const showTopbarTimer = timerIsRunning && !panelOpen;
 
   return (
     <div className="min-h-svh bg-[var(--color-bg-warm)]">
       <SessionTopBar
         title={fagprat.title}
-        center={session.transcriptionEnabled ? <RecordingButton /> : undefined}
+        center={
+          showTopbarTimer ? (
+            <TopBarTimer
+              duration={timer.duration}
+              startedAt={timer.startedAt}
+              pausedAt={timer.pausedAt}
+              remainingAtPause={timer.remainingAtPause}
+            />
+          ) : undefined
+        }
       >
+        {session.transcriptionEnabled && <RecordingButton />}
         <a
           href={DASHBOARD_URL}
           className="inline-flex items-center gap-2 rounded-xl border-2 border-border px-4 py-2 text-sm font-bold text-muted-foreground transition-all hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
@@ -138,7 +177,7 @@ function TeacherSessionLayout() {
 
       <div className="flex min-h-svh pt-14 pb-14 sm:pt-20 sm:pb-[100px]">
         <main
-          className="flex-1 px-4 py-6 transition-[margin] duration-300 sm:px-8 sm:py-8 md:[margin-right:var(--panel-margin)]"
+          className="flex min-h-0 flex-1 flex-col px-4 py-6 transition-[margin] duration-300 sm:px-8 sm:py-5 md:[margin-right:var(--panel-margin)]"
           style={cssVars({ "--panel-margin": teacherStep && panelOpen ? "340px" : "0px" })}
         >
           {teacherStep ? teacherStep.main : <StatementPicker />}
@@ -146,6 +185,7 @@ function TeacherSessionLayout() {
         {teacherStep && (
           <TeacherPanel
             defaultOpen={step !== 5}
+            attentionWhenClosed={timerIsRunning}
             footer={
               teacherStep.panelFooter === null ? null : (
                 <PanelFooter footer={teacherStep.panelFooter} />

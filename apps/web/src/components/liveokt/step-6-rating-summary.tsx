@@ -1,6 +1,7 @@
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { RatingChart } from "@workspace/evalion/components/live/rating-chart-live";
+import { TeacherStepLayout } from "@workspace/evalion/components/live/teacher-step-layout";
 import { resolveStatementHex } from "@workspace/evalion/lib/constants";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { ArrowRight } from "lucide-react";
@@ -26,19 +27,29 @@ export function useStep6(): TeacherStep {
   const statementColor = resolveStatementHex(statement?.color, selectedIdx);
 
   const main = (
-    <div className="flex flex-col items-center gap-8 pt-2 sm:gap-12">
-      {statement && <FasitBadge fasit={statement.fasit} />}
-      {statement && (
-        <StatementCard statement={statement} size="lg" color={statementColor} gradient />
-      )}
-      <Professor
-        size="md"
-        bordered
-        animate
-        textSize="lg"
-        text="Vurder fra 1 til 5 hvor godt du forstår påstanden nå."
-      />
-    </div>
+    <TeacherStepLayout
+      top={
+        statement ? (
+          <div className="flex w-full justify-center">
+            <FasitBadge fasit={statement.fasit} />
+          </div>
+        ) : undefined
+      }
+      statement={
+        statement && (
+          <StatementCard statement={statement} size="lg" color={statementColor} gradient />
+        )
+      }
+      professor={
+        <Professor
+          size="md"
+          bordered
+          animate
+          textSize="lg"
+          text="Vurder fra 1 til 5 hvor godt du forstår påstanden nå."
+        />
+      }
+    />
   );
 
   const panel = (

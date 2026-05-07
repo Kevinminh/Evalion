@@ -28,6 +28,8 @@ interface TeacherPanelProps {
   defaultOpen?: boolean;
   footer?: ReactNode;
   onOpenChange?: (open: boolean) => void;
+  /** Pulse the toggle when the panel is closed to hint that a panel exists. */
+  attentionWhenClosed?: boolean;
 }
 
 export function TeacherPanel({
@@ -35,6 +37,7 @@ export function TeacherPanel({
   defaultOpen = true,
   footer,
   onOpenChange,
+  attentionWhenClosed = false,
 }: TeacherPanelProps) {
   const isMobile = useIsMobile();
 
@@ -65,6 +68,10 @@ export function TeacherPanel({
     }
   };
 
+  const shouldPulse = !open && attentionWhenClosed;
+  // Note: `display` intentionally omitted from inline style so the responsive
+  // Tailwind classes (`hidden md:inline-flex` / `md:hidden`) on each button
+  // can control visibility per breakpoint without inline-style overriding.
   const desktopToggleStyle: CSSProperties = {
     position: "fixed",
     right: open ? PANEL_WIDTH_PX : 0,
@@ -76,13 +83,13 @@ export function TeacherPanel({
     borderRight: "none",
     borderTopLeftRadius: 8,
     borderBottomLeftRadius: 8,
-    color: "var(--muted-foreground)",
+    color: shouldPulse ? "var(--primary)" : "var(--muted-foreground)",
     boxShadow: "0 1px 2px rgba(0,0,0,0.06)",
-    transition: "right 0.3s ease, background 0.2s ease",
+    transition: "right 0.3s ease, background 0.2s ease, color 0.2s ease",
     cursor: "pointer",
-    display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
+    animation: shouldPulse ? "panel-tab-attention 2.4s ease-in-out infinite" : undefined,
   };
 
   const mobileToggleStyle: CSSProperties = {
@@ -98,7 +105,6 @@ export function TeacherPanel({
     color: "var(--muted-foreground)",
     boxShadow: "0 4px 8px rgba(0,0,0,0.12)",
     cursor: "pointer",
-    display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
   };
@@ -151,7 +157,7 @@ export function TeacherPanel({
         <div className={cn("md:hidden")} style={backdropStyle} onClick={toggle} />
       )}
       <div style={panelStyle}>
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5">{children}</div>
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pt-3 pb-4">{children}</div>
         {footer && <div className="shrink-0 border-t border-border p-3 sm:p-4">{footer}</div>}
       </div>
     </>

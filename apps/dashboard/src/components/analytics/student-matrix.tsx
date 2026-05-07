@@ -88,9 +88,13 @@ export function StudentMatrix({
                   >
                     <div className="min-w-0 flex-1">
                       <div className="text-[13px] font-bold text-foreground">{s.name}</div>
-                      {s.begrunnelse?.text && (
+                      {s.begrunnelse?.text ? (
                         <div className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">
                           {s.begrunnelse.text}
+                        </div>
+                      ) : (
+                        <div className="mt-0.5 text-[11px] italic leading-relaxed text-muted-foreground/70">
+                          Ingen begrunnelse skrevet
                         </div>
                       )}
                     </div>

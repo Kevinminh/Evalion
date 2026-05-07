@@ -4,6 +4,7 @@ import { EndringerCard } from "@workspace/evalion/components/live/endringer-card
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { PanelTabs } from "@workspace/evalion/components/live/panel-tabs";
 import { Professor } from "@workspace/evalion/components/live/professor";
+import { TeacherStepLayout } from "@workspace/evalion/components/live/teacher-step-layout";
 import { FASIT_TEXT, resolveStatementHex } from "@workspace/evalion/lib/constants";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 
@@ -29,6 +30,8 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
     changedToIncorrect,
     r2Votes,
     selectedIdx,
+    avgConfidenceR1,
+    avgConfidenceR2,
   } = useTeacherSession();
   const endringerTab = panelTab === "default" || panelTab === "endringer";
 
@@ -37,27 +40,35 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
   const main = (
     <>
       <CountdownOverlay visible={showCountdown} number={countdownNumber} />
-      <div className="flex flex-col items-center gap-8 pt-2 sm:gap-12">
-        {countdownDone && statement && (
-          <FasitBadge fasit={statement.fasit} animated size="lg" />
-        )}
-        {statement && (
-          <StatementCard statement={statement} size="lg" color={statementColor} gradient />
-        )}
-        {countdownDone && statement && (
-          <Professor
-            size="md"
-            bordered
-            animate
-            textSize="lg"
-            text={
-              <>
-                Hvorfor er denne påstanden <strong>{FASIT_TEXT[statement.fasit]}</strong>?
-              </>
-            }
-          />
-        )}
-      </div>
+      <TeacherStepLayout
+        top={
+          countdownDone && statement ? (
+            <div className="flex w-full justify-center">
+              <FasitBadge fasit={statement.fasit} animated size="lg" />
+            </div>
+          ) : undefined
+        }
+        statement={
+          statement && (
+            <StatementCard statement={statement} size="lg" color={statementColor} gradient />
+          )
+        }
+        professor={
+          countdownDone && statement ? (
+            <Professor
+              size="md"
+              bordered
+              animate
+              textSize="lg"
+              text={
+                <>
+                  Hvorfor er denne påstanden <strong>{FASIT_TEXT[statement.fasit]}</strong>?
+                </>
+              }
+            />
+          ) : undefined
+        }
+      />
     </>
   );
 
@@ -76,6 +87,8 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
           totalVotes={r2Total}
           changedToCorrect={changedToCorrect}
           changedToIncorrect={changedToIncorrect}
+          avgConfidenceR1={avgConfidenceR1}
+          avgConfidenceR2={avgConfidenceR2}
         />
       ) : (
         <div className="space-y-4">
@@ -83,6 +96,7 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
             key={`s${selectedIdx}-reveal`}
             bars={buildVoteBars(r2Votes)}
             total={r2Total}
+            correctKey={statement?.fasit}
           />
         </div>
       )}

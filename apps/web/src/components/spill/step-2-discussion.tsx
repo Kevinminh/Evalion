@@ -11,27 +11,16 @@ export function Step2Discussion() {
 
   return (
     <div className="flex w-full flex-col items-center gap-6">
-      <StatementCard statement={statement} />
-
-      <h2 className="text-xl font-extrabold text-foreground">Snakk sammen!</h2>
-
-      <Professor
-        size="sm"
-        bounce
-        textSize="sm"
-        text="Enige? Lag en god begrunnelse sammen! Uenige? Prøv å overbevise hverandre!"
-      />
-
       {groupMembers.length > 0 && (
-        <div className="w-full max-w-md">
-          <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+        <div className="flex w-full max-w-md flex-col items-center gap-2">
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Din gruppe
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-2">
             {groupMembers.map((m) => (
               <div
                 key={m._id}
-                className="flex items-center gap-2 rounded-lg bg-white px-3 py-1.5 shadow-xs"
+                className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5 shadow-xs"
               >
                 <div
                   className={cn(
@@ -47,6 +36,17 @@ export function Step2Discussion() {
           </div>
         </div>
       )}
+
+      <StatementCard statement={statement} />
+
+      <h2 className="text-xl font-extrabold text-foreground">Snakk sammen!</h2>
+
+      <Professor
+        size="sm"
+        bounce
+        textSize="sm"
+        text="Enige? Lag en god begrunnelse sammen! Uenige? Prøv å overbevise hverandre!"
+      />
 
       {session.transcriptionEnabled && <RecordingDisclaimer />}
     </div>

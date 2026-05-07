@@ -15,8 +15,8 @@ interface PanelTabsProps {
 
 export function PanelTabs({ tabs, activeTab, onTabChange, children }: PanelTabsProps) {
   return (
-    <div className="space-y-4">
-      <div className="flex gap-1 rounded-lg bg-neutral-200 p-1">
+    <div className="flex h-full min-h-0 flex-col gap-4">
+      <div className="flex shrink-0 gap-1 rounded-lg bg-neutral-200 p-1">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -32,7 +32,7 @@ export function PanelTabs({ tabs, activeTab, onTabChange, children }: PanelTabsP
           </button>
         ))}
       </div>
-      {children}
+      <div className="flex min-h-0 flex-1 flex-col">{children}</div>
     </div>
   );
 }

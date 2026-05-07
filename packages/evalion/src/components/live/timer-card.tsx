@@ -109,7 +109,14 @@ export function TimerCard({
       ).padStart(2, "0")}`;
 
   return (
-    <div className="flex flex-col items-center gap-3 rounded-2xl border-[1.5px] border-border bg-card p-4 shadow-sm">
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center rounded-2xl border-[1.5px] border-border bg-card shadow-sm transition-all",
+        isActive && !isFinished
+          ? "h-[120px] gap-2 p-3"
+          : "min-h-[210px] gap-3 p-4",
+      )}
+    >
       {showSetup && (
         <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
           Nedtelling
@@ -121,7 +128,7 @@ export function TimerCard({
           isRunning ? "text-4xl" : "text-5xl",
         )}
         style={{
-          color: isActive ? timerColor : "var(--foreground)",
+          color: isUrgent ? "var(--usant)" : isActive ? timerColor : "var(--foreground)",
           animation: isUrgent ? "var(--animate-timer-pulse)" : undefined,
         }}
       >

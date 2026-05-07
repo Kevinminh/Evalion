@@ -16,7 +16,13 @@ interface VoteAnalysisInput {
   step: number;
 }
 
+export interface ConfidenceLevelCount {
+  level: 1 | 2 | 3 | 4 | 5;
+  count: number;
+}
+
 export interface VoteAnalysis {
+  r1Votes: Doc<"sessionVotes">[];
   r2Votes: Doc<"sessionVotes">[];
   activeRoundVotes: Doc<"sessionVotes">[];
   voteBars: VoteBar[];
@@ -25,6 +31,30 @@ export interface VoteAnalysis {
   r2Total: number;
   changedToCorrect: number;
   changedToIncorrect: number;
+  avgConfidenceR1?: number;
+  avgConfidenceR2?: number;
+  confidenceR1: ConfidenceLevelCount[];
+  confidenceR2: ConfidenceLevelCount[];
+}
+
+function avgConfidence(votes: Doc<"sessionVotes">[]): number | undefined {
+  const withConf = votes.filter((v) => typeof v.confidence === "number");
+  if (withConf.length === 0) return undefined;
+  return withConf.reduce((sum, v) => sum + (v.confidence ?? 0), 0) / withConf.length;
+}
+
+function confidenceDistribution(votes: Doc<"sessionVotes">[]): ConfidenceLevelCount[] {
+  const counts: Record<1 | 2 | 3 | 4 | 5, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  for (const v of votes) {
+    const c = v.confidence;
+    if (typeof c === "number" && c >= 1 && c <= 5) {
+      counts[c as 1 | 2 | 3 | 4 | 5]++;
+    }
+  }
+  return [1, 2, 3, 4, 5].map((level) => ({
+    level: level as 1 | 2 | 3 | 4 | 5,
+    count: counts[level as 1 | 2 | 3 | 4 | 5],
+  }));
 }
 
 export function useVoteAnalysis({ votes, analytics, step }: VoteAnalysisInput): VoteAnalysis {
@@ -38,6 +68,7 @@ export function useVoteAnalysis({ votes, analytics, step }: VoteAnalysisInput): 
     const activeRoundVotes = step <= 2 ? r1 : r2;
 
     return {
+      r1Votes: r1,
       r2Votes: r2,
       activeRoundVotes,
       voteBars: buildVoteBars(activeRoundVotes),
@@ -46,6 +77,10 @@ export function useVoteAnalysis({ votes, analytics, step }: VoteAnalysisInput): 
       r2Total: analytics?.totalR2 ?? 0,
       changedToCorrect: analytics?.wrongToRight ?? 0,
       changedToIncorrect: analytics?.rightToWrong ?? 0,
+      avgConfidenceR1: avgConfidence(r1),
+      avgConfidenceR2: avgConfidence(r2),
+      confidenceR1: confidenceDistribution(r1),
+      confidenceR2: confidenceDistribution(r2),
     };
   }, [votes, analytics, step]);
 }

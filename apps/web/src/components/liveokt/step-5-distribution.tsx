@@ -13,7 +13,7 @@ export function useStep5(): TeacherStep {
     : null;
 
   const main = (
-    <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 pt-8">
+    <div className="mx-auto flex h-full max-w-2xl flex-col items-center justify-center gap-4">
       {statement && <FasitBadge fasit={statement.fasit} />}
       {statement && (
         <div className="max-h-[392px] w-full overflow-y-auto animate-[fadeInUp_0.5s_ease_0.2s_both]">
