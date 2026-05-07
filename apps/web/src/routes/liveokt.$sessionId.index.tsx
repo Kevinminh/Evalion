@@ -1,21 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
 import { SessionTopBar } from "@workspace/evalion/components/live/session-top-bar";
+import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
 import { TeacherLobbySkeleton } from "@workspace/evalion/components/skeletons/teacher-lobby-skeleton";
+import { DestructiveButton } from "@workspace/ui/components/destructive-button";
+import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
+import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 import { Users } from "lucide-react";
 
-import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
-import { DASHBOARD_URL } from "@/lib/env";
-import { parseSessionId, placeholderConvexId } from "@/lib/route-params";
-
-import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
-import { DestructiveButton } from "@workspace/ui/components/destructive-button";
 import { JoinCard } from "@/components/liveokt/lobby/join-card";
 import { StudentGrid } from "@/components/liveokt/lobby/student-grid";
 import { useLobbyActions } from "@/hooks/liveokt/use-lobby-actions";
-import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
+import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
+import { DASHBOARD_URL } from "@/lib/env";
+import { parseSessionId, placeholderConvexId } from "@/lib/route-params";
 
 export const Route = createFileRoute("/liveokt/$sessionId/")({
   beforeLoad: ({ params }) => {
@@ -82,11 +81,7 @@ function TeacherLobbyPage() {
       </SessionTopBar>
 
       <div className="flex flex-1 flex-col pt-16 lg:flex-row">
-        <JoinCard
-          joinCode={session.joinCode}
-          joinUrl={joinUrl}
-          joinHost={window.location.host}
-        />
+        <JoinCard joinCode={session.joinCode} joinUrl={joinUrl} joinHost={window.location.host} />
 
         <div className="flex flex-1 flex-col">
           <div className="flex-1 overflow-y-auto p-6">
