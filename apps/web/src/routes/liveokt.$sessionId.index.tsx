@@ -29,22 +29,38 @@ function TeacherLobbyPage() {
   const { sessionId } = Route.useParams();
   const typedSessionId = parseSessionId(sessionId);
 
-  const { data: session, isPending: sessionLoading } = useQuery(
-    liveSessionQueries.getById(typedSessionId),
-  );
-  const { data: fagprat, isPending: fagpratLoading } = useQuery({
+  const {
+    data: session,
+    isLoading: sessionLoading,
+    error: sessionError,
+  } = useQuery(liveSessionQueries.getById(typedSessionId));
+
+  const {
+    data: fagprat,
+    isLoading: fagpratLoading,
+    error: fagpratError,
+  } = useQuery({
     ...fagpratQueries.getById(session?.fagpratId ?? placeholderConvexId<"fagprats">()),
     enabled: !!session?.fagpratId,
   });
-  const { data: students } = useQuery(liveSessionQueries.listStudents(typedSessionId));
+
+  const {
+    data: students,
+    isLoading: studentsLoading,
+    error: studentsError,
+  } = useQuery(liveSessionQueries.listStudents(typedSessionId));
 
   const lobby = useLobbyActions({
     sessionId: typedSessionId,
     groupCount: session?.groupCount ?? 0,
   });
 
-  if (sessionLoading || fagpratLoading) {
+  if (sessionLoading || fagpratLoading || studentsLoading) {
     return <TeacherLobbySkeleton />;
+  }
+
+  if (sessionError || fagpratError || studentsError) {
+    return <ErrorState className="flex min-h-svh items-center justify-center" />;
   }
 
   if (!session || !fagprat) {
