@@ -12,6 +12,7 @@ interface ProfessorProps {
   bordered?: boolean;
   bounce?: boolean;
   className?: string;
+  imgClassName?: string;
 }
 
 const sizeConfig: Record<ProfessorSize, string> = {
@@ -32,6 +33,7 @@ export function Professor({
   bordered = false,
   bounce = false,
   className,
+  imgClassName,
 }: ProfessorProps) {
   const container = sizeConfig[size];
 
@@ -46,6 +48,7 @@ export function Professor({
             container,
             bordered && "border-[3px] border-primary/20",
             bounce && "animate-[gentle-bounce_3s_ease-in-out_infinite]",
+            imgClassName,
           )}
         />
         {label && (
