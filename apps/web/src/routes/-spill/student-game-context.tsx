@@ -4,7 +4,6 @@ import { useMutation } from "convex/react";
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 
 import { api } from "@/lib/convex";
-import type { Id } from "@/lib/convex";
 
 type Round = 0 | 1 | 2;
 
@@ -61,7 +60,7 @@ export function StudentGameProvider({
 
   const value = useMemo<StudentGameValue>(() => {
     const sessionId = session._id;
-    const studentId = student._id as Id<"sessionStudents">;
+    const studentId = student._id;
     const statementIndex = session.currentStatementIndex ?? 0;
     const currentStep = session.currentStep ?? -1;
     const round: Round = currentStep === 1 ? 1 : currentStep === 3 ? 2 : 0;

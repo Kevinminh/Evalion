@@ -11,7 +11,7 @@ import { api, liveSessionQueries } from "@/lib/convex";
 
 export const Route = createFileRoute("/delta")({
   validateSearch: (search: Record<string, unknown>) => ({
-    code: (search.code as string) ?? "",
+    code: typeof search.code === "string" ? search.code : "",
   }),
   component: DeltaPage,
 });
@@ -60,7 +60,7 @@ function DeltaPage() {
       });
       await navigate({
         to: "/spill/$studentId",
-        params: { studentId: studentId as string },
+        params: { studentId },
       });
     } catch {
       setError("Kunne ikke bli med. Prøv igjen.");

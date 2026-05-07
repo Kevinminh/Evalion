@@ -1,18 +1,18 @@
-import { useQuery, skipToken } from "@tanstack/react-query";
-import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
 import { StudentGameSkeleton } from "@workspace/evalion/components/skeletons/student-game-skeleton";
-import { isValidConvexId } from "@workspace/evalion/lib/convex-id";
 import { ConfirmDialog } from "@workspace/ui/components/confirm-dialog";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
-import type { Id } from "@/lib/convex";
+import { parseStudentId, placeholderConvexId } from "@/lib/route-params";
 import { useStep4Countdown } from "@/lib/use-step4-countdown";
 
+import { EmptyStateMessage } from "./-shared/empty-state-message";
 import { Step0Waiting } from "./-spill/step-0-waiting";
 import { Step1Vote } from "./-spill/step-1-vote";
 import { Step2Discussion } from "./-spill/step-2-discussion";
@@ -26,9 +26,7 @@ import { StudentTopbar } from "./-spill/student-topbar";
 
 export const Route = createFileRoute("/spill/$studentId")({
   beforeLoad: ({ params }) => {
-    if (!isValidConvexId(params.studentId)) {
-      throw notFound();
-    }
+    parseStudentId(params.studentId);
   },
   component: StudentGamePage,
   errorComponent: RouteErrorBoundary,
@@ -37,31 +35,32 @@ export const Route = createFileRoute("/spill/$studentId")({
 function StudentGamePage() {
   const { studentId } = Route.useParams();
   const navigate = useNavigate();
-  const typedStudentId = studentId as Id<"sessionStudents">;
+  const typedStudentId = parseStudentId(studentId);
 
   const { data: student, isPending: studentLoading } = useQuery(
     liveSessionQueries.getStudent(typedStudentId),
   );
-  const { data: session } = useQuery(
-    student?.sessionId
-      ? liveSessionQueries.getById(student.sessionId)
-      : { queryKey: ["session", "none"], queryFn: skipToken },
-  );
-  const { data: fagprat } = useQuery(
-    session?.fagpratId
-      ? fagpratQueries.getById(session.fagpratId)
-      : { queryKey: ["fagprat", "none"], queryFn: skipToken },
-  );
-  const { data: students } = useQuery(
-    student?.sessionId
-      ? liveSessionQueries.listStudents(student.sessionId)
-      : { queryKey: ["students", "none"], queryFn: skipToken },
-  );
-  const { data: votes } = useQuery(
-    student?.sessionId && fagprat
-      ? liveSessionQueries.getVotes(student.sessionId, session?.currentStatementIndex ?? 0)
-      : { queryKey: ["votes", "none"], queryFn: skipToken },
-  );
+  const { data: session } = useQuery({
+    ...liveSessionQueries.getById(student?.sessionId ?? placeholderConvexId<"liveSessions">()),
+    enabled: !!student?.sessionId,
+  });
+  const { data: fagprat } = useQuery({
+    ...fagpratQueries.getById(session?.fagpratId ?? placeholderConvexId<"fagprats">()),
+    enabled: !!session?.fagpratId,
+  });
+  const { data: students } = useQuery({
+    ...liveSessionQueries.listStudents(
+      student?.sessionId ?? placeholderConvexId<"liveSessions">(),
+    ),
+    enabled: !!student?.sessionId,
+  });
+  const { data: votes } = useQuery({
+    ...liveSessionQueries.getVotes(
+      student?.sessionId ?? placeholderConvexId<"liveSessions">(),
+      session?.currentStatementIndex ?? 0,
+    ),
+    enabled: !!student?.sessionId && !!fagprat,
+  });
 
   if (studentLoading) {
     return <StudentGameSkeleton />;
@@ -69,22 +68,22 @@ function StudentGamePage() {
 
   if (!student) {
     return (
-      <div className="flex min-h-svh items-center justify-center bg-background px-6">
+      <EmptyStateMessage>
         <p className="text-center text-lg font-bold text-foreground">Eleven ble ikke funnet</p>
-      </div>
+      </EmptyStateMessage>
     );
   }
 
   if (!session || !fagprat) {
     return (
-      <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background px-6">
+      <EmptyStateMessage className="gap-4">
         <StudentAvatar name={student.name} avatarColor={student.avatarColor} />
         <h1 className="text-xl font-extrabold text-foreground">Hei, {student.name}!</h1>
         <div className="flex items-center gap-2 text-muted-foreground">
           <span className="size-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           Kobler til økten...
         </div>
-      </div>
+      </EmptyStateMessage>
     );
   }
 

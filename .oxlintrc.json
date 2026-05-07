@@ -7,7 +7,6 @@
     "browser": true
   },
   "jsPlugins": [
-    "eslint-plugin-turbo",
     {
       "name": "eslint-tanstack-router",
       "specifier": "@tanstack/eslint-plugin-router"
@@ -23,7 +22,6 @@
     "typescript/no-floating-promises": "off",
     "typescript/no-misused-spread": "off",
     "typescript/consistent-type-assertions": ["warn", { "assertionStyle": "never" }],
-    "turbo/no-undeclared-env-vars": "warn",
     "react/rules-of-hooks": "error",
     "react/exhaustive-deps": "warn",
     "typescript/consistent-type-imports": ["warn", { "fixStyle": "separate-type-imports" }],

@@ -6,14 +6,15 @@ import { SessionTopBar } from "@workspace/evalion/components/live/session-top-ba
 import { StepNav } from "@workspace/evalion/components/live/step-nav";
 import { TeacherPanel } from "@workspace/evalion/components/live/teacher-panel";
 import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
-import { isValidConvexId } from "@workspace/evalion/lib/convex-id";
 import { ArrowRight } from "lucide-react";
 
 import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
-import type { Id } from "@/lib/convex";
+import { cssVars } from "@/lib/css-vars";
 import { DASHBOARD_URL } from "@/lib/env";
+import { parseSessionId, placeholderConvexId } from "@/lib/route-params";
 import { useStep4Countdown } from "@/lib/use-step4-countdown";
 
+import { EmptyStateMessage } from "./-shared/empty-state-message";
 import { StatementPicker } from "./-liveokt/statement-picker";
 import { Step1Main, Step1Panel } from "./-liveokt/step-1-vote-in-progress";
 import { Step2Main, Step2Panel } from "./-liveokt/step-2-group-discussion";
@@ -28,9 +29,7 @@ import {
 
 export const Route = createFileRoute("/liveokt/$sessionId/steg/$step")({
   beforeLoad: ({ params }) => {
-    if (!isValidConvexId(params.sessionId)) {
-      throw notFound();
-    }
+    parseSessionId(params.sessionId);
     if (!/^\d+$/.test(params.step)) {
       throw notFound();
     }
@@ -43,11 +42,13 @@ function LiveStepPage() {
   const { sessionId, step: stepParam } = Route.useParams();
   const navigate = useNavigate();
   const step = Number(stepParam);
-  const typedSessionId = sessionId as Id<"liveSessions">;
+  const typedSessionId = parseSessionId(sessionId);
 
-  const { data: session } = useQuery(liveSessionQueries.getById(typedSessionId));
-  const { data: fagprat, isPending } = useQuery({
-    ...fagpratQueries.getById(session?.fagpratId!),
+  const { data: session, isPending: sessionLoading } = useQuery(
+    liveSessionQueries.getById(typedSessionId),
+  );
+  const { data: fagprat, isPending: fagpratLoading } = useQuery({
+    ...fagpratQueries.getById(session?.fagpratId ?? placeholderConvexId<"fagprats">()),
     enabled: !!session?.fagpratId,
   });
   const { data: students } = useQuery(liveSessionQueries.listStudents(typedSessionId));
@@ -67,23 +68,23 @@ function LiveStepPage() {
     enabled: !!fagprat && [2, 5].includes(step),
   });
 
-  if (isPending) {
+  if (sessionLoading || fagpratLoading) {
     return <LiveStepSkeleton />;
   }
 
   if (!fagprat || !session) {
     return (
-      <div className="flex min-h-svh items-center justify-center">
+      <EmptyStateMessage>
         <p className="text-muted-foreground">FagPrat ikke funnet.</p>
-      </div>
+      </EmptyStateMessage>
     );
   }
 
   if (step > 0 && !fagprat.statements[selectedIdx]) {
     return (
-      <div className="flex min-h-svh items-center justify-center">
+      <EmptyStateMessage>
         <p className="text-muted-foreground">Påstanden ble ikke funnet.</p>
-      </div>
+      </EmptyStateMessage>
     );
   }
 
@@ -136,7 +137,7 @@ function TeacherSessionLayout() {
       <div className="flex pt-16 pb-14">
         <main
           className="flex-1 px-4 py-6 transition-[margin] duration-300 sm:px-8 sm:py-8 md:[margin-right:var(--panel-margin)]"
-          style={{ "--panel-margin": panelOpen ? "340px" : "0px" } as React.CSSProperties}
+          style={cssVars({ "--panel-margin": panelOpen ? "340px" : "0px" })}
         >
           <StepMainRenderer />
         </main>

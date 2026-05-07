@@ -25,8 +25,14 @@ function LoginPage() {
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+    const email = String(formData.get("email") ?? "");
+    const password = String(formData.get("password") ?? "");
+
+    if (!email || !password) {
+      setError("Fyll inn e-post og passord");
+      setLoading(false);
+      return;
+    }
 
     try {
       const { error: authError } = await authClient.signIn.email({

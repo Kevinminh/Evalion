@@ -1,6 +1,5 @@
-import { useQuery, skipToken } from "@tanstack/react-query";
-import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
-import { isValidConvexId } from "@workspace/evalion/lib/convex-id";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
 import { SessionTopBar } from "@workspace/evalion/components/live/session-top-bar";
 import { useMutation } from "convex/react";
@@ -12,13 +11,13 @@ import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 import { pastelFor } from "@/lib/avatar";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import { DASHBOARD_URL } from "@/lib/env";
-import type { Id } from "@/lib/convex";
+import { parseSessionId, placeholderConvexId } from "@/lib/route-params";
+
+import { EmptyStateMessage } from "./-shared/empty-state-message";
 
 export const Route = createFileRoute("/liveokt/$sessionId/")({
   beforeLoad: ({ params }) => {
-    if (!isValidConvexId(params.sessionId)) {
-      throw notFound();
-    }
+    parseSessionId(params.sessionId);
   },
   component: TeacherLobbyPage,
   errorComponent: RouteErrorBoundary,
@@ -27,16 +26,15 @@ export const Route = createFileRoute("/liveokt/$sessionId/")({
 function TeacherLobbyPage() {
   const { sessionId } = Route.useParams();
   const navigate = useNavigate();
-  const typedSessionId = sessionId as Id<"liveSessions">;
+  const typedSessionId = parseSessionId(sessionId);
 
   const { data: session, isPending: sessionLoading } = useQuery(
     liveSessionQueries.getById(typedSessionId),
   );
-  const { data: fagprat, isPending: fagpratLoading } = useQuery(
-    session?.fagpratId
-      ? fagpratQueries.getById(session.fagpratId)
-      : { queryKey: ["fagprat", "none"], queryFn: skipToken },
-  );
+  const { data: fagprat, isPending: fagpratLoading } = useQuery({
+    ...fagpratQueries.getById(session?.fagpratId ?? placeholderConvexId<"fagprats">()),
+    enabled: !!session?.fagpratId,
+  });
   const { data: students } = useQuery(liveSessionQueries.listStudents(typedSessionId));
 
   const removeStudentMutation = useMutation(api.liveSessions.removeStudent);
@@ -52,9 +50,9 @@ function TeacherLobbyPage() {
 
   if (!session || !fagprat) {
     return (
-      <div className="flex min-h-svh items-center justify-center">
+      <EmptyStateMessage>
         <p className="text-muted-foreground">Økt ikke funnet.</p>
-      </div>
+      </EmptyStateMessage>
     );
   }
 
