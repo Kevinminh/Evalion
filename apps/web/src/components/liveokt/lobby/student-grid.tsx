@@ -69,7 +69,7 @@ function UngroupedList({
           style={{ animation: "cardIn 0.3s ease" }}
         >
           <div
-            className="flex size-9 shrink-0 items-center justify-center rounded-full text-lg leading-none"
+            className="flex size-8 shrink-0 items-center justify-center rounded-full text-lg leading-none"
             style={{ background: pastelFor(student._id) }}
           >
             {student.avatarEmoji ?? student.name[0]}
@@ -78,7 +78,7 @@ function UngroupedList({
           <button
             type="button"
             onClick={() => onRemove(student._id)}
-            className="ml-1 rounded-full p-0.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+            className="ml-1 flex size-[22px] shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
           >
             <X className="size-3.5" />
           </button>

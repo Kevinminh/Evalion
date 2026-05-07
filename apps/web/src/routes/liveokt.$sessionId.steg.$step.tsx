@@ -168,7 +168,7 @@ function TeacherSessionLayout() {
         {session.transcriptionEnabled && <RecordingButton />}
       </SessionTopBar>
 
-      <div className="flex min-h-0 flex-1 pt-16 pb-[100px]">
+      <div className="flex min-h-0 flex-1 pt-20 pb-[100px]">
         <main
           className="flex min-h-0 flex-1 flex-col transition-[margin] duration-300 md:[margin-right:var(--panel-margin)]"
           style={cssVars({ "--panel-margin": teacherStep && panelOpen ? "340px" : "0px" })}
