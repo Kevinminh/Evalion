@@ -1,13 +1,12 @@
 import { useState } from "react";
-import { cn } from "@workspace/ui/lib/utils";
-import { STUDENT_VOTE_OPTIONS } from "@workspace/evalion/lib/constants";
 import type { Fasit } from "@workspace/evalion/lib/types";
 import { toast } from "sonner";
 
-import { ConfidenceScale } from "./confidence-scale";
+import { RatingScale } from "./rating-scale";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { useStudentGame } from "./student-game-context";
 import { SubmitButton } from "./submit-button";
+import { VoteOptions } from "./vote-options";
 import { WaitingScreen } from "./waiting-screen";
 
 export function Step3Revote() {
@@ -40,28 +39,12 @@ export function Step3Revote() {
 
       <div className="w-full max-w-md space-y-2">
         <p className="text-center text-sm font-bold text-foreground">Hva mener du?</p>
-        <div className={cn("flex gap-3", selectedVote && "has-selection")}>
-          {STUDENT_VOTE_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => setSelectedVote(opt.value)}
-              className={cn(
-                "flex-1 rounded-2xl py-3 text-[15px] font-bold text-white transition-all",
-                opt.bg,
-                opt.shadow,
-                selectedVote === opt.value && "outline-3 outline outline-white outline-offset-[-3px]",
-                selectedVote && selectedVote !== opt.value && "opacity-45",
-              )}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
+        <VoteOptions selected={selectedVote} onSelect={setSelectedVote} />
       </div>
 
       <div className="w-full max-w-md space-y-2">
         <p className="text-center text-sm font-bold text-foreground">Hvor sikker er du nå?</p>
-        <ConfidenceScale selected={selectedConfidence} onSelect={setSelectedConfidence} />
+        <RatingScale selected={selectedConfidence} onSelect={setSelectedConfidence} />
       </div>
 
       <SubmitButton sent={sent} disabled={!canSubmit} onClick={handleSubmit} />

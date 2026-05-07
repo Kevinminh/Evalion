@@ -15,6 +15,8 @@ import { parseSessionId, placeholderConvexId } from "@/lib/route-params";
 import { useStep4Countdown } from "@/lib/use-step4-countdown";
 
 import { EmptyStateMessage } from "./-shared/empty-state-message";
+import { DestructiveButton } from "./-liveokt/destructive-button";
+import { PrimaryActionButton } from "./-liveokt/primary-action-button";
 import { StatementPicker } from "./-liveokt/statement-picker";
 import { Step1Main, Step1Panel } from "./-liveokt/step-1-vote-in-progress";
 import { Step2Main, Step2Panel } from "./-liveokt/step-2-group-discussion";
@@ -126,12 +128,7 @@ function TeacherSessionLayout() {
         >
           Gå til dashboard
         </a>
-        <button
-          onClick={endSession}
-          className="inline-flex items-center gap-2 rounded-full bg-destructive px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_oklch(0.45_0.15_25)] transition-all hover:-translate-y-0.5 hover:shadow-[0_5px_0_oklch(0.45_0.15_25)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.45_0.15_25)]"
-        >
-          Avslutt
-        </button>
+        <DestructiveButton onClick={endSession}>Avslutt</DestructiveButton>
       </SessionTopBar>
 
       <div className="flex pt-16 pb-14">
@@ -229,34 +226,28 @@ function PanelFooter() {
     return (
       <div className="flex gap-2">
         {hasMoreStatements && (
-          <button
+          <PrimaryActionButton
+            className="flex-1"
             onClick={() => {
               markStatementUsed(selectedIdx);
               goToStep(0);
             }}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-[0_2px_0_oklch(0.35_0.16_295)] transition-all hover:-translate-y-px"
           >
             Neste påstand
             <ArrowRight className="size-4" />
-          </button>
+          </PrimaryActionButton>
         )}
-        <button
-          onClick={endSession}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-destructive px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-px"
-        >
+        <DestructiveButton className="flex-1" onClick={endSession}>
           Avslutt
-        </button>
+        </DestructiveButton>
       </div>
     );
   }
 
   return (
-    <button
-      onClick={() => goToStep(step + 1)}
-      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-[0_2px_0_oklch(0.35_0.16_295)] transition-all hover:-translate-y-px"
-    >
+    <PrimaryActionButton fullWidth onClick={() => goToStep(step + 1)}>
       Neste steg
       <ArrowRight className="size-4" />
-    </button>
+    </PrimaryActionButton>
   );
 }
