@@ -1,17 +1,11 @@
-import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
 import { BegrunnelseCard } from "@workspace/evalion/components/live/begrunnelse-card";
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { Professor } from "@workspace/evalion/components/live/professor";
 
-type Statement = Doc<"fagprats">["statements"][number];
-type Begrunnelse = Doc<"sessionBegrunnelser">;
-type Student = Doc<"sessionStudents">;
+import { useTeacherSession } from "./teacher-session-context";
 
-interface Step5MainProps {
-  statement: Statement | undefined;
-}
-
-export function Step5Main({ statement }: Step5MainProps) {
+export function Step5Main() {
+  const { statement } = useTeacherSession();
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 pt-8">
       {statement && <FasitBadge fasit={statement.fasit} />}
@@ -37,26 +31,14 @@ export function Step5Main({ statement }: Step5MainProps) {
   );
 }
 
-interface Step5PanelProps {
-  statement: Statement | undefined;
-  r2Votes: Doc<"sessionVotes">[];
-  r2Total: number;
-  begrunnelser: Begrunnelse[] | undefined;
-  studentList: Student[];
-}
-
-export function Step5Panel({
-  statement,
-  r2Votes,
-  r2Total,
-  begrunnelser,
-  studentList,
-}: Step5PanelProps) {
+export function Step5Panel() {
+  const { statement, r2Votes, r2Total, begrunnelser, students } = useTeacherSession();
   const correctCount = r2Votes.filter((v) => statement && v.vote === statement.fasit).length;
   const highlightedBegrunnelse = begrunnelser?.find((b) => b.highlighted);
   const highlightedStudent = highlightedBegrunnelse
-    ? studentList.find((s) => s._id === highlightedBegrunnelse.studentId)
+    ? students.find((s) => s._id === highlightedBegrunnelse.studentId)
     : null;
+
   return (
     <div className="space-y-4">
       <div className="rounded-lg bg-sant/10 p-3">

@@ -1,4 +1,3 @@
-import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
 import { CountdownOverlay } from "@workspace/evalion/components/live/countdown-overlay";
 import { DistributionChart } from "@workspace/evalion/components/live/distribution-chart";
 import { EndringerCard } from "@workspace/evalion/components/live/endringer-card";
@@ -6,33 +5,26 @@ import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { PanelTabs } from "@workspace/evalion/components/live/panel-tabs";
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { FASIT_TEXT } from "@workspace/evalion/lib/constants";
-import type { ReactNode } from "react";
+import { StatementCard } from "@workspace/ui/components/statement-card";
 
 import { buildVoteBars } from "@/lib/vote-bars";
 
-type Statement = Doc<"fagprats">["statements"][number];
+import { useTeacherSession } from "./teacher-session-context";
 
 interface Step4MainProps {
-  statementCard: ReactNode;
-  statement: Statement | undefined;
   showCountdown: boolean;
   countdownNumber: number;
   countdownDone: boolean;
 }
 
-export function Step4Main({
-  statementCard,
-  statement,
-  showCountdown,
-  countdownNumber,
-  countdownDone,
-}: Step4MainProps) {
+export function Step4Main({ showCountdown, countdownNumber, countdownDone }: Step4MainProps) {
+  const { statement } = useTeacherSession();
   return (
     <>
       <CountdownOverlay visible={showCountdown} number={countdownNumber} />
       <div className="flex flex-col items-center gap-6 pt-8">
         {countdownDone && statement && <FasitBadge fasit={statement.fasit} animated />}
-        {statementCard}
+        {statement && <StatementCard statement={statement} size="lg" />}
         {countdownDone && statement && (
           <Professor
             size="md"
@@ -48,26 +40,18 @@ export function Step4Main({
   );
 }
 
-interface Step4PanelProps {
-  panelTab: string;
-  onPanelTabChange: (tab: string) => void;
-  r2CorrectCount: number;
-  r2Total: number;
-  changedToCorrect: number;
-  changedToIncorrect: number;
-  r2Votes: Doc<"sessionVotes">[];
-}
-
-export function Step4Panel({
-  panelTab,
-  onPanelTabChange,
-  r2CorrectCount,
-  r2Total,
-  changedToCorrect,
-  changedToIncorrect,
-  r2Votes,
-}: Step4PanelProps) {
+export function Step4Panel() {
+  const {
+    panelTab,
+    setPanelTab,
+    r2CorrectCount,
+    r2Total,
+    changedToCorrect,
+    changedToIncorrect,
+    r2Votes,
+  } = useTeacherSession();
   const endringerTab = panelTab === "default" || panelTab === "endringer";
+
   return (
     <PanelTabs
       tabs={[
@@ -75,7 +59,7 @@ export function Step4Panel({
         { key: "stemmefordeling", label: "Stemmefordeling" },
       ]}
       activeTab={endringerTab ? "endringer" : "stemmefordeling"}
-      onTabChange={onPanelTabChange}
+      onTabChange={setPanelTab}
     >
       {endringerTab ? (
         <EndringerCard
