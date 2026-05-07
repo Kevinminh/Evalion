@@ -1,20 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
 import { SessionTopBar } from "@workspace/evalion/components/live/session-top-bar";
-import { useMutation } from "convex/react";
-import { Users, X } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
-
 import { TeacherLobbySkeleton } from "@workspace/evalion/components/skeletons/teacher-lobby-skeleton";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
-import { pastelFor } from "@/lib/avatar";
-import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
+import { Users } from "lucide-react";
+
+import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import { DASHBOARD_URL } from "@/lib/env";
 import { parseSessionId, placeholderConvexId } from "@/lib/route-params";
 
 import { EmptyStateMessage } from "./-shared/empty-state-message";
 import { DestructiveButton } from "./-liveokt/destructive-button";
+import { JoinCard } from "./-liveokt/lobby/join-card";
+import { StudentGrid } from "./-liveokt/lobby/student-grid";
+import { useLobbyActions } from "./-liveokt/lobby/use-lobby-actions";
 import { PrimaryActionButton } from "./-liveokt/primary-action-button";
 
 export const Route = createFileRoute("/liveokt/$sessionId/")({
@@ -27,7 +27,6 @@ export const Route = createFileRoute("/liveokt/$sessionId/")({
 
 function TeacherLobbyPage() {
   const { sessionId } = Route.useParams();
-  const navigate = useNavigate();
   const typedSessionId = parseSessionId(sessionId);
 
   const { data: session, isPending: sessionLoading } = useQuery(
@@ -39,14 +38,12 @@ function TeacherLobbyPage() {
   });
   const { data: students } = useQuery(liveSessionQueries.listStudents(typedSessionId));
 
-  const removeStudentMutation = useMutation(api.liveSessions.removeStudent);
-  const createGroupsMutation = useMutation(api.liveSessions.createGroups);
-  const updateStepMutation = useMutation(api.liveSessions.updateStep);
-  const endSessionMutation = useMutation(api.liveSessions.end);
+  const lobby = useLobbyActions({
+    sessionId: typedSessionId,
+    groupCount: session?.groupCount ?? 0,
+  });
 
-  const isPending = sessionLoading || fagpratLoading;
-
-  if (isPending) {
+  if (sessionLoading || fagpratLoading) {
     return <TeacherLobbySkeleton />;
   }
 
@@ -61,137 +58,44 @@ function TeacherLobbyPage() {
   const studentList = students ?? [];
   const hasGroups = studentList.some((s) => s.groupIndex !== undefined);
   const showGroupButton = session.groupsEnabled && !hasGroups;
-
-  const handleCreateGroups = async () => {
-    await createGroupsMutation({
-      sessionId: session._id,
-      groupCount: session.groupCount,
-    });
-  };
-
-  const dashboardUrl = DASHBOARD_URL;
-
-  const handleEnd = async () => {
-    await endSessionMutation({ id: session._id });
-    window.location.href = dashboardUrl;
-  };
-
-  const handleStart = async () => {
-    await updateStepMutation({ id: session._id, step: 0 });
-    navigate({
-      to: "/liveokt/$sessionId/steg/$step",
-      params: { sessionId, step: "0" },
-    });
-  };
-
   const joinUrl = `${window.location.origin}/delta?code=${session.joinCode}`;
-
-  const groupedStudents = hasGroups
-    ? Array.from({ length: session.groupCount }, (_, gi) =>
-        studentList.filter((s) => s.groupIndex === gi),
-      )
-    : null;
 
   return (
     <div className="flex min-h-svh flex-col bg-[#FFF8F2]">
       <SessionTopBar title={fagprat.title}>
         {showGroupButton && (
-          <PrimaryActionButton onClick={handleCreateGroups}>
+          <PrimaryActionButton onClick={lobby.createGroups}>
             <Users className="size-4" />
             Opprett grupper
           </PrimaryActionButton>
         )}
-        <PrimaryActionButton variant="sant" onClick={handleStart}>
+        <PrimaryActionButton variant="sant" onClick={lobby.start}>
           Start aktiviteten
         </PrimaryActionButton>
         <a
-          href={dashboardUrl}
+          href={DASHBOARD_URL}
           className="inline-flex items-center gap-2 rounded-xl border-2 border-border px-4 py-2 text-sm font-bold text-muted-foreground transition-all hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
         >
           Gå til dashboard
         </a>
-        <DestructiveButton onClick={handleEnd}>Avslutt</DestructiveButton>
+        <DestructiveButton onClick={lobby.end}>Avslutt</DestructiveButton>
       </SessionTopBar>
 
       <div className="flex flex-1 flex-col pt-16 lg:flex-row">
-        <div className="w-full p-4 lg:w-[38%] lg:min-w-[340px] lg:max-w-[480px]">
-          <div className="flex h-full flex-col items-center justify-center gap-4 rounded-2xl bg-card p-6 shadow-lg sm:p-8">
-          <img src="/logo.png" alt="Evalion" className="mb-2 h-12 object-contain sm:h-16" />
-          <p className="text-sm text-muted-foreground">{window.location.host}/delta</p>
-          <p className="text-sm font-semibold text-muted-foreground">
-            Skriv inn koden for å bli med:
-          </p>
-          <div className="rounded-xl border-2 border-primary/30 bg-primary/5 px-6 py-3 sm:px-8 sm:py-4">
-            <span className="font-mono text-2xl font-bold tracking-[0.25em] text-primary sm:text-4xl">
-              {session.joinCode}
-            </span>
-          </div>
-          <p className="mt-2 text-sm text-muted-foreground">Eller skann</p>
-          <div className="rounded-xl bg-white p-3">
-            <QRCodeSVG value={joinUrl} size={130} />
-          </div>
-          </div>
-        </div>
+        <JoinCard
+          joinCode={session.joinCode}
+          joinUrl={joinUrl}
+          joinHost={window.location.host}
+        />
 
         <div className="flex flex-1 flex-col">
           <div className="flex-1 overflow-y-auto p-6">
-            {groupedStudents === null ? (
-              <div className="flex flex-wrap content-start gap-3">
-                {studentList.map((student) => (
-                  <div
-                    key={student._id}
-                    className="flex items-center gap-2 rounded-xl border-[1.5px] border-border bg-card p-2 pr-3 shadow-xs"
-                    style={{ animation: "cardIn 0.3s ease" }}
-                  >
-                    <div
-                      className="flex size-9 shrink-0 items-center justify-center rounded-full text-lg leading-none"
-                      style={{ background: pastelFor(student._id) }}
-                    >
-                      {student.avatarEmoji ?? student.name[0]}
-                    </div>
-                    <span className="text-sm font-bold text-foreground">{student.name}</span>
-                    <button
-                      onClick={() => removeStudentMutation({ id: student._id })}
-                      className="ml-1 rounded-full p-0.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                    >
-                      <X className="size-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-4">
-                {groupedStudents.map((group, gi) => (
-                  <div
-                    key={gi}
-                    className="w-full min-w-[140px] sm:w-[180px]"
-                    style={{
-                      animation: "groupFadeIn 0.4s ease both",
-                      animationDelay: `${gi * 0.08}s`,
-                    }}
-                  >
-                    <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Gruppe {gi + 1}
-                    </div>
-                    <div className="flex flex-col gap-2 rounded-xl border-[1.5px] border-border bg-card p-3">
-                      {group.map((student) => (
-                        <div key={student._id} className="flex items-center gap-2">
-                          <div
-                            className="flex size-7 shrink-0 items-center justify-center rounded-full text-base leading-none"
-                            style={{ background: pastelFor(student._id) }}
-                          >
-                            {student.avatarEmoji ?? student.name[0]}
-                          </div>
-                          <span className="text-sm font-semibold text-foreground">
-                            {student.name}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <StudentGrid
+              students={studentList}
+              groupCount={session.groupCount}
+              hasGroups={hasGroups}
+              onRemove={lobby.removeStudent}
+            />
           </div>
 
           <div className="flex shrink-0 items-center justify-between border-t border-border px-6 py-3">

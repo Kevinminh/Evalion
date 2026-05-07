@@ -10,18 +10,11 @@ import { toast } from "sonner";
 
 import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import { parseStudentId, placeholderConvexId } from "@/lib/route-params";
-import { useStep4Countdown } from "@/lib/use-step4-countdown";
 
 import { EmptyStateMessage } from "./-shared/empty-state-message";
-import { Step0Waiting } from "./-spill/step-0-waiting";
-import { Step1Vote } from "./-spill/step-1-vote";
-import { Step2Discussion } from "./-spill/step-2-discussion";
-import { Step3Revote } from "./-spill/step-3-revote";
-import { Step4Reveal } from "./-spill/step-4-reveal";
-import { Step5Explanation } from "./-spill/step-5-explanation";
-import { Step6Rating } from "./-spill/step-6-rating";
 import { StudentAvatar } from "./-spill/student-avatar";
 import { StudentGameProvider, useStudentGame } from "./-spill/student-game-context";
+import { StudentStepRenderer } from "./-spill/student-step-renderer";
 import { StudentTopbar } from "./-spill/student-topbar";
 
 export const Route = createFileRoute("/spill/$studentId")({
@@ -141,8 +134,7 @@ function StudentGameLayout({ onLeave }: { onLeave: () => void }) {
 }
 
 function StudentGameContent({ onLeave }: { onLeave: () => void }) {
-  const { session, student, currentStep } = useStudentGame();
-  const { showCountdown, countdownNumber, countdownDone } = useStep4Countdown(currentStep);
+  const { session, student } = useStudentGame();
 
   if (session.status === "lobby") {
     return (
@@ -163,6 +155,7 @@ function StudentGameContent({ onLeave }: { onLeave: () => void }) {
         <h1 className="text-xl font-extrabold text-foreground">Økten er avsluttet</h1>
         <p className="text-muted-foreground">Takk for at du deltok!</p>
         <button
+          type="button"
           onClick={onLeave}
           className="mt-2 rounded-2xl bg-primary px-8 py-3 text-sm font-bold text-white shadow-[0_4px_0_var(--color-primary-700,theme(colors.purple.700))] transition-all active:translate-y-0.5"
         >
@@ -172,33 +165,5 @@ function StudentGameContent({ onLeave }: { onLeave: () => void }) {
     );
   }
 
-  switch (currentStep) {
-    case 0:
-      return <Step0Waiting />;
-    case 1:
-      return <Step1Vote />;
-    case 2:
-      return <Step2Discussion />;
-    case 3:
-      return <Step3Revote />;
-    case 4:
-      return (
-        <Step4Reveal
-          showCountdown={showCountdown}
-          countdownNumber={countdownNumber}
-          countdownDone={countdownDone}
-        />
-      );
-    case 5:
-      return <Step5Explanation />;
-    case 6:
-      return <Step6Rating />;
-    default:
-      return (
-        <div className="flex items-center text-muted-foreground">
-          Venter
-          <WaitingDots />
-        </div>
-      );
-  }
+  return <StudentStepRenderer />;
 }

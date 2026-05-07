@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 import { LiveStepSkeleton } from "@workspace/evalion/components/skeletons/live-step-skeleton";
-import { RecordButton } from "@workspace/evalion/components/live/record-button";
 import { SessionTopBar } from "@workspace/evalion/components/live/session-top-bar";
 import { StepNav } from "@workspace/evalion/components/live/step-nav";
 import { TeacherPanel } from "@workspace/evalion/components/live/teacher-panel";
@@ -17,6 +16,7 @@ import { useStep4Countdown } from "@/lib/use-step4-countdown";
 import { EmptyStateMessage } from "./-shared/empty-state-message";
 import { DestructiveButton } from "./-liveokt/destructive-button";
 import { PrimaryActionButton } from "./-liveokt/primary-action-button";
+import { RecordingButton } from "./-liveokt/recording-button";
 import { StatementPicker } from "./-liveokt/statement-picker";
 import { Step1Main, Step1Panel } from "./-liveokt/step-1-vote-in-progress";
 import { Step2Main, Step2Panel } from "./-liveokt/step-2-group-discussion";
@@ -146,18 +146,6 @@ function TeacherSessionLayout() {
       <StepNav currentStep={step} completedSteps={completedSteps} onStepClick={goToStep} />
     </div>
   );
-}
-
-function RecordingButton() {
-  const { step, recording, setRecording, recordElapsed } = useTeacherSession();
-  if ([2, 4].includes(step)) {
-    const state: "ready" | "recording" = recording ? "recording" : "ready";
-    return <RecordButton state={state} onToggle={() => setRecording(!recording)} elapsed={recordElapsed} />;
-  }
-  if ([1, 3, 5, 6].includes(step)) {
-    return <RecordButton state="disabled" onToggle={() => {}} />;
-  }
-  return null;
 }
 
 function StepMainRenderer() {
