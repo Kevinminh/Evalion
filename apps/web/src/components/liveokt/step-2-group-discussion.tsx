@@ -23,15 +23,20 @@ function HighlightedBegrunnelse({
 }) {
   return (
     <div className="space-y-2">
-      <BegrunnelseCard text={begrunnelse.text} studentName={studentName} />
+      <BegrunnelseCard
+        text={begrunnelse.text}
+        studentName={studentName}
+        highlighted={begrunnelse.highlighted ?? false}
+      />
       <button
         type="button"
         onClick={onToggle}
+        aria-pressed={begrunnelse.highlighted ?? false}
         className={cn(
-          "w-full rounded-lg px-3 py-2 text-xs font-bold transition-all",
+          "w-full rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-150",
           begrunnelse.highlighted
-            ? "bg-primary text-primary-foreground"
-            : "border border-border text-muted-foreground hover:bg-primary/10 hover:text-primary",
+            ? "bg-primary text-primary-foreground shadow-[0_2px_0_var(--color-purple-shadow)] active:translate-y-0.5 active:shadow-[0_0_0_var(--color-purple-shadow)]"
+            : "border border-border text-muted-foreground hover:border-primary/40 hover:bg-primary/10 hover:text-primary",
         )}
       >
         {begrunnelse.highlighted ? "Fremhevet" : "Fremhev"}
@@ -53,6 +58,7 @@ export function useStep2(): TeacherStep {
     totalVotes,
     timer,
     highlightBegrunnelse,
+    selectedIdx,
   } = useTeacherSession();
   const begrunnelseTab = panelTab === "default" || panelTab === "begrunnelser";
 
@@ -107,7 +113,11 @@ export function useStep2(): TeacherStep {
         <div className="space-y-4">
           <StudentVoteList />
           <div className="h-px bg-border" />
-          <DistributionChart bars={voteBars} total={totalVotes} />
+          <DistributionChart
+            bars={voteBars}
+            total={totalVotes}
+            resetKey={`s${selectedIdx}-discussion`}
+          />
         </div>
       )}
     </PanelTabs>

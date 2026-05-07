@@ -114,7 +114,7 @@ function StudentGameLayout({ onLeave }: { onLeave: () => void }) {
   const useWideLayout = session.status === "active" && phase.kind === "waiting";
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center bg-background px-6 py-8">
+    <div className="flex min-h-svh flex-col items-center justify-center bg-[var(--color-bg-warm)] px-6 py-8">
       <StudentTopbar
         studentName={student.name}
         fagpratTitle={fagprat.title}

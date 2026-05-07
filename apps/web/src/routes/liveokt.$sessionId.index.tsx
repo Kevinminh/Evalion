@@ -61,7 +61,7 @@ function TeacherLobbyPage() {
   const joinUrl = `${window.location.origin}/delta?code=${session.joinCode}`;
 
   return (
-    <div className="flex min-h-svh flex-col bg-[#FFF8F2]">
+    <div className="flex min-h-svh flex-col bg-[var(--color-bg-warm)]">
       <SessionTopBar title={fagprat.title}>
         {showGroupButton && (
           <PrimaryActionButton onClick={lobby.createGroups}>

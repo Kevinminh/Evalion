@@ -28,6 +28,7 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
     changedToCorrect,
     changedToIncorrect,
     r2Votes,
+    selectedIdx,
   } = useTeacherSession();
   const endringerTab = panelTab === "default" || panelTab === "endringer";
 
@@ -35,7 +36,9 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
     <>
       <CountdownOverlay visible={showCountdown} number={countdownNumber} />
       <div className="flex flex-col items-center gap-6 pt-8">
-        {countdownDone && statement && <FasitBadge fasit={statement.fasit} animated />}
+        {countdownDone && statement && (
+          <FasitBadge fasit={statement.fasit} animated size="lg" />
+        )}
         {statement && <StatementCard statement={statement} size="lg" />}
         {countdownDone && statement && (
           <Professor
@@ -69,7 +72,11 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
         />
       ) : (
         <div className="space-y-4">
-          <DistributionChart bars={buildVoteBars(r2Votes)} total={r2Total} />
+          <DistributionChart
+            bars={buildVoteBars(r2Votes)}
+            total={r2Total}
+            resetKey={`s${selectedIdx}-reveal`}
+          />
         </div>
       )}
     </PanelTabs>

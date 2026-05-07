@@ -21,7 +21,7 @@ export function Step4Reveal({ showCountdown, countdownNumber, countdownDone }: S
     <>
       <CountdownOverlay visible={showCountdown} number={countdownNumber} />
       <div className="flex w-full flex-col items-center gap-6">
-        {countdownDone && <FasitBadge fasit={statement.fasit} animated />}
+        {countdownDone && <FasitBadge fasit={statement.fasit} animated size="lg" />}
 
         <StatementCard statement={statement} />
 

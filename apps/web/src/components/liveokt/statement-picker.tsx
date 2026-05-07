@@ -1,6 +1,7 @@
 import { STATEMENT_COLORS_HEX } from "@workspace/evalion/lib/constants";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 import { cn } from "@workspace/ui/lib/utils";
+import { Check } from "lucide-react";
 
 import { COUNTDOWN_STEP_MS } from "@/lib/timings";
 
@@ -15,7 +16,7 @@ export function StatementPicker() {
   const hasSomeSelected = selectedStatement !== null;
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-evenly gap-8 py-4 lg:flex-row lg:gap-12">
+    <div className="flex min-h-full w-full flex-1 flex-col items-center justify-center gap-8 py-4 lg:flex-row lg:justify-evenly lg:gap-12">
       <div className="flex shrink-0 flex-col items-center gap-2">
         <img
           src="/professoren.png"
@@ -60,8 +61,11 @@ export function StatementPicker() {
             >
               {s.text}
               {isUsed && (
-                <span className="absolute top-2 right-2 flex size-6 items-center justify-center rounded-full bg-primary/80 text-xs text-white">
-                  ✓
+                <span
+                  aria-label="Brukt"
+                  className="absolute top-2 right-2 flex size-7 items-center justify-center rounded-full bg-primary text-white shadow-[0_2px_0_rgba(0,0,0,0.12)]"
+                >
+                  <Check className="size-4" strokeWidth={3} />
                 </span>
               )}
             </button>

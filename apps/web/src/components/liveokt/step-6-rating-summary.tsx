@@ -30,7 +30,13 @@ export function useStep6(): TeacherStep {
     </div>
   );
 
-  const panel = <RatingChart distribution={ratingDistribution} average={avgRating} />;
+  const panel = (
+    <RatingChart
+      distribution={ratingDistribution}
+      average={avgRating}
+      resetKey={`s${selectedIdx}`}
+    />
+  );
 
   const unusedCount =
     fagprat.statements.length - usedStatements.size - (usedStatements.has(selectedIdx) ? 0 : 1);

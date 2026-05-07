@@ -18,6 +18,7 @@ export function useStep3(): TeacherStep {
     totalVotes,
     timer,
     goToStep,
+    selectedIdx,
   } = useTeacherSession();
 
   const main = (
@@ -40,7 +41,7 @@ export function useStep3(): TeacherStep {
       <div className="h-px bg-border" />
       <StudentVoteList />
       <div className="h-px bg-border" />
-      <DistributionChart bars={voteBars} total={totalVotes} />
+      <DistributionChart bars={voteBars} total={totalVotes} resetKey={`s${selectedIdx}-r2`} />
     </div>
   );
 

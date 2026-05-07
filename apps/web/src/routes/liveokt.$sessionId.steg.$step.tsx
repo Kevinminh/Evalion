@@ -122,7 +122,7 @@ function TeacherSessionLayout() {
   const teacherStep = useCurrentStep();
 
   return (
-    <div className="min-h-svh bg-background">
+    <div className="min-h-svh bg-[var(--color-bg-warm)]">
       <SessionTopBar
         title={fagprat.title}
         center={session.transcriptionEnabled ? <RecordingButton /> : undefined}

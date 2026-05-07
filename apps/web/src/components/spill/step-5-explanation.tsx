@@ -10,8 +10,8 @@ export function Step5Explanation() {
     <div className="flex w-full flex-col items-center gap-4">
       <FasitBadge fasit={statement.fasit} />
 
-      <div className="w-full max-w-md overflow-hidden rounded-2xl border-[1.5px] border-blue-200">
-        <div className="bg-gradient-to-br from-blue-100 to-blue-50 p-5">
+      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-primary/20 shadow-sm">
+        <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-5">
           <p className="text-center text-base font-bold text-foreground">{statement.text}</p>
         </div>
 
@@ -25,10 +25,10 @@ export function Step5Explanation() {
               />
             </div>
             <div>
-              <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <div className="mb-2 text-xs font-bold uppercase tracking-wider text-primary/70">
                 Forklaring
               </div>
-              <p className="text-sm leading-relaxed text-foreground/80">{statement.explanation}</p>
+              <p className="text-sm leading-relaxed text-foreground/85">{statement.explanation}</p>
             </div>
           </div>
         </div>
