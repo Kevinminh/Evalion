@@ -1,5 +1,6 @@
 import { BarChart3 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { cn } from "@workspace/ui/lib/utils";
 
 import { ColumnChart } from "./column-chart";
 import { ConfidenceCircles } from "./confidence-circles";
@@ -132,7 +133,14 @@ export function RoundAnalytics({
                   {confidence.avgConfidence.toFixed(1)}
                 </span>
                 {confidence.avgConfidence !== prevConfidence.avgConfidence && (
-                  <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-bold text-green-700">
+                  <span
+                    className={cn(
+                      "rounded-full px-2 py-0.5 text-xs font-bold tabular-nums",
+                      confidence.avgConfidence > prevConfidence.avgConfidence
+                        ? "bg-sant/15 text-sant"
+                        : "bg-usant/15 text-usant",
+                    )}
+                  >
                     {confidence.avgConfidence > prevConfidence.avgConfidence ? "+" : ""}
                     {(confidence.avgConfidence - prevConfidence.avgConfidence).toFixed(1)}
                   </span>
@@ -196,11 +204,11 @@ export function RoundAnalytics({
               </span>
             </div>
             {wrongToRight !== undefined && totalWrong !== undefined && totalWrong > 0 && (
-              <div className="mt-1 flex items-center justify-center gap-1.5 rounded-[10px] bg-green-50 px-2.5 py-1.5">
-                <span className="text-base font-extrabold text-green-700">
+              <div className="mt-1 flex items-center justify-center gap-1.5 rounded-[10px] bg-sant/10 px-2.5 py-1.5">
+                <span className="text-base font-extrabold text-sant tabular-nums">
                   {wrongToRight}/{totalWrong}
                 </span>
-                <span className="text-[11px] font-semibold text-green-700">
+                <span className="text-[11px] font-semibold text-sant">
                   endret fra feil til riktig svar (
                   {Math.round((wrongToRight / totalWrong) * 100)}%)
                 </span>

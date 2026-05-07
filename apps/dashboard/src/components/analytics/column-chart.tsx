@@ -63,11 +63,11 @@ export function ColumnChart({ items }: ColumnChartProps) {
             {item.delta && (
               <span
                 className={cn(
-                  "text-[10px] font-bold",
+                  "text-[10px] font-bold tabular-nums",
                   item.delta.count > 0 && item.isCorrect
-                    ? "text-green-700"
+                    ? "text-sant"
                     : item.delta.count < 0 && item.isCorrect
-                      ? "text-red-700"
+                      ? "text-usant"
                       : "text-muted-foreground",
                 )}
               >
