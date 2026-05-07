@@ -26,7 +26,7 @@ export function Step3Revote() {
     if (!canSubmit) return;
     setSent(true);
     try {
-      await castVote({ round: 2, vote: selectedVote!, confidence: selectedConfidence! });
+      await castVote({ vote: selectedVote!, confidence: selectedConfidence! });
     } catch {
       setSent(false);
       toast.error("Svaret ble ikke sendt. Prøv igjen.");

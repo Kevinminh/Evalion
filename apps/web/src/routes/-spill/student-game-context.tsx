@@ -5,7 +5,7 @@ import { createContext, useContext, useMemo, type ReactNode } from "react";
 
 import { api } from "@/lib/convex";
 
-type Round = 0 | 1 | 2;
+import { phaseFromSession, phaseRound, phaseStepNumber, type StudentPhase } from "./student-phase";
 
 export interface StudentGameValue {
   session: Doc<"liveSessions">;
@@ -15,13 +15,15 @@ export interface StudentGameValue {
 
   statement: FagPratStatement | undefined;
   statementIndex: number;
+  phase: StudentPhase;
+  // Numeric step accessor preserved for the topbar / progress indicator until
+  // those move to a phase-aware API in a follow-up.
   currentStep: number;
-  round: Round;
   hasVoted: boolean;
   groupMembers: Doc<"sessionStudents">[];
 
-  castVote: (args: { round: 1 | 2; vote: Fasit; confidence: number }) => Promise<unknown>;
-  submitBegrunnelse: (args: { round: 1 | 2; text: string }) => Promise<unknown>;
+  castVote: (args: { vote: Fasit; confidence: number }) => Promise<unknown>;
+  submitBegrunnelse: (args: { text: string }) => Promise<unknown>;
   submitRating: (rating: number) => Promise<unknown>;
   removeStudent: () => Promise<unknown>;
 }
@@ -62,19 +64,15 @@ export function StudentGameProvider({
     const sessionId = session._id;
     const studentId = student._id;
     const statementIndex = session.currentStatementIndex ?? 0;
-    const currentStep = session.currentStep ?? -1;
-    const round: Round = currentStep === 1 ? 1 : currentStep === 3 ? 2 : 0;
+    const phase = phaseFromSession(session);
+    const round = phaseRound(phase);
 
-    const existingVote = votes.find(
-      (v) => v.studentId === studentId && v.round === round,
-    );
+    const existingVote = votes.find((v) => v.studentId === studentId && v.round === round);
     const hasVoted = !!existingVote;
 
     const groupMembers =
       student.groupIndex !== undefined
-        ? students.filter(
-            (s) => s.groupIndex === student.groupIndex && s._id !== student._id,
-          )
+        ? students.filter((s) => s.groupIndex === student.groupIndex && s._id !== student._id)
         : [];
 
     const statement = fagprat.statements[statementIndex];
@@ -86,14 +84,37 @@ export function StudentGameProvider({
       students,
       statement,
       statementIndex,
-      currentStep,
-      round,
+      phase,
+      currentStep: phaseStepNumber(phase),
       hasVoted,
       groupMembers,
-      castVote: ({ round: r, vote, confidence }) =>
-        castVoteMutation({ sessionId, studentId, statementIndex, round: r, vote, confidence }),
-      submitBegrunnelse: ({ round: r, text }) =>
-        submitBegrunnelseMutation({ sessionId, studentId, statementIndex, round: r, text }),
+      castVote: ({ vote, confidence }) => {
+        const r = phaseRound(phase);
+        if (r === 0) {
+          return Promise.reject(new Error("Cannot cast a vote outside of a vote phase"));
+        }
+        return castVoteMutation({
+          sessionId,
+          studentId,
+          statementIndex,
+          round: r,
+          vote,
+          confidence,
+        });
+      },
+      submitBegrunnelse: ({ text }) => {
+        const r = phaseRound(phase);
+        if (r === 0) {
+          return Promise.reject(new Error("Cannot submit begrunnelse outside of a vote phase"));
+        }
+        return submitBegrunnelseMutation({
+          sessionId,
+          studentId,
+          statementIndex,
+          round: r,
+          text,
+        });
+      },
       submitRating: (rating) =>
         submitRatingMutation({ sessionId, studentId, statementIndex, rating }),
       removeStudent: () => removeStudentMutation({ id: studentId }),

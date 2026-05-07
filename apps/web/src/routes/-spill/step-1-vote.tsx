@@ -37,8 +37,8 @@ export function Step1Vote() {
     const trimmed = begrunnelseText.trim();
     try {
       await Promise.all([
-        castVote({ round: 1, vote: selectedVote!, confidence: selectedConfidence! }),
-        trimmed ? submitBegrunnelse({ round: 1, text: trimmed }) : Promise.resolve(),
+        castVote({ vote: selectedVote!, confidence: selectedConfidence! }),
+        trimmed ? submitBegrunnelse({ text: trimmed }) : Promise.resolve(),
       ]);
       if (trimmed) clearBegrunnelseDraft();
     } catch {

@@ -12,19 +12,19 @@ import { Step6Rating } from "./step-6-rating";
 import { useStudentGame } from "./student-game-context";
 
 export function StudentStepRenderer() {
-  const { currentStep } = useStudentGame();
+  const { phase, currentStep } = useStudentGame();
   const { showCountdown, countdownNumber, countdownDone } = useStep4Countdown(currentStep);
 
-  switch (currentStep) {
-    case 0:
+  switch (phase.kind) {
+    case "waiting":
       return <Step0Waiting />;
-    case 1:
+    case "vote":
       return <Step1Vote />;
-    case 2:
+    case "discussion":
       return <Step2Discussion />;
-    case 3:
+    case "revote":
       return <Step3Revote />;
-    case 4:
+    case "reveal":
       return (
         <Step4Reveal
           showCountdown={showCountdown}
@@ -32,16 +32,24 @@ export function StudentStepRenderer() {
           countdownDone={countdownDone}
         />
       );
-    case 5:
+    case "explanation":
       return <Step5Explanation />;
-    case 6:
+    case "rating":
       return <Step6Rating />;
-    default:
+    case "lobby":
+    case "ended":
+      // Handled by spill.$studentId.tsx wrapper before reaching the renderer.
+      return null;
+    default: {
+      // Exhaustiveness check: every phase.kind must be handled above.
+      const _exhaustive: never = phase;
+      void _exhaustive;
       return (
         <div className="flex items-center text-muted-foreground">
           Venter
           <WaitingDots />
         </div>
       );
+    }
   }
 }
