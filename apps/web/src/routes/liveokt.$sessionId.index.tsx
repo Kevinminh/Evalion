@@ -15,7 +15,7 @@ import { StudentGrid } from "@/components/liveokt/lobby/student-grid";
 import { useLobbyActions } from "@/hooks/liveokt/use-lobby-actions";
 import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import { DASHBOARD_URL } from "@/lib/env";
-import { parseSessionId, placeholderConvexId } from "@/lib/route-params";
+import { parseSessionId } from "@/lib/route-params";
 
 export const Route = createFileRoute("/liveokt/$sessionId/")({
   beforeLoad: ({ params }) => {
@@ -39,10 +39,7 @@ function TeacherLobbyPage() {
     data: fagprat,
     isLoading: fagpratLoading,
     error: fagpratError,
-  } = useQuery({
-    ...fagpratQueries.getById(session?.fagpratId ?? placeholderConvexId<"fagprats">()),
-    enabled: !!session?.fagpratId,
-  });
+  } = useQuery(fagpratQueries.getById(session?.fagpratId ?? "skip"));
 
   const {
     data: students,

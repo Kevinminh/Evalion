@@ -4,21 +4,20 @@ import { Professor } from "@workspace/evalion/components/live/professor";
 import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
 import { StudentGameSkeleton } from "@workspace/evalion/components/skeletons/student-game-skeleton";
 import { ConfirmDialog } from "@workspace/ui/components/confirm-dialog";
+import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
+import { StudentAvatar } from "@workspace/ui/components/student-avatar";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
+import { cn } from "@workspace/ui/lib/utils";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
-import { parseStudentId, placeholderConvexId } from "@/lib/route-params";
-
-import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
-import { StudentAvatar } from "@workspace/ui/components/student-avatar";
-import { cn } from "@workspace/ui/lib/utils";
 import { StudentGameProvider, useStudentGame } from "@/components/spill/student-game-context";
-import { phaseStepNumber } from "@/types/student-phase";
 import { StudentStepRenderer } from "@/components/spill/student-step-renderer";
 import { StudentTimerBadge } from "@/components/spill/student-timer-badge";
 import { StudentTopbar } from "@/components/spill/student-topbar";
+import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
+import { parseStudentId } from "@/lib/route-params";
+import { phaseStepNumber } from "@/types/student-phase";
 
 export const Route = createFileRoute("/spill/$studentId")({
   beforeLoad: ({ params }) => {
@@ -36,27 +35,17 @@ function StudentGamePage() {
   const { data: student, isPending: studentLoading } = useQuery(
     liveSessionQueries.getStudent(typedStudentId),
   );
-  const { data: session } = useQuery({
-    ...liveSessionQueries.getById(student?.sessionId ?? placeholderConvexId<"liveSessions">()),
-    enabled: !!student?.sessionId,
-  });
-  const { data: fagprat } = useQuery({
-    ...fagpratQueries.getById(session?.fagpratId ?? placeholderConvexId<"fagprats">()),
-    enabled: !!session?.fagpratId,
-  });
-  const { data: students } = useQuery({
-    ...liveSessionQueries.listStudents(
-      student?.sessionId ?? placeholderConvexId<"liveSessions">(),
-    ),
-    enabled: !!student?.sessionId,
-  });
-  const { data: votes } = useQuery({
-    ...liveSessionQueries.getVotes(
-      student?.sessionId ?? placeholderConvexId<"liveSessions">(),
+  const { data: session } = useQuery(liveSessionQueries.getById(student?.sessionId ?? "skip"));
+  const { data: fagprat } = useQuery(fagpratQueries.getById(session?.fagpratId ?? "skip"));
+  const { data: students } = useQuery(
+    liveSessionQueries.listStudents(student?.sessionId ?? "skip"),
+  );
+  const { data: votes } = useQuery(
+    liveSessionQueries.getVotes(
+      student?.sessionId && fagprat ? student.sessionId : "skip",
       session?.currentStatementIndex ?? 0,
     ),
-    enabled: !!student?.sessionId && !!fagprat,
-  });
+  );
 
   if (studentLoading) {
     return <StudentGameSkeleton />;
@@ -153,12 +142,7 @@ function StudentGameContent({ onLeave }: { onLeave: () => void }) {
   if (session.status === "lobby") {
     return (
       <div className="flex flex-col items-center gap-6 py-8">
-        <Professor
-          size="sm"
-          bounce
-          bordered
-          imgClassName="size-16 sm:size-20 md:size-24"
-        />
+        <Professor size="sm" bounce bordered imgClassName="size-16 sm:size-20 md:size-24" />
         <h1 className="text-xl font-extrabold text-foreground">Hei, {student.name}!</h1>
         <div className="flex items-center text-muted-foreground">
           Venter på at læreren starter

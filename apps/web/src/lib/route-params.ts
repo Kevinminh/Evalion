@@ -1,6 +1,6 @@
+import { notFound } from "@tanstack/react-router";
 import type { TableNames } from "@workspace/backend/convex/_generated/dataModel";
 import { isValidConvexId } from "@workspace/evalion/lib/convex-id";
-import { notFound } from "@tanstack/react-router";
 
 import type { Id } from "@/lib/convex";
 
@@ -24,10 +24,4 @@ export function parseSessionId(raw: string | undefined): Id<"liveSessions"> {
 
 export function parseStudentId(raw: string | undefined): Id<"sessionStudents"> {
   return parseConvexId<"sessionStudents">(raw);
-}
-
-// Placeholder Id used to satisfy convexQuery's typed args when paired with
-// `enabled: false`. The queryFn never runs, so this value is never sent.
-export function placeholderConvexId<T extends TableNames>(): Id<T> {
-  return asConvexId<T>("placeholder");
 }

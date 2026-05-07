@@ -12,9 +12,10 @@ import { useEffect, useRef } from "react";
 import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import { cssVars } from "@/lib/css-vars";
 import { DASHBOARD_URL } from "@/lib/env";
-import { parseSessionId, placeholderConvexId } from "@/lib/route-params";
+import { parseSessionId } from "@/lib/route-params";
 import { useStep4Countdown } from "@/hooks/use-step4-countdown";
 
+import { DestructiveButton } from "@workspace/ui/components/destructive-button";
 import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
 import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
 import { RecordingButton } from "@/components/liveokt/recording-button";
@@ -51,10 +52,9 @@ function LiveStepPage() {
   const { data: session, isPending: sessionLoading } = useQuery(
     liveSessionQueries.getById(typedSessionId),
   );
-  const { data: fagprat, isPending: fagpratLoading } = useQuery({
-    ...fagpratQueries.getById(session?.fagpratId ?? placeholderConvexId<"fagprats">()),
-    enabled: !!session?.fagpratId,
-  });
+  const { data: fagprat, isPending: fagpratLoading } = useQuery(
+    fagpratQueries.getById(session?.fagpratId ?? "skip"),
+  );
   const { data: students } = useQuery(liveSessionQueries.listStudents(typedSessionId));
 
   const selectedIdx = session?.currentStatementIndex ?? 0;
@@ -153,7 +153,6 @@ function TeacherSessionLayout() {
     <div className="flex h-svh flex-col overflow-hidden bg-[var(--color-bg-primary)]">
       <SessionTopBar
         title={fagprat.title}
-        onExit={endSession}
         center={
           showTopbarTimer ? (
             <TopBarTimer
@@ -166,6 +165,7 @@ function TeacherSessionLayout() {
         }
       >
         {session.transcriptionEnabled && <RecordingButton />}
+        <DestructiveButton onClick={endSession}>Avslutt økt</DestructiveButton>
       </SessionTopBar>
 
       <div className="flex min-h-0 flex-1 pt-20 pb-[100px]">
