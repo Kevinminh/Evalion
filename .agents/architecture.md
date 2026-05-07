@@ -6,7 +6,7 @@ A high-level map of how the Evalion monorepo fits together. For framework-specif
 
 | App | Domain | Stack | Port | Purpose |
 | --- | --- | --- | --- | --- |
-| `apps/web` | `play.co-lab.no` | TanStack Start + Vite + React 19 | 3000 | Student-facing game client. Students join with a 6-character code, vote, discuss, and self-evaluate. |
+| `apps/web` | `play.co-lab.no` | TanStack Start + Vite + React 19 | 3000 | Live-session app for **both** guest students (join by 6-character code, vote, discuss, self-evaluate) **and** authenticated teachers (run the live console, advance steps). |
 | `apps/dashboard` | `dashboard.co-lab.no` | TanStack Start + Vite + React 19 | 3001 | Teacher dashboard. Manage FagPrat sets, run live sessions, view analytics and history. |
 | `apps/landing` | `co-lab.no` | Next.js 15 App Router + Turbopack | 3002 | Marketing site, public FagPrat demo, plus a logged-in workspace for the standalone Påstandsgenerator. |
 
@@ -47,20 +47,20 @@ Rules of thumb:
 ```
 routes/
 ├── __root.tsx                       Root document, providers, error/not-found fallbacks
-├── index.tsx                        Join-code entry
+├── index.tsx                        Guest entry — paste 6-char join code → /delta
+├── delta.tsx                        Guest "Hva heter du?" — name + addStudent → /spill
+├── spill.$studentId.tsx             Per-student game page (guest)
+├── -spill/                          Student step UI (vote, discussion, reveal, rating, …)
 ├── login.tsx / logout.tsx
-├── delta.tsx                        Marketing/early-access surface
-├── _authed.tsx + _authed/           Authenticated-only routes (currently /private)
-├── liveokt.$sessionId.tsx           Student lobby/session shell
-├── liveokt.$sessionId.index.tsx
-├── liveokt.$sessionId.steg.$step.tsx Step-driven student game flow
-├── -liveokt/                        Step components (1-vote → 6-rating-summary)
-├── -spill/                          Student game UI (vote, discussion, reveal, …)
-├── spill.$studentId.tsx             Per-student game page
+├── liveokt.$sessionId.tsx           Teacher live-console shell (beforeLoad → /login)
+├── liveokt.$sessionId.index.tsx     Teacher lobby (pre-start)
+├── liveokt.$sessionId.steg.$step.tsx Teacher step-driver (1-vote → 6-rating-summary)
+├── -liveokt/                        Teacher step components + session context
+├── _authed.tsx + _authed/           Other authenticated-only routes (currently /private)
 └── api/auth                         Better Auth HTTP handler mount
 ```
 
-The `-liveokt` and `-spill` directories are TanStack Router "private" folders — they are imported by routes but are not themselves routable.
+The `-liveokt` and `-spill` directories are TanStack Router "private" folders — they are imported by routes but are not themselves routable. `liveokt.*` routes are teacher-only (`beforeLoad` redirects unauthenticated visitors to `/login`); guests stay on `index` → `delta` → `spill.$studentId`.
 
 ### `apps/dashboard` (TanStack Router file-based)
 
