@@ -24,9 +24,32 @@ const AVATAR_COLORS = [
 ];
 
 const AVATAR_EMOJIS = [
-  "🦊", "🐸", "🦁", "🐼", "🐰", "🦋", "🐬", "🦉", "🐧", "🐢",
-  "🦎", "🦩", "🐋", "🦜", "🐙", "🐝", "🦈", "🐨", "🦔", "🐾",
-  "🦒", "🐶", "🐱", "🐻", "🐵", "🐯",
+  "🦊",
+  "🐸",
+  "🦁",
+  "🐼",
+  "🐰",
+  "🦋",
+  "🐬",
+  "🦉",
+  "🐧",
+  "🐢",
+  "🦎",
+  "🦩",
+  "🐋",
+  "🦜",
+  "🐙",
+  "🐝",
+  "🦈",
+  "🐨",
+  "🦔",
+  "🐾",
+  "🦒",
+  "🐶",
+  "🐱",
+  "🐻",
+  "🐵",
+  "🐯",
 ];
 
 // ── Session queries ──
@@ -211,10 +234,22 @@ export const remove = mutation({
     }
 
     const [students, votes, ratings, begrunnelser] = await Promise.all([
-      ctx.db.query("sessionStudents").withIndex("by_session", (q) => q.eq("sessionId", args.id)).collect(),
-      ctx.db.query("sessionVotes").withIndex("by_session_statement", (q) => q.eq("sessionId", args.id)).collect(),
-      ctx.db.query("sessionRatings").withIndex("by_session_statement", (q) => q.eq("sessionId", args.id)).collect(),
-      ctx.db.query("sessionBegrunnelser").withIndex("by_session_statement", (q) => q.eq("sessionId", args.id)).collect(),
+      ctx.db
+        .query("sessionStudents")
+        .withIndex("by_session", (q) => q.eq("sessionId", args.id))
+        .collect(),
+      ctx.db
+        .query("sessionVotes")
+        .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
+        .collect(),
+      ctx.db
+        .query("sessionRatings")
+        .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
+        .collect(),
+      ctx.db
+        .query("sessionBegrunnelser")
+        .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
+        .collect(),
     ]);
 
     await Promise.all([
@@ -476,9 +511,35 @@ export const getVoteAnalytics = query({
 
     // Confidence tracking per round
     const confData = {
-      1: { sum: 0, count: 0, buckets: [0, 0, 0, 0, 0], byVote: { sant: { sum: 0, count: 0 }, usant: { sum: 0, count: 0 }, delvis: { sum: 0, count: 0 } } },
-      2: { sum: 0, count: 0, buckets: [0, 0, 0, 0, 0], byVote: { sant: { sum: 0, count: 0 }, usant: { sum: 0, count: 0 }, delvis: { sum: 0, count: 0 } } },
-    } as Record<number, { sum: number; count: number; buckets: number[]; byVote: Record<string, { sum: number; count: number }> }>;
+      1: {
+        sum: 0,
+        count: 0,
+        buckets: [0, 0, 0, 0, 0],
+        byVote: {
+          sant: { sum: 0, count: 0 },
+          usant: { sum: 0, count: 0 },
+          delvis: { sum: 0, count: 0 },
+        },
+      },
+      2: {
+        sum: 0,
+        count: 0,
+        buckets: [0, 0, 0, 0, 0],
+        byVote: {
+          sant: { sum: 0, count: 0 },
+          usant: { sum: 0, count: 0 },
+          delvis: { sum: 0, count: 0 },
+        },
+      },
+    } as Record<
+      number,
+      {
+        sum: number;
+        count: number;
+        buckets: number[];
+        byVote: Record<string, { sum: number; count: number }>;
+      }
+    >;
 
     for (const vote of allVotes) {
       const r = vote.round === 1 ? 1 : vote.round === 2 ? 2 : 0;
@@ -496,7 +557,12 @@ export const getVoteAnalytics = query({
       }
     }
 
-    const distribution = (roundCounts: { sant: number; usant: number; delvis: number; total: number }) => {
+    const distribution = (roundCounts: {
+      sant: number;
+      usant: number;
+      delvis: number;
+      total: number;
+    }) => {
       const { sant, usant, delvis, total } = roundCounts;
       return {
         sant,
@@ -518,9 +584,15 @@ export const getVoteAnalytics = query({
           count: d.buckets[level - 1]!,
         })),
         confidenceByVote: {
-          sant: d.byVote.sant!.count ? Math.round((d.byVote.sant!.sum / d.byVote.sant!.count) * 10) / 10 : 0,
-          usant: d.byVote.usant!.count ? Math.round((d.byVote.usant!.sum / d.byVote.usant!.count) * 10) / 10 : 0,
-          delvis: d.byVote.delvis!.count ? Math.round((d.byVote.delvis!.sum / d.byVote.delvis!.count) * 10) / 10 : 0,
+          sant: d.byVote.sant!.count
+            ? Math.round((d.byVote.sant!.sum / d.byVote.sant!.count) * 10) / 10
+            : 0,
+          usant: d.byVote.usant!.count
+            ? Math.round((d.byVote.usant!.sum / d.byVote.usant!.count) * 10) / 10
+            : 0,
+          delvis: d.byVote.delvis!.count
+            ? Math.round((d.byVote.delvis!.sum / d.byVote.delvis!.count) * 10) / 10
+            : 0,
         },
       };
     };
@@ -552,7 +624,12 @@ export const getVoteAnalytics = query({
         q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
       )
       .collect();
-    const begrunnelseByStudent = new Map(begrunnelser.map((b) => [`${b.studentId}:${b.round}`, b.text]));
+    const begrunnelseByStudent = new Map(
+      begrunnelser.map((b) => [
+        `${b.studentId}:${b.round}`,
+        { _id: b._id, text: b.text, highlighted: b.highlighted ?? false },
+      ]),
+    );
 
     const studentData = allStudents.map((s) => {
       const r1 = r1ByStudent.get(s._id);
@@ -561,8 +638,12 @@ export const getVoteAnalytics = query({
         studentId: s._id,
         name: s.name,
         avatarColor: s.avatarColor,
-        round1: r1 ? { vote: r1.vote, confidence: r1.confidence ?? null, correct: r1.vote === fasit } : null,
-        round2: r2 ? { vote: r2.vote, confidence: r2.confidence ?? null, correct: r2.vote === fasit } : null,
+        round1: r1
+          ? { vote: r1.vote, confidence: r1.confidence ?? null, correct: r1.vote === fasit }
+          : null,
+        round2: r2
+          ? { vote: r2.vote, confidence: r2.confidence ?? null, correct: r2.vote === fasit }
+          : null,
         begrunnelseR1: begrunnelseByStudent.get(`${s._id}:1`) ?? null,
       };
     });
@@ -705,9 +786,7 @@ export const highlightBegrunnelse = mutation({
       const others = await ctx.db
         .query("sessionBegrunnelser")
         .withIndex("by_session_statement", (q) =>
-          q
-            .eq("sessionId", begrunnelse.sessionId)
-            .eq("statementIndex", begrunnelse.statementIndex),
+          q.eq("sessionId", begrunnelse.sessionId).eq("statementIndex", begrunnelse.statementIndex),
         )
         .filter((q) => q.eq(q.field("highlighted"), true))
         .collect();

@@ -1,6 +1,13 @@
-import { VOTE_DOT_COLORS, VOTE_LABELS, LEVEL_CIRCLE_COLORS } from "@workspace/evalion/lib/constants";
+import type { Id } from "@workspace/backend/convex/_generated/dataModel";
+import {
+  VOTE_DOT_COLORS,
+  VOTE_LABELS,
+  LEVEL_CIRCLE_COLORS,
+} from "@workspace/evalion/lib/constants";
 import type { Fasit } from "@workspace/evalion/lib/types";
 import { cn } from "@workspace/ui/lib/utils";
+
+import type { BegrunnelseRef } from "./types";
 
 interface MatrixCell {
   label: string;
@@ -11,7 +18,7 @@ interface MatrixCell {
     name: string;
     vote: "sant" | "usant" | "delvis";
     confidence: number | null;
-    begrunnelse?: string | null;
+    begrunnelse?: BegrunnelseRef | null;
     vote2?: "sant" | "usant" | "delvis";
   }>;
 }
@@ -22,6 +29,7 @@ interface StudentMatrixProps {
   layout?: "r1" | "r2";
   selectedIdx: number | null;
   onSelect: (idx: number | null) => void;
+  onToggleHighlight?: (id: Id<"sessionBegrunnelser">, next: boolean) => void;
 }
 
 export function StudentMatrix({
@@ -30,13 +38,14 @@ export function StudentMatrix({
   layout = "r1",
   selectedIdx,
   onSelect,
+  onToggleHighlight,
 }: StudentMatrixProps) {
   const selected = selectedIdx !== null ? cells[selectedIdx] : null;
 
   const handleSelect = (i: number) => onSelect(selectedIdx === i ? null : i);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+    <div className="overflow-hidden rounded-[16px] border border-neutral-200 bg-white">
       <div className="px-3.5 py-2.5">
         <span className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">
           {title}
@@ -54,47 +63,74 @@ export function StudentMatrix({
             <div className="pb-2 text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
               {selected.label} ({selected.students.length})
             </div>
-            <div className="flex flex-col">
-              {selected.students.map((s, j) => (
-                <div key={j} className="flex items-start gap-2.5 border-b border-neutral-100 py-2 last:border-b-0">
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-bold text-foreground">{s.name}</div>
-                    {s.begrunnelse && (
-                      <div className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">
-                        {s.begrunnelse}
-                      </div>
+            <div className="-mx-3.5 flex flex-col">
+              {selected.students.map((s, j) => {
+                const canHighlight = !!s.begrunnelse && !!onToggleHighlight;
+                const highlighted = s.begrunnelse?.highlighted ?? false;
+                const handleClick = () => {
+                  if (s.begrunnelse && onToggleHighlight) {
+                    onToggleHighlight(s.begrunnelse._id, !s.begrunnelse.highlighted);
+                  }
+                };
+                return (
+                  <button
+                    key={j}
+                    type="button"
+                    onClick={handleClick}
+                    disabled={!canHighlight}
+                    aria-pressed={highlighted}
+                    className={cn(
+                      "flex w-full items-start gap-2.5 border-b border-neutral-100 px-3.5 py-2 text-left transition-colors last:border-b-0",
+                      canHighlight ? "cursor-pointer hover:bg-neutral-50" : "cursor-default",
+                      highlighted &&
+                        "border-l-[3px] border-l-primary bg-primary/8 hover:bg-primary/10",
                     )}
-                  </div>
-                  <div className="flex shrink-0 items-center gap-1.5">
-                    {s.vote2 ? (
-                      <div className="flex items-center gap-1">
-                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold text-white ${VOTE_DOT_COLORS[s.vote as Fasit]}`}>
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[13px] font-bold text-foreground">{s.name}</div>
+                      {s.begrunnelse?.text && (
+                        <div className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">
+                          {s.begrunnelse.text}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      {s.vote2 ? (
+                        <div className="flex items-center gap-1">
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold text-white ${VOTE_DOT_COLORS[s.vote as Fasit]}`}
+                          >
+                            {VOTE_LABELS[s.vote as Fasit]}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground">→</span>
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold text-white ${VOTE_DOT_COLORS[s.vote2 as Fasit]}`}
+                          >
+                            {VOTE_LABELS[s.vote2 as Fasit]}
+                          </span>
+                        </div>
+                      ) : (
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold text-white ${VOTE_DOT_COLORS[s.vote as Fasit]}`}
+                        >
                           {VOTE_LABELS[s.vote as Fasit]}
                         </span>
-                        <span className="text-[10px] text-muted-foreground">→</span>
-                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold text-white ${VOTE_DOT_COLORS[s.vote2 as Fasit]}`}>
-                          {VOTE_LABELS[s.vote2 as Fasit]}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold text-white ${VOTE_DOT_COLORS[s.vote as Fasit]}`}>
-                        {VOTE_LABELS[s.vote as Fasit]}
-                      </span>
-                    )}
-                    {s.confidence != null && (
-                      <div
-                        className={cn(
-                          "flex size-6 items-center justify-center rounded-full border-[2.5px] text-[11px] font-extrabold",
-                          LEVEL_CIRCLE_COLORS[s.confidence]?.border ?? "border-neutral-300",
-                          LEVEL_CIRCLE_COLORS[s.confidence]?.text ?? "text-neutral-500",
-                        )}
-                      >
-                        {s.confidence}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
+                      )}
+                      {s.confidence != null && (
+                        <div
+                          className={cn(
+                            "flex size-6 items-center justify-center rounded-full border-[2.5px] text-[11px] font-extrabold",
+                            LEVEL_CIRCLE_COLORS[s.confidence]?.border ?? "border-neutral-300",
+                            LEVEL_CIRCLE_COLORS[s.confidence]?.text ?? "text-neutral-500",
+                          )}
+                        >
+                          {s.confidence}
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -106,7 +142,7 @@ export function StudentMatrix({
 export function MatrixHint() {
   return (
     <div className="flex justify-center">
-      <span className="rounded-2xl border border-primary/20 bg-primary/5 px-5 py-2.5 text-[12px] font-semibold text-primary/80">
+      <span className="rounded-[16px] border border-primary/20 bg-primary/5 px-5 py-2.5 text-center text-[12px] font-semibold text-primary/80">
         Trykk på kategoriene for å se de individuelle elevbidragene
       </span>
     </div>
@@ -122,7 +158,6 @@ function R1Matrix({
   selectedIdx: number | null;
   onSelect: (i: number) => void;
 }) {
-  // Expected order: [riktigHoy (0), feilHoy (1), riktigLav (2), feilLav (3)]
   const cellAt = (i: number) => cells[i];
   const cellButton = (i: number) => {
     const c = cellAt(i);
@@ -133,13 +168,15 @@ function R1Matrix({
         type="button"
         onClick={() => onSelect(i)}
         className={cn(
-          "flex w-full flex-col items-center justify-center rounded-xl border-2 px-3 py-2.5 text-center transition-all",
+          "flex w-full flex-col items-center justify-center rounded-[12px] border-2 px-3 py-2.5 text-center transition-all",
           isSelected
             ? "border-primary/40 bg-primary/10 ring-2 ring-primary/15"
             : "border-neutral-200 bg-white hover:bg-neutral-50",
         )}
       >
-        <span className="text-base font-extrabold leading-tight text-foreground">{c.count} stk</span>
+        <span className="text-base font-extrabold leading-tight text-foreground">
+          {c.count} stk
+        </span>
       </button>
     );
   };
@@ -150,7 +187,9 @@ function R1Matrix({
       style={{ gridTemplateColumns: "auto 1fr 1fr" }}
     >
       <div />
-      <div className="text-center text-[11px] font-bold text-muted-foreground">Riktig standpunkt</div>
+      <div className="text-center text-[11px] font-bold text-muted-foreground">
+        Riktig standpunkt
+      </div>
       <div className="text-center text-[11px] font-bold text-muted-foreground">Feil standpunkt</div>
 
       <div className="pr-2 text-right text-[11px] font-bold whitespace-nowrap text-muted-foreground">

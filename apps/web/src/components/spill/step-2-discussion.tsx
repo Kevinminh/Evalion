@@ -1,8 +1,8 @@
 import { Professor } from "@workspace/evalion/components/live/professor";
-import { cn } from "@workspace/ui/lib/utils";
-
 import { RecordingDisclaimer } from "@workspace/ui/components/recording-disclaimer";
 import { StatementCard } from "@workspace/ui/components/statement-card";
+import { cn } from "@workspace/ui/lib/utils";
+
 import { useStudentGame } from "./student-game-context";
 
 export function Step2Discussion() {
@@ -19,7 +19,7 @@ export function Step2Discussion() {
         size="sm"
         bounce
         textSize="sm"
-        text="Diskuter påstanden med læringspartneren din. Hva tenker dere? Bruk fagbegreper og eksempler."
+        text="Enige? Lag en god begrunnelse sammen! Uenige? Prøv å overbevise hverandre!"
       />
 
       {groupMembers.length > 0 && (

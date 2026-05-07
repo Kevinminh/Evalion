@@ -1,13 +1,14 @@
+import type { Id } from "@workspace/backend/convex/_generated/dataModel";
+import { cn } from "@workspace/ui/lib/utils";
 import { BarChart3 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { cn } from "@workspace/ui/lib/utils";
+
+import type { Fasit } from "@/lib/types";
 
 import { ColumnChart } from "./column-chart";
 import { ConfidenceCircles } from "./confidence-circles";
 import { MatrixHint, StudentMatrix } from "./student-matrix";
 import type { RoundDistribution, ConfidenceData, StudentData } from "./types";
-
-import type { Fasit } from "@/lib/types";
 
 interface RoundAnalyticsProps {
   round: 1 | 2;
@@ -20,6 +21,7 @@ interface RoundAnalyticsProps {
   totalStudents: number;
   sessionActive: boolean;
   students: StudentData[];
+  onToggleHighlight?: (id: Id<"sessionBegrunnelser">, next: boolean) => void;
 }
 
 export function RoundAnalytics({
@@ -33,6 +35,7 @@ export function RoundAnalytics({
   totalStudents,
   sessionActive,
   students,
+  onToggleHighlight,
 }: RoundAnalyticsProps) {
   const [showConfDetail, setShowConfDetail] = useState(false);
   const [matrixSelected, setMatrixSelected] = useState<number | null>(null);
@@ -44,7 +47,10 @@ export function RoundAnalytics({
       pct: distribution.santPct,
       isCorrect: fasit === "sant",
       delta: prevDistribution
-        ? { count: distribution.sant - prevDistribution.sant, pct: distribution.santPct - prevDistribution.santPct }
+        ? {
+            count: distribution.sant - prevDistribution.sant,
+            pct: distribution.santPct - prevDistribution.santPct,
+          }
         : undefined,
     },
     {
@@ -53,7 +59,10 @@ export function RoundAnalytics({
       pct: distribution.delvisPct,
       isCorrect: fasit === "delvis",
       delta: prevDistribution
-        ? { count: distribution.delvis - prevDistribution.delvis, pct: distribution.delvisPct - prevDistribution.delvisPct }
+        ? {
+            count: distribution.delvis - prevDistribution.delvis,
+            pct: distribution.delvisPct - prevDistribution.delvisPct,
+          }
         : undefined,
     },
     {
@@ -62,7 +71,10 @@ export function RoundAnalytics({
       pct: distribution.usantPct,
       isCorrect: fasit === "usant",
       delta: prevDistribution
-        ? { count: distribution.usant - prevDistribution.usant, pct: distribution.usantPct - prevDistribution.usantPct }
+        ? {
+            count: distribution.usant - prevDistribution.usant,
+            pct: distribution.usantPct - prevDistribution.usantPct,
+          }
         : undefined,
     },
   ];
@@ -74,13 +86,16 @@ export function RoundAnalytics({
     const count = students.filter(
       (s) => s.round1 && s.round2 && s.round1.vote !== s.round2.vote,
     ).length;
-    return { changedCount: count, changedPct: totalStudents > 0 ? Math.round((count / totalStudents) * 100) : 0 };
+    return {
+      changedCount: count,
+      changedPct: totalStudents > 0 ? Math.round((count / totalStudents) * 100) : 0,
+    };
   }, [students, totalStudents]);
 
   return (
     <div className="flex flex-col gap-3.5">
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
-        <div className="mx-3.5 mt-3.5 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 p-2.5 text-center">
+      <div className="overflow-hidden rounded-[16px] border border-neutral-200 bg-white">
+        <div className="mx-3.5 mt-3.5 rounded-[12px] bg-gradient-to-br from-purple-50 to-purple-100 p-2.5 text-center">
           <p className="text-xs font-semibold italic leading-relaxed text-purple-800">
             «{statementText}»
           </p>
@@ -164,15 +179,21 @@ export function RoundAnalytics({
             <div className="mt-2.5 flex flex-wrap justify-center gap-6 border-t border-neutral-100 pt-2.5">
               <div className="flex items-center gap-2.5 text-xs font-semibold">
                 <span className="text-muted-foreground">Sant:</span>
-                <span className="font-mono font-bold">{confidence.confidenceByVote.sant.toFixed(1)}</span>
+                <span className="font-mono font-bold">
+                  {confidence.confidenceByVote.sant.toFixed(1)}
+                </span>
               </div>
               <div className="flex items-center gap-2.5 text-xs font-semibold">
                 <span className="text-muted-foreground">Delvis sant:</span>
-                <span className="font-mono font-bold">{confidence.confidenceByVote.delvis.toFixed(1)}</span>
+                <span className="font-mono font-bold">
+                  {confidence.confidenceByVote.delvis.toFixed(1)}
+                </span>
               </div>
               <div className="flex items-center gap-2.5 text-xs font-semibold">
                 <span className="text-muted-foreground">Usant:</span>
-                <span className="font-mono font-bold">{confidence.confidenceByVote.usant.toFixed(1)}</span>
+                <span className="font-mono font-bold">
+                  {confidence.confidenceByVote.usant.toFixed(1)}
+                </span>
               </div>
             </div>
           </div>
@@ -180,14 +201,14 @@ export function RoundAnalytics({
       </div>
 
       {round === 2 && (
-        <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+        <div className="overflow-hidden rounded-[16px] border border-neutral-200 bg-white">
           <div className="px-3.5 py-2.5">
             <span className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">
               Endringer
             </span>
           </div>
           <div className="px-3.5 pb-3.5">
-            <div className="flex flex-col items-center gap-1 rounded-xl bg-primary/5 px-4 py-3">
+            <div className="flex flex-col items-center gap-1 rounded-[14px] bg-primary/5 px-4 py-3">
               <span className="font-mono text-2xl font-extrabold leading-none text-primary tabular-nums">
                 {changedCount}/{totalStudents}
               </span>
@@ -205,6 +226,7 @@ export function RoundAnalytics({
           layout="r1"
           selectedIdx={matrixSelected}
           onSelect={setMatrixSelected}
+          onToggleHighlight={onToggleHighlight}
         />
       ) : (
         <StudentMatrix
@@ -247,9 +269,17 @@ function buildR1MatrixCells(students: StudentData[]) {
 
   // Order matters: R1Matrix expects [riktigHoy, feilHoy, riktigLav, feilLav]
   return [
-    { label: "Riktig - Høy sikkerhet (4-5)", count: riktigHoy.length, students: mapStudents(riktigHoy) },
+    {
+      label: "Riktig - Høy sikkerhet (4-5)",
+      count: riktigHoy.length,
+      students: mapStudents(riktigHoy),
+    },
     { label: "Feil - Høy sikkerhet (4-5)", count: feilHoy.length, students: mapStudents(feilHoy) },
-    { label: "Riktig - Lav sikkerhet (1-3)", count: riktigLav.length, students: mapStudents(riktigLav) },
+    {
+      label: "Riktig - Lav sikkerhet (1-3)",
+      count: riktigLav.length,
+      students: mapStudents(riktigLav),
+    },
     { label: "Feil - Lav sikkerhet (1-3)", count: feilLav.length, students: mapStudents(feilLav) },
   ];
 }
@@ -282,9 +312,33 @@ function buildR2MatrixCells(students: StudentData[]) {
     }));
 
   return [
-    { label: "Endret til riktig", count: endretTilRiktig.length, colorClass: "bg-sant/15", textClass: "text-sant", students: mapStudents(endretTilRiktig) },
-    { label: "Endret fra riktig til feil", count: endretFraRiktig.length, colorClass: "bg-usant/15", textClass: "text-usant", students: mapStudents(endretFraRiktig) },
-    { label: "Endret, fortsatt feil", count: endretFortsattFeil.length, colorClass: "bg-orange-100", textClass: "text-orange-800", students: mapStudents(endretFortsattFeil) },
-    { label: "Uendret", count: uendret.length, colorClass: "bg-yellow-100", textClass: "text-yellow-800", students: mapStudents(uendret) },
+    {
+      label: "Endret til riktig",
+      count: endretTilRiktig.length,
+      colorClass: "bg-sant/15",
+      textClass: "text-sant",
+      students: mapStudents(endretTilRiktig),
+    },
+    {
+      label: "Endret fra riktig til feil",
+      count: endretFraRiktig.length,
+      colorClass: "bg-usant/15",
+      textClass: "text-usant",
+      students: mapStudents(endretFraRiktig),
+    },
+    {
+      label: "Endret, fortsatt feil",
+      count: endretFortsattFeil.length,
+      colorClass: "bg-orange-100",
+      textClass: "text-orange-800",
+      students: mapStudents(endretFortsattFeil),
+    },
+    {
+      label: "Uendret",
+      count: uendret.length,
+      colorClass: "bg-yellow-100",
+      textClass: "text-yellow-800",
+      students: mapStudents(uendret),
+    },
   ];
 }

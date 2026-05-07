@@ -46,8 +46,8 @@ export function ResultatTab({
 
   return (
     <div className="flex flex-col gap-3.5">
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
-        <div className="mx-3.5 mt-3.5 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 p-2.5 text-center">
+      <div className="overflow-hidden rounded-[16px] border border-neutral-200 bg-white">
+        <div className="mx-3.5 mt-3.5 rounded-[12px] bg-gradient-to-br from-purple-50 to-purple-100 p-2.5 text-center">
           <p className="text-xs font-semibold italic leading-relaxed text-purple-800">
             «{statementText}»
           </p>
@@ -110,7 +110,7 @@ export function ResultatTab({
         )}
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+      <div className="overflow-hidden rounded-[16px] border border-neutral-200 bg-white">
         <div className="border-b border-neutral-100 px-3.5 py-2.5">
           <span className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">
             Alle elever

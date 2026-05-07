@@ -36,17 +36,14 @@ export function useSessionMutations({
   const endSessionMutation = useMutation(api.liveSessions.end);
   const highlightBegrunnelseMutation = useMutation(api.liveSessions.highlightBegrunnelse);
 
-  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [usedStatements, setUsedStatements] = useState<Set<number>>(new Set());
+
+  const completedSteps = step > 0 ? Array.from({ length: step - 1 }, (_, i) => i + 1) : [];
 
   const goToStep = useCallback(
     async (n: number, statementIndexOverride?: number) => {
       if (n === 0) {
-        setCompletedSteps([]);
         onResetStatement();
-      }
-      if (step > 0 && step < n) {
-        setCompletedSteps((prev) => (prev.includes(step) ? prev : [...prev, step]));
       }
       const targetIndex = statementIndexOverride ?? selectedIdx;
       try {

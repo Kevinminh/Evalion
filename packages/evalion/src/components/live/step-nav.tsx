@@ -1,5 +1,4 @@
 import { cn } from "@workspace/ui/lib/utils";
-import { Check } from "lucide-react";
 
 const steps = [
   { num: 1, label: "Første stemmerunde" },
@@ -41,11 +40,12 @@ export function StepNav({ currentStep, completedSteps = [], onStepClick }: StepN
               className={cn(
                 "flex size-7 items-center justify-center rounded-full text-xs font-extrabold sm:size-8",
                 isActive && "bg-primary text-primary-foreground",
-                isCompleted && "bg-[#4CAF50] text-white",
+                isCompleted && "text-white",
                 isInactive && "bg-muted text-muted-foreground",
               )}
+              style={isCompleted ? { backgroundColor: "#4CAF50" } : undefined}
             >
-              {isCompleted ? <Check className="size-4" /> : step.num}
+              {step.num}
             </span>
             <span
               className={cn(

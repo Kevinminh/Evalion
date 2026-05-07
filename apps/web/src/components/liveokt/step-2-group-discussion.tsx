@@ -1,49 +1,14 @@
-import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
 import { BegrunnelseCard } from "@workspace/evalion/components/live/begrunnelse-card";
-import { BegrunnelseNav } from "@workspace/evalion/components/live/begrunnelse-nav";
 import { DistributionChart } from "@workspace/evalion/components/live/distribution-chart";
 import { PanelTabs } from "@workspace/evalion/components/live/panel-tabs";
 import { Professor } from "@workspace/evalion/components/live/professor";
-import { TimerCard } from "@workspace/evalion/components/live/timer-card";
+import { resolveStatementHex } from "@workspace/evalion/lib/constants";
 import { StatementCard } from "@workspace/ui/components/statement-card";
-import { cn } from "@workspace/ui/lib/utils";
+import { Smartphone } from "lucide-react";
 
-import { StudentVoteList } from "./student-vote-list";
 import type { TeacherStep } from "@/types/teacher-step";
-import { useTeacherSession } from "./teacher-session-context";
 
-function HighlightedBegrunnelse({
-  begrunnelse,
-  studentName,
-  onToggle,
-}: {
-  begrunnelse: Doc<"sessionBegrunnelser">;
-  studentName: string | undefined;
-  onToggle: () => void;
-}) {
-  return (
-    <div className="space-y-2">
-      <BegrunnelseCard
-        text={begrunnelse.text}
-        studentName={studentName}
-        highlighted={begrunnelse.highlighted ?? false}
-      />
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-pressed={begrunnelse.highlighted ?? false}
-        className={cn(
-          "w-full rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-150",
-          begrunnelse.highlighted
-            ? "bg-primary text-primary-foreground shadow-[0_2px_0_var(--color-purple-shadow)] active:translate-y-0.5 active:shadow-[0_0_0_var(--color-purple-shadow)]"
-            : "border border-border text-muted-foreground hover:border-primary/40 hover:bg-primary/10 hover:text-primary",
-        )}
-      >
-        {begrunnelse.highlighted ? "Fremhevet" : "Fremhev"}
-      </button>
-    </div>
-  );
-}
+import { useTeacherSession } from "./teacher-session-context";
 
 export function useStep2(): TeacherStep {
   const {
@@ -51,77 +16,98 @@ export function useStep2(): TeacherStep {
     panelTab,
     setPanelTab,
     begrunnelser,
-    begrunnelseIdx,
-    setBegrunnelseIdx,
     students,
     voteBars,
     totalVotes,
-    timer,
-    highlightBegrunnelse,
+    activeRoundVotes,
     selectedIdx,
   } = useTeacherSession();
   const begrunnelseTab = panelTab === "default" || panelTab === "begrunnelser";
 
+  const statementColor = resolveStatementHex(statement?.color, selectedIdx);
+
   const main = (
-    <div className="flex flex-col items-center gap-6 pt-4">
-      {statement && <StatementCard statement={statement} size="lg" />}
+    <div className="flex flex-col items-center gap-10 pt-2 sm:gap-14">
+      {statement && (
+        <StatementCard statement={statement} size="lg" color={statementColor} gradient />
+      )}
       <Professor
         size="md"
+        bordered
+        animate
         text="Diskuter med læringspartneren din. Forklar hva du tenker og lytt til hva den andre mener."
       />
     </div>
   );
 
-  const currentBegrunnelse = begrunnelser?.[begrunnelseIdx];
-  const currentStudentName = currentBegrunnelse
-    ? students.find((s) => s._id === currentBegrunnelse.studentId)?.name
+  const highlighted = begrunnelser?.find((b) => b.highlighted) ?? null;
+  const highlightedStudent = highlighted
+    ? students.find((s) => s._id === highlighted.studentId)
+    : undefined;
+  const highlightedVote = highlighted
+    ? activeRoundVotes.find((v) => v.studentId === highlighted.studentId)?.vote
     : undefined;
 
+  const withConfidence = activeRoundVotes.filter((v) => typeof v.confidence === "number");
+  const avgConfidence = withConfidence.length
+    ? withConfidence.reduce((sum, v) => sum + (v.confidence ?? 0), 0) / withConfidence.length
+    : null;
+
   const panel = (
-    <PanelTabs
-      tabs={[
-        { key: "begrunnelser", label: "Begrunnelser" },
-        { key: "stemmefordeling", label: "Stemmefordeling" },
-      ]}
-      activeTab={begrunnelseTab ? "begrunnelser" : "stemmefordeling"}
-      onTabChange={setPanelTab}
-    >
-      {begrunnelseTab ? (
-        <div className="space-y-4">
-          <TimerCard {...timer} />
-          {!begrunnelser || begrunnelser.length === 0 ? (
-            <p className="text-xs italic text-muted-foreground">Ingen begrunnelser ennå</p>
-          ) : (
-            <>
-              <BegrunnelseNav
-                current={begrunnelseIdx + 1}
-                total={begrunnelser.length}
-                onPrev={() => setBegrunnelseIdx((i) => Math.max(0, i - 1))}
-                onNext={() => setBegrunnelseIdx((i) => Math.min(begrunnelser.length - 1, i + 1))}
+    <div className="space-y-3">
+      <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+        Elevsvar – Første stemmerunde
+      </p>
+      <PanelTabs
+        tabs={[
+          { key: "begrunnelser", label: "Begrunnelser" },
+          { key: "stemmefordeling", label: "Stemmefordeling" },
+        ]}
+        activeTab={begrunnelseTab ? "begrunnelser" : "stemmefordeling"}
+        onTabChange={setPanelTab}
+      >
+        {begrunnelseTab ? (
+          highlighted ? (
+            <div className="space-y-2">
+              <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-primary">
+                Fremhevet
+              </p>
+              <BegrunnelseCard
+                text={highlighted.text}
+                studentName={highlightedStudent?.name}
+                vote={highlightedVote}
+                highlighted
               />
-              {currentBegrunnelse && (
-                <HighlightedBegrunnelse
-                  begrunnelse={currentBegrunnelse}
-                  studentName={currentStudentName}
-                  onToggle={() => highlightBegrunnelse(currentBegrunnelse)}
-                />
-              )}
-            </>
-          )}
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <StudentVoteList />
-          <div className="h-px bg-border" />
-          <DistributionChart
-            key={`s${selectedIdx}-discussion`}
-            bars={voteBars}
-            total={totalVotes}
-          />
-        </div>
-      )}
-    </PanelTabs>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-card/40 p-8 text-center">
+              <Smartphone className="size-8 text-muted-foreground/40" />
+              <p className="text-xs italic leading-relaxed text-muted-foreground">
+                Trykk på begrunnelser i live-statistikken på din eksterne enhet for å fremheve dem
+                her.
+              </p>
+            </div>
+          )
+        ) : (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between rounded-xl border border-border px-4 py-3">
+              <span className="text-sm font-semibold text-muted-foreground">
+                Gjennomsnittlig sikkerhet
+              </span>
+              <span className="text-lg font-bold tabular-nums text-primary">
+                {avgConfidence !== null ? avgConfidence.toFixed(1).replace(".", ",") : "–"}
+              </span>
+            </div>
+            <DistributionChart
+              key={`s${selectedIdx}-discussion`}
+              bars={voteBars}
+              total={totalVotes}
+            />
+          </div>
+        )}
+      </PanelTabs>
+    </div>
   );
 
-  return { main, panel };
+  return { main, panel, panelFooter: null };
 }

@@ -1,14 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { api } from "@workspace/backend/convex/_generated/api";
 import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
 import { Skeleton } from "@workspace/ui/components/skeleton";
-import { cn } from "@workspace/ui/lib/utils";
-import { useState } from "react";
-
-import { RoundAnalytics } from "@/components/analytics/round-analytics";
-import { ResultatTab } from "@/components/analytics/resultat-tab";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
+import { cn } from "@workspace/ui/lib/utils";
+import { useMutation } from "convex/react";
+import { useEffect, useState } from "react";
+
+import { ResultatTab } from "@/components/analytics/resultat-tab";
+import { RoundAnalytics } from "@/components/analytics/round-analytics";
 import { liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 
@@ -31,6 +33,15 @@ const BADGE_LABELS: Record<TabId, string> = {
   resultat: "Resultat",
 };
 
+const STEP_TO_TAB: Record<number, TabId> = {
+  1: "runde1",
+  2: "runde1",
+  3: "runde2",
+  4: "resultat",
+  5: "resultat",
+  6: "resultat",
+};
+
 function AnalyticsPage() {
   const { id } = Route.useParams();
   const sessionId = id as Id<"liveSessions">;
@@ -44,10 +55,27 @@ function AnalyticsPage() {
   const [activeTab, setActiveTab] = useState<TabId>("runde1");
   const [selectedStatement, setSelectedStatement] = useState(0);
 
+  const serverStatementIndex = session?.currentStatementIndex;
+  const serverStep = session?.currentStep;
+
+  useEffect(() => {
+    if (serverStatementIndex !== undefined) {
+      setSelectedStatement(serverStatementIndex);
+    }
+  }, [serverStatementIndex]);
+
+  useEffect(() => {
+    if (serverStep && STEP_TO_TAB[serverStep]) {
+      setActiveTab(STEP_TO_TAB[serverStep]);
+    }
+  }, [serverStep]);
+
   // Fetch analytics for the selected statement (always called — sessionId is from route params)
   const { data: analytics } = useQuery(
     liveSessionQueries.getVoteAnalytics(sessionId, selectedStatement),
   );
+
+  const highlightBegrunnelse = useMutation(api.liveSessions.highlightBegrunnelse);
 
   if (sessionPending) return <AnalyticsSkeleton />;
   if (sessionError) return <ErrorState className="flex min-h-svh items-center justify-center" />;
@@ -116,8 +144,8 @@ function AnalyticsPage() {
       <div className="mx-auto w-full max-w-lg flex-1 px-4 pb-8">
         {!analytics ? (
           <div className="flex flex-col gap-4 pt-4">
-            <Skeleton className="h-64 rounded-2xl" />
-            <Skeleton className="h-48 rounded-2xl" />
+            <Skeleton className="h-64 rounded-[16px]" />
+            <Skeleton className="h-48 rounded-[16px]" />
           </div>
         ) : (
           <>
@@ -131,6 +159,7 @@ function AnalyticsPage() {
                 totalStudents={totalStudents}
                 sessionActive={sessionActive}
                 students={analytics.students}
+                onToggleHighlight={(id, next) => highlightBegrunnelse({ id, highlighted: next })}
               />
             )}
 
@@ -179,8 +208,8 @@ function AnalyticsSkeleton() {
         <Skeleton className="h-9 w-24 rounded-full" />
       </div>
       <div className="mx-auto w-full max-w-lg px-4">
-        <Skeleton className="h-64 rounded-2xl" />
-        <Skeleton className="mt-4 h-48 rounded-2xl" />
+        <Skeleton className="h-64 rounded-[16px]" />
+        <Skeleton className="mt-4 h-48 rounded-[16px]" />
       </div>
     </div>
   );

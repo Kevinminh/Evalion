@@ -1,12 +1,17 @@
 import { cn } from "@workspace/ui/lib/utils";
 import { PanelRightClose, PanelRightOpen } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 
 const STORAGE_KEY = "fagprat-panel-collapsed";
 const MD_BREAKPOINT = 768;
+const PANEL_WIDTH_PX = 340;
+const TOPBAR_HEIGHT_PX = 64; // matches sm:h-16 on SessionTopBar
+const STEPNAV_HEIGHT_PX = 56; // matches the bottom step nav
 
 function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" && window.innerWidth < MD_BREAKPOINT);
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== "undefined" && window.innerWidth < MD_BREAKPOINT,
+  );
 
   useEffect(() => {
     const mq = window.matchMedia(`(max-width: ${MD_BREAKPOINT - 1}px)`);
@@ -25,23 +30,25 @@ interface TeacherPanelProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-export function TeacherPanel({ children, defaultOpen = true, footer, onOpenChange }: TeacherPanelProps) {
+export function TeacherPanel({
+  children,
+  defaultOpen = true,
+  footer,
+  onOpenChange,
+}: TeacherPanelProps) {
   const isMobile = useIsMobile();
 
   const [open, setOpen] = useState(() => {
-    // Always start collapsed on mobile
     if (typeof window !== "undefined" && window.innerWidth < MD_BREAKPOINT) return false;
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored !== null) return stored !== "true";
     return defaultOpen;
   });
 
-  // Notify parent of initial state
   useEffect(() => {
     onOpenChange?.(open);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-collapse when resizing down to mobile
   useEffect(() => {
     if (isMobile && open) {
       setOpen(false);
@@ -58,33 +65,92 @@ export function TeacherPanel({ children, defaultOpen = true, footer, onOpenChang
     }
   };
 
+  const desktopToggleStyle: CSSProperties = {
+    position: "fixed",
+    right: open ? PANEL_WIDTH_PX : 0,
+    top: "5rem",
+    zIndex: 30,
+    padding: "0.5rem",
+    background: "var(--card)",
+    border: "1.5px solid var(--border)",
+    borderRight: "none",
+    borderTopLeftRadius: 8,
+    borderBottomLeftRadius: 8,
+    color: "var(--muted-foreground)",
+    boxShadow: "0 1px 2px rgba(0,0,0,0.06)",
+    transition: "right 0.3s ease, background 0.2s ease",
+    cursor: "pointer",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+  };
+
+  const mobileToggleStyle: CSSProperties = {
+    position: "fixed",
+    right: "0.75rem",
+    bottom: "4rem",
+    zIndex: 30,
+    width: 40,
+    height: 40,
+    borderRadius: 9999,
+    background: "var(--card)",
+    border: "1px solid var(--border)",
+    color: "var(--muted-foreground)",
+    boxShadow: "0 4px 8px rgba(0,0,0,0.12)",
+    cursor: "pointer",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+  };
+
+  const backdropStyle: CSSProperties = {
+    position: "fixed",
+    inset: 0,
+    zIndex: 10,
+    background: "rgba(0,0,0,0.4)",
+  };
+
+  const panelStyle: CSSProperties = {
+    position: "fixed",
+    right: 0,
+    top: TOPBAR_HEIGHT_PX,
+    bottom: STEPNAV_HEIGHT_PX,
+    zIndex: 20,
+    width: isMobile ? "85vw" : PANEL_WIDTH_PX,
+    maxWidth: PANEL_WIDTH_PX,
+    background: "var(--card)",
+    borderLeft: "1px solid var(--border)",
+    transform: open ? "translateX(0)" : "translateX(100%)",
+    transition: "transform 0.3s ease",
+    display: "flex",
+    flexDirection: "column",
+  };
+
   return (
     <>
-      {/* Desktop toggle button */}
+      {/* Desktop toggle */}
       <button
         onClick={toggle}
-        className="fixed right-0 top-20 z-30 hidden rounded-l-lg border border-r-0 border-border bg-card p-2 text-muted-foreground shadow-sm transition-all hover:bg-muted md:block"
-        style={{ right: open ? "340px" : "0px" }}
+        aria-label={open ? "Skjul panel" : "Vis panel"}
+        className={cn("hidden md:inline-flex")}
+        style={desktopToggleStyle}
       >
         {open ? <PanelRightClose className="size-4" /> : <PanelRightOpen className="size-4" />}
       </button>
-      {/* Mobile toggle button */}
+      {/* Mobile toggle */}
       <button
         onClick={toggle}
-        className="fixed right-3 bottom-16 z-30 flex size-10 items-center justify-center rounded-full border border-border bg-card shadow-md md:hidden"
+        aria-label={open ? "Skjul panel" : "Vis panel"}
+        className={cn("md:hidden")}
+        style={mobileToggleStyle}
       >
         {open ? <PanelRightClose className="size-4" /> : <PanelRightOpen className="size-4" />}
       </button>
-      {/* Backdrop overlay on mobile when panel is open */}
+      {/* Backdrop on mobile when open */}
       {isMobile && open && (
-        <div className="fixed inset-0 z-10 bg-black/40 md:hidden" onClick={toggle} />
+        <div className={cn("md:hidden")} style={backdropStyle} onClick={toggle} />
       )}
-      <div
-        className={cn(
-          "fixed right-0 top-16 bottom-14 z-20 flex w-[85vw] max-w-[340px] flex-col border-l bg-card transition-transform duration-300 md:w-[340px]",
-          open ? "translate-x-0" : "translate-x-full",
-        )}
-      >
+      <div style={panelStyle}>
         <div className="flex-1 overflow-y-auto p-4 sm:p-5">{children}</div>
         {footer && <div className="shrink-0 border-t border-border p-3 sm:p-4">{footer}</div>}
       </div>
