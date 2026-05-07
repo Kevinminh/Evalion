@@ -55,6 +55,7 @@ function RegisterPage() {
   return (
     <div className="flex min-h-svh items-center justify-center bg-background px-6">
       <RegisterForm
+        className="max-w-md"
         logo={<img src="/logo.png" alt="Evalion" className="mx-auto h-10" />}
         description="Opprett en konto for å komme i gang"
         onSubmit={handleSubmit}

@@ -53,6 +53,7 @@ function LoginPage() {
   return (
     <div className="flex min-h-svh items-center justify-center bg-background px-6">
       <LoginForm
+        className="max-w-md"
         logo={<img src="/logo.png" alt="Evalion" className="mx-auto h-10" />}
         description="Logg inn for å administrere dine FagPrat-økter"
         onSubmit={handleSubmit}
