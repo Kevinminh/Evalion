@@ -1,27 +1,25 @@
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
-import { useMutation } from "convex/react";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
-import { toast } from "sonner";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 
-import { api } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 import type { TimerControls } from "@/lib/use-timer-controls";
 import { useTimerControls } from "@/lib/use-timer-controls";
-import { buildVoteBars, type VoteBar } from "@/lib/vote-bars";
+
+import { usePanelState } from "./hooks/use-panel-state";
+import { useRatingStats, type RatingStats } from "./hooks/use-rating-stats";
+import { useRecording, type RecordingState } from "./hooks/use-recording";
+import { useSessionMutations, type SessionMutations } from "./hooks/use-session-mutations";
+import { useVoteAnalysis, type VoteAnalysis } from "./hooks/use-vote-analysis";
 
 type Statement = Doc<"fagprats">["statements"][number];
 
-export interface TeacherSessionValue {
+export interface TeacherSessionValue
+  extends VoteAnalysis,
+    RatingStats,
+    RecordingState,
+    SessionMutations {
   sessionId: Id<"liveSessions">;
   step: number;
-
   session: Doc<"liveSessions">;
   fagprat: Doc<"fagprats">;
   students: Doc<"sessionStudents">[];
@@ -29,35 +27,15 @@ export interface TeacherSessionValue {
 
   selectedIdx: number;
   statement: Statement | undefined;
-  r2Votes: Doc<"sessionVotes">[];
-  activeRoundVotes: Doc<"sessionVotes">[];
-  voteBars: VoteBar[];
-  totalVotes: number;
-  r2CorrectCount: number;
-  r2Total: number;
-  changedToCorrect: number;
-  changedToIncorrect: number;
-  ratingDistribution: { score: number; count: number }[];
-  avgRating: number | undefined;
-
   selectedStatement: number | null;
   setSelectedStatement: (n: number | null) => void;
+
+  panelOpen: boolean;
+  setPanelOpen: (b: boolean) => void;
   panelTab: string;
   setPanelTab: (s: string) => void;
   begrunnelseIdx: number;
   setBegrunnelseIdx: (updater: (i: number) => number) => void;
-  recording: boolean;
-  setRecording: (b: boolean) => void;
-  recordElapsed: number;
-  panelOpen: boolean;
-  setPanelOpen: (b: boolean) => void;
-  completedSteps: number[];
-  usedStatements: Set<number>;
-  markStatementUsed: (n: number) => void;
-
-  goToStep: (n: number, statementIndexOverride?: number) => Promise<void>;
-  endSession: () => Promise<void>;
-  highlightBegrunnelse: (b: Doc<"sessionBegrunnelser">) => Promise<unknown>;
 
   timer: TimerControls;
 }
@@ -109,152 +87,62 @@ export function TeacherSessionProvider({
   children,
 }: TeacherSessionProviderProps) {
   const [selectedStatement, setSelectedStatement] = useState<number | null>(null);
-  const [panelTab, setPanelTab] = useState("default");
-  const [begrunnelseIdx, setBegrunnelseIdx] = useState(0);
-  const [recording, setRecording] = useState(false);
-  const [recordElapsed, setRecordElapsed] = useState(0);
-  const [panelOpen, setPanelOpen] = useState(true);
-  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const [usedStatements, setUsedStatements] = useState<Set<number>>(new Set());
+  const selectedIdx = selectedStatement ?? session.currentStatementIndex ?? 0;
+  const statement = fagprat.statements[selectedIdx];
 
-  const updateStepMutation = useMutation(api.liveSessions.updateStep);
-  const endSessionMutation = useMutation(api.liveSessions.end);
-  const highlightBegrunnelseMutation = useMutation(api.liveSessions.highlightBegrunnelse);
+  const voteAnalysis = useVoteAnalysis({ votes, analytics, step });
+  const ratingStats = useRatingStats(analytics);
+  const recording = useRecording();
+  const panelState = usePanelState(step, selectedIdx);
   const timer = useTimerControls(sessionId, session);
 
-  useEffect(() => {
-    if (!recording) {
-      setRecordElapsed(0);
-      return;
-    }
-    const interval = setInterval(() => setRecordElapsed((t) => t + 1), 1000);
-    return () => clearInterval(interval);
-  }, [recording]);
+  const onResetStatement = useCallback(() => setSelectedStatement(null), []);
+  const mutations = useSessionMutations({
+    sessionId,
+    step,
+    selectedIdx,
+    navigateToStep,
+    onSessionEnded,
+    onResetStatement,
+  });
 
-  const selectedIdx = selectedStatement ?? session.currentStatementIndex ?? 0;
-
-  useEffect(() => {
-    setPanelTab("default");
-    setBegrunnelseIdx(0);
-  }, [step, selectedIdx]);
-
-  const value = useMemo<TeacherSessionValue>(() => {
-    const statement = fagprat.statements[selectedIdx];
-
-    const r1: typeof votes = [];
-    const r2: typeof votes = [];
-    for (const v of votes) {
-      if (v.round === 1) r1.push(v);
-      else if (v.round === 2) r2.push(v);
-    }
-    const activeRoundVotes = step <= 2 ? r1 : r2;
-
-    const r2CorrectCount = analytics?.correctR2 ?? 0;
-    const r2Total = analytics?.totalR2 ?? 0;
-    const changedToCorrect = analytics?.wrongToRight ?? 0;
-    const changedToIncorrect = analytics?.rightToWrong ?? 0;
-    const ratingDistribution =
-      analytics?.ratingDistribution ?? [1, 2, 3, 4, 5].map((score) => ({ score, count: 0 }));
-    const avgRating = analytics && analytics.avgRating > 0 ? analytics.avgRating : undefined;
-
-    const goToStep = async (n: number, statementIndexOverride?: number) => {
-      if (n === 0) {
-        setCompletedSteps([]);
-        setSelectedStatement(null);
-      }
-      if (step > 0 && step < n) {
-        setCompletedSteps((prev) => (prev.includes(step) ? prev : [...prev, step]));
-      }
-      const targetIndex = statementIndexOverride ?? selectedIdx;
-      try {
-        await updateStepMutation({
-          id: sessionId,
-          step: n,
-          ...(n === 0 ? {} : { statementIndex: targetIndex }),
-        });
-        await navigateToStep(n);
-      } catch {
-        toast.error("Kunne ikke bytte steg. Prøv igjen.");
-      }
-    };
-
-    const endSession = async () => {
-      try {
-        await endSessionMutation({ id: sessionId });
-        onSessionEnded();
-      } catch {
-        toast.error("Kunne ikke avslutte økten. Prøv igjen.");
-      }
-    };
-
-    return {
+  const value = useMemo<TeacherSessionValue>(
+    () => ({
       sessionId,
       step,
       session,
       fagprat,
       students,
       begrunnelser,
-
       selectedIdx,
       statement,
-      r2Votes: r2,
-      activeRoundVotes,
-      voteBars: buildVoteBars(activeRoundVotes),
-      totalVotes: activeRoundVotes.length,
-      r2CorrectCount,
-      r2Total,
-      changedToCorrect,
-      changedToIncorrect,
-      ratingDistribution,
-      avgRating,
-
       selectedStatement,
       setSelectedStatement,
-      panelTab,
-      setPanelTab,
-      begrunnelseIdx,
-      setBegrunnelseIdx,
-      recording,
-      setRecording,
-      recordElapsed,
-      panelOpen,
-      setPanelOpen,
-      completedSteps,
-      usedStatements,
-      markStatementUsed: (n) => setUsedStatements((prev) => new Set(prev).add(n)),
-
-      goToStep,
-      endSession,
-      highlightBegrunnelse: (b) =>
-        highlightBegrunnelseMutation({ id: b._id, highlighted: !b.highlighted }),
-
       timer,
-    };
-  }, [
-    sessionId,
-    step,
-    session,
-    fagprat,
-    students,
-    votes,
-    analytics,
-    begrunnelser,
-    selectedIdx,
-    selectedStatement,
-    panelTab,
-    begrunnelseIdx,
-    recording,
-    recordElapsed,
-    panelOpen,
-    completedSteps,
-    usedStatements,
-    timer,
-    updateStepMutation,
-    endSessionMutation,
-    highlightBegrunnelseMutation,
-    navigateToStep,
-    onSessionEnded,
-  ]);
+      ...voteAnalysis,
+      ...ratingStats,
+      ...recording,
+      ...panelState,
+      ...mutations,
+    }),
+    [
+      sessionId,
+      step,
+      session,
+      fagprat,
+      students,
+      begrunnelser,
+      selectedIdx,
+      statement,
+      selectedStatement,
+      timer,
+      voteAnalysis,
+      ratingStats,
+      recording,
+      panelState,
+      mutations,
+    ],
+  );
 
   return (
     <TeacherSessionContext.Provider value={value}>{children}</TeacherSessionContext.Provider>
