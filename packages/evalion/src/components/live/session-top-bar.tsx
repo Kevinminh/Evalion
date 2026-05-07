@@ -1,3 +1,4 @@
+import { Separator } from "@workspace/ui/components/separator";
 import { X } from "lucide-react";
 
 interface SessionTopBarProps {
@@ -12,7 +13,7 @@ export function SessionTopBar({ title, onExit, center, children }: SessionTopBar
     <div className="fixed top-0 right-0 left-0 z-40 flex h-20 min-h-20 items-center justify-between border-b-[1.5px] border-[#EEEEEE] bg-white px-8">
       <div className="flex items-center gap-4">
         <img src="/co-lab-logo.png" alt="CO-LAB" className="h-7 object-contain" />
-        <div className="h-8 w-[1.5px] bg-[#E0E0E0]" />
+        <Separator orientation="vertical" className="h-full" />
         <span className="text-lg font-bold text-[#212121]">{title}</span>
       </div>
       {center && (
