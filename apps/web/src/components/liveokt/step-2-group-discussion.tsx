@@ -114,9 +114,9 @@ export function useStep2(): TeacherStep {
           <StudentVoteList />
           <div className="h-px bg-border" />
           <DistributionChart
+            key={`s${selectedIdx}-discussion`}
             bars={voteBars}
             total={totalVotes}
-            resetKey={`s${selectedIdx}-discussion`}
           />
         </div>
       )}

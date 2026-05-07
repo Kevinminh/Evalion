@@ -10,16 +10,9 @@ interface DistributionChartProps {
   bars: DistributionBar[];
   total: number;
   height?: number;
-  /** When this changes, bars re-animate from 0. Useful between voting rounds. */
-  resetKey?: string | number;
 }
 
-export function DistributionChart({
-  bars,
-  total,
-  height = 160,
-  resetKey,
-}: DistributionChartProps) {
+export function DistributionChart({ bars, total, height = 160 }: DistributionChartProps) {
   const maxValue = Math.max(...bars.map((b) => b.value), 1);
 
   return (
@@ -28,7 +21,7 @@ export function DistributionChart({
         const pct = total > 0 ? Math.round((bar.value / total) * 100) : 0;
         const barHeight = total > 0 ? (bar.value / maxValue) * (height - 40) : 0;
         return (
-          <div key={`${resetKey ?? ""}:${bar.label}`} className="flex flex-col items-center gap-1">
+          <div key={bar.label} className="flex flex-col items-center gap-1">
             <span className="text-xs font-bold text-foreground tabular-nums">{bar.value}</span>
             <span className="text-[10px] font-semibold text-muted-foreground tabular-nums">
               {pct}%

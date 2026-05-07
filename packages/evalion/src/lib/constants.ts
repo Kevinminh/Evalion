@@ -96,9 +96,19 @@ export const FASIT_COLUMN_CONFIG: Record<
 // ── Student vote buttons (3D style for student game) ───────────────────────
 export const STUDENT_VOTE_OPTIONS = [
   { value: "sant" as const, label: "Sant", bg: "bg-sant", shadow: "shadow-[0_4px_0_#2E7D32]" },
-  { value: "delvis" as const, label: "Delvis sant", bg: "bg-delvis", shadow: "shadow-[0_4px_0_#E65100]" },
+  {
+    value: "delvis" as const,
+    label: "Delvis sant",
+    bg: "bg-delvis",
+    shadow: "shadow-[0_4px_0_#E65100]",
+  },
   { value: "usant" as const, label: "Usant", bg: "bg-usant", shadow: "shadow-[0_4px_0_#B71C1C]" },
 ] as const;
+
+/** Shared 3D-press button class chain used by both teacher VoteButtons and
+ * student VoteOptions. Pairs with hover lift and active-press depression. */
+export const VOTE_BUTTON_3D_CLASSES =
+  "shadow-[0_4px_0_rgba(0,0,0,0.18)] hover:-translate-y-0.5 hover:shadow-[0_6px_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-[0_1px_0_rgba(0,0,0,0.18)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/40";
 
 // ── Confidence / rating circle colors (1-5 scale) ─────────────────────────
 export const LEVEL_CIRCLE_COLORS: Record<number, { border: string; text: string }> = {
@@ -118,20 +128,17 @@ export const STATEMENT_COLORS = [
   { name: "red", bg: "bg-red-100", border: "border-red-300", text: "text-red-700" },
 ] as const;
 
-/** Hex variant of statement colors for use outside Tailwind (e.g. inline styles).
- * `text` is the teacher-card text color; `textStudent` is the slightly
- * different student-card text color. These mirror the demo HTML mockups
- * (`fagprat-steg0.html` / `demo-steg0-elev.html`). */
+/** Hex variant of statement colors for inline styles (teacher card). For the
+ * student variant, use STATEMENT_COLORS_STUDENT_HEX. */
 export const STATEMENT_COLORS_HEX = [
-  { bg: "#FFFDE7", border: "#FFE082", text: "#8D6E00", textStudent: "#5D4037" },
-  { bg: "#E3F1FC", border: "#90CAF9", text: "#2C5F8A", textStudent: "#1565C0" },
-  { bg: "#FFF3E0", border: "#FFCC80", text: "#B35C00", textStudent: "#BF360C" },
-  { bg: "#F3EEFF", border: "#CE93D8", text: "#6A1B9A", textStudent: "#6A1B9A" },
-  { bg: "#FFEBEE", border: "#EF9A9A", text: "#C62828", textStudent: "#B71C1C" },
+  { bg: "#FFFDE7", border: "#FFE082", text: "#8D6E00" },
+  { bg: "#E3F1FC", border: "#90CAF9", text: "#2C5F8A" },
+  { bg: "#FFF3E0", border: "#FFCC80", text: "#B35C00" },
+  { bg: "#F3EEFF", border: "#CE93D8", text: "#6A1B9A" },
+  { bg: "#FFEBEE", border: "#EF9A9A", text: "#C62828" },
 ] as const;
 
-/** Student card variants. Slightly warmer bg/border than the teacher set;
- *  matches `demo-steg0-elev.html` `.sv-card-*` classes. */
+/** Student card variants — slightly warmer bg/border than the teacher set. */
 export const STATEMENT_COLORS_STUDENT_HEX = [
   { bg: "#FFF8E1", border: "#FFD54F", text: "#5D4037" },
   { bg: "#E8F4FD", border: "#90CAF9", text: "#1565C0" },
@@ -150,6 +157,32 @@ export function getStatementColorHex(index: number) {
 
 export function getStatementColorStudentHex(index: number) {
   return STATEMENT_COLORS_STUDENT_HEX[index % STATEMENT_COLORS_STUDENT_HEX.length]!;
+}
+
+const STATEMENT_COLOR_NAME_INDEX: Record<string, number> = {
+  yellow: 0,
+  blue: 1,
+  orange: 2,
+  purple: 3,
+  red: 4,
+};
+
+/** Resolve a statement's color name (or fallback index) to the teacher hex palette. */
+export function resolveStatementHex(color: string | undefined, fallbackIdx: number) {
+  const idx =
+    color !== undefined && STATEMENT_COLOR_NAME_INDEX[color] !== undefined
+      ? STATEMENT_COLOR_NAME_INDEX[color]!
+      : fallbackIdx;
+  return getStatementColorHex(idx);
+}
+
+/** Resolve a statement's color name (or fallback index) to the student hex palette. */
+export function resolveStatementStudentHex(color: string | undefined, fallbackIdx: number) {
+  const idx =
+    color !== undefined && STATEMENT_COLOR_NAME_INDEX[color] !== undefined
+      ? STATEMENT_COLOR_NAME_INDEX[color]!
+      : fallbackIdx;
+  return getStatementColorStudentHex(idx);
 }
 
 // ── Domain options ──────────────────────────────────────────────────────────

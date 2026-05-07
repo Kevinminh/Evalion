@@ -38,9 +38,7 @@ export function FasitBadge({
       )}
       style={{
         letterSpacing: "0.05em",
-        animation: animated
-          ? "fasit-pulse 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both"
-          : undefined,
+        animation: animated ? "var(--animate-fasit-pulse)" : undefined,
       }}
     >
       {label}

@@ -4,7 +4,7 @@ interface ColumnItem {
   label: string;
   count: number;
   pct: number;
-  colorClass: string;
+  colorClass?: string;
   isCorrect?: boolean;
   delta?: { count: number; pct: number };
 }
@@ -13,13 +13,30 @@ interface ColumnChartProps {
   items: ColumnItem[];
 }
 
+const FASIT_BAR_BG: Record<string, string> = {
+  Sant: "bg-sant",
+  "Delvis sant": "bg-delvis",
+  Delvis: "bg-delvis",
+  Usant: "bg-usant",
+};
+
+const FASIT_TEXT: Record<string, string> = {
+  Sant: "text-sant",
+  "Delvis sant": "text-delvis",
+  Delvis: "text-delvis",
+  Usant: "text-usant",
+};
+
 export function ColumnChart({ items }: ColumnChartProps) {
   const maxPct = Math.max(...items.map((i) => i.pct), 1);
 
   return (
     <div className="flex items-end justify-center gap-4 px-2 pt-3 pb-1">
       {items.map((item) => {
-        const height = Math.max((item.pct / maxPct) * 100, 15);
+        const height = (item.pct / maxPct) * 100;
+        const colored = item.isCorrect;
+        const barClass = colored ? (FASIT_BAR_BG[item.label] ?? "bg-sant") : "bg-neutral-300";
+        const textColor = colored ? (FASIT_TEXT[item.label] ?? "text-sant") : "text-muted-foreground";
         return (
           <div
             key={item.label}
@@ -28,8 +45,9 @@ export function ColumnChart({ items }: ColumnChartProps) {
           >
             <span
               className={cn(
-                "text-xs font-semibold text-muted-foreground",
-                item.isCorrect && "font-extrabold text-amber-700",
+                "text-xs font-semibold",
+                textColor,
+                colored && "font-extrabold",
               )}
             >
               {item.count} stk
@@ -38,14 +56,14 @@ export function ColumnChart({ items }: ColumnChartProps) {
               <div
                 className={cn(
                   "absolute bottom-0 w-full rounded-b-lg flex items-center justify-center transition-all duration-400",
-                  item.colorClass,
+                  barClass,
                 )}
-                style={{ height: `${height}%`, minHeight: 20 }}
+                style={{ height: `${height}%`, minHeight: 2 }}
               >
                 <span
                   className={cn(
-                    "text-xs font-semibold text-muted-foreground",
-                    item.colorClass === "bg-delvis" && "font-extrabold text-white",
+                    "text-xs font-semibold",
+                    colored ? "text-white font-extrabold" : "text-muted-foreground",
                   )}
                 >
                   {item.pct}%
@@ -54,8 +72,9 @@ export function ColumnChart({ items }: ColumnChartProps) {
             </div>
             <span
               className={cn(
-                "text-[11px] font-semibold text-muted-foreground",
-                item.isCorrect && "font-extrabold text-amber-700",
+                "text-[11px] font-semibold",
+                textColor,
+                colored && "font-extrabold",
               )}
             >
               {item.label}

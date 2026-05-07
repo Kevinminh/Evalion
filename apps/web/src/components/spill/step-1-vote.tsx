@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { resolveStatementStudentHex } from "@workspace/evalion/lib/constants";
 import type { Fasit } from "@workspace/evalion/lib/types";
+import { RatingScale } from "@workspace/ui/components/rating-scale";
+import { StatementCard } from "@workspace/ui/components/statement-card";
+import { SubmitButton } from "@workspace/ui/components/submit-button";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { useBegrunnelseDraft } from "@/hooks/use-begrunnelse-draft";
 
-import { RatingScale } from "@workspace/ui/components/rating-scale";
-import { StatementCard } from "@workspace/ui/components/statement-card";
 import { useStudentGame } from "./student-game-context";
-import { SubmitButton } from "@workspace/ui/components/submit-button";
 import { VoteOptions } from "./vote-options";
 import { WaitingScreen } from "./waiting-screen";
 
@@ -29,7 +30,10 @@ export function Step1Vote() {
     return <WaitingScreen />;
   }
 
-  const canSubmit = selectedVote !== null && selectedConfidence !== null;
+  const isTimerStarted = !!session.timerStartedAt;
+  const formDisabled = !isTimerStarted;
+  const canSubmit = selectedVote !== null && selectedConfidence !== null && isTimerStarted;
+  const statementColor = resolveStatementStudentHex(statement.color, statementIndex);
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
@@ -49,27 +53,47 @@ export function Step1Vote() {
 
   return (
     <div className="flex w-full flex-col items-center gap-5">
-      <StatementCard statement={statement} />
+      <StatementCard statement={statement} color={statementColor} />
 
-      <div className="w-full max-w-md space-y-2">
-        <p className="text-center text-sm font-bold text-foreground">Hva mener du?</p>
-        <VoteOptions selected={selectedVote} onSelect={setSelectedVote} />
-      </div>
+      {!isTimerStarted && (
+        <p className="text-center text-xs font-medium text-muted-foreground">
+          Venter på at læreren starter nedtellingen...
+        </p>
+      )}
 
-      <div className="w-full max-w-md space-y-2">
-        <p className="text-center text-sm font-bold text-foreground">Hvor sikker er du?</p>
-        <RatingScale selected={selectedConfidence} onSelect={setSelectedConfidence} />
-      </div>
+      <div
+        className={
+          formDisabled
+            ? "pointer-events-none flex w-full max-w-md flex-col items-stretch gap-5 opacity-40 transition-opacity"
+            : "flex w-full max-w-md flex-col items-stretch gap-5 transition-opacity"
+        }
+        aria-disabled={formDisabled}
+      >
+        <div className="space-y-2">
+          <p className="text-center text-sm font-bold text-foreground">Hva mener du?</p>
+          <VoteOptions selected={selectedVote} onSelect={setSelectedVote} disabled={formDisabled} />
+        </div>
 
-      <div className="w-full max-w-md space-y-2">
-        <p className="text-center text-sm font-bold text-foreground">Begrunn svaret ditt</p>
-        <textarea
-          value={begrunnelseText}
-          onChange={(e) => setBegrunnelseText(e.target.value)}
-          placeholder="Skriv din begrunnelse her..."
-          className="w-full rounded-xl border-[1.5px] border-neutral-300 bg-white px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary focus:ring-2 focus:ring-primary/20"
-          rows={3}
-        />
+        <div className="space-y-2">
+          <p className="text-center text-sm font-bold text-foreground">Hvor sikker er du?</p>
+          <RatingScale
+            selected={selectedConfidence}
+            onSelect={setSelectedConfidence}
+            disabled={formDisabled}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-center text-sm font-bold text-foreground">Begrunn svaret ditt</p>
+          <textarea
+            value={begrunnelseText}
+            onChange={(e) => setBegrunnelseText(e.target.value)}
+            placeholder="Skriv din begrunnelse her..."
+            disabled={formDisabled}
+            className="w-full rounded-xl border-[1.5px] border-neutral-300 bg-white px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:bg-neutral-50"
+            rows={3}
+          />
+        </div>
       </div>
 
       <SubmitButton sent={sent} disabled={!canSubmit} onClick={handleSubmit} />

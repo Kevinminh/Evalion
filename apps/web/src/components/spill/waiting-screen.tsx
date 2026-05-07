@@ -9,7 +9,7 @@ export function WaitingScreen() {
         className="inline-flex items-center gap-2 rounded-full bg-sant/15 px-4 py-1.5 text-sm font-bold uppercase tracking-wider text-sant"
         style={{
           letterSpacing: "0.05em",
-          animation: "fasit-pulse 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both",
+          animation: "var(--animate-fasit-pulse)",
         }}
       >
         <CheckCircle2 className="size-4" />

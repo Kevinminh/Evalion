@@ -58,11 +58,6 @@ function AnalyticsPage() {
   const totalStudents = session.studentCount;
   const sessionActive = session.status === "active";
 
-  // Calculate total wrong from R1 for the wrongToRight fraction
-  const totalWrongR1 = analytics
-    ? analytics.students.filter((s) => s.round1 && !s.round1.correct).length
-    : 0;
-
   return (
     <div className="flex min-h-svh flex-col bg-neutral-100">
       {/* Header */}
@@ -151,8 +146,6 @@ function AnalyticsPage() {
                 totalStudents={totalStudents}
                 sessionActive={sessionActive}
                 students={analytics.students}
-                wrongToRight={analytics.wrongToRight}
-                totalWrong={totalWrongR1}
               />
             )}
 

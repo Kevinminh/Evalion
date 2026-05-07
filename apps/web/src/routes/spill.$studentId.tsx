@@ -17,6 +17,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { StudentGameProvider, useStudentGame } from "@/components/spill/student-game-context";
 import { phaseStepNumber } from "@/types/student-phase";
 import { StudentStepRenderer } from "@/components/spill/student-step-renderer";
+import { StudentTimerBadge } from "@/components/spill/student-timer-badge";
 import { StudentTopbar } from "@/components/spill/student-topbar";
 
 export const Route = createFileRoute("/spill/$studentId")({
@@ -121,6 +122,7 @@ function StudentGameLayout({ onLeave }: { onLeave: () => void }) {
         currentStep={session.status === "active" ? phaseStepNumber(phase) : undefined}
         stepLabel={session.status === "lobby" ? "Lobby" : undefined}
         onLeave={() => setShowLeaveConfirm(true)}
+        rightSlot={<StudentTimerBadge />}
       />
 
       <div

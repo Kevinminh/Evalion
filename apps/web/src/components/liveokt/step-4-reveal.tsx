@@ -73,9 +73,9 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
       ) : (
         <div className="space-y-4">
           <DistributionChart
+            key={`s${selectedIdx}-reveal`}
             bars={buildVoteBars(r2Votes)}
             total={r2Total}
-            resetKey={`s${selectedIdx}-reveal`}
           />
         </div>
       )}

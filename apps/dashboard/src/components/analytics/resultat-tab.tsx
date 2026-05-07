@@ -31,9 +31,9 @@ export function ResultatTab({
   const [showRatingDetail, setShowRatingDetail] = useState(false);
 
   const makeItems = (dist: RoundDistribution) => [
-    { label: "Sant", count: dist.sant, pct: dist.santPct, colorClass: "bg-neutral-300", isCorrect: fasit === "sant" },
-    { label: "Delvis", count: dist.delvis, pct: dist.delvisPct, colorClass: "bg-delvis", isCorrect: fasit === "delvis" },
-    { label: "Usant", count: dist.usant, pct: dist.usantPct, colorClass: "bg-neutral-300", isCorrect: fasit === "usant" },
+    { label: "Sant", count: dist.sant, pct: dist.santPct, isCorrect: fasit === "sant" },
+    { label: "Delvis sant", count: dist.delvis, pct: dist.delvisPct, isCorrect: fasit === "delvis" },
+    { label: "Usant", count: dist.usant, pct: dist.usantPct, isCorrect: fasit === "usant" },
   ];
 
   const sortedStudents = useMemo(

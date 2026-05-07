@@ -6,8 +6,6 @@ interface RatingDistribution {
 interface RatingChartProps {
   distribution: RatingDistribution[];
   average?: number;
-  /** When this changes, bars re-animate from 0. */
-  resetKey?: string | number;
 }
 
 // 1 → red (usant), 5 → green (sant); middle scores transition through delvis/orange.
@@ -19,7 +17,7 @@ const BAR_COLORS = [
   "var(--sant)",
 ];
 
-export function RatingChart({ distribution, average, resetKey }: RatingChartProps) {
+export function RatingChart({ distribution, average }: RatingChartProps) {
   const total = distribution.reduce((sum, d) => sum + d.count, 0);
   const maxCount = Math.max(...distribution.map((d) => d.count), 1);
 
@@ -40,10 +38,7 @@ export function RatingChart({ distribution, average, resetKey }: RatingChartProp
           const pct = total > 0 ? Math.round((d.count / total) * 100) : 0;
           const barHeight = total > 0 ? (d.count / maxCount) * 120 : 0;
           return (
-            <div
-              key={`${resetKey ?? ""}:${d.score}`}
-              className="flex flex-col items-center gap-1"
-            >
+            <div key={d.score} className="flex flex-col items-center gap-1">
               <span className="text-xs font-bold text-foreground tabular-nums">{d.count}</span>
               <span className="text-[10px] font-semibold text-muted-foreground tabular-nums">
                 {pct}%

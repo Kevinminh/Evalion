@@ -1,3 +1,4 @@
+import { ExplanationCard } from "@workspace/evalion/components/live/explanation-card";
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 
 import { useStudentGame } from "./student-game-context";
@@ -9,29 +10,8 @@ export function Step5Explanation() {
   return (
     <div className="flex w-full flex-col items-center gap-4">
       <FasitBadge fasit={statement.fasit} />
-
-      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-primary/20 shadow-sm">
-        <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-5">
-          <p className="text-center text-base font-bold text-foreground">{statement.text}</p>
-        </div>
-
-        <div className="bg-white p-5">
-          <div className="flex gap-3">
-            <div className="size-12 shrink-0 overflow-hidden rounded-full border-2 border-primary/20">
-              <img
-                src="/professoren.png"
-                alt="Professoren"
-                className="size-full object-cover"
-              />
-            </div>
-            <div>
-              <div className="mb-2 text-xs font-bold uppercase tracking-wider text-primary/70">
-                Forklaring
-              </div>
-              <p className="text-sm leading-relaxed text-foreground/85">{statement.explanation}</p>
-            </div>
-          </div>
-        </div>
+      <div className="w-full max-w-md">
+        <ExplanationCard statementText={statement.text} explanation={statement.explanation} />
       </div>
     </div>
   );

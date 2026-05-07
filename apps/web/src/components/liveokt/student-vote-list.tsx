@@ -1,15 +1,21 @@
 import { VOTE_DOT_COLORS, VOTE_LABELS } from "@workspace/evalion/lib/constants";
 import { cn } from "@workspace/ui/lib/utils";
+import { useMemo } from "react";
 
 import { useTeacherSession } from "./teacher-session-context";
 
 export function StudentVoteList() {
   const { students, activeRoundVotes } = useTeacherSession();
 
+  const voteByStudent = useMemo(
+    () => new Map(activeRoundVotes.map((v) => [v.studentId, v])),
+    [activeRoundVotes],
+  );
+
   return (
     <div className="space-y-2">
       {students.map((s) => {
-        const studentVote = activeRoundVotes.find((v) => v.studentId === s._id);
+        const studentVote = voteByStudent.get(s._id);
         return (
           <div key={s._id} className="flex items-center gap-2 text-sm">
             <span

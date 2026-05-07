@@ -1,6 +1,6 @@
 import { BegrunnelseCard } from "@workspace/evalion/components/live/begrunnelse-card";
+import { ExplanationCard } from "@workspace/evalion/components/live/explanation-card";
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
-import { Professor } from "@workspace/evalion/components/live/professor";
 
 import type { TeacherStep } from "@/types/teacher-step";
 import { useTeacherSession } from "./teacher-session-context";
@@ -15,24 +15,15 @@ export function useStep5(): TeacherStep {
   const main = (
     <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 pt-8">
       {statement && <FasitBadge fasit={statement.fasit} />}
-      <div className="w-full max-h-[392px] overflow-y-auto rounded-2xl border border-primary/20 shadow-sm animate-[fadeInUp_0.5s_ease_0.2s_both]">
-        <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-6">
-          <p className="text-center text-lg font-bold text-foreground">{statement?.text}</p>
+      {statement && (
+        <div className="max-h-[392px] w-full overflow-y-auto animate-[fadeInUp_0.5s_ease_0.2s_both]">
+          <ExplanationCard
+            statementText={statement.text}
+            explanation={statement.explanation}
+            size="lg"
+          />
         </div>
-        <div className="bg-white p-6">
-          <div className="flex gap-4">
-            <Professor size="md" bordered className="shrink-0" />
-            <div>
-              <div className="mb-2 text-xs font-bold uppercase tracking-wider text-primary/70">
-                Forklaring
-              </div>
-              <p className="text-sm leading-relaxed text-foreground/85">
-                {statement?.explanation}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 

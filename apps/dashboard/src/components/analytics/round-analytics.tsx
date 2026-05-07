@@ -4,7 +4,7 @@ import { cn } from "@workspace/ui/lib/utils";
 
 import { ColumnChart } from "./column-chart";
 import { ConfidenceCircles } from "./confidence-circles";
-import { StudentMatrix } from "./student-matrix";
+import { MatrixHint, StudentMatrix } from "./student-matrix";
 import type { RoundDistribution, ConfidenceData, StudentData } from "./types";
 
 import type { Fasit } from "@/lib/types";
@@ -20,8 +20,6 @@ interface RoundAnalyticsProps {
   totalStudents: number;
   sessionActive: boolean;
   students: StudentData[];
-  wrongToRight?: number;
-  totalWrong?: number;
 }
 
 export function RoundAnalytics({
@@ -35,17 +33,15 @@ export function RoundAnalytics({
   totalStudents,
   sessionActive,
   students,
-  wrongToRight,
-  totalWrong,
 }: RoundAnalyticsProps) {
   const [showConfDetail, setShowConfDetail] = useState(false);
+  const [matrixSelected, setMatrixSelected] = useState<number | null>(null);
 
   const voteItems = [
     {
       label: "Sant",
       count: distribution.sant,
       pct: distribution.santPct,
-      colorClass: "bg-neutral-300",
       isCorrect: fasit === "sant",
       delta: prevDistribution
         ? { count: distribution.sant - prevDistribution.sant, pct: distribution.santPct - prevDistribution.santPct }
@@ -55,7 +51,6 @@ export function RoundAnalytics({
       label: "Delvis sant",
       count: distribution.delvis,
       pct: distribution.delvisPct,
-      colorClass: "bg-delvis",
       isCorrect: fasit === "delvis",
       delta: prevDistribution
         ? { count: distribution.delvis - prevDistribution.delvis, pct: distribution.delvisPct - prevDistribution.delvisPct }
@@ -65,7 +60,6 @@ export function RoundAnalytics({
       label: "Usant",
       count: distribution.usant,
       pct: distribution.usantPct,
-      colorClass: "bg-neutral-300",
       isCorrect: fasit === "usant",
       delta: prevDistribution
         ? { count: distribution.usant - prevDistribution.usant, pct: distribution.usantPct - prevDistribution.usantPct }
@@ -73,10 +67,8 @@ export function RoundAnalytics({
     },
   ];
 
-  const matrixCells = useMemo(
-    () => (round === 1 ? buildR1MatrixCells(students) : buildR2MatrixCells(students)),
-    [round, students],
-  );
+  const r1Cells = useMemo(() => buildR1MatrixCells(students), [students]);
+  const r2Cells = useMemo(() => buildR2MatrixCells(students), [students]);
 
   const { changedCount, changedPct } = useMemo(() => {
     const count = students.filter(
@@ -102,7 +94,7 @@ export function RoundAnalytics({
           {sessionActive && round === 1 ? (
             <div className="flex items-center gap-1.5 rounded-full bg-sant px-3 py-1 text-[9px] font-extrabold uppercase tracking-wider text-white">
               <span className="size-1.5 animate-pulse rounded-full bg-white" />
-              Avstemning aktiv
+              Avstemning pågår
             </div>
           ) : (
             <div className="rounded-full bg-neutral-500 px-3 py-1 text-[9px] font-extrabold uppercase tracking-wider text-white">
@@ -191,34 +183,40 @@ export function RoundAnalytics({
         <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
           <div className="px-3.5 py-2.5">
             <span className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">
-              Endring i standpunkt
+              Endringer
             </span>
           </div>
           <div className="px-3.5 pb-3.5">
-            <div className="flex flex-col items-center gap-0.5 py-1.5">
-              <span className="text-[40px] font-extrabold leading-none text-foreground">
-                {changedPct}%
+            <div className="flex flex-col items-center gap-1 rounded-xl bg-primary/5 px-4 py-3">
+              <span className="font-mono text-2xl font-extrabold leading-none text-primary tabular-nums">
+                {changedCount}/{totalStudents}
               </span>
-              <span className="text-xs font-semibold text-muted-foreground">
-                {changedCount} av {totalStudents} elever endret standpunkt
+              <span className="text-[11px] font-semibold text-muted-foreground">
+                har endret mening ({changedPct}%)
               </span>
             </div>
-            {wrongToRight !== undefined && totalWrong !== undefined && totalWrong > 0 && (
-              <div className="mt-1 flex items-center justify-center gap-1.5 rounded-[10px] bg-sant/10 px-2.5 py-1.5">
-                <span className="text-base font-extrabold text-sant tabular-nums">
-                  {wrongToRight}/{totalWrong}
-                </span>
-                <span className="text-[11px] font-semibold text-sant">
-                  endret fra feil til riktig svar (
-                  {Math.round((wrongToRight / totalWrong) * 100)}%)
-                </span>
-              </div>
-            )}
           </div>
         </div>
       )}
 
-      <StudentMatrix cells={matrixCells} />
+      {round === 1 ? (
+        <StudentMatrix
+          cells={r1Cells}
+          layout="r1"
+          selectedIdx={matrixSelected}
+          onSelect={setMatrixSelected}
+        />
+      ) : (
+        <StudentMatrix
+          cells={r2Cells}
+          title="Kategorier"
+          layout="r2"
+          selectedIdx={matrixSelected}
+          onSelect={setMatrixSelected}
+        />
+      )}
+
+      {matrixSelected === null && <MatrixHint />}
     </div>
   );
 }
@@ -247,11 +245,12 @@ function buildR1MatrixCells(students: StudentData[]) {
       begrunnelse: s.begrunnelseR1,
     }));
 
+  // Order matters: R1Matrix expects [riktigHoy, feilHoy, riktigLav, feilLav]
   return [
-    { label: "Riktig - Høy sikkerhet (4-5)", count: riktigHoy.length, colorClass: "bg-green-50", textClass: "text-green-900", students: mapStudents(riktigHoy) },
-    { label: "Riktig - Lav sikkerhet (1-3)", count: riktigLav.length, colorClass: "bg-yellow-50", textClass: "text-yellow-900", students: mapStudents(riktigLav) },
-    { label: "Feil - Høy sikkerhet (4-5)", count: feilHoy.length, colorClass: "bg-red-50", textClass: "text-red-900", students: mapStudents(feilHoy) },
-    { label: "Feil - Lav sikkerhet (1-3)", count: feilLav.length, colorClass: "bg-orange-50", textClass: "text-orange-900", students: mapStudents(feilLav) },
+    { label: "Riktig - Høy sikkerhet (4-5)", count: riktigHoy.length, students: mapStudents(riktigHoy) },
+    { label: "Feil - Høy sikkerhet (4-5)", count: feilHoy.length, students: mapStudents(feilHoy) },
+    { label: "Riktig - Lav sikkerhet (1-3)", count: riktigLav.length, students: mapStudents(riktigLav) },
+    { label: "Feil - Lav sikkerhet (1-3)", count: feilLav.length, students: mapStudents(feilLav) },
   ];
 }
 
@@ -283,9 +282,9 @@ function buildR2MatrixCells(students: StudentData[]) {
     }));
 
   return [
-    { label: "Endret til riktig", count: endretTilRiktig.length, colorClass: "bg-green-50", textClass: "text-green-900", students: mapStudents(endretTilRiktig) },
-    { label: "Endret fra riktig til feil", count: endretFraRiktig.length, colorClass: "bg-red-50", textClass: "text-red-900", students: mapStudents(endretFraRiktig) },
-    { label: "Endret, fortsatt feil", count: endretFortsattFeil.length, colorClass: "bg-orange-50", textClass: "text-orange-900", students: mapStudents(endretFortsattFeil) },
-    { label: "Uendret", count: uendret.length, colorClass: "bg-yellow-50", textClass: "text-yellow-900", students: mapStudents(uendret) },
+    { label: "Endret til riktig", count: endretTilRiktig.length, colorClass: "bg-sant/15", textClass: "text-sant", students: mapStudents(endretTilRiktig) },
+    { label: "Endret fra riktig til feil", count: endretFraRiktig.length, colorClass: "bg-usant/15", textClass: "text-usant", students: mapStudents(endretFraRiktig) },
+    { label: "Endret, fortsatt feil", count: endretFortsattFeil.length, colorClass: "bg-orange-100", textClass: "text-orange-800", students: mapStudents(endretFortsattFeil) },
+    { label: "Uendret", count: uendret.length, colorClass: "bg-yellow-100", textClass: "text-yellow-800", students: mapStudents(uendret) },
   ];
 }

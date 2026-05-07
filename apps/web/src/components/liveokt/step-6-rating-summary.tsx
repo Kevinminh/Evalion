@@ -32,9 +32,9 @@ export function useStep6(): TeacherStep {
 
   const panel = (
     <RatingChart
+      key={`s${selectedIdx}`}
       distribution={ratingDistribution}
       average={avgRating}
-      resetKey={`s${selectedIdx}`}
     />
   );
 

@@ -1,13 +1,12 @@
 import { VOTE_DOT_COLORS, VOTE_LABELS, LEVEL_CIRCLE_COLORS } from "@workspace/evalion/lib/constants";
 import type { Fasit } from "@workspace/evalion/lib/types";
 import { cn } from "@workspace/ui/lib/utils";
-import { useState } from "react";
 
 interface MatrixCell {
   label: string;
   count: number;
-  colorClass: string;
-  textClass: string;
+  colorClass?: string;
+  textClass?: string;
   students: Array<{
     name: string;
     vote: "sant" | "usant" | "delvis";
@@ -20,10 +19,21 @@ interface MatrixCell {
 interface StudentMatrixProps {
   cells: MatrixCell[];
   title?: string;
+  layout?: "r1" | "r2";
+  selectedIdx: number | null;
+  onSelect: (idx: number | null) => void;
 }
 
-export function StudentMatrix({ cells, title = "Elevkategorisering" }: StudentMatrixProps) {
-  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+export function StudentMatrix({
+  cells,
+  title = "Elevkategorisering",
+  layout = "r1",
+  selectedIdx,
+  onSelect,
+}: StudentMatrixProps) {
+  const selected = selectedIdx !== null ? cells[selectedIdx] : null;
+
+  const handleSelect = (i: number) => onSelect(selectedIdx === i ? null : i);
 
   return (
     <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
@@ -33,35 +43,19 @@ export function StudentMatrix({ cells, title = "Elevkategorisering" }: StudentMa
         </span>
       </div>
       <div className="px-3.5 pb-3.5">
-        <div className="grid grid-cols-2 gap-2">
-          {cells.map((cell, i) => (
-            <button
-              key={i}
-              onClick={() => setSelectedIdx(selectedIdx === i ? null : i)}
-              className={cn(
-                "flex flex-col items-center gap-0.5 rounded-[14px] p-3 text-center transition-all",
-                cell.colorClass,
-                selectedIdx === i && "ring-2 ring-primary ring-offset-1",
-              )}
-            >
-              <span className={cn("text-[11px] font-bold leading-tight", cell.textClass)}>
-                {cell.label}
-              </span>
-              <span className={cn("text-[22px] font-extrabold leading-none", cell.textClass)}>
-                {cell.count}
-              </span>
-            </button>
-          ))}
-        </div>
+        {layout === "r1" ? (
+          <R1Matrix cells={cells} selectedIdx={selectedIdx} onSelect={handleSelect} />
+        ) : (
+          <R2Matrix cells={cells} selectedIdx={selectedIdx} onSelect={handleSelect} />
+        )}
 
-        {/* Student list for selected category */}
-        {selectedIdx !== null && cells[selectedIdx] && (
+        {selected && (
           <div className="mt-3 border-t border-neutral-100 pt-2">
             <div className="pb-2 text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
-              {cells[selectedIdx]!.label} ({cells[selectedIdx]!.students.length})
+              {selected.label} ({selected.students.length})
             </div>
             <div className="flex flex-col">
-              {cells[selectedIdx]!.students.map((s, j) => (
+              {selected.students.map((s, j) => (
                 <div key={j} className="flex items-start gap-2.5 border-b border-neutral-100 py-2 last:border-b-0">
                   <div className="min-w-0 flex-1">
                     <div className="text-[13px] font-bold text-foreground">{s.name}</div>
@@ -105,6 +99,108 @@ export function StudentMatrix({ cells, title = "Elevkategorisering" }: StudentMa
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+export function MatrixHint() {
+  return (
+    <div className="flex justify-center">
+      <span className="rounded-2xl border border-primary/20 bg-primary/5 px-5 py-2.5 text-[12px] font-semibold text-primary/80">
+        Trykk på kategoriene for å se de individuelle elevbidragene
+      </span>
+    </div>
+  );
+}
+
+function R1Matrix({
+  cells,
+  selectedIdx,
+  onSelect,
+}: {
+  cells: MatrixCell[];
+  selectedIdx: number | null;
+  onSelect: (i: number) => void;
+}) {
+  // Expected order: [riktigHoy (0), feilHoy (1), riktigLav (2), feilLav (3)]
+  const cellAt = (i: number) => cells[i];
+  const cellButton = (i: number) => {
+    const c = cellAt(i);
+    if (!c) return null;
+    const isSelected = selectedIdx === i;
+    return (
+      <button
+        type="button"
+        onClick={() => onSelect(i)}
+        className={cn(
+          "flex w-full flex-col items-center justify-center rounded-xl border-2 px-3 py-2.5 text-center transition-all",
+          isSelected
+            ? "border-primary/40 bg-primary/10 ring-2 ring-primary/15"
+            : "border-neutral-200 bg-white hover:bg-neutral-50",
+        )}
+      >
+        <span className="text-base font-extrabold leading-tight text-foreground">{c.count} stk</span>
+      </button>
+    );
+  };
+
+  return (
+    <div
+      className="grid items-center gap-x-2 gap-y-2"
+      style={{ gridTemplateColumns: "auto 1fr 1fr" }}
+    >
+      <div />
+      <div className="text-center text-[11px] font-bold text-muted-foreground">Riktig standpunkt</div>
+      <div className="text-center text-[11px] font-bold text-muted-foreground">Feil standpunkt</div>
+
+      <div className="pr-2 text-right text-[11px] font-bold whitespace-nowrap text-muted-foreground">
+        Høy sikkerhet (4-5)
+      </div>
+      {cellButton(0)}
+      {cellButton(1)}
+
+      <div className="pr-2 text-right text-[11px] font-bold whitespace-nowrap text-muted-foreground">
+        Lav sikkerhet (1-3)
+      </div>
+      {cellButton(2)}
+      {cellButton(3)}
+    </div>
+  );
+}
+
+function R2Matrix({
+  cells,
+  selectedIdx,
+  onSelect,
+}: {
+  cells: MatrixCell[];
+  selectedIdx: number | null;
+  onSelect: (i: number) => void;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {cells.map((cell, i) => {
+        const isSelected = selectedIdx === i;
+        return (
+          <button
+            key={i}
+            type="button"
+            onClick={() => onSelect(i)}
+            className={cn(
+              "flex flex-col items-center gap-0.5 rounded-[14px] border-2 border-transparent p-3 text-center transition-all",
+              cell.colorClass,
+              isSelected && "border-primary/40 ring-2 ring-primary/15",
+            )}
+          >
+            <span className={cn("text-[11px] font-bold leading-tight", cell.textClass)}>
+              {cell.label}
+            </span>
+            <span className={cn("text-[22px] font-extrabold leading-none", cell.textClass)}>
+              {cell.count}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }

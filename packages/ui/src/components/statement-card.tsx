@@ -1,25 +1,59 @@
 import { cn } from "@workspace/ui/lib/utils";
+import type { CSSProperties } from "react";
+
+interface StatementColor {
+  bg: string;
+  border: string;
+  text: string;
+}
 
 interface StatementCardProps {
   statement: { text: string };
   size?: "sm" | "lg";
+  color?: StatementColor;
+  /** If true, render bg as a 135° gradient (for the teacher's large card). */
+  gradient?: boolean;
   className?: string;
 }
 
-export function StatementCard({ statement, size = "sm", className }: StatementCardProps) {
+export function StatementCard({
+  statement,
+  size = "sm",
+  color,
+  gradient,
+  className,
+}: StatementCardProps) {
+  const cardStyle: CSSProperties | undefined = color
+    ? {
+        background: gradient
+          ? `linear-gradient(135deg, ${color.bg}, color-mix(in srgb, ${color.bg} 70%, #ffffff))`
+          : color.bg,
+        borderColor: color.border,
+      }
+    : undefined;
+
+  const textStyle: CSSProperties | undefined = color ? { color: color.text } : undefined;
+
+  const isLg = size === "lg";
+  const hasColor = !!color;
+
   return (
     <div
       className={cn(
-        "mx-auto w-full rounded-2xl border-[1.5px] border-blue-200 bg-blue-50",
-        size === "lg" ? "max-w-2xl p-6" : "max-w-md p-5",
+        "mx-auto w-full rounded-2xl",
+        hasColor ? "border-2" : "border-[1.5px] border-blue-200 bg-blue-50",
+        isLg ? (hasColor ? "max-w-3xl px-10 py-8" : "max-w-2xl p-6") : "max-w-md p-5",
         className,
       )}
+      style={cardStyle}
     >
       <p
         className={cn(
-          "text-center font-bold text-foreground",
-          size === "lg" ? "text-lg" : "text-base",
+          "text-center font-bold",
+          !hasColor && "text-foreground",
+          isLg ? (hasColor ? "text-2xl leading-relaxed" : "text-lg") : "text-base",
         )}
+        style={textStyle}
       >
         {statement.text}
       </p>
