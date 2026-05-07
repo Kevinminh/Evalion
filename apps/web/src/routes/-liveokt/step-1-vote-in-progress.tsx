@@ -6,11 +6,8 @@ import { TimerCard } from "@workspace/evalion/components/live/timer-card";
 import { Users } from "lucide-react";
 import type { ReactNode } from "react";
 
-interface VoteBar {
-  label: string;
-  value: number;
-  color: string;
-}
+import type { TimerControls } from "@/lib/use-timer-controls";
+import type { VoteBar } from "@/lib/vote-bars";
 
 interface Step1MainProps {
   statementCard: ReactNode;
@@ -42,38 +39,13 @@ interface Step1PanelProps {
   studentVoteList: ReactNode;
   voteBars: VoteBar[];
   totalVotes: number;
-  timerDuration: number | undefined;
-  timerStartedAt: number | undefined;
-  timerPausedAt: number | undefined;
-  timerRemainingAtPause: number | undefined;
-  onTimerStart: (duration: number) => void;
-  onTimerPause: () => void;
-  onTimerStop: () => void;
+  timer: TimerControls;
 }
 
-export function Step1Panel({
-  studentVoteList,
-  voteBars,
-  totalVotes,
-  timerDuration,
-  timerStartedAt,
-  timerPausedAt,
-  timerRemainingAtPause,
-  onTimerStart,
-  onTimerPause,
-  onTimerStop,
-}: Step1PanelProps) {
+export function Step1Panel({ studentVoteList, voteBars, totalVotes, timer }: Step1PanelProps) {
   return (
     <div className="space-y-4">
-      <TimerCard
-        duration={timerDuration}
-        startedAt={timerStartedAt}
-        pausedAt={timerPausedAt}
-        remainingAtPause={timerRemainingAtPause}
-        onStart={onTimerStart}
-        onPause={onTimerPause}
-        onStop={onTimerStop}
-      />
+      <TimerCard {...timer} />
       <div className="h-px bg-border" />
       {studentVoteList}
       <div className="h-px bg-border" />

@@ -8,11 +8,8 @@ import { TimerCard } from "@workspace/evalion/components/live/timer-card";
 import { cn } from "@workspace/ui/lib/utils";
 import type { ReactNode } from "react";
 
-interface VoteBar {
-  label: string;
-  value: number;
-  color: string;
-}
+import type { TimerControls } from "@/lib/use-timer-controls";
+import type { VoteBar } from "@/lib/vote-bars";
 
 type Begrunnelse = Doc<"sessionBegrunnelser">;
 type Student = Doc<"sessionStudents">;
@@ -44,13 +41,7 @@ interface Step2PanelProps {
   studentVoteList: ReactNode;
   voteBars: VoteBar[];
   totalVotes: number;
-  timerDuration: number | undefined;
-  timerStartedAt: number | undefined;
-  timerPausedAt: number | undefined;
-  timerRemainingAtPause: number | undefined;
-  onTimerStart: (duration: number) => void;
-  onTimerPause: () => void;
-  onTimerStop: () => void;
+  timer: TimerControls;
 }
 
 export function Step2Panel({
@@ -64,13 +55,7 @@ export function Step2Panel({
   studentVoteList,
   voteBars,
   totalVotes,
-  timerDuration,
-  timerStartedAt,
-  timerPausedAt,
-  timerRemainingAtPause,
-  onTimerStart,
-  onTimerPause,
-  onTimerStop,
+  timer,
 }: Step2PanelProps) {
   const begrunnelseTab = panelTab === "default" || panelTab === "begrunnelser";
   return (
@@ -84,15 +69,7 @@ export function Step2Panel({
     >
       {begrunnelseTab ? (
         <div className="space-y-4">
-          <TimerCard
-            duration={timerDuration}
-            startedAt={timerStartedAt}
-            pausedAt={timerPausedAt}
-            remainingAtPause={timerRemainingAtPause}
-            onStart={onTimerStart}
-            onPause={onTimerPause}
-            onStop={onTimerStop}
-          />
+          <TimerCard {...timer} />
           {!begrunnelser || begrunnelser.length === 0 ? (
             <p className="text-xs italic text-muted-foreground">Ingen begrunnelser ennå</p>
           ) : (

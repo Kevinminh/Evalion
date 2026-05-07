@@ -14,6 +14,7 @@ import type { Id } from "@/lib/convex";
 import { useBegrunnelseDraft } from "@/lib/use-begrunnelse-draft";
 import { useStep4Countdown } from "@/lib/use-step4-countdown";
 
+import { LeaveConfirmDialog } from "./-spill/leave-confirm-dialog";
 import { StudentAvatar } from "./-spill/student-avatar";
 import { StudentTopbar } from "./-spill/student-topbar";
 import { Step0Waiting } from "./-spill/step-0-waiting";
@@ -310,31 +311,11 @@ function StudentGamePage() {
         {renderContent()}
       </div>
 
-      {/* Leave confirmation overlay */}
-      {showLeaveConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="mx-4 w-full max-w-sm rounded-2xl bg-card p-6 shadow-xl">
-            <h2 className="text-lg font-bold text-foreground">Forlat spill?</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Er du sikker på at du vil forlate spillet?
-            </p>
-            <div className="mt-5 flex gap-3">
-              <button
-                onClick={() => setShowLeaveConfirm(false)}
-                className="flex-1 rounded-xl border border-border px-4 py-2.5 text-sm font-bold text-foreground transition-colors hover:bg-muted"
-              >
-                Avbryt
-              </button>
-              <button
-                onClick={handleLeave}
-                className="flex-1 rounded-xl bg-destructive px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-destructive/90"
-              >
-                Ja, forlat
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <LeaveConfirmDialog
+        open={showLeaveConfirm}
+        onCancel={() => setShowLeaveConfirm(false)}
+        onConfirm={handleLeave}
+      />
     </div>
   );
 }

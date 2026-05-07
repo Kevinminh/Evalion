@@ -8,6 +8,8 @@ import { Professor } from "@workspace/evalion/components/live/professor";
 import { FASIT_TEXT } from "@workspace/evalion/lib/constants";
 import type { ReactNode } from "react";
 
+import { buildVoteBars } from "@/lib/vote-bars";
+
 type Statement = Doc<"fagprats">["statements"][number];
 
 interface Step4MainProps {
@@ -84,26 +86,7 @@ export function Step4Panel({
         />
       ) : (
         <div className="space-y-4">
-          <DistributionChart
-            bars={[
-              {
-                label: "Sant",
-                value: r2Votes.filter((v) => v.vote === "sant").length,
-                color: "bg-sant",
-              },
-              {
-                label: "Usant",
-                value: r2Votes.filter((v) => v.vote === "usant").length,
-                color: "bg-usant",
-              },
-              {
-                label: "Delvis",
-                value: r2Votes.filter((v) => v.vote === "delvis").length,
-                color: "bg-delvis",
-              },
-            ]}
-            total={r2Total}
-          />
+          <DistributionChart bars={buildVoteBars(r2Votes)} total={r2Total} />
         </div>
       )}
     </PanelTabs>

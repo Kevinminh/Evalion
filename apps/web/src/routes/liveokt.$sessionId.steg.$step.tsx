@@ -20,11 +20,14 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { LiveStepSkeleton } from "@workspace/evalion/components/skeletons/live-step-skeleton";
+import { StatementCard } from "@workspace/ui/components/statement-card";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 import { DASHBOARD_URL } from "@/lib/env";
 import { COUNTDOWN_STEP_MS } from "@/lib/timings";
 import { useStep4Countdown } from "@/lib/use-step4-countdown";
+import { useTimerControls } from "@/lib/use-timer-controls";
+import { buildVoteBars } from "@/lib/vote-bars";
 import { Step1Main, Step1Panel } from "./-liveokt/step-1-vote-in-progress";
 import { Step2Main, Step2Panel } from "./-liveokt/step-2-group-discussion";
 import { Step3Main, Step3Panel } from "./-liveokt/step-3-revote";
@@ -60,10 +63,9 @@ function LiveStepPage() {
 
   const updateStepMutation = useMutation(api.liveSessions.updateStep);
   const endSessionMutation = useMutation(api.liveSessions.end);
-  const startTimerMutation = useMutation(api.liveSessions.startTimer);
-  const pauseTimerMutation = useMutation(api.liveSessions.pauseTimer);
-  const stopTimerMutation = useMutation(api.liveSessions.stopTimer);
   const highlightBegrunnelseMutation = useMutation(api.liveSessions.highlightBegrunnelse);
+
+  const timer = useTimerControls(typedSessionId, session);
 
   const [selectedStatement, setSelectedStatement] = useState<number | null>(null);
   // vote and rating state not needed — teacher doesn't interact with student UI
@@ -83,11 +85,6 @@ function LiveStepPage() {
   const { data: votes } = useQuery({
     ...liveSessionQueries.getVotes(typedSessionId, selectedIdx),
     enabled: !!fagprat,
-  });
-
-  const { data: ratings } = useQuery({
-    ...liveSessionQueries.getRatings(typedSessionId, selectedIdx),
-    enabled: !!fagprat && step === 6,
   });
 
   const { data: analytics } = useQuery({
@@ -174,70 +171,34 @@ function LiveStepPage() {
 
   const studentList = students ?? [];
   const voteList = votes ?? [];
-  const ratingList = ratings ?? [];
 
-  // Memoized vote filtering and distribution
+  // Filter votes by round for current view
   const { r2Votes, activeRoundVotes, voteBars, totalVotes } = useMemo(() => {
     const r1: typeof voteList = [];
     const r2: typeof voteList = [];
-    const counts = { sant: 0, usant: 0, delvis: 0 };
-
     for (const v of voteList) {
       if (v.round === 1) r1.push(v);
       else if (v.round === 2) r2.push(v);
     }
-
     const active = step <= 2 ? r1 : r2;
-    for (const v of active) counts[v.vote]++;
-
     return {
       r2Votes: r2,
       activeRoundVotes: active,
       totalVotes: active.length,
-      voteBars: [
-        { label: "Sant", value: counts.sant, color: "bg-sant" },
-        { label: "Usant", value: counts.usant, color: "bg-usant" },
-        { label: "Delvis", value: counts.delvis, color: "bg-delvis" },
-      ],
+      voteBars: buildVoteBars(active),
     };
   }, [voteList, step]);
 
-  // Memoized analytics — prefer backend query, fallback to client-side
-  const { r2CorrectCount, r2Total, changedToCorrect, changedToIncorrect, ratingDistribution, avgRating } = useMemo(() => {
-    const r2Correct = analytics?.correctR2 ?? (statement ? r2Votes.filter((v) => v.vote === statement.fasit).length : 0);
-    const r2Tot = analytics?.totalR2 ?? r2Votes.length;
+  // Analytics — server-first; fields default to 0/empty when no analytics yet
+  const r2CorrectCount = analytics?.correctR2 ?? 0;
+  const r2Total = analytics?.totalR2 ?? 0;
+  const changedToCorrect = analytics?.wrongToRight ?? 0;
+  const changedToIncorrect = analytics?.rightToWrong ?? 0;
+  const ratingDistribution =
+    analytics?.ratingDistribution ?? [1, 2, 3, 4, 5].map((score) => ({ score, count: 0 }));
+  const avgRating = analytics && analytics.avgRating > 0 ? analytics.avgRating : undefined;
 
-    // Rating distribution — single-pass fallback
-    let ratDist = analytics?.ratingDistribution;
-    if (!ratDist) {
-      const buckets = [0, 0, 0, 0, 0];
-      for (const r of ratingList) {
-        if (r.rating >= 1 && r.rating <= 5) buckets[r.rating - 1]!++;
-      }
-      ratDist = [1, 2, 3, 4, 5].map((score) => ({ score, count: buckets[score - 1]! }));
-    }
-
-    const avg = analytics?.avgRating !== undefined && analytics.avgRating > 0
-      ? analytics.avgRating
-      : ratingList.length > 0
-        ? ratingList.reduce((sum, r) => sum + r.rating, 0) / ratingList.length
-        : undefined;
-
-    return {
-      r2CorrectCount: r2Correct,
-      r2Total: r2Tot,
-      changedToCorrect: analytics?.wrongToRight ?? 0,
-      changedToIncorrect: analytics?.rightToWrong ?? 0,
-      ratingDistribution: ratDist,
-      avgRating: avg,
-    };
-  }, [analytics, statement, r2Votes, ratingList]);
-
-  const statementCard = (
-    <div className="mx-auto max-w-2xl rounded-2xl border-[1.5px] border-blue-200 bg-blue-50 p-6">
-      <p className="text-center text-lg font-bold text-foreground">{statement?.text}</p>
-    </div>
-  );
+  const statementCard = statement ? <StatementCard statement={statement} size="lg" /> : null;
 
   const studentVoteList = (
     <div className="space-y-2">
@@ -382,13 +343,7 @@ function LiveStepPage() {
             studentVoteList={studentVoteList}
             voteBars={voteBars}
             totalVotes={totalVotes}
-            timerDuration={session?.timerDuration}
-            timerStartedAt={session?.timerStartedAt}
-            timerPausedAt={session?.timerPausedAt}
-            timerRemainingAtPause={session?.timerRemainingAtPause}
-            onTimerStart={(d) => startTimerMutation({ id: typedSessionId, duration: d })}
-            onTimerPause={() => pauseTimerMutation({ id: typedSessionId })}
-            onTimerStop={() => stopTimerMutation({ id: typedSessionId })}
+            timer={timer}
           />
         );
 
@@ -407,13 +362,7 @@ function LiveStepPage() {
             studentVoteList={studentVoteList}
             voteBars={voteBars}
             totalVotes={totalVotes}
-            timerDuration={session?.timerDuration}
-            timerStartedAt={session?.timerStartedAt}
-            timerPausedAt={session?.timerPausedAt}
-            timerRemainingAtPause={session?.timerRemainingAtPause}
-            onTimerStart={(d) => startTimerMutation({ id: typedSessionId, duration: d })}
-            onTimerPause={() => pauseTimerMutation({ id: typedSessionId })}
-            onTimerStop={() => stopTimerMutation({ id: typedSessionId })}
+            timer={timer}
           />
         );
 
@@ -423,13 +372,7 @@ function LiveStepPage() {
             studentVoteList={studentVoteList}
             voteBars={voteBars}
             totalVotes={totalVotes}
-            timerDuration={session?.timerDuration}
-            timerStartedAt={session?.timerStartedAt}
-            timerPausedAt={session?.timerPausedAt}
-            timerRemainingAtPause={session?.timerRemainingAtPause}
-            onTimerStart={(d) => startTimerMutation({ id: typedSessionId, duration: d })}
-            onTimerPause={() => pauseTimerMutation({ id: typedSessionId })}
-            onTimerStop={() => stopTimerMutation({ id: typedSessionId })}
+            timer={timer}
           />
         );
 
