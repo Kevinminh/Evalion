@@ -1,7 +1,7 @@
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { cn } from "@workspace/ui/lib/utils";
 
-import { RecordingDisclaimer } from "./recording-disclaimer";
+import { RecordingDisclaimer } from "@workspace/ui/components/recording-disclaimer";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { useStudentGame } from "./student-game-context";
 

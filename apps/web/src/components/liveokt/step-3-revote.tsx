@@ -6,10 +6,10 @@ import { StatementCard } from "@workspace/ui/components/statement-card";
 import { Users } from "lucide-react";
 
 import { StudentVoteList } from "./student-vote-list";
-import type { TeacherStep } from "./teacher-step";
+import type { TeacherStep } from "@/types/teacher-step";
 import { useTeacherSession } from "./teacher-session-context";
 
-export function useStep1(): TeacherStep {
+export function useStep3(): TeacherStep {
   const {
     statement,
     students,
@@ -30,10 +30,7 @@ export function useStep1(): TeacherStep {
         </div>
       </div>
       {statement && <StatementCard statement={statement} size="lg" />}
-      <Professor
-        size="md"
-        text="Stem uten å avsløre for de andre, og skriv gjerne ned hva du tenker. Hvor sikker er du?"
-      />
+      <Professor size="md" text="Har du endret mening etter diskusjonen? Stem på nytt!" />
     </div>
   );
 

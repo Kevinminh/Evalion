@@ -3,9 +3,9 @@ import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { toast } from "sonner";
 
 import { StatementCard } from "@workspace/ui/components/statement-card";
-import { RatingScale } from "./rating-scale";
+import { RatingScale } from "@workspace/ui/components/rating-scale";
 import { useStudentGame } from "./student-game-context";
-import { SubmitButton } from "./submit-button";
+import { SubmitButton } from "@workspace/ui/components/submit-button";
 import { WaitingScreen } from "./waiting-screen";
 
 export function Step6Rating() {

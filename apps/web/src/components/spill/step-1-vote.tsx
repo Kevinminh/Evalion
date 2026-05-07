@@ -2,15 +2,24 @@ import { useState } from "react";
 import type { Fasit } from "@workspace/evalion/lib/types";
 import { toast } from "sonner";
 
-import { RatingScale } from "./rating-scale";
+import { useBegrunnelseDraft } from "@/hooks/use-begrunnelse-draft";
+
+import { RatingScale } from "@workspace/ui/components/rating-scale";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { useStudentGame } from "./student-game-context";
-import { SubmitButton } from "./submit-button";
+import { SubmitButton } from "@workspace/ui/components/submit-button";
 import { VoteOptions } from "./vote-options";
 import { WaitingScreen } from "./waiting-screen";
 
-export function Step3Revote() {
-  const { statement, hasVoted, castVote } = useStudentGame();
+export function Step1Vote() {
+  const { statement, hasVoted, session, student, statementIndex, castVote, submitBegrunnelse } =
+    useStudentGame();
+  const {
+    text: begrunnelseText,
+    setText: setBegrunnelseText,
+    clear: clearBegrunnelseDraft,
+  } = useBegrunnelseDraft(session._id, student._id, statementIndex);
+
   const [selectedVote, setSelectedVote] = useState<Fasit | null>(null);
   const [selectedConfidence, setSelectedConfidence] = useState<number | null>(null);
   const [sent, setSent] = useState(false);
@@ -25,8 +34,13 @@ export function Step3Revote() {
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setSent(true);
+    const trimmed = begrunnelseText.trim();
     try {
-      await castVote({ vote: selectedVote!, confidence: selectedConfidence! });
+      await Promise.all([
+        castVote({ vote: selectedVote!, confidence: selectedConfidence! }),
+        trimmed ? submitBegrunnelse({ text: trimmed }) : Promise.resolve(),
+      ]);
+      if (trimmed) clearBegrunnelseDraft();
     } catch {
       setSent(false);
       toast.error("Svaret ble ikke sendt. Prøv igjen.");
@@ -43,8 +57,19 @@ export function Step3Revote() {
       </div>
 
       <div className="w-full max-w-md space-y-2">
-        <p className="text-center text-sm font-bold text-foreground">Hvor sikker er du nå?</p>
+        <p className="text-center text-sm font-bold text-foreground">Hvor sikker er du?</p>
         <RatingScale selected={selectedConfidence} onSelect={setSelectedConfidence} />
+      </div>
+
+      <div className="w-full max-w-md space-y-2">
+        <p className="text-center text-sm font-bold text-foreground">Begrunn svaret ditt</p>
+        <textarea
+          value={begrunnelseText}
+          onChange={(e) => setBegrunnelseText(e.target.value)}
+          placeholder="Skriv din begrunnelse her..."
+          className="w-full rounded-xl border-[1.5px] border-neutral-300 bg-white px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary focus:ring-2 focus:ring-primary/20"
+          rows={3}
+        />
       </div>
 
       <SubmitButton sent={sent} disabled={!canSubmit} onClick={handleSubmit} />

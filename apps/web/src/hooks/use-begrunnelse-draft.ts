@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import type { Id } from "./convex";
+import type { Id } from "@/lib/convex";
 
 export function useBegrunnelseDraft(
   sessionId: Id<"liveSessions"> | undefined,

@@ -5,7 +5,7 @@ import { createContext, useContext, useMemo, type ReactNode } from "react";
 
 import { api } from "@/lib/convex";
 
-import { phaseFromSession, phaseRound, type StudentPhase } from "./student-phase";
+import { phaseFromSession, phaseRound, type StudentPhase } from "@/types/student-phase";
 
 export interface StudentGameValue {
   session: Doc<"liveSessions">;

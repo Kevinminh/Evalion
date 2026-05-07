@@ -9,7 +9,7 @@ import { StatementCard } from "@workspace/ui/components/statement-card";
 
 import { buildVoteBars } from "@/lib/vote-bars";
 
-import type { TeacherStep } from "./teacher-step";
+import type { TeacherStep } from "@/types/teacher-step";
 import { useTeacherSession } from "./teacher-session-context";
 
 interface Step4Args {

@@ -2,7 +2,7 @@ import { BegrunnelseCard } from "@workspace/evalion/components/live/begrunnelse-
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { Professor } from "@workspace/evalion/components/live/professor";
 
-import type { TeacherStep } from "./teacher-step";
+import type { TeacherStep } from "@/types/teacher-step";
 import { useTeacherSession } from "./teacher-session-context";
 
 export function useStep5(): TeacherStep {

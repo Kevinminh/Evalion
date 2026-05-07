@@ -11,14 +11,14 @@ import {
 } from "react";
 
 import type { Id } from "@/lib/convex";
-import type { TimerControls } from "@/lib/use-timer-controls";
-import { useTimerControls } from "@/lib/use-timer-controls";
+import type { TimerControls } from "@/hooks/use-timer-controls";
+import { useTimerControls } from "@/hooks/use-timer-controls";
 
-import { usePanelState } from "./hooks/use-panel-state";
-import { useRatingStats, type RatingStats } from "./hooks/use-rating-stats";
-import { useRecording, type RecordingState } from "./hooks/use-recording";
-import { useSessionMutations, type SessionMutations } from "./hooks/use-session-mutations";
-import { useVoteAnalysis, type VoteAnalysis } from "./hooks/use-vote-analysis";
+import { usePanelState } from "@/hooks/liveokt/use-panel-state";
+import { useRatingStats, type RatingStats } from "@/hooks/liveokt/use-rating-stats";
+import { useRecording, type RecordingState } from "@/hooks/liveokt/use-recording";
+import { useSessionMutations, type SessionMutations } from "@/hooks/liveokt/use-session-mutations";
+import { useVoteAnalysis, type VoteAnalysis } from "@/hooks/liveokt/use-vote-analysis";
 
 type Statement = Doc<"fagprats">["statements"][number];
 

@@ -1,6 +1,6 @@
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 
-import { useStep4Countdown } from "@/lib/use-step4-countdown";
+import { useStep4Countdown } from "@/hooks/use-step4-countdown";
 
 import { Step0Waiting } from "./step-0-waiting";
 import { Step1Vote } from "./step-1-vote";
@@ -10,7 +10,7 @@ import { Step4Reveal } from "./step-4-reveal";
 import { Step5Explanation } from "./step-5-explanation";
 import { Step6Rating } from "./step-6-rating";
 import { useStudentGame } from "./student-game-context";
-import { phaseStepNumber } from "./student-phase";
+import { phaseStepNumber } from "@/types/student-phase";
 
 export function StudentStepRenderer() {
   const { phase } = useStudentGame();

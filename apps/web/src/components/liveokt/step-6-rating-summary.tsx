@@ -4,9 +4,9 @@ import { RatingChart } from "@workspace/evalion/components/live/rating-chart-liv
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { ArrowRight } from "lucide-react";
 
-import { DestructiveButton } from "./destructive-button";
-import { PrimaryActionButton } from "./primary-action-button";
-import type { TeacherStep } from "./teacher-step";
+import { DestructiveButton } from "@workspace/ui/components/destructive-button";
+import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
+import type { TeacherStep } from "@/types/teacher-step";
 import { useTeacherSession } from "./teacher-session-context";
 
 export function useStep6(): TeacherStep {

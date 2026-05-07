@@ -11,12 +11,12 @@ import { toast } from "sonner";
 import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import { parseStudentId, placeholderConvexId } from "@/lib/route-params";
 
-import { EmptyStateMessage } from "./-shared/empty-state-message";
-import { StudentAvatar } from "./-spill/student-avatar";
-import { StudentGameProvider, useStudentGame } from "./-spill/student-game-context";
-import { phaseStepNumber } from "./-spill/student-phase";
-import { StudentStepRenderer } from "./-spill/student-step-renderer";
-import { StudentTopbar } from "./-spill/student-topbar";
+import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
+import { StudentAvatar } from "@workspace/ui/components/student-avatar";
+import { StudentGameProvider, useStudentGame } from "@/components/spill/student-game-context";
+import { phaseStepNumber } from "@/types/student-phase";
+import { StudentStepRenderer } from "@/components/spill/student-step-renderer";
+import { StudentTopbar } from "@/components/spill/student-topbar";
 
 export const Route = createFileRoute("/spill/$studentId")({
   beforeLoad: ({ params }) => {

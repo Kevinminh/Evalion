@@ -11,24 +11,24 @@ import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import { cssVars } from "@/lib/css-vars";
 import { DASHBOARD_URL } from "@/lib/env";
 import { parseSessionId, placeholderConvexId } from "@/lib/route-params";
-import { useStep4Countdown } from "@/lib/use-step4-countdown";
+import { useStep4Countdown } from "@/hooks/use-step4-countdown";
 
-import { EmptyStateMessage } from "./-shared/empty-state-message";
-import { DestructiveButton } from "./-liveokt/destructive-button";
-import { PrimaryActionButton } from "./-liveokt/primary-action-button";
-import { RecordingButton } from "./-liveokt/recording-button";
-import { StatementPicker } from "./-liveokt/statement-picker";
-import { useStep1 } from "./-liveokt/step-1-vote-in-progress";
-import { useStep2 } from "./-liveokt/step-2-group-discussion";
-import { useStep3 } from "./-liveokt/step-3-revote";
-import { useStep4 } from "./-liveokt/step-4-reveal";
-import { useStep5 } from "./-liveokt/step-5-distribution";
-import { useStep6 } from "./-liveokt/step-6-rating-summary";
+import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
+import { DestructiveButton } from "@workspace/ui/components/destructive-button";
+import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
+import { RecordingButton } from "@/components/liveokt/recording-button";
+import { StatementPicker } from "@/components/liveokt/statement-picker";
+import { useStep1 } from "@/components/liveokt/step-1-vote-in-progress";
+import { useStep2 } from "@/components/liveokt/step-2-group-discussion";
+import { useStep3 } from "@/components/liveokt/step-3-revote";
+import { useStep4 } from "@/components/liveokt/step-4-reveal";
+import { useStep5 } from "@/components/liveokt/step-5-distribution";
+import { useStep6 } from "@/components/liveokt/step-6-rating-summary";
 import {
   TeacherSessionProvider,
   useTeacherSession,
-} from "./-liveokt/teacher-session-context";
-import type { TeacherStep } from "./-liveokt/teacher-step";
+} from "@/components/liveokt/teacher-session-context";
+import type { TeacherStep } from "@/types/teacher-step";
 
 export const Route = createFileRoute("/liveokt/$sessionId/steg/$step")({
   beforeLoad: ({ params }) => {

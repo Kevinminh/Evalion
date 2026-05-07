@@ -2,8 +2,8 @@ import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { useCallback, useMemo } from "react";
 
-import { api } from "./convex";
-import type { Id } from "./convex";
+import { api } from "@/lib/convex";
+import type { Id } from "@/lib/convex";
 
 export interface TimerControls {
   duration: number | undefined;

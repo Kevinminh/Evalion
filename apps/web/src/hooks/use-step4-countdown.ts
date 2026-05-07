@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { COUNTDOWN_STEP_MS, COUNTDOWN_TOTAL_MS } from "./timings";
+import { COUNTDOWN_STEP_MS, COUNTDOWN_TOTAL_MS } from "@/lib/timings";
 
 export function useStep4Countdown(currentStep: number | undefined) {
   const [showCountdown, setShowCountdown] = useState(false);

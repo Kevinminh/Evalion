@@ -9,7 +9,7 @@ import { StatementCard } from "@workspace/ui/components/statement-card";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { StudentVoteList } from "./student-vote-list";
-import type { TeacherStep } from "./teacher-step";
+import type { TeacherStep } from "@/types/teacher-step";
 import { useTeacherSession } from "./teacher-session-context";
 
 function HighlightedBegrunnelse({

@@ -10,12 +10,12 @@ import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import { DASHBOARD_URL } from "@/lib/env";
 import { parseSessionId, placeholderConvexId } from "@/lib/route-params";
 
-import { EmptyStateMessage } from "./-shared/empty-state-message";
-import { DestructiveButton } from "./-liveokt/destructive-button";
-import { JoinCard } from "./-liveokt/lobby/join-card";
-import { StudentGrid } from "./-liveokt/lobby/student-grid";
-import { useLobbyActions } from "./-liveokt/lobby/use-lobby-actions";
-import { PrimaryActionButton } from "./-liveokt/primary-action-button";
+import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
+import { DestructiveButton } from "@workspace/ui/components/destructive-button";
+import { JoinCard } from "@/components/liveokt/lobby/join-card";
+import { StudentGrid } from "@/components/liveokt/lobby/student-grid";
+import { useLobbyActions } from "@/hooks/liveokt/use-lobby-actions";
+import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
 
 export const Route = createFileRoute("/liveokt/$sessionId/")({
   beforeLoad: ({ params }) => {

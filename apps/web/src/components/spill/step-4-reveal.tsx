@@ -3,7 +3,7 @@ import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { FASIT_TEXT } from "@workspace/evalion/lib/constants";
 
-import { RecordingDisclaimer } from "./recording-disclaimer";
+import { RecordingDisclaimer } from "@workspace/ui/components/recording-disclaimer";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { useStudentGame } from "./student-game-context";
 

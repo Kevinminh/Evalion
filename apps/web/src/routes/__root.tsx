@@ -14,7 +14,7 @@ import { Toaster } from "@workspace/ui/components/sonner";
 
 import { authClient } from "@/lib/auth-client";
 import { getToken } from "@/lib/auth-server";
-import { ClearAuthForGuests } from "@/lib/clear-auth-for-guests";
+import { ClearAuthForGuests } from "@/components/clear-auth-for-guests";
 
 import appCss from "@workspace/ui/globals.css?url";
 
