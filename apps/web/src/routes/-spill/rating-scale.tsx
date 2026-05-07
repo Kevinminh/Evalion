@@ -22,6 +22,7 @@ interface RatingScaleProps {
   onSelect: (value: number) => void;
   variant?: "confidence" | "rating";
   disabled?: boolean;
+  className?: string;
 }
 
 export function RatingScale({
@@ -29,9 +30,10 @@ export function RatingScale({
   onSelect,
   variant = "confidence",
   disabled,
+  className,
 }: RatingScaleProps) {
   return (
-    <div className="flex gap-2">
+    <div className={cn("flex gap-2", className)}>
       {SCALE_VALUES.map((n) => {
         const isSelected = selected === n;
         const selectedClass =

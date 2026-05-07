@@ -44,9 +44,12 @@ export function Step6Rating() {
 
         <div className="flex items-center gap-2">
           <span className="shrink-0 text-xs font-semibold text-muted-foreground">Forstår ikke</span>
-          <div className="flex-1">
-            <RatingScale variant="rating" selected={selected} onSelect={setSelected} />
-          </div>
+          <RatingScale
+            variant="rating"
+            selected={selected}
+            onSelect={setSelected}
+            className="flex-1"
+          />
           <span className="shrink-0 text-xs font-semibold text-muted-foreground">Forstår godt</span>
         </div>
       </div>

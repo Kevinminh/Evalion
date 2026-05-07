@@ -1,5 +1,14 @@
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
+} from "react";
 
 import type { Id } from "@/lib/convex";
 import type { TimerControls } from "@/lib/use-timer-controls";
@@ -35,7 +44,7 @@ export interface TeacherSessionValue
   panelTab: string;
   setPanelTab: (s: string) => void;
   begrunnelseIdx: number;
-  setBegrunnelseIdx: (updater: (i: number) => number) => void;
+  setBegrunnelseIdx: Dispatch<SetStateAction<number>>;
 
   timer: TimerControls;
 }
