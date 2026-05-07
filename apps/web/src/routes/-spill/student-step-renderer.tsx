@@ -10,10 +10,13 @@ import { Step4Reveal } from "./step-4-reveal";
 import { Step5Explanation } from "./step-5-explanation";
 import { Step6Rating } from "./step-6-rating";
 import { useStudentGame } from "./student-game-context";
+import { phaseStepNumber } from "./student-phase";
 
 export function StudentStepRenderer() {
-  const { phase, currentStep } = useStudentGame();
-  const { showCountdown, countdownNumber, countdownDone } = useStep4Countdown(currentStep);
+  const { phase } = useStudentGame();
+  const { showCountdown, countdownNumber, countdownDone } = useStep4Countdown(
+    phaseStepNumber(phase),
+  );
 
   switch (phase.kind) {
     case "waiting":

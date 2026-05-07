@@ -6,12 +6,21 @@ import { StatementCard } from "@workspace/ui/components/statement-card";
 import { Users } from "lucide-react";
 
 import { StudentVoteList } from "./student-vote-list";
+import type { TeacherStep } from "./teacher-step";
 import { useTeacherSession } from "./teacher-session-context";
 
-export function Step1Main() {
-  const { statement, students, activeRoundVotes, goToStep } = useTeacherSession();
+export function useStep1(): TeacherStep {
+  const {
+    statement,
+    students,
+    activeRoundVotes,
+    voteBars,
+    totalVotes,
+    timer,
+    goToStep,
+  } = useTeacherSession();
 
-  return (
+  const main = (
     <div className="flex flex-col items-center gap-8 pt-4">
       <div className="flex w-full items-center justify-between">
         <BackButton onClick={() => goToStep(0)} />
@@ -27,11 +36,8 @@ export function Step1Main() {
       />
     </div>
   );
-}
 
-export function Step1Panel() {
-  const { voteBars, totalVotes, timer } = useTeacherSession();
-  return (
+  const panel = (
     <div className="space-y-4">
       <TimerCard {...timer} />
       <div className="h-px bg-border" />
@@ -40,4 +46,6 @@ export function Step1Panel() {
       <DistributionChart bars={voteBars} total={totalVotes} />
     </div>
   );
+
+  return { main, panel };
 }

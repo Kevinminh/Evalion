@@ -18,16 +18,17 @@ import { DestructiveButton } from "./-liveokt/destructive-button";
 import { PrimaryActionButton } from "./-liveokt/primary-action-button";
 import { RecordingButton } from "./-liveokt/recording-button";
 import { StatementPicker } from "./-liveokt/statement-picker";
-import { Step1Main, Step1Panel } from "./-liveokt/step-1-vote-in-progress";
-import { Step2Main, Step2Panel } from "./-liveokt/step-2-group-discussion";
-import { Step3Main, Step3Panel } from "./-liveokt/step-3-revote";
-import { Step4Main, Step4Panel } from "./-liveokt/step-4-reveal";
-import { Step5Main, Step5Panel } from "./-liveokt/step-5-distribution";
-import { Step6Main, Step6Panel } from "./-liveokt/step-6-rating-summary";
+import { useStep1 } from "./-liveokt/step-1-vote-in-progress";
+import { useStep2 } from "./-liveokt/step-2-group-discussion";
+import { useStep3 } from "./-liveokt/step-3-revote";
+import { useStep4 } from "./-liveokt/step-4-reveal";
+import { useStep5 } from "./-liveokt/step-5-distribution";
+import { useStep6 } from "./-liveokt/step-6-rating-summary";
 import {
   TeacherSessionProvider,
   useTeacherSession,
 } from "./-liveokt/teacher-session-context";
+import type { TeacherStep } from "./-liveokt/teacher-step";
 
 export const Route = createFileRoute("/liveokt/$sessionId/steg/$step")({
   beforeLoad: ({ params }) => {
@@ -118,10 +119,14 @@ function LiveStepPage() {
 function TeacherSessionLayout() {
   const { fagprat, session, step, panelOpen, setPanelOpen, completedSteps, goToStep, endSession } =
     useTeacherSession();
+  const teacherStep = useCurrentStep();
 
   return (
     <div className="min-h-svh bg-background">
-      <SessionTopBar title={fagprat.title} center={session.transcriptionEnabled ? <RecordingButton /> : undefined}>
+      <SessionTopBar
+        title={fagprat.title}
+        center={session.transcriptionEnabled ? <RecordingButton /> : undefined}
+      >
         <a
           href={DASHBOARD_URL}
           className="inline-flex items-center gap-2 rounded-xl border-2 border-border px-4 py-2 text-sm font-bold text-muted-foreground transition-all hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
@@ -136,10 +141,18 @@ function TeacherSessionLayout() {
           className="flex-1 px-4 py-6 transition-[margin] duration-300 sm:px-8 sm:py-8 md:[margin-right:var(--panel-margin)]"
           style={cssVars({ "--panel-margin": panelOpen ? "340px" : "0px" })}
         >
-          <StepMainRenderer />
+          {teacherStep ? teacherStep.main : <StatementPicker />}
         </main>
-        <TeacherPanel defaultOpen={step !== 5} footer={<PanelFooter />} onOpenChange={setPanelOpen}>
-          <StepPanelRenderer />
+        <TeacherPanel
+          defaultOpen={step !== 5}
+          footer={teacherStep ? <PanelFooter footer={teacherStep.panelFooter} /> : null}
+          onOpenChange={setPanelOpen}
+        >
+          {teacherStep ? (
+            teacherStep.panel
+          ) : (
+            <p className="text-center text-sm text-muted-foreground">Venter på valg...</p>
+          )}
         </TeacherPanel>
       </div>
 
@@ -148,89 +161,43 @@ function TeacherSessionLayout() {
   );
 }
 
-function StepMainRenderer() {
+// Returns the TeacherStep for the current step number, or null when on step 0
+// (statement picker, no per-step main/panel definition).
+function useCurrentStep(): TeacherStep | null {
   const { step } = useTeacherSession();
   const { showCountdown, countdownNumber, countdownDone } = useStep4Countdown(step);
 
+  // Hooks must be called unconditionally; capture every step result and pick.
+  const step1 = useStep1();
+  const step2 = useStep2();
+  const step3 = useStep3();
+  const step4 = useStep4({ showCountdown, countdownNumber, countdownDone });
+  const step5 = useStep5();
+  const step6 = useStep6();
+
   switch (step) {
-    case 0:
-      return <StatementPicker />;
     case 1:
-      return <Step1Main />;
+      return step1;
     case 2:
-      return <Step2Main />;
+      return step2;
     case 3:
-      return <Step3Main />;
+      return step3;
     case 4:
-      return (
-        <Step4Main
-          showCountdown={showCountdown}
-          countdownNumber={countdownNumber}
-          countdownDone={countdownDone}
-        />
-      );
+      return step4;
     case 5:
-      return <Step5Main />;
+      return step5;
     case 6:
-      return <Step6Main />;
+      return step6;
     default:
       return null;
   }
 }
 
-function StepPanelRenderer() {
-  const { step } = useTeacherSession();
+function PanelFooter({ footer }: { footer: TeacherStep["panelFooter"] }) {
+  const { step, goToStep } = useTeacherSession();
 
-  switch (step) {
-    case 0:
-      return <p className="text-center text-sm text-muted-foreground">Venter på valg...</p>;
-    case 1:
-      return <Step1Panel />;
-    case 2:
-      return <Step2Panel />;
-    case 3:
-      return <Step3Panel />;
-    case 4:
-      return <Step4Panel />;
-    case 5:
-      return <Step5Panel />;
-    case 6:
-      return <Step6Panel />;
-    default:
-      return null;
-  }
-}
-
-function PanelFooter() {
-  const { step, fagprat, selectedIdx, usedStatements, markStatementUsed, goToStep, endSession } =
-    useTeacherSession();
-
+  if (footer) return <>{footer}</>;
   if (step === 0) return null;
-
-  if (step === 6) {
-    const unusedCount =
-      fagprat.statements.length - usedStatements.size - (usedStatements.has(selectedIdx) ? 0 : 1);
-    const hasMoreStatements = unusedCount > 0;
-    return (
-      <div className="flex gap-2">
-        {hasMoreStatements && (
-          <PrimaryActionButton
-            className="flex-1"
-            onClick={() => {
-              markStatementUsed(selectedIdx);
-              goToStep(0);
-            }}
-          >
-            Neste påstand
-            <ArrowRight className="size-4" />
-          </PrimaryActionButton>
-        )}
-        <DestructiveButton className="flex-1" onClick={endSession}>
-          Avslutt
-        </DestructiveButton>
-      </div>
-    );
-  }
 
   return (
     <PrimaryActionButton fullWidth onClick={() => goToStep(step + 1)}>

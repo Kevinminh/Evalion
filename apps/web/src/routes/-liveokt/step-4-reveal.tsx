@@ -9,17 +9,29 @@ import { StatementCard } from "@workspace/ui/components/statement-card";
 
 import { buildVoteBars } from "@/lib/vote-bars";
 
+import type { TeacherStep } from "./teacher-step";
 import { useTeacherSession } from "./teacher-session-context";
 
-interface Step4MainProps {
+interface Step4Args {
   showCountdown: boolean;
   countdownNumber: number;
   countdownDone: boolean;
 }
 
-export function Step4Main({ showCountdown, countdownNumber, countdownDone }: Step4MainProps) {
-  const { statement } = useTeacherSession();
-  return (
+export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step4Args): TeacherStep {
+  const {
+    statement,
+    panelTab,
+    setPanelTab,
+    r2CorrectCount,
+    r2Total,
+    changedToCorrect,
+    changedToIncorrect,
+    r2Votes,
+  } = useTeacherSession();
+  const endringerTab = panelTab === "default" || panelTab === "endringer";
+
+  const main = (
     <>
       <CountdownOverlay visible={showCountdown} number={countdownNumber} />
       <div className="flex flex-col items-center gap-6 pt-8">
@@ -38,21 +50,8 @@ export function Step4Main({ showCountdown, countdownNumber, countdownDone }: Ste
       </div>
     </>
   );
-}
 
-export function Step4Panel() {
-  const {
-    panelTab,
-    setPanelTab,
-    r2CorrectCount,
-    r2Total,
-    changedToCorrect,
-    changedToIncorrect,
-    r2Votes,
-  } = useTeacherSession();
-  const endringerTab = panelTab === "default" || panelTab === "endringer";
-
-  return (
+  const panel = (
     <PanelTabs
       tabs={[
         { key: "endringer", label: "Endringer" },
@@ -75,4 +74,6 @@ export function Step4Panel() {
       )}
     </PanelTabs>
   );
+
+  return { main, panel };
 }

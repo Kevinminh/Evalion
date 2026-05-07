@@ -1,3 +1,4 @@
+import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
 import { BegrunnelseCard } from "@workspace/evalion/components/live/begrunnelse-card";
 import { BegrunnelseNav } from "@workspace/evalion/components/live/begrunnelse-nav";
 import { DistributionChart } from "@workspace/evalion/components/live/distribution-chart";
@@ -8,23 +9,40 @@ import { StatementCard } from "@workspace/ui/components/statement-card";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { StudentVoteList } from "./student-vote-list";
+import type { TeacherStep } from "./teacher-step";
 import { useTeacherSession } from "./teacher-session-context";
 
-export function Step2Main() {
-  const { statement } = useTeacherSession();
+function HighlightedBegrunnelse({
+  begrunnelse,
+  studentName,
+  onToggle,
+}: {
+  begrunnelse: Doc<"sessionBegrunnelser">;
+  studentName: string | undefined;
+  onToggle: () => void;
+}) {
   return (
-    <div className="flex flex-col items-center gap-6 pt-4">
-      {statement && <StatementCard statement={statement} size="lg" />}
-      <Professor
-        size="md"
-        text="Diskuter med læringspartneren din. Forklar hva du tenker og lytt til hva den andre mener."
-      />
+    <div className="space-y-2">
+      <BegrunnelseCard text={begrunnelse.text} studentName={studentName} />
+      <button
+        type="button"
+        onClick={onToggle}
+        className={cn(
+          "w-full rounded-lg px-3 py-2 text-xs font-bold transition-all",
+          begrunnelse.highlighted
+            ? "bg-primary text-primary-foreground"
+            : "border border-border text-muted-foreground hover:bg-primary/10 hover:text-primary",
+        )}
+      >
+        {begrunnelse.highlighted ? "Fremhevet" : "Fremhev"}
+      </button>
     </div>
   );
 }
 
-export function Step2Panel() {
+export function useStep2(): TeacherStep {
   const {
+    statement,
     panelTab,
     setPanelTab,
     begrunnelser,
@@ -38,7 +56,22 @@ export function Step2Panel() {
   } = useTeacherSession();
   const begrunnelseTab = panelTab === "default" || panelTab === "begrunnelser";
 
-  return (
+  const main = (
+    <div className="flex flex-col items-center gap-6 pt-4">
+      {statement && <StatementCard statement={statement} size="lg" />}
+      <Professor
+        size="md"
+        text="Diskuter med læringspartneren din. Forklar hva du tenker og lytt til hva den andre mener."
+      />
+    </div>
+  );
+
+  const currentBegrunnelse = begrunnelser?.[begrunnelseIdx];
+  const currentStudentName = currentBegrunnelse
+    ? students.find((s) => s._id === currentBegrunnelse.studentId)?.name
+    : undefined;
+
+  const panel = (
     <PanelTabs
       tabs={[
         { key: "begrunnelser", label: "Begrunnelser" },
@@ -60,27 +93,13 @@ export function Step2Panel() {
                 onPrev={() => setBegrunnelseIdx((i) => Math.max(0, i - 1))}
                 onNext={() => setBegrunnelseIdx((i) => Math.min(begrunnelser.length - 1, i + 1))}
               />
-              {(() => {
-                const b = begrunnelser[begrunnelseIdx];
-                if (!b) return null;
-                const studentName = students.find((s) => s._id === b.studentId)?.name;
-                return (
-                  <div className="space-y-2">
-                    <BegrunnelseCard text={b.text} studentName={studentName} />
-                    <button
-                      onClick={() => highlightBegrunnelse(b)}
-                      className={cn(
-                        "w-full rounded-lg px-3 py-2 text-xs font-bold transition-all",
-                        b.highlighted
-                          ? "bg-primary text-primary-foreground"
-                          : "border border-border text-muted-foreground hover:bg-primary/10 hover:text-primary",
-                      )}
-                    >
-                      {b.highlighted ? "Fremhevet" : "Fremhev"}
-                    </button>
-                  </div>
-                );
-              })()}
+              {currentBegrunnelse && (
+                <HighlightedBegrunnelse
+                  begrunnelse={currentBegrunnelse}
+                  studentName={currentStudentName}
+                  onToggle={() => highlightBegrunnelse(currentBegrunnelse)}
+                />
+              )}
             </>
           )}
         </div>
@@ -93,4 +112,6 @@ export function Step2Panel() {
       )}
     </PanelTabs>
   );
+
+  return { main, panel };
 }

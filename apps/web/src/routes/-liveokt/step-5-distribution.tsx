@@ -2,11 +2,17 @@ import { BegrunnelseCard } from "@workspace/evalion/components/live/begrunnelse-
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { Professor } from "@workspace/evalion/components/live/professor";
 
+import type { TeacherStep } from "./teacher-step";
 import { useTeacherSession } from "./teacher-session-context";
 
-export function Step5Main() {
-  const { statement } = useTeacherSession();
-  return (
+export function useStep5(): TeacherStep {
+  const { statement, r2CorrectCount, r2Total, begrunnelser, students } = useTeacherSession();
+  const highlightedBegrunnelse = begrunnelser?.find((b) => b.highlighted);
+  const highlightedStudent = highlightedBegrunnelse
+    ? students.find((s) => s._id === highlightedBegrunnelse.studentId)
+    : null;
+
+  const main = (
     <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 pt-8">
       {statement && <FasitBadge fasit={statement.fasit} />}
       <div className="w-full max-h-[392px] overflow-y-auto rounded-2xl border-[1.5px] border-blue-200 animate-[fadeInUp_0.5s_ease_0.2s_both]">
@@ -29,16 +35,8 @@ export function Step5Main() {
       </div>
     </div>
   );
-}
 
-export function Step5Panel() {
-  const { r2CorrectCount, r2Total, begrunnelser, students } = useTeacherSession();
-  const highlightedBegrunnelse = begrunnelser?.find((b) => b.highlighted);
-  const highlightedStudent = highlightedBegrunnelse
-    ? students.find((s) => s._id === highlightedBegrunnelse.studentId)
-    : null;
-
-  return (
+  const panel = (
     <div className="space-y-4">
       <div className="rounded-lg bg-sant/10 p-3">
         <div className="text-xs font-bold uppercase tracking-wider text-sant">Svarte riktig</div>
@@ -63,4 +61,6 @@ export function Step5Panel() {
       )}
     </div>
   );
+
+  return { main, panel };
 }

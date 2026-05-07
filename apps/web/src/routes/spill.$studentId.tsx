@@ -14,6 +14,7 @@ import { parseStudentId, placeholderConvexId } from "@/lib/route-params";
 import { EmptyStateMessage } from "./-shared/empty-state-message";
 import { StudentAvatar } from "./-spill/student-avatar";
 import { StudentGameProvider, useStudentGame } from "./-spill/student-game-context";
+import { phaseStepNumber } from "./-spill/student-phase";
 import { StudentStepRenderer } from "./-spill/student-step-renderer";
 import { StudentTopbar } from "./-spill/student-topbar";
 
@@ -94,7 +95,7 @@ function StudentGamePage() {
 }
 
 function StudentGameLayout({ onLeave }: { onLeave: () => void }) {
-  const { student, session, fagprat, currentStep, removeStudent } = useStudentGame();
+  const { student, session, fagprat, phase, removeStudent } = useStudentGame();
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   const handleLeave = async () => {
@@ -111,7 +112,7 @@ function StudentGameLayout({ onLeave }: { onLeave: () => void }) {
       <StudentTopbar
         studentName={student.name}
         fagpratTitle={fagprat.title}
-        currentStep={session.status === "active" ? currentStep : undefined}
+        currentStep={session.status === "active" ? phaseStepNumber(phase) : undefined}
         stepLabel={session.status === "lobby" ? "Lobby" : undefined}
         onLeave={() => setShowLeaveConfirm(true)}
       />

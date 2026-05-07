@@ -5,7 +5,7 @@ import { createContext, useContext, useMemo, type ReactNode } from "react";
 
 import { api } from "@/lib/convex";
 
-import { phaseFromSession, phaseRound, phaseStepNumber, type StudentPhase } from "./student-phase";
+import { phaseFromSession, phaseRound, type StudentPhase } from "./student-phase";
 
 export interface StudentGameValue {
   session: Doc<"liveSessions">;
@@ -16,9 +16,6 @@ export interface StudentGameValue {
   statement: FagPratStatement | undefined;
   statementIndex: number;
   phase: StudentPhase;
-  // Numeric step accessor preserved for the topbar / progress indicator until
-  // those move to a phase-aware API in a follow-up.
-  currentStep: number;
   hasVoted: boolean;
   groupMembers: Doc<"sessionStudents">[];
 
@@ -85,7 +82,6 @@ export function StudentGameProvider({
       statement,
       statementIndex,
       phase,
-      currentStep: phaseStepNumber(phase),
       hasVoted,
       groupMembers,
       castVote: ({ vote, confidence }) => {
