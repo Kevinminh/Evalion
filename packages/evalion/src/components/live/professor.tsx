@@ -45,7 +45,7 @@ export function Professor({
       ? {
           borderWidth: 3,
           borderStyle: "solid",
-          borderColor: "#C2A9FF",
+          borderColor: "var(--color-primary-200)",
         }
       : {}),
   };

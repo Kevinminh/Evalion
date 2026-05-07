@@ -1,5 +1,6 @@
 import { cn } from "@workspace/ui/lib/utils";
 import { ArrowRight, Pause, Play, Square } from "lucide-react";
+import type { CSSProperties } from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 export interface TimerPreset {
@@ -120,6 +121,7 @@ export function TimerCard({
   const isFinished = isActive && displayRemaining <= 0;
   const showSetup = !isActive;
   const isUrgent = isRunning && displayRemaining > 0 && displayRemaining <= 10;
+  const sliderPct = ((selectedDuration - sliderMin) / (sliderMax - sliderMin)) * 100;
 
   const displayValue = isActive
     ? `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
@@ -130,11 +132,13 @@ export function TimerCard({
   const card = (
     <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-[24px] bg-white shadow-[0_4px_6px_rgba(0,0,0,0.07),0_2px_4px_rgba(0,0,0,0.04)] transition-all",
-        isActive && !isFinished
-          ? "h-[120px] min-h-0 gap-2 p-3"
-          : "min-h-[210px] gap-2.5 p-4",
+        "flex flex-col items-center justify-center rounded-[24px] transition-all",
+        isActive && !isFinished ? "h-[120px] min-h-0 gap-2 p-3" : "min-h-[210px] gap-2.5 p-4",
       )}
+      style={{
+        backgroundColor: "var(--color-neutral-0)",
+        boxShadow: "0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04)",
+      }}
     >
       <div
         className={cn(
@@ -153,8 +157,13 @@ export function TimerCard({
       {showSetup && (
         <>
           <button
+            type="button"
             onClick={() => onStart?.(selectedDuration)}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#4CAF50] px-4 py-2.5 text-sm font-bold text-white shadow-[0_3px_0_#43A047] transition-all hover:bg-[#43A047] active:translate-y-0.5 active:shadow-[0_1px_0_#43A047]"
+            className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all active:translate-y-0.5"
+            style={{
+              backgroundColor: "var(--color-sant)",
+              boxShadow: "0 3px 0 var(--color-sant-hover)",
+            }}
           >
             <Play className="size-[18px] fill-current" /> Start
           </button>
@@ -166,7 +175,8 @@ export function TimerCard({
               step={5}
               value={selectedDuration}
               onChange={(e) => setSelectedDuration(Number(e.target.value))}
-              className="w-full accent-[#6C3FC5]"
+              className="timer-range w-full"
+              style={{ "--timer-pct": `${sliderPct}%` } as CSSProperties}
             />
           </div>
           <div className="flex w-full justify-center gap-2">
@@ -175,13 +185,21 @@ export function TimerCard({
               return (
                 <button
                   key={p.seconds}
+                  type="button"
                   onClick={() => setSelectedDuration(p.seconds)}
-                  className={cn(
-                    "flex-1 rounded-full border-[1.5px] px-3 py-1.5 text-sm font-semibold transition-colors",
-                    isSelected
-                      ? "border-[#8554F6] bg-[#F3EEFF] font-bold text-[#5A2FA8]"
-                      : "border-[#E0E0E0] bg-white text-[#616161] hover:border-[#A37EFF] hover:bg-[#F3EEFF] hover:text-[#6C3FC5]",
-                  )}
+                  className="flex-1 rounded-full border-[1.5px] px-3 py-1.5 text-sm transition-colors"
+                  style={{
+                    backgroundColor: isSelected
+                      ? "var(--color-primary-50)"
+                      : "var(--color-neutral-0)",
+                    borderColor: isSelected
+                      ? "var(--color-primary-400)"
+                      : "var(--color-neutral-300)",
+                    color: isSelected
+                      ? "var(--color-primary-600)"
+                      : "var(--color-text-secondary)",
+                    fontWeight: isSelected ? 700 : 600,
+                  }}
                 >
                   {p.label}
                 </button>
@@ -195,26 +213,41 @@ export function TimerCard({
         <div className="flex w-full gap-2">
           {isRunning ? (
             <button
+              type="button"
               onClick={() => onPause?.()}
-              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#FF9800] px-4 py-2.5 text-sm font-bold text-white shadow-[0_3px_0_#FB8C00] transition-all hover:bg-[#FB8C00] active:translate-y-0.5 active:shadow-[0_1px_0_#FB8C00]"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all active:translate-y-0.5"
+              style={{
+                backgroundColor: "var(--color-delvis)",
+                boxShadow: "0 3px 0 var(--color-delvis-hover)",
+              }}
             >
               <Pause className="size-4 fill-current" /> Pause
             </button>
           ) : (
             <button
+              type="button"
               onClick={() => {
                 if (remainingAtPause !== undefined && remainingAtPause > 0) {
                   onStart?.(remainingAtPause);
                 }
               }}
-              className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#4CAF50] px-4 py-2.5 text-sm font-bold text-white shadow-[0_3px_0_#43A047] transition-all hover:bg-[#43A047] active:translate-y-0.5 active:shadow-[0_1px_0_#43A047]"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all active:translate-y-0.5"
+              style={{
+                backgroundColor: "var(--color-sant)",
+                boxShadow: "0 3px 0 var(--color-sant-hover)",
+              }}
             >
               <Play className="size-4 fill-current" /> Fortsett
             </button>
           )}
           <button
+            type="button"
             onClick={() => onStop?.()}
-            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#EF5350] px-4 py-2.5 text-sm font-bold text-white shadow-[0_3px_0_#D32F2F] transition-all hover:bg-[#D32F2F] active:translate-y-0.5 active:shadow-[0_1px_0_#D32F2F]"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all active:translate-y-0.5"
+            style={{
+              backgroundColor: "var(--color-error)",
+              boxShadow: "0 3px 0 var(--color-usant-hover)",
+            }}
           >
             <Square className="size-4 fill-current" /> Stopp
           </button>
@@ -226,20 +259,64 @@ export function TimerCard({
   return (
     <div className="flex flex-col gap-3">
       {sectionLabel && (
-        <span className="px-1 text-xs font-bold uppercase tracking-[0.08em] text-[#616161]">
+        <span
+          className="px-1 text-xs font-bold uppercase tracking-[0.08em]"
+          style={{ color: "var(--color-text-secondary)" }}
+        >
           {sectionLabel}
         </span>
       )}
       {card}
       {isFinished && onNextStep && (
         <button
+          type="button"
           onClick={onNextStep}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#6C3FC5] px-4 py-4 text-sm font-bold text-white shadow-[0_3px_0_#48208B] transition-all hover:opacity-90 active:translate-y-0.5 active:shadow-[0_1px_0_#48208B]"
+          className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-4 text-sm font-bold text-white transition-all active:translate-y-0.5"
+          style={{
+            backgroundColor: "var(--color-primary-500)",
+            boxShadow: "0 3px 0 var(--color-primary-700)",
+          }}
         >
           {nextStepLabel}
           <ArrowRight className="size-[18px]" />
         </button>
       )}
+      <style>{`
+        input[type="range"].timer-range {
+          -webkit-appearance: none;
+          appearance: none;
+          height: 8px;
+          border-radius: 9999px;
+          background: linear-gradient(
+            90deg,
+            var(--color-primary-300) 0%,
+            var(--color-primary-300) var(--timer-pct, 0%),
+            var(--color-neutral-200) var(--timer-pct, 0%)
+          );
+          outline: none;
+          cursor: pointer;
+        }
+        input[type="range"].timer-range::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          background: var(--color-primary-500);
+          border: 3px solid var(--color-neutral-0);
+          box-shadow: 0 2px 8px rgba(108, 63, 197, 0.35);
+          cursor: pointer;
+        }
+        input[type="range"].timer-range::-moz-range-thumb {
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          background: var(--color-primary-500);
+          border: 3px solid var(--color-neutral-0);
+          box-shadow: 0 2px 8px rgba(108, 63, 197, 0.35);
+          cursor: pointer;
+        }
+      `}</style>
     </div>
   );
 }

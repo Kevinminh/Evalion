@@ -13,7 +13,7 @@ export function Step0Waiting() {
         <img
           src="/professoren.png"
           alt="Professoren"
-          className="size-20 rounded-full border-[3px] border-purple-200 bg-muted object-cover sm:size-24 md:size-28 animate-[gentle-bounce_3s_ease-in-out_infinite]"
+          className="size-24 rounded-full border-[3px] border-purple-200 bg-muted object-cover sm:size-28 md:size-32 animate-[gentle-bounce_3s_ease-in-out_infinite]"
         />
         <span className="text-xs font-semibold text-muted-foreground">Venter på læreren</span>
         <WaitingDots />
