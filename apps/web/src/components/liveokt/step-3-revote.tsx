@@ -2,6 +2,7 @@ import { BackButton } from "@workspace/evalion/components/live/back-button";
 import { DistributionChart } from "@workspace/evalion/components/live/distribution-chart";
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { TimerCard } from "@workspace/evalion/components/live/timer-card";
+import { resolveStatementHex } from "@workspace/evalion/lib/constants";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { Users } from "lucide-react";
 
@@ -21,8 +22,10 @@ export function useStep3(): TeacherStep {
     selectedIdx,
   } = useTeacherSession();
 
+  const statementColor = resolveStatementHex(statement?.color, selectedIdx);
+
   const main = (
-    <div className="flex flex-col items-center gap-8 pt-4">
+    <div className="flex flex-col items-center gap-10 pt-2 sm:gap-14">
       <div className="flex w-full items-center justify-between">
         <BackButton onClick={() => goToStep(0)} />
         <div className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-border px-4 py-2 text-sm font-semibold text-muted-foreground">
@@ -30,8 +33,16 @@ export function useStep3(): TeacherStep {
           {activeRoundVotes.length} / {students.length} har stemt
         </div>
       </div>
-      {statement && <StatementCard statement={statement} size="lg" />}
-      <Professor size="md" text="Har du endret mening etter diskusjonen? Stem på nytt!" />
+      {statement && (
+        <StatementCard statement={statement} size="lg" color={statementColor} gradient />
+      )}
+      <Professor
+        size="md"
+        bordered
+        animate
+        textSize="lg"
+        text="Har du endret mening etter diskusjonen? Stem på nytt!"
+      />
     </div>
   );
 

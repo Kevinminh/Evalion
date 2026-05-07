@@ -21,7 +21,7 @@ export function StatementPicker() {
         <img
           src="/professoren.png"
           alt="Professoren"
-          className="size-32 rounded-full border-[5px] border-primary/20 bg-muted object-cover sm:size-40 lg:size-[180px] xl:size-[220px]"
+          className="size-32 rounded-full border-[5px] border-purple-200 bg-muted object-cover sm:size-40 lg:size-[180px] xl:size-[220px]"
         />
         <span className="text-base font-semibold text-muted-foreground">Velg en påstand</span>
         <WaitingDots />

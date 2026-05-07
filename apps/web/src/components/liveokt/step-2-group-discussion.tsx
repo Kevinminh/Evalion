@@ -35,6 +35,7 @@ export function useStep2(): TeacherStep {
         size="md"
         bordered
         animate
+        textSize="lg"
         text="Diskuter med læringspartneren din. Forklar hva du tenker og lytt til hva den andre mener."
       />
     </div>

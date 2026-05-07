@@ -33,6 +33,7 @@ export function useStep1(): TeacherStep {
         size="md"
         bordered
         animate
+        textSize="lg"
         text="Stem uten å avsløre for de andre, og skriv gjerne ned hva du tenker. Hvor sikker er du?"
       />
     </div>

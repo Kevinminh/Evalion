@@ -4,7 +4,7 @@ import { EndringerCard } from "@workspace/evalion/components/live/endringer-card
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { PanelTabs } from "@workspace/evalion/components/live/panel-tabs";
 import { Professor } from "@workspace/evalion/components/live/professor";
-import { FASIT_TEXT } from "@workspace/evalion/lib/constants";
+import { FASIT_TEXT, resolveStatementHex } from "@workspace/evalion/lib/constants";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 
 import { buildVoteBars } from "@/lib/vote-bars";
@@ -32,17 +32,24 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
   } = useTeacherSession();
   const endringerTab = panelTab === "default" || panelTab === "endringer";
 
+  const statementColor = resolveStatementHex(statement?.color, selectedIdx);
+
   const main = (
     <>
       <CountdownOverlay visible={showCountdown} number={countdownNumber} />
-      <div className="flex flex-col items-center gap-6 pt-8">
+      <div className="flex flex-col items-center gap-8 pt-2 sm:gap-12">
         {countdownDone && statement && (
           <FasitBadge fasit={statement.fasit} animated size="lg" />
         )}
-        {statement && <StatementCard statement={statement} size="lg" />}
+        {statement && (
+          <StatementCard statement={statement} size="lg" color={statementColor} gradient />
+        )}
         {countdownDone && statement && (
           <Professor
             size="md"
+            bordered
+            animate
+            textSize="lg"
             text={
               <>
                 Hvorfor er denne påstanden <strong>{FASIT_TEXT[statement.fasit]}</strong>?

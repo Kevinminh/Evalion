@@ -5,8 +5,8 @@ import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 const STORAGE_KEY = "fagprat-panel-collapsed";
 const MD_BREAKPOINT = 768;
 const PANEL_WIDTH_PX = 340;
-const TOPBAR_HEIGHT_PX = 64; // matches sm:h-16 on SessionTopBar
-const STEPNAV_HEIGHT_PX = 56; // matches the bottom step nav
+const TOPBAR_HEIGHT_PX = 80; // matches sm:h-20 on SessionTopBar
+const STEPNAV_HEIGHT_PX = 100; // matches sm:h-[100px] on StepNav
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(
@@ -68,7 +68,7 @@ export function TeacherPanel({
   const desktopToggleStyle: CSSProperties = {
     position: "fixed",
     right: open ? PANEL_WIDTH_PX : 0,
-    top: "5rem",
+    top: "6rem",
     zIndex: 30,
     padding: "0.5rem",
     background: "var(--card)",

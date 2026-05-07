@@ -6,7 +6,7 @@ type ProfessorSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
 interface ProfessorProps {
   size?: ProfessorSize;
   text?: ReactNode;
-  textSize?: "sm" | "base";
+  textSize?: "sm" | "base" | "lg";
   label?: string;
   animate?: boolean;
   bordered?: boolean;
@@ -44,7 +44,7 @@ export function Professor({
       ? {
           borderWidth: 3,
           borderStyle: "solid",
-          borderColor: "color-mix(in srgb, var(--primary) 20%, transparent)",
+          borderColor: "var(--color-purple-200)",
         }
       : {}),
   };
@@ -67,19 +67,21 @@ export function Professor({
       {text && (
         <div className="relative flex items-center">
           <div
-            className="absolute -left-2 size-0 border-8 border-transparent border-r-white"
-            style={{ filter: "drop-shadow(-1px 0 0 var(--border))" }}
+            className="absolute -left-[10px] size-0 border-y-[10px] border-r-[10px] border-y-transparent border-r-white"
+            style={{ filter: "drop-shadow(-2px 0 1px rgba(0,0,0,0.04))" }}
           />
           <div
             className={cn(
-              "rounded-2xl border border-border bg-white px-5 py-4",
+              "rounded-2xl border-[1.5px] border-border bg-white px-6 py-5 shadow-md",
               animate && "animate-[fadeInUp_0.5s_ease_0.2s_both]",
             )}
           >
             <p
               className={cn(
-                "font-medium italic text-foreground/80",
-                textSize === "sm" ? "text-sm" : "text-base",
+                "text-center font-medium leading-relaxed text-foreground",
+                textSize === "sm" && "text-sm",
+                textSize === "lg" && "text-xl",
+                (textSize === "base" || textSize === undefined) && "text-base",
               )}
             >
               {text}

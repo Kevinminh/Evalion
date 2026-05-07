@@ -136,7 +136,7 @@ function TeacherSessionLayout() {
         <DestructiveButton onClick={endSession}>Avslutt</DestructiveButton>
       </SessionTopBar>
 
-      <div className="flex min-h-svh pt-16 pb-14">
+      <div className="flex min-h-svh pt-14 pb-14 sm:pt-20 sm:pb-[100px]">
         <main
           className="flex-1 px-4 py-6 transition-[margin] duration-300 sm:px-8 sm:py-8 md:[margin-right:var(--panel-margin)]"
           style={cssVars({ "--panel-margin": teacherStep && panelOpen ? "340px" : "0px" })}
