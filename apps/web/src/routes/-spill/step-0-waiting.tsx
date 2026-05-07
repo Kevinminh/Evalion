@@ -1,9 +1,7 @@
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 
-interface Step0WaitingProps {
-  statements?: Array<{ text: string; color?: string }>;
-}
+import { useStudentGame } from "./student-game-context";
 
 const CARD_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   blue: { bg: "bg-blue-50", text: "text-blue-800", border: "border-blue-200" },
@@ -15,7 +13,10 @@ const CARD_COLORS: Record<string, { bg: string; text: string; border: string }> 
 
 const DEFAULT_ORDER = ["blue", "orange", "purple", "yellow"];
 
-export function Step0Waiting({ statements }: Step0WaitingProps) {
+export function Step0Waiting() {
+  const { fagprat } = useStudentGame();
+  const statements = fagprat.statements;
+
   return (
     <div className="flex w-full flex-col items-center gap-6">
       <div className="flex items-center gap-4">

@@ -5,20 +5,17 @@ import { toast } from "sonner";
 
 import { ConfidenceScale } from "./confidence-scale";
 import { StatementCard } from "@workspace/ui/components/statement-card";
+import { useStudentGame } from "./student-game-context";
 import { SubmitButton } from "./submit-button";
 import { WaitingScreen } from "./waiting-screen";
 
-interface Step3RevoteProps {
-  statement: { text: string };
-  onSubmit: (data: { vote: "sant" | "usant" | "delvis"; confidence: number }) => Promise<void>;
-  hasVoted: boolean;
-}
-
-export function Step3Revote({ statement, onSubmit, hasVoted }: Step3RevoteProps) {
+export function Step3Revote() {
+  const { statement, hasVoted, castVote } = useStudentGame();
   const [selectedVote, setSelectedVote] = useState<"sant" | "usant" | "delvis" | null>(null);
   const [selectedConfidence, setSelectedConfidence] = useState<number | null>(null);
   const [sent, setSent] = useState(false);
 
+  if (!statement) return null;
   if (hasVoted || sent) {
     return <WaitingScreen />;
   }
@@ -29,7 +26,7 @@ export function Step3Revote({ statement, onSubmit, hasVoted }: Step3RevoteProps)
     if (!canSubmit) return;
     setSent(true);
     try {
-      await onSubmit({ vote: selectedVote!, confidence: selectedConfidence! });
+      await castVote({ round: 2, vote: selectedVote!, confidence: selectedConfidence! });
     } catch {
       setSent(false);
       toast.error("Svaret ble ikke sendt. Prøv igjen.");

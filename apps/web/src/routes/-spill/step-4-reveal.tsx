@@ -2,26 +2,21 @@ import { CountdownOverlay } from "@workspace/evalion/components/live/countdown-o
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { FASIT_TEXT } from "@workspace/evalion/lib/constants";
-import type { FagPratStatement } from "@workspace/evalion/lib/types";
 
 import { RecordingDisclaimer } from "./recording-disclaimer";
 import { StatementCard } from "@workspace/ui/components/statement-card";
+import { useStudentGame } from "./student-game-context";
 
 interface Step4RevealProps {
-  statement: FagPratStatement;
   showCountdown: boolean;
   countdownNumber: number;
   countdownDone: boolean;
-  transcriptionEnabled?: boolean;
 }
 
-export function Step4Reveal({
-  statement,
-  showCountdown,
-  countdownNumber,
-  countdownDone,
-  transcriptionEnabled,
-}: Step4RevealProps) {
+export function Step4Reveal({ showCountdown, countdownNumber, countdownDone }: Step4RevealProps) {
+  const { statement, session } = useStudentGame();
+  if (!statement) return null;
+
   return (
     <>
       <CountdownOverlay visible={showCountdown} number={countdownNumber} />
@@ -41,7 +36,7 @@ export function Step4Reveal({
           />
         )}
 
-        {countdownDone && transcriptionEnabled && <RecordingDisclaimer />}
+        {countdownDone && session.transcriptionEnabled && <RecordingDisclaimer />}
       </div>
     </>
   );

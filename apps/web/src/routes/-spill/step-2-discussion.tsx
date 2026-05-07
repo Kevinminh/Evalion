@@ -3,18 +3,12 @@ import { cn } from "@workspace/ui/lib/utils";
 
 import { RecordingDisclaimer } from "./recording-disclaimer";
 import { StatementCard } from "@workspace/ui/components/statement-card";
+import { useStudentGame } from "./student-game-context";
 
-interface Step2DiscussionProps {
-  statement: { text: string };
-  groupMembers: Array<{ _id: string; name: string; avatarColor: string }>;
-  transcriptionEnabled?: boolean;
-}
+export function Step2Discussion() {
+  const { statement, groupMembers, session } = useStudentGame();
+  if (!statement) return null;
 
-export function Step2Discussion({
-  statement,
-  groupMembers,
-  transcriptionEnabled,
-}: Step2DiscussionProps) {
   return (
     <div className="flex w-full flex-col items-center gap-6">
       <StatementCard statement={statement} />
@@ -28,7 +22,6 @@ export function Step2Discussion({
         text="Diskuter påstanden med læringspartneren din. Hva tenker dere? Bruk fagbegreper og eksempler."
       />
 
-      {/* Group members */}
       {groupMembers.length > 0 && (
         <div className="w-full max-w-md">
           <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -55,7 +48,7 @@ export function Step2Discussion({
         </div>
       )}
 
-      {transcriptionEnabled && <RecordingDisclaimer />}
+      {session.transcriptionEnabled && <RecordingDisclaimer />}
     </div>
   );
 }
