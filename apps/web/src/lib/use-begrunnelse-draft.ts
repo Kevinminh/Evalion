@@ -31,7 +31,7 @@ export function useBegrunnelseDraft(
         localStorage.removeItem(draftKey);
       }
     } catch {
-      // localStorage unavailable
+      /* localStorage unavailable */
     }
   }, [draftKey, text]);
 
@@ -41,7 +41,7 @@ export function useBegrunnelseDraft(
       try {
         localStorage.removeItem(draftKey);
       } catch {
-        // localStorage unavailable
+        /* localStorage unavailable */
       }
     }
   }, [draftKey]);

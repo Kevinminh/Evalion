@@ -28,7 +28,7 @@ export function StatementPicker() {
               onClick={() => {
                 if (isUsed) return;
                 setSelectedStatement(i);
-                setTimeout(() => goToStep(1), COUNTDOWN_STEP_MS);
+                setTimeout(() => goToStep(1, i), COUNTDOWN_STEP_MS);
               }}
               style={{
                 backgroundColor: color.bg,

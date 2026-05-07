@@ -8,7 +8,6 @@ import { TeacherPanel } from "@workspace/evalion/components/live/teacher-panel";
 import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
 import { isValidConvexId } from "@workspace/evalion/lib/convex-id";
 import { ArrowRight } from "lucide-react";
-import { toast } from "sonner";
 
 import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
@@ -117,14 +116,6 @@ function TeacherSessionLayout() {
   const { fagprat, session, step, panelOpen, setPanelOpen, completedSteps, goToStep, endSession } =
     useTeacherSession();
 
-  const handleEnd = async () => {
-    try {
-      await endSession();
-    } catch {
-      toast.error("Kunne ikke avslutte økten. Prøv igjen.");
-    }
-  };
-
   return (
     <div className="min-h-svh bg-background">
       <SessionTopBar title={fagprat.title} center={session.transcriptionEnabled ? <RecordingButton /> : undefined}>
@@ -135,7 +126,7 @@ function TeacherSessionLayout() {
           Gå til dashboard
         </a>
         <button
-          onClick={handleEnd}
+          onClick={endSession}
           className="inline-flex items-center gap-2 rounded-full bg-destructive px-5 py-2 text-sm font-bold text-white shadow-[0_3px_0_oklch(0.45_0.15_25)] transition-all hover:-translate-y-0.5 hover:shadow-[0_5px_0_oklch(0.45_0.15_25)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.45_0.15_25)]"
         >
           Avslutt
@@ -230,14 +221,6 @@ function PanelFooter() {
 
   if (step === 0) return null;
 
-  const handleEnd = async () => {
-    try {
-      await endSession();
-    } catch {
-      toast.error("Kunne ikke avslutte økten. Prøv igjen.");
-    }
-  };
-
   if (step === 6) {
     const unusedCount =
       fagprat.statements.length - usedStatements.size - (usedStatements.has(selectedIdx) ? 0 : 1);
@@ -257,7 +240,7 @@ function PanelFooter() {
           </button>
         )}
         <button
-          onClick={handleEnd}
+          onClick={endSession}
           className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-destructive px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-px"
         >
           Avslutt
@@ -268,11 +251,7 @@ function PanelFooter() {
 
   return (
     <button
-      onClick={() => {
-        goToStep(step + 1).catch(() => {
-          toast.error("Kunne ikke bytte steg. Prøv igjen.");
-        });
-      }}
+      onClick={() => goToStep(step + 1)}
       className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-[0_2px_0_oklch(0.35_0.16_295)] transition-all hover:-translate-y-px"
     >
       Neste steg

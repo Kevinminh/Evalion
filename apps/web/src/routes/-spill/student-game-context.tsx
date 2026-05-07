@@ -1,5 +1,5 @@
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
-import type { FagPratStatement } from "@workspace/evalion/lib/types";
+import type { FagPratStatement, Fasit } from "@workspace/evalion/lib/types";
 import { useMutation } from "convex/react";
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 
@@ -21,11 +21,7 @@ export interface StudentGameValue {
   hasVoted: boolean;
   groupMembers: Doc<"sessionStudents">[];
 
-  castVote: (args: {
-    round: 1 | 2;
-    vote: "sant" | "usant" | "delvis";
-    confidence: number;
-  }) => Promise<unknown>;
+  castVote: (args: { round: 1 | 2; vote: Fasit; confidence: number }) => Promise<unknown>;
   submitBegrunnelse: (args: { round: 1 | 2; text: string }) => Promise<unknown>;
   submitRating: (rating: number) => Promise<unknown>;
   removeStudent: () => Promise<unknown>;

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { cn } from "@workspace/ui/lib/utils";
 import { STUDENT_VOTE_OPTIONS } from "@workspace/evalion/lib/constants";
+import type { Fasit } from "@workspace/evalion/lib/types";
 import { toast } from "sonner";
 
 import { ConfidenceScale } from "./confidence-scale";
@@ -11,7 +12,7 @@ import { WaitingScreen } from "./waiting-screen";
 
 export function Step3Revote() {
   const { statement, hasVoted, castVote } = useStudentGame();
-  const [selectedVote, setSelectedVote] = useState<"sant" | "usant" | "delvis" | null>(null);
+  const [selectedVote, setSelectedVote] = useState<Fasit | null>(null);
   const [selectedConfidence, setSelectedConfidence] = useState<number | null>(null);
   const [sent, setSent] = useState(false);
 

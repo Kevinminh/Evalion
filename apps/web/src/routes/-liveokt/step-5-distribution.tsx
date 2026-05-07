@@ -32,8 +32,7 @@ export function Step5Main() {
 }
 
 export function Step5Panel() {
-  const { statement, r2Votes, r2Total, begrunnelser, students } = useTeacherSession();
-  const correctCount = r2Votes.filter((v) => statement && v.vote === statement.fasit).length;
+  const { r2CorrectCount, r2Total, begrunnelser, students } = useTeacherSession();
   const highlightedBegrunnelse = begrunnelser?.find((b) => b.highlighted);
   const highlightedStudent = highlightedBegrunnelse
     ? students.find((s) => s._id === highlightedBegrunnelse.studentId)
@@ -44,7 +43,7 @@ export function Step5Panel() {
       <div className="rounded-lg bg-sant/10 p-3">
         <div className="text-xs font-bold uppercase tracking-wider text-sant">Svarte riktig</div>
         <p className="text-lg font-extrabold text-sant">
-          {correctCount}/{r2Total}
+          {r2CorrectCount}/{r2Total}
         </p>
       </div>
       {highlightedBegrunnelse ? (

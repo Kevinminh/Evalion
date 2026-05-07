@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { cn } from "@workspace/ui/lib/utils";
 import { STUDENT_VOTE_OPTIONS } from "@workspace/evalion/lib/constants";
+import type { Fasit } from "@workspace/evalion/lib/types";
 import { toast } from "sonner";
 
 import { useBegrunnelseDraft } from "@/lib/use-begrunnelse-draft";
@@ -20,7 +21,7 @@ export function Step1Vote() {
     clear: clearBegrunnelseDraft,
   } = useBegrunnelseDraft(session._id, student._id, statementIndex);
 
-  const [selectedVote, setSelectedVote] = useState<"sant" | "usant" | "delvis" | null>(null);
+  const [selectedVote, setSelectedVote] = useState<Fasit | null>(null);
   const [selectedConfidence, setSelectedConfidence] = useState<number | null>(null);
   const [sent, setSent] = useState(false);
 
@@ -34,17 +35,13 @@ export function Step1Vote() {
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setSent(true);
+    const trimmed = begrunnelseText.trim();
     try {
-      await castVote({
-        round: 1,
-        vote: selectedVote!,
-        confidence: selectedConfidence!,
-      });
-      const trimmed = begrunnelseText.trim();
-      if (trimmed) {
-        await submitBegrunnelse({ round: 1, text: trimmed });
-        clearBegrunnelseDraft();
-      }
+      await Promise.all([
+        castVote({ round: 1, vote: selectedVote!, confidence: selectedConfidence! }),
+        trimmed ? submitBegrunnelse({ round: 1, text: trimmed }) : Promise.resolve(),
+      ]);
+      if (trimmed) clearBegrunnelseDraft();
     } catch {
       setSent(false);
       toast.error("Svaret ble ikke sendt. Prøv igjen.");

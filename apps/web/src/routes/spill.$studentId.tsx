@@ -4,6 +4,7 @@ import { Professor } from "@workspace/evalion/components/live/professor";
 import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
 import { StudentGameSkeleton } from "@workspace/evalion/components/skeletons/student-game-skeleton";
 import { isValidConvexId } from "@workspace/evalion/lib/convex-id";
+import { ConfirmDialog } from "@workspace/ui/components/confirm-dialog";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -12,7 +13,6 @@ import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 import { useStep4Countdown } from "@/lib/use-step4-countdown";
 
-import { LeaveConfirmDialog } from "./-spill/leave-confirm-dialog";
 import { Step0Waiting } from "./-spill/step-0-waiting";
 import { Step1Vote } from "./-spill/step-1-vote";
 import { Step2Discussion } from "./-spill/step-2-discussion";
@@ -128,9 +128,13 @@ function StudentGameLayout({ onLeave }: { onLeave: () => void }) {
         <StudentGameContent onLeave={onLeave} />
       </div>
 
-      <LeaveConfirmDialog
+      <ConfirmDialog
         open={showLeaveConfirm}
-        onCancel={() => setShowLeaveConfirm(false)}
+        onOpenChange={setShowLeaveConfirm}
+        title="Forlat spill?"
+        description="Er du sikker på at du vil forlate spillet?"
+        confirmLabel="Ja, forlat"
+        cancelLabel="Avbryt"
         onConfirm={handleLeave}
       />
     </div>

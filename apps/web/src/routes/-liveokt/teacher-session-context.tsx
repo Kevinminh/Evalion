@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { toast } from "sonner";
 
 import { api } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
@@ -18,28 +19,14 @@ import { buildVoteBars, type VoteBar } from "@/lib/vote-bars";
 type Statement = Doc<"fagprats">["statements"][number];
 
 export interface TeacherSessionValue {
-  // Identity
   sessionId: Id<"liveSessions">;
   step: number;
 
-  // Data
   session: Doc<"liveSessions">;
   fagprat: Doc<"fagprats">;
   students: Doc<"sessionStudents">[];
-  votes: Doc<"sessionVotes">[];
-  analytics:
-    | {
-        correctR2: number;
-        totalR2: number;
-        wrongToRight: number;
-        rightToWrong: number;
-        avgRating: number;
-        ratingDistribution: { score: number; count: number }[];
-      }
-    | undefined;
   begrunnelser: Doc<"sessionBegrunnelser">[] | undefined;
 
-  // Derived
   selectedIdx: number;
   statement: Statement | undefined;
   r2Votes: Doc<"sessionVotes">[];
@@ -53,7 +40,6 @@ export interface TeacherSessionValue {
   ratingDistribution: { score: number; count: number }[];
   avgRating: number | undefined;
 
-  // Ephemeral UI state
   selectedStatement: number | null;
   setSelectedStatement: (n: number | null) => void;
   panelTab: string;
@@ -66,14 +52,10 @@ export interface TeacherSessionValue {
   panelOpen: boolean;
   setPanelOpen: (b: boolean) => void;
   completedSteps: number[];
-  markStepCompleted: (n: number) => void;
-  resetCompletedSteps: () => void;
   usedStatements: Set<number>;
   markStatementUsed: (n: number) => void;
-  resetUsedStatements: () => void;
 
-  // Mutations
-  goToStep: (n: number) => Promise<void>;
+  goToStep: (n: number, statementIndexOverride?: number) => Promise<void>;
   endSession: () => Promise<void>;
   highlightBegrunnelse: (b: Doc<"sessionBegrunnelser">) => Promise<unknown>;
 
@@ -97,7 +79,16 @@ interface TeacherSessionProviderProps {
   fagprat: Doc<"fagprats">;
   students: Doc<"sessionStudents">[];
   votes: Doc<"sessionVotes">[];
-  analytics: TeacherSessionValue["analytics"];
+  analytics:
+    | {
+        correctR2: number;
+        totalR2: number;
+        wrongToRight: number;
+        rightToWrong: number;
+        avgRating: number;
+        ratingDistribution: { score: number; count: number }[];
+      }
+    | undefined;
   begrunnelser: Doc<"sessionBegrunnelser">[] | undefined;
   navigateToStep: (n: number) => Promise<void>;
   onSessionEnded: () => void;
@@ -131,7 +122,6 @@ export function TeacherSessionProvider({
   const highlightBegrunnelseMutation = useMutation(api.liveSessions.highlightBegrunnelse);
   const timer = useTimerControls(sessionId, session);
 
-  // Recording timer
   useEffect(() => {
     if (!recording) {
       setRecordElapsed(0);
@@ -143,7 +133,6 @@ export function TeacherSessionProvider({
 
   const selectedIdx = selectedStatement ?? session.currentStatementIndex ?? 0;
 
-  // Reset panel tab and begrunnelse index when step or statement changes
   useEffect(() => {
     setPanelTab("default");
     setBegrunnelseIdx(0);
@@ -168,7 +157,7 @@ export function TeacherSessionProvider({
       analytics?.ratingDistribution ?? [1, 2, 3, 4, 5].map((score) => ({ score, count: 0 }));
     const avgRating = analytics && analytics.avgRating > 0 ? analytics.avgRating : undefined;
 
-    const goToStep = async (n: number) => {
+    const goToStep = async (n: number, statementIndexOverride?: number) => {
       if (n === 0) {
         setCompletedSteps([]);
         setSelectedStatement(null);
@@ -176,17 +165,26 @@ export function TeacherSessionProvider({
       if (step > 0 && step < n) {
         setCompletedSteps((prev) => (prev.includes(step) ? prev : [...prev, step]));
       }
-      await updateStepMutation({
-        id: sessionId,
-        step: n,
-        ...(n === 0 ? {} : { statementIndex: selectedIdx }),
-      });
-      await navigateToStep(n);
+      const targetIndex = statementIndexOverride ?? selectedIdx;
+      try {
+        await updateStepMutation({
+          id: sessionId,
+          step: n,
+          ...(n === 0 ? {} : { statementIndex: targetIndex }),
+        });
+        await navigateToStep(n);
+      } catch {
+        toast.error("Kunne ikke bytte steg. Prøv igjen.");
+      }
     };
 
     const endSession = async () => {
-      await endSessionMutation({ id: sessionId });
-      onSessionEnded();
+      try {
+        await endSessionMutation({ id: sessionId });
+        onSessionEnded();
+      } catch {
+        toast.error("Kunne ikke avslutte økten. Prøv igjen.");
+      }
     };
 
     return {
@@ -195,8 +193,6 @@ export function TeacherSessionProvider({
       session,
       fagprat,
       students,
-      votes,
-      analytics,
       begrunnelser,
 
       selectedIdx,
@@ -224,12 +220,8 @@ export function TeacherSessionProvider({
       panelOpen,
       setPanelOpen,
       completedSteps,
-      markStepCompleted: (n) =>
-        setCompletedSteps((prev) => (prev.includes(n) ? prev : [...prev, n])),
-      resetCompletedSteps: () => setCompletedSteps([]),
       usedStatements,
       markStatementUsed: (n) => setUsedStatements((prev) => new Set(prev).add(n)),
-      resetUsedStatements: () => setUsedStatements(new Set()),
 
       goToStep,
       endSession,
