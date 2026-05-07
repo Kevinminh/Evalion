@@ -12,7 +12,7 @@ Evalion passer på alle trinn og fag, og er enkelt å komme i gang med. Læreren
 
 ---
 
-A TypeScript + React monorepo built with TanStack Start, shadcn/ui, and Better Auth.
+A TypeScript + React monorepo built with TanStack Start, Next.js, Convex, shadcn/ui, and Better Auth.
 
 ## Prerequisites
 
@@ -44,21 +44,25 @@ pnpm --filter web dev
 
 ## Packages
 
-| Package           | Name              | Purpose                                                     |
-| ----------------- | ----------------- | ----------------------------------------------------------- |
-| `packages/ui`     | `@workspace/ui`   | Shared UI components (shadcn/ui + Base UI + Tailwind CSS 4) |
-| `packages/config` | `@evalion/config` | Shared TypeScript base configuration                        |
+| Package             | Name                 | Purpose                                                                                       |
+| ------------------- | -------------------- | --------------------------------------------------------------------------------------------- |
+| `packages/backend`  | `@workspace/backend` | Convex backend — schema, queries, mutations, actions, HTTP, Better Auth integration          |
+| `packages/evalion`  | `@workspace/evalion` | Cross-app feature code: shared auth/live-session UI, hooks, and lib helpers (depends on backend + ui) |
+| `packages/ui`       | `@workspace/ui`      | Pure UI primitives (shadcn/ui + Base UI + Tailwind CSS 4)                                    |
+| `packages/config`   | `@evalion/config`    | Shared TypeScript base configuration                                                          |
 
 ## Commands
 
-| Task       | Command          |
-| ---------- | ---------------- |
-| Dev (all)  | `pnpm dev`       |
-| Build      | `pnpm build`     |
-| Lint       | `pnpm lint`      |
-| Lint + fix | `pnpm lint:fix`  |
-| Format     | `pnpm format`    |
-| Type check | `pnpm typecheck` |
+| Task        | Command          |
+| ----------- | ---------------- |
+| Dev (all)   | `pnpm dev`       |
+| Build       | `pnpm build`     |
+| Lint        | `pnpm lint`      |
+| Lint + fix  | `pnpm lint:fix`  |
+| Format      | `pnpm format`    |
+| Type check  | `pnpm typecheck` |
+| Convex dev  | `pnpm db:dev`    |
+| Convex deploy | `pnpm db:deploy` |
 
 ## Adding UI Components
 

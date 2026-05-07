@@ -1,64 +1,138 @@
 # Auth Patterns
 
-This project uses [Better Auth](https://www.better-auth.com/) (`better-auth ^1.5.6`).
+This project uses **Better Auth** (`better-auth ^1.5.6`) integrated with Convex via `@convex-dev/better-auth`. There is **no Drizzle / SQL adapter** — Better Auth's data lives inside the Convex `betterAuth` component. See [`backend.md`](backend.md) for how the component is wired in `packages/backend/convex/`.
 
-## Setup
+## How the pieces fit
 
-Auth configuration should live in a shared location (e.g., `packages/auth/` or `apps/web/src/lib/auth.ts`). The auth instance is created with `betterAuth()`:
-
-```tsx
-import { betterAuth } from "better-auth";
-
-export const auth = betterAuth({
-  database: drizzleAdapter(db),
-  // ...providers, plugins
-});
+```
+Frontend ── @convex-dev/better-auth/react ─┐
+                                           │
+                                           ▼
+              packages/backend/convex/auth.ts  ──→  components.betterAuth (component)
+                                           │             │
+                                           │             └─ owns its own schema (users, sessions, accounts)
+                                           ▼
+                          packages/backend/convex/http.ts mounts /api/auth/*
 ```
 
-Create an auth client for React:
+- `authComponent` (in `convex/auth.ts`) is created with `createClient<DataModel, typeof schema>(components.betterAuth, …)`.
+- `createAuth(ctx)` / `options` configures email-password, Google OAuth, `trustedOrigins`, and optional cross-subdomain cookies via `COOKIE_DOMAIN`.
+- `authComponent.registerRoutes(http, createAuth)` mounts the Better Auth HTTP routes under the Convex deployment.
+- An `onDelete` trigger on the `user` table cascades a user's own live sessions, votes/ratings/begrunnelser/students, fagprats, and drafts.
+
+## Frontend auth client
+
+Each app exports an auth client from its `lib/auth-client.ts` (a thin wrapper around `createAuthClient` from `better-auth/react` plus the Convex plugin). Use it for sign-in / sign-up / sign-out and for reading the session reactively:
 
 ```tsx
-import { createAuthClient } from "better-auth/react";
+import { authClient } from "@/lib/auth-client";
 
-export const authClient = createAuthClient({
-  baseURL: import.meta.env.VITE_AUTH_URL,
-});
+const { data: session } = authClient.useSession();
 ```
 
-## Route Guards
-
-Protect routes using TanStack Router's `beforeLoad` hook:
+The Convex provider tree is set up in each app's `__root.tsx` (TanStack apps) or `app/components/providers.tsx` (landing). It wires `ConvexBetterAuthProvider` so Convex queries see the authenticated identity:
 
 ```tsx
-export const Route = createFileRoute("/dashboard")({
-  beforeLoad: async ({ context }) => {
-    const session = await authClient.getSession();
-    if (!session) {
-      throw redirect({ to: "/login" });
+<ConvexBetterAuthProvider
+  client={convexClient}
+  authClient={authClient}
+  initialToken={token}
+>
+  …
+</ConvexBetterAuthProvider>
+```
+
+## Server-side token (TanStack apps)
+
+`apps/web` and `apps/dashboard` read the cookie server-side in the root `beforeLoad` and prime the Convex client so loaders run authenticated:
+
+```tsx
+const getAuth = createServerFn({ method: "GET" }).handler(async () => {
+  return await getToken();           // from @/lib/auth-server
+});
+
+export const Route = createRootRouteWithContext<…>()({
+  beforeLoad: async (ctx) => {
+    const token = await getAuth();
+    if (token) {
+      ctx.context.convexQueryClient.serverHttpClient?.setAuth(token);
     }
+    return { isAuthenticated: !!token, token };
+  },
+  …
+});
+```
+
+## Route guards (TanStack apps)
+
+Layout routes are the right place to guard whole sections:
+
+```tsx
+// apps/dashboard/src/routes/_authed.tsx
+export const Route = createFileRoute("/_authed")({
+  beforeLoad: ({ context }) => {
+    if (!context.isAuthenticated) throw redirect({ to: "/login" });
   },
 });
 ```
 
-For layouts that guard all child routes, use `beforeLoad` on the layout route (e.g., `_authenticated.tsx`).
+Use `_authed` for "must be logged in but no shared chrome" (live console, analytics) and `_dashboard` for "logged in **and** wrapped in the sidebar shell" (teacher tools).
 
-## Server-side Auth
+## Guest sessions on `apps/web`
 
-Use `createServerFn` to verify auth on the server:
+Students join sessions without an account. The Convex client is created with `expectAuth: true`, which means it blocks queries until `setAuth` or `clearAuth` is called. For unauthenticated visitors we explicitly call `clearAuth()`:
 
 ```tsx
-import { createServerFn } from "@tanstack/react-start";
+function ClearAuthForGuests() {
+  const { isLoading, isAuthenticated } = useConvexAuth();
+  const client = useConvex();
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) client.clearAuth();
+  }, [isLoading, isAuthenticated, client]);
+  return null;
+}
+```
 
-const getSession = createServerFn({ method: "GET" }).handler(async ({ request }) => {
-  const session = await auth.api.getSession({ headers: request.headers });
-  return session;
+This component is mounted inside `ConvexBetterAuthProvider` in `apps/web/src/routes/__root.tsx`. Don't remove it — without it, students hang forever waiting for an auth token that never arrives.
+
+## Landing app middleware
+
+The Next.js landing site uses `middleware.ts` to gate the `(workspace)` group:
+
+```ts
+const PROTECTED_PATTERNS = [/^\/lag-pastander(\/|$)/];
+
+export function middleware(req: NextRequest) {
+  if (!PROTECTED_PATTERNS.some((re) => re.test(req.nextUrl.pathname))) {
+    return NextResponse.next();
+  }
+  if (!getSessionCookie(req)) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/logg-inn";
+    return NextResponse.redirect(url);
+  }
+  return NextResponse.next();
+}
+```
+
+Add new protected patterns to `PROTECTED_PATTERNS` and the `matcher` config when introducing new gated workspace routes.
+
+## Backend access control
+
+Inside Convex queries and mutations, derive the caller from `ctx.auth.getUserIdentity()` (or `getAuthUser` re-exported from `auth.ts`). Use `helpers.ts#requireAdmin` to gate admin-only actions like `reddi.generateStatements` and `aiPrompts` writes.
+
+```ts
+import { requireAdmin } from "./helpers";
+
+export const someAdminThing = mutation({
+  args: { … },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    …
+  },
 });
 ```
 
-## Middleware
+## Shared auth UI
 
-For auth middleware that runs on every request, use TanStack Start's middleware system or Nitro server middleware depending on the use case.
-
-## Auth Utilities
-
-Export reusable auth helpers (e.g., `useSession`, `useRequireAuth`) from a shared location so all routes use consistent auth checks.
+Login, register, logout, and the user menu live in `packages/evalion/src/components/auth/` so all three apps render the same forms. Pull them in via `@workspace/evalion/components/auth/login-form` etc. — don't fork copies into individual apps.
