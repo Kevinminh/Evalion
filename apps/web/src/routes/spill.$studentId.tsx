@@ -141,13 +141,15 @@ function StudentGameContent({ onLeave }: { onLeave: () => void }) {
 
   if (session.status === "lobby") {
     return (
-      <div className="flex flex-col items-center gap-6 py-8">
-        <Professor size="sm" bounce bordered imgClassName="size-16 sm:size-20 md:size-24" />
-        <h1 className="text-xl font-extrabold text-foreground">Hei, {student.name}!</h1>
-        <div className="flex items-center text-muted-foreground">
-          Venter på at læreren starter
-          <WaitingDots />
-        </div>
+      <div className="flex flex-col items-center gap-3 py-8">
+        <Professor size="xl" bounce bordered className="justify-center" />
+        <h1 className="text-base font-bold text-[var(--color-primary-700)]">
+          Hei, <span className="text-[var(--color-primary-500)]">{student.name}</span>!
+        </h1>
+        <p className="text-center text-sm font-semibold text-muted-foreground">
+          Venter på at læreren starter aktiviteten
+        </p>
+        <WaitingDots className="ml-0" />
       </div>
     );
   }

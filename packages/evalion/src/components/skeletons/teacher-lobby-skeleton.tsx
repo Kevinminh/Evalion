@@ -20,7 +20,7 @@ export function TeacherLobbySkeleton() {
       </div>
 
       <div className="flex flex-1 flex-col pt-20 lg:flex-row">
-        <div className="w-full p-4 lg:w-[38%] lg:min-w-[360px] lg:max-w-[480px]">
+        <div className="w-full p-4 lg:w-[42%] lg:min-w-[420px] lg:max-w-[560px]">
           <div className="flex h-full flex-col items-center justify-center gap-3 rounded-2xl border-[1.5px] border-border bg-card p-6 shadow-lg sm:p-8">
             <Skeleton className="mb-2 h-16 w-32" />
             <Skeleton className="h-5 w-40" />
