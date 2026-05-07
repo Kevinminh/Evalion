@@ -1,3 +1,4 @@
+import { Professor } from "@workspace/evalion/components/live/professor";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 
 interface Step0WaitingProps {
@@ -18,13 +19,7 @@ export function Step0Waiting({ statements }: Step0WaitingProps) {
   return (
     <div className="flex w-full flex-col items-center gap-6">
       <div className="flex items-center gap-4">
-        <div className="size-20 shrink-0 overflow-hidden rounded-full">
-          <img
-            src="/professoren.png"
-            alt="Professoren"
-            className="size-full animate-[gentle-bounce_3s_ease-in-out_infinite] object-cover"
-          />
-        </div>
+        <Professor size="sm" bounce />
         <div>
           <h2 className="text-lg font-bold text-foreground">Læreren velger en påstand</h2>
           <div className="flex items-center text-muted-foreground">

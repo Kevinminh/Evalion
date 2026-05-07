@@ -1,28 +1,36 @@
 import { cn } from "@workspace/ui/lib/utils";
 import type { ReactNode } from "react";
 
+type ProfessorSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+
 interface ProfessorProps {
-  size?: "xs" | "sm" | "md" | "lg";
+  size?: ProfessorSize;
   text?: ReactNode;
+  textSize?: "sm" | "base";
   label?: string;
   animate?: boolean;
   bordered?: boolean;
+  bounce?: boolean;
   className?: string;
 }
 
-const sizeConfig = {
+const sizeConfig: Record<ProfessorSize, string> = {
   xs: "size-12",
-  sm: "size-24",
+  sm: "size-20",
   md: "size-24",
-  lg: "size-[220px]",
+  lg: "size-28",
+  xl: "size-32",
+  "2xl": "size-[220px]",
 };
 
 export function Professor({
-  size = "sm",
+  size = "md",
   text,
+  textSize = "base",
   label,
   animate = true,
   bordered = false,
+  bounce = false,
   className,
 }: ProfessorProps) {
   const container = sizeConfig[size];
@@ -37,6 +45,7 @@ export function Professor({
             "rounded-full object-cover",
             container,
             bordered && "border-[3px] border-primary/20",
+            bounce && "animate-[gentle-bounce_3s_ease-in-out_infinite]",
           )}
         />
         {label && (
@@ -55,7 +64,14 @@ export function Professor({
               animate && "animate-[fadeInUp_0.5s_ease_0.2s_both]",
             )}
           >
-            <p className="text-base font-medium italic text-foreground/80">{text}</p>
+            <p
+              className={cn(
+                "font-medium italic text-foreground/80",
+                textSize === "sm" ? "text-sm" : "text-base",
+              )}
+            >
+              {text}
+            </p>
           </div>
         </div>
       )}

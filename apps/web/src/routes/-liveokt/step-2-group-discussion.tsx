@@ -26,7 +26,7 @@ export function Step2Main({ statementCard }: Step2MainProps) {
     <div className="flex flex-col items-center gap-6 pt-4">
       {statementCard}
       <Professor
-        size="sm"
+        size="md"
         text="Diskuter med læringspartneren din. Forklar hva du tenker og lytt til hva den andre mener."
       />
     </div>

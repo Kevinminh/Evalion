@@ -1,4 +1,5 @@
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
+import { CountdownOverlay } from "@workspace/evalion/components/live/countdown-overlay";
 import { DistributionChart } from "@workspace/evalion/components/live/distribution-chart";
 import { EndringerCard } from "@workspace/evalion/components/live/endringer-card";
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
@@ -26,22 +27,13 @@ export function Step4Main({
 }: Step4MainProps) {
   return (
     <>
-      {showCountdown && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
-          <span
-            key={countdownNumber}
-            className="text-[160px] font-extrabold text-white animate-[countdown-pop_0.8s_ease_both]"
-          >
-            {countdownNumber}
-          </span>
-        </div>
-      )}
+      <CountdownOverlay visible={showCountdown} number={countdownNumber} />
       <div className="flex flex-col items-center gap-6 pt-8">
         {countdownDone && statement && <FasitBadge fasit={statement.fasit} animated />}
         {statementCard}
         {countdownDone && statement && (
           <Professor
-            size="sm"
+            size="md"
             text={
               <>
                 Hvorfor er denne påstanden <strong>{FASIT_TEXT[statement.fasit]}</strong>?

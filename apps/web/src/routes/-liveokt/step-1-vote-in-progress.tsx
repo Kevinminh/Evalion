@@ -31,7 +31,7 @@ export function Step1Main({ statementCard, studentList, activeRoundVotes, onBack
       </div>
       {statementCard}
       <Professor
-        size="sm"
+        size="md"
         text="Stem uten å avsløre for de andre, og skriv gjerne ned hva du tenker. Hvor sikker er du?"
       />
     </div>

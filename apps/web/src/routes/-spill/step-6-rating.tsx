@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
+import type { FagPratStatement } from "@workspace/evalion/lib/types";
 import { toast } from "sonner";
 
 import { StatementCard } from "@workspace/ui/components/statement-card";
@@ -7,7 +8,7 @@ import { SubmitButton } from "./submit-button";
 import { WaitingScreen } from "./waiting-screen";
 
 interface Step6RatingProps {
-  statement: { text: string; fasit: "sant" | "usant" | "delvis" };
+  statement: FagPratStatement;
   ratingSent: boolean;
   onRate: (rating: number) => Promise<void>;
 }

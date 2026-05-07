@@ -30,7 +30,7 @@ export function Step3Main({ statementCard, studentList, activeRoundVotes, onBack
         </div>
       </div>
       {statementCard}
-      <Professor size="sm" text="Har du endret mening etter diskusjonen? Stem på nytt!" />
+      <Professor size="md" text="Har du endret mening etter diskusjonen? Stem på nytt!" />
     </div>
   );
 }

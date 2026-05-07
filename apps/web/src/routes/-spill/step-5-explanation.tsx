@@ -1,11 +1,8 @@
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
+import type { FagPratStatement } from "@workspace/evalion/lib/types";
 
 interface Step5ExplanationProps {
-  statement: {
-    text: string;
-    fasit: "sant" | "usant" | "delvis";
-    explanation: string;
-  };
+  statement: FagPratStatement;
 }
 
 export function Step5Explanation({ statement }: Step5ExplanationProps) {

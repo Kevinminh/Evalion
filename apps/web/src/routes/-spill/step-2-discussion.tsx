@@ -1,3 +1,4 @@
+import { Professor } from "@workspace/evalion/components/live/professor";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { RecordingDisclaimer } from "./recording-disclaimer";
@@ -20,28 +21,12 @@ export function Step2Discussion({
 
       <h2 className="text-xl font-extrabold text-foreground">Snakk sammen!</h2>
 
-      {/* Professor with speech bubble */}
-      <div className="flex items-center gap-4">
-        <div className="size-20 shrink-0 overflow-hidden rounded-full">
-          <img
-            src="/professoren.png"
-            alt="Professoren"
-            className="size-full animate-[gentle-bounce_3s_ease-in-out_infinite] object-cover"
-          />
-        </div>
-        <div className="relative">
-          <div
-            className="absolute top-1/2 -left-2 size-0 -translate-y-1/2 border-8 border-transparent border-r-white"
-            style={{ filter: "drop-shadow(-1px 0 0 #e5e7eb)" }}
-          />
-          <div className="rounded-2xl border border-neutral-200 bg-white px-5 py-4">
-            <p className="text-sm font-medium italic text-foreground/80">
-              Diskuter påstanden med læringspartneren din. Hva tenker dere? Bruk fagbegreper og
-              eksempler.
-            </p>
-          </div>
-        </div>
-      </div>
+      <Professor
+        size="sm"
+        bounce
+        textSize="sm"
+        text="Diskuter påstanden med læringspartneren din. Hva tenker dere? Bruk fagbegreper og eksempler."
+      />
 
       {/* Group members */}
       {groupMembers.length > 0 && (

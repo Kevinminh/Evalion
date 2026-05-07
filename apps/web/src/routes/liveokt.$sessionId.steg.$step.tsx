@@ -16,14 +16,15 @@ import { cn } from "@workspace/ui/lib/utils";
 // VoteButtons removed — teacher view doesn't vote
 import { useMutation } from "convex/react";
 import { ArrowRight } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { LiveStepSkeleton } from "@workspace/evalion/components/skeletons/live-step-skeleton";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 import { DASHBOARD_URL } from "@/lib/env";
-import { COUNTDOWN_STEP_MS, COUNTDOWN_TOTAL_MS } from "@/lib/timings";
+import { COUNTDOWN_STEP_MS } from "@/lib/timings";
+import { useStep4Countdown } from "@/lib/use-step4-countdown";
 import { Step1Main, Step1Panel } from "./-liveokt/step-1-vote-in-progress";
 import { Step2Main, Step2Panel } from "./-liveokt/step-2-group-discussion";
 import { Step3Main, Step3Panel } from "./-liveokt/step-3-revote";
@@ -66,9 +67,6 @@ function LiveStepPage() {
 
   const [selectedStatement, setSelectedStatement] = useState<number | null>(null);
   // vote and rating state not needed — teacher doesn't interact with student UI
-  const [showCountdown, setShowCountdown] = useState(false);
-  const [countdownNumber, setCountdownNumber] = useState(3);
-  const [countdownDone, setCountdownDone] = useState(false);
   const [panelTab, setPanelTab] = useState("default");
   const [begrunnelseIdx, setBegrunnelseIdx] = useState(0);
   const [recording, setRecording] = useState(false);
@@ -77,7 +75,7 @@ function LiveStepPage() {
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [usedStatements, setUsedStatements] = useState<Set<number>>(new Set());
 
-  const countdownTriggered = useRef(false);
+  const { showCountdown, countdownNumber, countdownDone } = useStep4Countdown(step);
 
   const selectedIdx = selectedStatement ?? session?.currentStatementIndex ?? 0;
   const statement = fagprat?.statements[selectedIdx];
@@ -147,34 +145,6 @@ function LiveStepPage() {
       toast.error("Kunne ikke bytte steg. Prøv igjen.");
     }
   };
-
-  // Step 4 countdown effect
-  useEffect(() => {
-    if (step !== 4) {
-      countdownTriggered.current = false;
-      setCountdownDone(false);
-      return;
-    }
-    if (countdownTriggered.current) return;
-
-    countdownTriggered.current = true;
-    setShowCountdown(true);
-    setCountdownNumber(3);
-    setCountdownDone(false);
-
-    const t1 = setTimeout(() => setCountdownNumber(2), COUNTDOWN_STEP_MS);
-    const t2 = setTimeout(() => setCountdownNumber(1), COUNTDOWN_STEP_MS * 2);
-    const t3 = setTimeout(() => {
-      setShowCountdown(false);
-      setCountdownDone(true);
-    }, COUNTDOWN_TOTAL_MS);
-
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-    };
-  }, [step]);
 
   // Reset panel tab and begrunnelse index when step or statement changes
   useEffect(() => {
@@ -313,7 +283,7 @@ function LiveStepPage() {
         const isOdd = fagprat.statements.length % 2 !== 0;
         return (
           <div className="flex flex-col items-start gap-6 lg:flex-row lg:gap-10">
-            <Professor size="lg" label="Velg en påstand" className="flex-col pt-4 lg:pt-8" />
+            <Professor size="2xl" label="Velg en påstand" className="flex-col pt-4 lg:pt-8" />
             <div className="grid w-full flex-1 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
               {fagprat.statements.map((s, i) => {
                 const isSelected = selectedStatement === i;

@@ -16,7 +16,7 @@ export function Step6Main({ statementCard, statement }: Step6MainProps) {
     <div className="flex flex-col items-center gap-8 pt-8">
       {statement && <FasitBadge fasit={statement.fasit} />}
       {statementCard}
-      <Professor size="sm" text="Vurder fra 1 til 5 hvor godt du forstår påstanden nå." />
+      <Professor size="md" text="Vurder fra 1 til 5 hvor godt du forstår påstanden nå." />
     </div>
   );
 }

@@ -1,16 +1,18 @@
 import { useQuery, skipToken } from "@tanstack/react-query";
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { Professor } from "@workspace/evalion/components/live/professor";
+import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
+import { StudentGameSkeleton } from "@workspace/evalion/components/skeletons/student-game-skeleton";
 import { isValidConvexId } from "@workspace/evalion/lib/convex-id";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 import { useMutation } from "convex/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
-import { StudentGameSkeleton } from "@workspace/evalion/components/skeletons/student-game-skeleton";
 import { api, fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
-import { COUNTDOWN_STEP_MS, COUNTDOWN_TOTAL_MS } from "@/lib/timings";
+import { useBegrunnelseDraft } from "@/lib/use-begrunnelse-draft";
+import { useStep4Countdown } from "@/lib/use-step4-countdown";
 
 import { StudentAvatar } from "./-spill/student-avatar";
 import { StudentTopbar } from "./-spill/student-topbar";
@@ -77,87 +79,29 @@ function StudentGamePage() {
   const removeStudentMutation = useMutation(api.liveSessions.removeStudent);
 
   const [ratingSent, setRatingSent] = useState(false);
-  const [begrunnelseText, setBegrunnelseText] = useState("");
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
-  const [showCountdown, setShowCountdown] = useState(false);
-  const [countdownNumber, setCountdownNumber] = useState(3);
-  const [countdownDone, setCountdownDone] = useState(false);
 
-  const countdownTriggered = useRef(false);
-  const prevStep = useRef<number | undefined>(undefined);
+  const currentStep = session?.currentStep ?? -1;
 
-  // Reset state when step changes
+  const {
+    text: begrunnelseText,
+    setText: setBegrunnelseText,
+    clear: clearBegrunnelseDraft,
+  } = useBegrunnelseDraft(student?.sessionId, typedStudentId, statementIndex);
+
+  const { showCountdown, countdownNumber, countdownDone } = useStep4Countdown(currentStep);
+
+  // Reset rating-sent flag when moving to a new statement
   useEffect(() => {
-    if (session?.currentStep !== prevStep.current) {
-      setRatingSent(false);
-      prevStep.current = session?.currentStep;
-    }
-  }, [session?.currentStep]);
-
-  // Persist begrunnelse drafts to localStorage
-  const draftKey =
-    student?.sessionId && typedStudentId
-      ? `begrunnelse:${student.sessionId}:${typedStudentId}:${statementIndex}`
-      : null;
-
-  useEffect(() => {
-    if (!draftKey) return;
-    try {
-      const saved = localStorage.getItem(draftKey);
-      setBegrunnelseText(saved ?? "");
-    } catch {
-      setBegrunnelseText("");
-    }
-  }, [draftKey]);
-
-  useEffect(() => {
-    if (!draftKey) return;
-    try {
-      if (begrunnelseText) {
-        localStorage.setItem(draftKey, begrunnelseText);
-      } else {
-        localStorage.removeItem(draftKey);
-      }
-    } catch {
-      // localStorage unavailable
-    }
-  }, [draftKey, begrunnelseText]);
+    setRatingSent(false);
+  }, [statementIndex]);
 
   // Check if student already voted this round
-  const currentStep = session?.currentStep ?? -1;
   const round = currentStep === 1 ? 1 : currentStep === 3 ? 2 : 0;
   const existingVote = votes?.find(
     (v) => v.studentId === typedStudentId && v.round === round,
   );
   const hasVoted = !!existingVote;
-
-  // Step 4 countdown
-  useEffect(() => {
-    if (currentStep !== 4) {
-      countdownTriggered.current = false;
-      setCountdownDone(false);
-      return;
-    }
-    if (countdownTriggered.current) return;
-
-    countdownTriggered.current = true;
-    setShowCountdown(true);
-    setCountdownNumber(3);
-    setCountdownDone(false);
-
-    const t1 = setTimeout(() => setCountdownNumber(2), COUNTDOWN_STEP_MS);
-    const t2 = setTimeout(() => setCountdownNumber(1), COUNTDOWN_STEP_MS * 2);
-    const t3 = setTimeout(() => {
-      setShowCountdown(false);
-      setCountdownDone(true);
-    }, COUNTDOWN_TOTAL_MS);
-
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-    };
-  }, [currentStep]);
 
   if (studentLoading) {
     return <StudentGameSkeleton />;
@@ -210,13 +154,7 @@ function StudentGamePage() {
     if (session.status === "lobby") {
       return (
         <div className="flex flex-col items-center gap-6 py-8">
-          <div className="size-28 overflow-hidden rounded-full border-4 border-primary/20">
-            <img
-              src="/professoren.png"
-              alt="Professoren"
-              className="size-full animate-[gentle-bounce_3s_ease-in-out_infinite] object-cover"
-            />
-          </div>
+          <Professor size="lg" bounce bordered />
           <h1 className="text-xl font-extrabold text-foreground">Hei, {student.name}!</h1>
           <div className="flex items-center text-muted-foreground">
             Venter på at læreren starter
@@ -272,9 +210,7 @@ function StudentGamePage() {
                   round: 1,
                   text: begrunnelse.trim(),
                 });
-                if (draftKey) {
-                  try { localStorage.removeItem(draftKey); } catch { /* noop */ }
-                }
+                clearBegrunnelseDraft();
               }
             }}
           />
@@ -313,7 +249,7 @@ function StudentGamePage() {
         if (!statement) return null;
         return (
           <Step4Reveal
-            statement={statement as { text: string; fasit: "sant" | "usant" | "delvis" }}
+            statement={statement}
             showCountdown={showCountdown}
             countdownNumber={countdownNumber}
             countdownDone={countdownDone}
@@ -323,17 +259,13 @@ function StudentGamePage() {
 
       case 5:
         if (!statement) return null;
-        return (
-          <Step5Explanation
-            statement={statement as { text: string; fasit: "sant" | "usant" | "delvis"; explanation: string }}
-          />
-        );
+        return <Step5Explanation statement={statement} />;
 
       case 6:
         if (!statement) return null;
         return (
           <Step6Rating
-            statement={statement as { text: string; fasit: "sant" | "usant" | "delvis" }}
+            statement={statement}
             ratingSent={ratingSent}
             onRate={async (n) => {
               setRatingSent(true);
