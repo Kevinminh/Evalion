@@ -10,9 +10,16 @@ interface DistributionChartProps {
   bars: DistributionBar[];
   total: number;
   height?: number;
+  /** When this changes, bars re-animate from 0. Useful between voting rounds. */
+  resetKey?: string | number;
 }
 
-export function DistributionChart({ bars, total, height = 160 }: DistributionChartProps) {
+export function DistributionChart({
+  bars,
+  total,
+  height = 160,
+  resetKey,
+}: DistributionChartProps) {
   const maxValue = Math.max(...bars.map((b) => b.value), 1);
 
   return (
@@ -21,12 +28,17 @@ export function DistributionChart({ bars, total, height = 160 }: DistributionCha
         const pct = total > 0 ? Math.round((bar.value / total) * 100) : 0;
         const barHeight = total > 0 ? (bar.value / maxValue) * (height - 40) : 0;
         return (
-          <div key={bar.label} className="flex flex-col items-center gap-1">
-            <span className="text-xs font-bold text-foreground">{bar.value}</span>
-            <span className="text-[10px] font-semibold text-muted-foreground">{pct}%</span>
+          <div key={`${resetKey ?? ""}:${bar.label}`} className="flex flex-col items-center gap-1">
+            <span className="text-xs font-bold text-foreground tabular-nums">{bar.value}</span>
+            <span className="text-[10px] font-semibold text-muted-foreground tabular-nums">
+              {pct}%
+            </span>
             <div
-              className={cn("w-12 rounded-t-lg transition-all duration-500", bar.color)}
-              style={{ height: Math.max(barHeight, 4) }}
+              className={cn("w-12 rounded-t-lg", bar.color)}
+              style={{
+                height: Math.max(barHeight, 4),
+                transition: "height 600ms cubic-bezier(0.25, 0.1, 0.25, 1)",
+              }}
             />
             <span className="text-xs font-semibold text-muted-foreground">{bar.label}</span>
           </div>

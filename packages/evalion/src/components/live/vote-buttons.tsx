@@ -5,22 +5,16 @@ const options = [
     value: "sant" as const,
     label: "Sant",
     bg: "bg-sant",
-    hover: "hover:brightness-110",
-    glow: "shadow-[0_0_20px_var(--sant)/40%]",
-  },
-  {
-    value: "usant" as const,
-    label: "Usant",
-    bg: "bg-usant",
-    hover: "hover:brightness-110",
-    glow: "shadow-[0_0_20px_var(--usant)/40%]",
   },
   {
     value: "delvis" as const,
     label: "Delvis sant",
     bg: "bg-delvis",
-    hover: "hover:brightness-110",
-    glow: "shadow-[0_0_20px_var(--delvis)/40%]",
+  },
+  {
+    value: "usant" as const,
+    label: "Usant",
+    bg: "bg-usant",
   },
 ] as const;
 
@@ -32,26 +26,32 @@ interface VoteButtonsProps {
 
 export function VoteButtons({ selected, onVote, disabled }: VoteButtonsProps) {
   return (
-    <div className="flex justify-center gap-4">
-      {options.map((opt) => (
-        <button
-          key={opt.value}
-          onClick={() => onVote(opt.value)}
-          disabled={disabled}
-          className={cn(
-            "rounded-2xl px-8 py-4 text-lg font-extrabold text-white transition-all",
-            opt.bg,
-            opt.hover,
-            selected === opt.value
-              ? `scale-105 ${opt.glow} shadow-[0_4px_0_rgba(0,0,0,0.2)]`
-              : "shadow-[0_3px_0_rgba(0,0,0,0.15)]",
-            selected && selected !== opt.value && "opacity-50 scale-95",
-            disabled && "pointer-events-none",
-          )}
-        >
-          {opt.label}
-        </button>
-      ))}
+    <div className="flex flex-wrap justify-center gap-4">
+      {options.map((opt) => {
+        const isSelected = selected === opt.value;
+        const isDimmed = selected !== null && selected !== opt.value;
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => onVote(opt.value)}
+            disabled={disabled}
+            aria-pressed={isSelected}
+            className={cn(
+              "rounded-2xl px-8 py-4 text-lg font-extrabold text-white transition-all duration-150 ease-out",
+              "shadow-[0_4px_0_rgba(0,0,0,0.18)] hover:-translate-y-0.5 hover:shadow-[0_6px_0_rgba(0,0,0,0.2)]",
+              "active:translate-y-1 active:shadow-[0_1px_0_rgba(0,0,0,0.18)]",
+              "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/40",
+              opt.bg,
+              isSelected && "ring-4 ring-white/70 scale-[1.04]",
+              isDimmed && "opacity-55 scale-[0.97]",
+              disabled && "pointer-events-none opacity-70",
+            )}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

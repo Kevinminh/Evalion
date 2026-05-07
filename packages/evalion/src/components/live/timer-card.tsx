@@ -89,12 +89,28 @@ export function TimerCard({
 
   const showControls = !isActive;
 
+  const totalDuration = duration ?? selectedDuration;
+  const pct = isActive && totalDuration > 0 ? displayRemaining / totalDuration : 1;
+  let timerColor = "var(--sant)";
+  if (isActive && pct < 0.25) {
+    timerColor = "var(--usant)";
+  } else if (isActive && pct < 0.5) {
+    timerColor = "var(--delvis)";
+  }
+  const isUrgent = isRunning && displayRemaining > 0 && displayRemaining <= 10;
+
   return (
     <div className="rounded-xl border-[1.5px] border-border bg-card p-4">
       <div className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
         Tid igjen
       </div>
-      <div className="mb-3 text-center font-mono text-4xl font-bold tabular-nums text-foreground">
+      <div
+        className="mb-3 text-center font-mono text-4xl font-bold tabular-nums transition-colors duration-300"
+        style={{
+          color: isActive ? timerColor : "var(--foreground)",
+          animation: isUrgent ? "timer-pulse 1s ease-in-out infinite" : undefined,
+        }}
+      >
         {isActive
           ? `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
           : `${String(Math.floor(selectedDuration / 60)).padStart(2, "0")}:${String(selectedDuration % 60).padStart(2, "0")}`}

@@ -136,24 +136,22 @@ function TeacherSessionLayout() {
         <DestructiveButton onClick={endSession}>Avslutt</DestructiveButton>
       </SessionTopBar>
 
-      <div className="flex pt-16 pb-14">
+      <div className="flex min-h-svh pt-16 pb-14">
         <main
           className="flex-1 px-4 py-6 transition-[margin] duration-300 sm:px-8 sm:py-8 md:[margin-right:var(--panel-margin)]"
-          style={cssVars({ "--panel-margin": panelOpen ? "340px" : "0px" })}
+          style={cssVars({ "--panel-margin": teacherStep && panelOpen ? "340px" : "0px" })}
         >
           {teacherStep ? teacherStep.main : <StatementPicker />}
         </main>
-        <TeacherPanel
-          defaultOpen={step !== 5}
-          footer={teacherStep ? <PanelFooter footer={teacherStep.panelFooter} /> : null}
-          onOpenChange={setPanelOpen}
-        >
-          {teacherStep ? (
-            teacherStep.panel
-          ) : (
-            <p className="text-center text-sm text-muted-foreground">Venter på valg...</p>
-          )}
-        </TeacherPanel>
+        {teacherStep && (
+          <TeacherPanel
+            defaultOpen={step !== 5}
+            footer={<PanelFooter footer={teacherStep.panelFooter} />}
+            onOpenChange={setPanelOpen}
+          >
+            {teacherStep.panel}
+          </TeacherPanel>
+        )}
       </div>
 
       <StepNav currentStep={step} completedSteps={completedSteps} onStepClick={goToStep} />

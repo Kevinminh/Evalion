@@ -13,6 +13,7 @@ import { parseStudentId, placeholderConvexId } from "@/lib/route-params";
 
 import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
 import { StudentAvatar } from "@workspace/ui/components/student-avatar";
+import { cn } from "@workspace/ui/lib/utils";
 import { StudentGameProvider, useStudentGame } from "@/components/spill/student-game-context";
 import { phaseStepNumber } from "@/types/student-phase";
 import { StudentStepRenderer } from "@/components/spill/student-step-renderer";
@@ -107,6 +108,11 @@ function StudentGameLayout({ onLeave }: { onLeave: () => void }) {
     }
   };
 
+  // Step 0 (waiting for the teacher to pick a påstand) needs more horizontal
+  // room so the Professor and the påstand cards can sit side-by-side on iPads,
+  // matching the landing-page demo layout.
+  const useWideLayout = session.status === "active" && phase.kind === "waiting";
+
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-background px-6 py-8">
       <StudentTopbar
@@ -117,7 +123,12 @@ function StudentGameLayout({ onLeave }: { onLeave: () => void }) {
         onLeave={() => setShowLeaveConfirm(true)}
       />
 
-      <div className="flex w-full max-w-md flex-col items-center pt-8">
+      <div
+        className={cn(
+          "flex w-full flex-col items-center pt-8",
+          useWideLayout ? "max-w-3xl" : "max-w-md",
+        )}
+      >
         <StudentGameContent onLeave={onLeave} />
       </div>
 

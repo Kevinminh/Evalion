@@ -118,13 +118,26 @@ export const STATEMENT_COLORS = [
   { name: "red", bg: "bg-red-100", border: "border-red-300", text: "text-red-700" },
 ] as const;
 
-/** Hex variant of statement colors for use outside Tailwind (e.g. inline styles) */
+/** Hex variant of statement colors for use outside Tailwind (e.g. inline styles).
+ * `text` is the teacher-card text color; `textStudent` is the slightly
+ * different student-card text color. These mirror the demo HTML mockups
+ * (`fagprat-steg0.html` / `demo-steg0-elev.html`). */
 export const STATEMENT_COLORS_HEX = [
-  { bg: "#FFFDE7", border: "#FFE082" },
-  { bg: "#E3F1FC", border: "#90CAF9" },
-  { bg: "#FFF3E0", border: "#FFCC80" },
-  { bg: "#F3EEFF", border: "#CE93D8" },
-  { bg: "#FFEBEE", border: "#EF9A9A" },
+  { bg: "#FFFDE7", border: "#FFE082", text: "#8D6E00", textStudent: "#5D4037" },
+  { bg: "#E3F1FC", border: "#90CAF9", text: "#2C5F8A", textStudent: "#1565C0" },
+  { bg: "#FFF3E0", border: "#FFCC80", text: "#B35C00", textStudent: "#BF360C" },
+  { bg: "#F3EEFF", border: "#CE93D8", text: "#6A1B9A", textStudent: "#6A1B9A" },
+  { bg: "#FFEBEE", border: "#EF9A9A", text: "#C62828", textStudent: "#B71C1C" },
+] as const;
+
+/** Student card variants. Slightly warmer bg/border than the teacher set;
+ *  matches `demo-steg0-elev.html` `.sv-card-*` classes. */
+export const STATEMENT_COLORS_STUDENT_HEX = [
+  { bg: "#FFF8E1", border: "#FFD54F", text: "#5D4037" },
+  { bg: "#E8F4FD", border: "#90CAF9", text: "#1565C0" },
+  { bg: "#FFF3E0", border: "#FFB74D", text: "#BF360C" },
+  { bg: "#F3E5F5", border: "#CE93D8", text: "#6A1B9A" },
+  { bg: "#FFEBEE", border: "#EF9A9A", text: "#B71C1C" },
 ] as const;
 
 export function getStatementColor(index: number) {
@@ -133,6 +146,10 @@ export function getStatementColor(index: number) {
 
 export function getStatementColorHex(index: number) {
   return STATEMENT_COLORS_HEX[index % STATEMENT_COLORS_HEX.length]!;
+}
+
+export function getStatementColorStudentHex(index: number) {
+  return STATEMENT_COLORS_STUDENT_HEX[index % STATEMENT_COLORS_STUDENT_HEX.length]!;
 }
 
 // ── Domain options ──────────────────────────────────────────────────────────

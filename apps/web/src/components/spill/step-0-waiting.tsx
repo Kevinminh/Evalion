@@ -1,46 +1,39 @@
-import { Professor } from "@workspace/evalion/components/live/professor";
+import { STATEMENT_COLORS_STUDENT_HEX } from "@workspace/evalion/lib/constants";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 
 import { useStudentGame } from "./student-game-context";
 
-const CARD_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  blue: { bg: "bg-blue-50", text: "text-blue-800", border: "border-blue-200" },
-  orange: { bg: "bg-orange-50", text: "text-orange-800", border: "border-orange-200" },
-  purple: { bg: "bg-purple-50", text: "text-purple-800", border: "border-purple-200" },
-  yellow: { bg: "bg-yellow-50", text: "text-yellow-800", border: "border-yellow-200" },
-  red: { bg: "bg-red-50", text: "text-red-800", border: "border-red-200" },
-};
-
-const DEFAULT_ORDER = ["blue", "orange", "purple", "yellow"];
-
 export function Step0Waiting() {
   const { fagprat } = useStudentGame();
-  const statements = fagprat.statements;
+  const statements = fagprat.statements ?? [];
 
   return (
-    <div className="flex w-full flex-col items-center gap-6">
-      <div className="flex items-center gap-4">
-        <Professor size="sm" bounce />
-        <div>
-          <h2 className="text-lg font-bold text-foreground">Læreren velger en påstand</h2>
-          <div className="flex items-center text-muted-foreground">
-            Venter
-            <WaitingDots />
-          </div>
-        </div>
+    <div className="flex w-full flex-col items-center justify-center gap-6 sm:flex-row sm:items-center sm:gap-8">
+      <div className="flex shrink-0 flex-col items-center gap-2">
+        <img
+          src="/professoren.png"
+          alt="Professoren"
+          className="size-20 rounded-full border-[3px] border-primary/20 bg-muted object-cover sm:size-24 md:size-28 animate-[gentle-bounce_3s_ease-in-out_infinite]"
+        />
+        <span className="text-xs font-semibold text-muted-foreground">Venter på læreren</span>
+        <WaitingDots />
       </div>
 
-      {statements && statements.length > 0 && (
-        <div className="grid w-full max-w-lg gap-3">
+      {statements.length > 0 && (
+        <div className="grid w-full max-w-md gap-3 sm:max-w-sm sm:flex-1">
           {statements.map((stmt, i) => {
-            const colorKey = stmt.color ?? DEFAULT_ORDER[i % DEFAULT_ORDER.length]!;
-            const colors = CARD_COLORS[colorKey] ?? CARD_COLORS.blue!;
+            const color = STATEMENT_COLORS_STUDENT_HEX[i % STATEMENT_COLORS_STUDENT_HEX.length]!;
             return (
               <div
                 key={i}
-                className={`rounded-xl border-2 ${colors.border} ${colors.bg} p-4 text-center`}
+                style={{
+                  backgroundColor: color.bg,
+                  borderColor: color.border,
+                  color: color.text,
+                }}
+                className="flex min-h-[64px] items-center justify-center rounded-xl border-2 px-4 py-3 text-center text-sm font-semibold leading-relaxed transition-all"
               >
-                <p className={`text-sm font-bold ${colors.text}`}>{stmt.text}</p>
+                {stmt.text}
               </div>
             );
           })}

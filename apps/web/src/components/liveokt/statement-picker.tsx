@@ -1,5 +1,5 @@
-import { Professor } from "@workspace/evalion/components/live/professor";
 import { STATEMENT_COLORS_HEX } from "@workspace/evalion/lib/constants";
+import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 import { cn } from "@workspace/ui/lib/utils";
 
 import { COUNTDOWN_STEP_MS } from "@/lib/timings";
@@ -9,18 +9,29 @@ import { useTeacherSession } from "./teacher-session-context";
 export function StatementPicker() {
   const { fagprat, selectedStatement, setSelectedStatement, usedStatements, goToStep } =
     useTeacherSession();
-  const isOdd = fagprat.statements.length % 2 !== 0;
+  const count = fagprat.statements.length;
+  const isOdd = count % 2 !== 0;
+  const isSmallCount = count <= 4;
+  const hasSomeSelected = selectedStatement !== null;
 
   return (
-    <div className="flex flex-col items-start gap-6 lg:flex-row lg:gap-10">
-      <Professor size="2xl" label="Velg en påstand" className="flex-col pt-4 lg:pt-8" />
-      <div className="grid w-full flex-1 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+    <div className="flex h-full w-full flex-col items-center justify-evenly gap-8 py-4 lg:flex-row lg:gap-12">
+      <div className="flex shrink-0 flex-col items-center gap-2">
+        <img
+          src="/professoren.png"
+          alt="Professoren"
+          className="size-32 rounded-full border-[5px] border-primary/20 bg-muted object-cover sm:size-40 lg:size-[180px] xl:size-[220px]"
+        />
+        <span className="text-base font-semibold text-muted-foreground">Velg en påstand</span>
+        <WaitingDots />
+      </div>
+
+      <div className="grid w-full max-w-[900px] shrink-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
         {fagprat.statements.map((s, i) => {
           const isSelected = selectedStatement === i;
-          const hasSomeSelected = selectedStatement !== null;
-          const isLast = i === fagprat.statements.length - 1;
+          const isLast = i === count - 1;
           const isUsed = usedStatements.has(i);
-          const color = STATEMENT_COLORS_HEX[i % STATEMENT_COLORS_HEX.length];
+          const color = STATEMENT_COLORS_HEX[i % STATEMENT_COLORS_HEX.length]!;
           return (
             <button
               key={i}
@@ -33,13 +44,18 @@ export function StatementPicker() {
               style={{
                 backgroundColor: color.bg,
                 borderColor: color.border,
+                color: color.text,
               }}
               className={cn(
-                "relative rounded-2xl border-2 p-6 text-left text-base font-semibold transition-all duration-300 hover:scale-[1.03]",
-                isSelected && "scale-105 ring-2 ring-primary",
+                "relative flex items-center justify-center rounded-2xl border-2 text-center font-semibold leading-relaxed transition-all duration-300",
+                isSmallCount
+                  ? "min-h-[130px] px-6 py-5 text-base"
+                  : "min-h-[110px] px-5 py-4 text-sm",
+                "hover:scale-[1.03] hover:shadow-lg",
+                isSelected && "scale-105 shadow-xl",
                 hasSomeSelected && !isSelected && "scale-[0.97] opacity-40",
-                isUsed && "cursor-default opacity-40 hover:scale-100",
-                isOdd && isLast && "col-span-2 mx-auto max-w-[calc(50%-12px)]",
+                isUsed && "cursor-default opacity-40 hover:scale-100 hover:shadow-none",
+                isOdd && isLast && "col-span-1 sm:col-span-2 sm:mx-auto sm:max-w-[calc(50%-12px)]",
               )}
             >
               {s.text}
