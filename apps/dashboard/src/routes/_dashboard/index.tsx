@@ -38,6 +38,7 @@ function UtforskPage() {
           : undefined;
 
   const showNone = !forkunnskapIntro && !forkunnskapOppsummering;
+  const isSearching = debouncedSearchQuery.length > 0;
 
   const { results, status, loadMore } = usePaginatedQuery(
     api.fagprats.search,
@@ -104,29 +105,31 @@ function UtforskPage() {
 
         {filterOpen && (
           <div className="filter-panel">
-            <div className="filter-section">
-              <div className="filter-section-label">Sortering</div>
-              <div className="filter-sort-options">
-                <label className="filter-radio">
-                  <input
-                    type="radio"
-                    name="sort"
-                    checked={sortBy === "relevant"}
-                    onChange={() => setSortBy("relevant")}
-                  />
-                  Mest relevant
-                </label>
-                <label className="filter-radio">
-                  <input
-                    type="radio"
-                    name="sort"
-                    checked={sortBy === "newest"}
-                    onChange={() => setSortBy("newest")}
-                  />
-                  Nyeste
-                </label>
+            {!isSearching && (
+              <div className="filter-section">
+                <div className="filter-section-label">Sortering</div>
+                <div className="filter-sort-options">
+                  <label className="filter-radio">
+                    <input
+                      type="radio"
+                      name="sort"
+                      checked={sortBy === "relevant"}
+                      onChange={() => setSortBy("relevant")}
+                    />
+                    Mest relevant
+                  </label>
+                  <label className="filter-radio">
+                    <input
+                      type="radio"
+                      name="sort"
+                      checked={sortBy === "newest"}
+                      onChange={() => setSortBy("newest")}
+                    />
+                    Nyeste
+                  </label>
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="filter-section">
               <div className="filter-section-label">Forkunnskaper</div>
