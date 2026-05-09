@@ -1,20 +1,21 @@
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { api } from "@workspace/backend/convex/_generated/api";
+import { FagPratCardSkeleton } from "@workspace/evalion/components/skeletons/fagprat-card-skeleton";
+import { usePaginatedQuery } from "convex/react";
 import { useRef, useState } from "react";
 
 import { CustomDropdown } from "@/components/custom-dropdown";
-import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { FagPratCard } from "@/components/fagprat-card";
-import { FagPratCardSkeleton } from "@workspace/evalion/components/skeletons/fagprat-card-skeleton";
 import { TypeIcon } from "@/components/type-icon";
 import { LEVEL_OPTIONS, SKELETON_COUNT, SUBJECT_OPTIONS } from "@/lib/constants";
-import { fagpratQueries } from "@/lib/convex";
 import { useClickOutside } from "@/lib/use-click-outside";
 import { useDebouncedValue } from "@/lib/use-debounced-value";
 
 export const Route = createFileRoute("/_dashboard/")({
   component: UtforskPage,
 });
+
+const PAGE_SIZE = 6;
 
 function UtforskPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,23 +39,27 @@ function UtforskPage() {
 
   const showNone = !forkunnskapIntro && !forkunnskapOppsummering;
 
-  const {
-    data: searchResults,
-    isPending,
-    isError,
-  } = useQuery(
-    fagpratQueries.search({
-      searchText: debouncedSearchQuery || undefined,
-      subject: selectedFag || undefined,
-      level: selectedTrinn || undefined,
-      type: typeFilter,
-      sortBy: sortBy === "newest" ? "recent" : "relevant",
-    }),
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.fagprats.search,
+    showNone
+      ? "skip"
+      : {
+          searchText: debouncedSearchQuery || undefined,
+          subject: selectedFag || undefined,
+          level: selectedTrinn || undefined,
+          type: typeFilter,
+          sortBy: sortBy === "newest" ? "recent" : "relevant",
+        },
+    { initialNumItems: PAGE_SIZE },
   );
 
-  const filtered = showNone ? [] : (searchResults ?? []);
-
   useClickOutside(filterRef, () => setFilterOpen(false));
+
+  const isFirstLoad = !showNone && status === "LoadingFirstPage";
+  const isLoadingMore = status === "LoadingMore";
+  const canLoadMore = status === "CanLoadMore";
+  const items = showNone ? [] : (results ?? []);
+  const isEmpty = !isFirstLoad && items.length === 0;
 
   return (
     <>
@@ -171,9 +176,7 @@ function UtforskPage() {
 
       <h2 className="section-title">Populære FagPrater</h2>
 
-      {isError && <ErrorState className="py-12 text-center" />}
-
-      {isPending && (
+      {isFirstLoad && (
         <div className="fp-grid">
           {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
             <FagPratCardSkeleton key={i} />
@@ -181,15 +184,30 @@ function UtforskPage() {
         </div>
       )}
 
-      {!isPending && (
+      {!isFirstLoad && items.length > 0 && (
         <div className="fp-grid">
-          {filtered.map((fp) => (
+          {items.map((fp) => (
             <FagPratCard key={fp._id} fagprat={fp} variant="browse" />
           ))}
+          {isLoadingMore &&
+            Array.from({ length: 3 }).map((_, i) => <FagPratCardSkeleton key={`more-${i}`} />)}
         </div>
       )}
 
-      {!isPending && filtered.length === 0 && (
+      {(canLoadMore || isLoadingMore) && (
+        <div className="flex justify-center py-8">
+          <button
+            type="button"
+            onClick={() => loadMore(PAGE_SIZE)}
+            disabled={isLoadingMore}
+            className="rounded-xl border-2 border-input bg-background px-6 py-3 text-sm font-semibold transition-colors hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isLoadingMore ? "Laster…" : "Last inn flere"}
+          </button>
+        </div>
+      )}
+
+      {isEmpty && (
         <p className="py-12 text-center text-muted-foreground">
           {debouncedSearchQuery
             ? `Ingen FagPrater funnet for "${debouncedSearchQuery}"`
