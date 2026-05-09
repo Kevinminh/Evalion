@@ -8,7 +8,7 @@ import {
 } from "@workspace/ui/components/dropdown-menu";
 import { Button } from "@workspace/ui/components/button";
 import { useMutation } from "convex/react";
-import { Users, Pencil, MoreVertical, Play, Copy, Trash2 } from "lucide-react";
+import { Users, Pencil, MoreVertical, Copy, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -55,40 +55,38 @@ export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
 
   return (
     <div
-      className="flex cursor-pointer flex-col rounded-2xl border-[1.5px] border-border bg-card p-6 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-[3px] hover:border-primary/30 hover:shadow-md"
+      className="fp-card"
       onClick={() => navigate({ to: "/fagprat/$id", params: { id: fagprat._id } })}
     >
-      {/* Tags */}
-      <div className="mb-4 flex flex-wrap gap-2">
-        <span className="inline-block rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
-          {fagprat.subject}
-        </span>
-        <span className="inline-block rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
-          {fagprat.level}
-        </span>
+      <div className="fp-card-tags">
+        <span className="fp-card-tag">{fagprat.subject}</span>
+        <span className="fp-card-tag">{fagprat.level}</span>
         <TypeIcon type={fagprat.type} />
       </div>
 
-      {/* Title */}
-      <h3 className="mb-2 text-lg font-extrabold leading-snug text-foreground">{fagprat.title}</h3>
-
-      {/* Statement count */}
-      <p className="mb-5 text-sm text-muted-foreground">{fagprat.statements.length} påstander</p>
+      <h3 className="fp-card-title">{fagprat.title}</h3>
+      <p className="fp-card-count">{fagprat.statements.length} påstander</p>
 
       {variant === "browse" ? (
         <>
-          {/* Usage */}
-          <div className="mt-auto flex items-center gap-2 pb-3 text-sm text-muted-foreground">
-            <Play className="size-5 text-teal-400" />
+          <div className="fp-card-usage">
+            <svg
+              className="fp-card-usage-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polygon points="10 8 16 12 10 16 10 8" />
+            </svg>
             Brukt {fagprat.usageCount} ganger
           </div>
-          {/* Author */}
-          <div className="border-t border-border/50 pt-3">
-            <AuthorAvatar name={fagprat.authorName} />
-          </div>
+          <AuthorAvatar name={fagprat.authorName} />
         </>
       ) : (
-        /* Collection actions */
         <div className="mt-auto flex items-center gap-3">
           <Button
             variant="teal"
@@ -112,7 +110,6 @@ export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
             <Pencil className="size-4" />
           </button>
 
-          {/* Mer dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger
               aria-label="Flere valg"
