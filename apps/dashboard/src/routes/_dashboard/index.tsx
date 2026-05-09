@@ -10,6 +10,7 @@ import { TypeIcon } from "@/components/type-icon";
 import { LEVEL_OPTIONS, SKELETON_COUNT, SUBJECT_OPTIONS } from "@/lib/constants";
 import { fagpratQueries } from "@/lib/convex";
 import { useClickOutside } from "@/lib/use-click-outside";
+import { useDebouncedValue } from "@/lib/use-debounced-value";
 
 export const Route = createFileRoute("/_dashboard/")({
   component: UtforskPage,
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/_dashboard/")({
 
 function UtforskPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, 250);
   const [filterOpen, setFilterOpen] = useState(false);
   const [sortBy, setSortBy] = useState<"relevant" | "newest">("relevant");
   const [forkunnskapIntro, setForkunnskapIntro] = useState(true);
@@ -42,7 +44,7 @@ function UtforskPage() {
     isError,
   } = useQuery(
     fagpratQueries.search({
-      searchText: searchQuery || undefined,
+      searchText: debouncedSearchQuery || undefined,
       subject: selectedFag || undefined,
       level: selectedTrinn || undefined,
       type: typeFilter,
@@ -66,7 +68,7 @@ function UtforskPage() {
           <span className="search-icon">🔍</span>
           <input
             type="text"
-            placeholder="Søk etter fag, tema, trinn..."
+            placeholder="Søk etter tittel..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="search-input"
@@ -189,7 +191,9 @@ function UtforskPage() {
 
       {!isPending && filtered.length === 0 && (
         <p className="py-12 text-center text-muted-foreground">
-          Ingen FagPrater funnet for &quot;{searchQuery}&quot;
+          {debouncedSearchQuery
+            ? `Ingen FagPrater funnet for "${debouncedSearchQuery}"`
+            : "Ingen FagPrater funnet"}
         </p>
       )}
     </>
