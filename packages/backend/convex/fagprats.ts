@@ -159,13 +159,10 @@ export const search = query({
     subject: v.optional(v.string()),
     level: v.optional(v.string()),
     type: v.optional(v.union(v.literal("intro"), v.literal("oppsummering"))),
-    // sortBy is accepted but currently honored only as newest-first in the
-    // browse branch (BM25 in the search branch). Sort-by-popularity returns
-    // when the usageCount-suffixed indexes land.
     sortBy: v.optional(v.union(v.literal("relevant"), v.literal("recent"))),
   },
   handler: async (ctx, args) => {
-    // Search-text branch: BM25 relevance via the search index.
+    // Search-text branch: BM25 relevance via the search index. sortBy is ignored.
     if (args.searchText && args.searchText.trim().length > 0) {
       return await ctx.db
         .query("fagprats")
@@ -180,29 +177,53 @@ export const search = query({
     }
 
     // Browse branch: pick the most specific compound index for the active
-    // filters and order by _creationTime desc.
+    // filters. The _usageCount variant orders by popularity desc; the plain
+    // index orders by _creationTime desc. Both via .order("desc").
+    const popular = args.sortBy !== "recent";
     const queryBuilder =
       args.subject && args.level
-        ? ctx.db
-            .query("fagprats")
-            .withIndex("by_visibility_subject_level", (q) =>
-              q.eq("visibility", "public").eq("subject", args.subject!).eq("level", args.level!),
-            )
-        : args.subject
+        ? popular
           ? ctx.db
               .query("fagprats")
-              .withIndex("by_visibility_subject", (q) =>
-                q.eq("visibility", "public").eq("subject", args.subject!),
+              .withIndex("by_visibility_subject_level_usageCount", (q) =>
+                q.eq("visibility", "public").eq("subject", args.subject!).eq("level", args.level!),
               )
-          : args.level
+          : ctx.db
+              .query("fagprats")
+              .withIndex("by_visibility_subject_level", (q) =>
+                q.eq("visibility", "public").eq("subject", args.subject!).eq("level", args.level!),
+              )
+        : args.subject
+          ? popular
             ? ctx.db
                 .query("fagprats")
-                .withIndex("by_visibility_level", (q) =>
-                  q.eq("visibility", "public").eq("level", args.level!),
+                .withIndex("by_visibility_subject_usageCount", (q) =>
+                  q.eq("visibility", "public").eq("subject", args.subject!),
                 )
             : ctx.db
                 .query("fagprats")
-                .withIndex("by_visibility", (q) => q.eq("visibility", "public"));
+                .withIndex("by_visibility_subject", (q) =>
+                  q.eq("visibility", "public").eq("subject", args.subject!),
+                )
+          : args.level
+            ? popular
+              ? ctx.db
+                  .query("fagprats")
+                  .withIndex("by_visibility_level_usageCount", (q) =>
+                    q.eq("visibility", "public").eq("level", args.level!),
+                  )
+              : ctx.db
+                  .query("fagprats")
+                  .withIndex("by_visibility_level", (q) =>
+                    q.eq("visibility", "public").eq("level", args.level!),
+                  )
+            : popular
+              ? ctx.db
+                  .query("fagprats")
+                  .withIndex("by_visibility_usageCount", (q) => q.eq("visibility", "public"))
+              : ctx.db
+                  .query("fagprats")
+                  .withIndex("by_visibility", (q) => q.eq("visibility", "public"));
 
     const result = await queryBuilder.order("desc").paginate(args.paginationOpts);
 
