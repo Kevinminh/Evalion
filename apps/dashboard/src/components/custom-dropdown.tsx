@@ -54,7 +54,7 @@ export function CustomDropdown({
           {selected?.label ?? placeholder}
         </button>
         {open && (
-          <div id={listboxId} role="listbox" aria-label={label} className="filter-dropdown-list">
+          <div id={listboxId} role="listbox" aria-label={label} className="filter-dropdown-list space-y-1">
             {options.map((opt) => (
               <button
                 key={opt.value}
