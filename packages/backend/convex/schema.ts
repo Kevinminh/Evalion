@@ -38,7 +38,15 @@ export default defineSchema({
     .index("by_visibility_subject", ["visibility", "subject"])
     .index("by_visibility_level", ["visibility", "level"])
     .index("by_visibility_subject_level", ["visibility", "subject", "level"])
-    .index("by_subject", ["subject"])
+    .index("by_visibility_usageCount", ["visibility", "usageCount"])
+    .index("by_visibility_subject_usageCount", ["visibility", "subject", "usageCount"])
+    .index("by_visibility_level_usageCount", ["visibility", "level", "usageCount"])
+    .index("by_visibility_subject_level_usageCount", [
+      "visibility",
+      "subject",
+      "level",
+      "usageCount",
+    ])
     .searchIndex("search_fagprats", {
       searchField: "title",
       filterFields: ["subject", "level", "type", "visibility"],
@@ -80,7 +88,12 @@ export default defineSchema({
     confidence: v.optional(v.number()),
   })
     .index("by_session_statement", ["sessionId", "statementIndex"])
-    .index("by_session_statement_student_round", ["sessionId", "statementIndex", "studentId", "round"]),
+    .index("by_session_statement_student_round", [
+      "sessionId",
+      "statementIndex",
+      "studentId",
+      "round",
+    ]),
 
   sessionRatings: defineTable({
     sessionId: v.id("liveSessions"),
@@ -100,7 +113,12 @@ export default defineSchema({
     highlighted: v.optional(v.boolean()),
   })
     .index("by_session_statement", ["sessionId", "statementIndex"])
-    .index("by_session_statement_student_round", ["sessionId", "statementIndex", "studentId", "round"])
+    .index("by_session_statement_student_round", [
+      "sessionId",
+      "statementIndex",
+      "studentId",
+      "round",
+    ])
     .index("by_session_student", ["sessionId", "studentId"]),
 
   emailSubscribers: defineTable({
@@ -114,17 +132,13 @@ export default defineSchema({
       v.object({
         clientId: v.string(),
         text: v.string(),
-        fasit: v.optional(
-          v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis")),
-        ),
+        fasit: v.optional(v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis"))),
         forklaring: v.string(),
       }),
     ),
     lastFag: v.optional(v.string()),
     lastTrinn: v.optional(v.string()),
-    lastForkunnskap: v.optional(
-      v.union(v.literal("intro"), v.literal("oppsummering")),
-    ),
+    lastForkunnskap: v.optional(v.union(v.literal("intro"), v.literal("oppsummering"))),
     updatedAt: v.number(),
   }).index("by_user", ["userId"]),
 

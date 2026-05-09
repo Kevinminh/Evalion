@@ -1,3 +1,4 @@
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 
 import { query, mutation } from "./_generated/server";
@@ -53,7 +54,8 @@ export const create = mutation({
     if (args.subject.length > 100) throw new Error("Subject too long (max 100 characters)");
     if (args.level.length > 100) throw new Error("Level too long (max 100 characters)");
     if (args.concepts.length > 20) throw new Error("Too many concepts (max 20)");
-    if (args.concepts.some((c) => c.length > 100)) throw new Error("Concept too long (max 100 characters)");
+    if (args.concepts.some((c) => c.length > 100))
+      throw new Error("Concept too long (max 100 characters)");
     if (args.statements.length > 20) throw new Error("Too many statements (max 20)");
 
     return await ctx.db.insert("fagprats", {
@@ -87,12 +89,18 @@ export const update = mutation({
       throw new Error("Not authorized");
     }
     // Validate string lengths on provided fields
-    if (args.title !== undefined && args.title.length > 200) throw new Error("Title too long (max 200 characters)");
-    if (args.subject !== undefined && args.subject.length > 100) throw new Error("Subject too long (max 100 characters)");
-    if (args.level !== undefined && args.level.length > 100) throw new Error("Level too long (max 100 characters)");
-    if (args.concepts !== undefined && args.concepts.length > 20) throw new Error("Too many concepts (max 20)");
-    if (args.concepts?.some((c) => c.length > 100)) throw new Error("Concept too long (max 100 characters)");
-    if (args.statements !== undefined && args.statements.length > 20) throw new Error("Too many statements (max 20)");
+    if (args.title !== undefined && args.title.length > 200)
+      throw new Error("Title too long (max 200 characters)");
+    if (args.subject !== undefined && args.subject.length > 100)
+      throw new Error("Subject too long (max 100 characters)");
+    if (args.level !== undefined && args.level.length > 100)
+      throw new Error("Level too long (max 100 characters)");
+    if (args.concepts !== undefined && args.concepts.length > 20)
+      throw new Error("Too many concepts (max 20)");
+    if (args.concepts?.some((c) => c.length > 100))
+      throw new Error("Concept too long (max 100 characters)");
+    if (args.statements !== undefined && args.statements.length > 20)
+      throw new Error("Too many statements (max 20)");
 
     const { id, ...fields } = args;
     await ctx.db.patch(id, { ...fields, updatedAt: Date.now() });
@@ -146,6 +154,7 @@ export const duplicate = mutation({
 
 export const search = query({
   args: {
+    paginationOpts: paginationOptsValidator,
     searchText: v.optional(v.string()),
     subject: v.optional(v.string()),
     level: v.optional(v.string()),
@@ -153,57 +162,77 @@ export const search = query({
     sortBy: v.optional(v.union(v.literal("relevant"), v.literal("recent"))),
   },
   handler: async (ctx, args) => {
+    // Search-text branch: BM25 relevance via the search index. sortBy is ignored.
     if (args.searchText && args.searchText.trim().length > 0) {
-      let searchQuery = ctx.db
+      return await ctx.db
         .query("fagprats")
         .withSearchIndex("search_fagprats", (q) => {
-          let s = q.search("title", args.searchText!);
-          s = s.eq("visibility", "public");
+          let s = q.search("title", args.searchText!).eq("visibility", "public");
           if (args.subject) s = s.eq("subject", args.subject);
           if (args.level) s = s.eq("level", args.level);
           if (args.type) s = s.eq("type", args.type);
           return s;
-        });
-      return await searchQuery.collect();
+        })
+        .paginate(args.paginationOpts);
     }
-    // No search text — browse with filters using most specific compound index
-    let results;
-    if (args.subject && args.level) {
-      results = await ctx.db
-        .query("fagprats")
-        .withIndex("by_visibility_subject_level", (q) =>
-          q.eq("visibility", "public").eq("subject", args.subject!).eq("level", args.level!),
-        )
-        .collect();
-    } else if (args.subject) {
-      results = await ctx.db
-        .query("fagprats")
-        .withIndex("by_visibility_subject", (q) =>
-          q.eq("visibility", "public").eq("subject", args.subject!),
-        )
-        .collect();
-    } else if (args.level) {
-      results = await ctx.db
-        .query("fagprats")
-        .withIndex("by_visibility_level", (q) =>
-          q.eq("visibility", "public").eq("level", args.level!),
-        )
-        .collect();
-    } else {
-      results = await ctx.db
-        .query("fagprats")
-        .withIndex("by_visibility", (q) => q.eq("visibility", "public"))
-        .collect();
+
+    // Browse branch: pick the most specific compound index for the active
+    // filters. The _usageCount variant orders by popularity desc; the plain
+    // index orders by _creationTime desc. Both via .order("desc").
+    const popular = args.sortBy !== "recent";
+    const queryBuilder =
+      args.subject && args.level
+        ? popular
+          ? ctx.db
+              .query("fagprats")
+              .withIndex("by_visibility_subject_level_usageCount", (q) =>
+                q.eq("visibility", "public").eq("subject", args.subject!).eq("level", args.level!),
+              )
+          : ctx.db
+              .query("fagprats")
+              .withIndex("by_visibility_subject_level", (q) =>
+                q.eq("visibility", "public").eq("subject", args.subject!).eq("level", args.level!),
+              )
+        : args.subject
+          ? popular
+            ? ctx.db
+                .query("fagprats")
+                .withIndex("by_visibility_subject_usageCount", (q) =>
+                  q.eq("visibility", "public").eq("subject", args.subject!),
+                )
+            : ctx.db
+                .query("fagprats")
+                .withIndex("by_visibility_subject", (q) =>
+                  q.eq("visibility", "public").eq("subject", args.subject!),
+                )
+          : args.level
+            ? popular
+              ? ctx.db
+                  .query("fagprats")
+                  .withIndex("by_visibility_level_usageCount", (q) =>
+                    q.eq("visibility", "public").eq("level", args.level!),
+                  )
+              : ctx.db
+                  .query("fagprats")
+                  .withIndex("by_visibility_level", (q) =>
+                    q.eq("visibility", "public").eq("level", args.level!),
+                  )
+            : popular
+              ? ctx.db
+                  .query("fagprats")
+                  .withIndex("by_visibility_usageCount", (q) => q.eq("visibility", "public"))
+              : ctx.db
+                  .query("fagprats")
+                  .withIndex("by_visibility", (q) => q.eq("visibility", "public"));
+
+    const result = await queryBuilder.order("desc").paginate(args.paginationOpts);
+
+    // type has only two values and isn't in the browse indexes; post-filter
+    // the page. Page sizes can be smaller than requested when type is set.
+    if (args.type) {
+      return { ...result, page: result.page.filter((f) => f.type === args.type) };
     }
-    // Apply type filter (not in index)
-    let filtered = results;
-    if (args.type) filtered = filtered.filter((f) => f.type === args.type);
-    if (args.sortBy === "recent") {
-      filtered.sort((a, b) => b._creationTime - a._creationTime);
-    } else {
-      filtered.sort((a, b) => b.usageCount - a.usageCount);
-    }
-    return filtered;
+    return result;
   },
 });
 
