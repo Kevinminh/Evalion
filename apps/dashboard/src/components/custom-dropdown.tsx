@@ -1,5 +1,4 @@
-import { ChevronDown } from "lucide-react";
-import { useState, useRef, useId } from "react";
+import { useId, useRef, useState } from "react";
 
 import { useClickOutside } from "@/lib/use-click-outside";
 
@@ -11,10 +10,6 @@ interface CustomDropdownProps {
   options: { value: string; label: string }[];
 }
 
-/**
- * ARIA-compliant dropdown for filter/sort controls.
- * For form inputs (e.g. create/edit pages), prefer native <select> elements instead.
- */
 export function CustomDropdown({
   label,
   value,
@@ -41,54 +36,44 @@ export function CustomDropdown({
   };
 
   return (
-    <div ref={ref} className="relative" onKeyDown={handleKeyDown}>
-      {label && (
-        <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-foreground">
-          {label}
-        </label>
-      )}
-      <button
-        ref={buttonRef}
-        type="button"
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-controls={open ? listboxId : undefined}
-        onClick={(e) => {
-          e.stopPropagation();
-          setOpen(!open);
-        }}
-        className="flex w-full items-center justify-between rounded-lg border-[1.5px] border-border bg-card px-3 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-primary/40 focus:border-primary focus:ring-3 focus:ring-primary/20"
-      >
-        <span className={!value ? "text-muted-foreground" : ""}>{selected?.label ?? placeholder}</span>
-        <ChevronDown className="size-4 text-muted-foreground" />
-      </button>
-      {open && (
-        <div
-          id={listboxId}
-          role="listbox"
-          aria-label={label}
-          className="absolute top-full left-0 z-20 mt-1 w-full rounded-lg border-[1.5px] border-border bg-card py-1 shadow-lg"
+    <div onKeyDown={handleKeyDown}>
+      {label && <label className="filter-field-label">{label}</label>}
+      <div ref={ref} className="filter-dropdown">
+        <button
+          ref={buttonRef}
+          type="button"
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-controls={open ? listboxId : undefined}
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpen(!open);
+          }}
+          className={`filter-dropdown-trigger${open ? " open" : ""}`}
         >
-          {options.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              role="option"
-              aria-selected={opt.value === value}
-              onClick={(e) => {
-                e.stopPropagation();
-                onChange(opt.value);
-                setOpen(false);
-              }}
-              className={`w-full px-3 py-2 text-left text-sm transition-colors hover:bg-primary/5 ${
-                opt.value === value ? "font-bold text-primary" : "text-foreground"
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      )}
+          {selected?.label ?? placeholder}
+        </button>
+        {open && (
+          <div id={listboxId} role="listbox" aria-label={label} className="filter-dropdown-list space-y-1">
+            {options.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                role="option"
+                aria-selected={opt.value === value}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
+                className={`filter-dropdown-option${opt.value === value ? " selected" : ""}`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

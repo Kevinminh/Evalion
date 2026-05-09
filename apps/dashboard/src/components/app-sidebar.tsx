@@ -1,36 +1,38 @@
 import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
-import { UserMenu } from "@workspace/evalion/components/auth/user-menu";
-import { Button } from "@workspace/ui/components/button";
-import { DropdownMenuItem } from "@workspace/ui/components/dropdown-menu";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@workspace/ui/components/sidebar";
-import { Search, FolderOpen, Clock, Plus, Settings, HelpCircle } from "lucide-react";
-import type { ComponentProps } from "react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@workspace/ui/components/dropdown-menu";
+import { HelpCircle, LogOut, Settings } from "lucide-react";
 
 import { authClient } from "@/lib/auth-client";
 
 const navItems = [
-  { label: "Utforsk", path: "/" as const, icon: Search },
-  { label: "Min samling", path: "/min-samling" as const, icon: FolderOpen },
-  { label: "Historikk", path: "/historikk" as const, icon: Clock },
+  { label: "Utforsk", path: "/" as const, icon: "🔍" },
+  { label: "Min samling", path: "/min-samling" as const, icon: "📁" },
+  { label: "Historikk", path: "/historikk" as const, icon: "🕐" },
 ];
 
-export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return (parts[0]?.[0] ?? "?").toUpperCase();
+  const first = parts[0]?.[0] ?? "";
+  const last = parts[parts.length - 1]?.[0] ?? "";
+  return (first + last).toUpperCase();
+}
+
+export function AppSidebar() {
   const matchRoute = useMatchRoute();
   const navigate = useNavigate();
   const { data: session } = authClient.useSession();
+
   const isActive = (path: string) => {
-    if (path === "/") return matchRoute({ to: "/", fuzzy: false });
-    return matchRoute({ to: path, fuzzy: true });
+    if (path === "/") return !!matchRoute({ to: "/", fuzzy: false });
+    return !!matchRoute({ to: path, fuzzy: true });
   };
 
   const handleLogout = async () => {
@@ -38,51 +40,46 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
     await navigate({ to: "/login" });
   };
 
+  const name = session?.user?.name ?? "Bruker";
+  const email = session?.user?.email ?? "";
+
   return (
-    <Sidebar {...props}>
-      <SidebarHeader className="items-center justify-center px-4 pt-4 pb-2">
-        <img src="/logo.png" alt="Evalion" className="h-16 object-contain" />
-      </SidebarHeader>
+    <nav className="sidebar">
+      <div className="sidebar-logo">
+        <img src="/logo.png" alt="Evalion" />
+      </div>
 
-      <SidebarGroup className="px-4 py-2">
-        <Button
-          variant="accent"
-          className="w-full rounded-lg"
-          render={<Link to="/lag-fagprat" search={{ draft: "" }} />}
-        >
-          <Plus className="size-5" />
-          Lag en FagPrat
-        </Button>
-      </SidebarGroup>
+      <div className="sidebar-cta">
+        <Link to="/lag-fagprat" search={{ draft: "" }} className="sidebar-cta-btn">
+          <span className="sidebar-cta-icon">+</span>
+          <span>Lag en FagPrat</span>
+        </Link>
+      </div>
 
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton
-                    isActive={!!isActive(item.path)}
-                    tooltip={item.label}
-                    render={<Link to={item.path} />}
-                  >
-                    <item.icon />
-                    <span>{item.label}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
+      <div className="sidebar-nav">
+        {navItems.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            className={`sidebar-item${isActive(item.path) ? " active" : ""}`}
+          >
+            <span className="sidebar-item-icon">{item.icon}</span>
+            <span className="sidebar-item-label">{item.label}</span>
+          </Link>
+        ))}
+      </div>
 
-      <SidebarFooter>
-        <UserMenu
-          name={session?.user?.name ?? "Bruker"}
-          email={session?.user?.email ?? ""}
-          variant="expanded"
-          onLogout={handleLogout}
-        >
+      <div className="sidebar-spacer" />
+
+      <DropdownMenu>
+        <DropdownMenuTrigger className="sidebar-user">
+          <div className="sidebar-user-avatar">{getInitials(name)}</div>
+          <div className="sidebar-user-info">
+            <span className="sidebar-user-name">{name}</span>
+            <span className="sidebar-user-email">{email}</span>
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" side="top" sideOffset={8}>
           <DropdownMenuItem render={<Link to="/profile" />}>
             <Settings className="size-4" />
             Innstillinger
@@ -91,8 +88,13 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
             <HelpCircle className="size-4" />
             Hjelp
           </DropdownMenuItem>
-        </UserMenu>
-      </SidebarFooter>
-    </Sidebar>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleLogout}>
+            <LogOut className="size-4" />
+            Logg ut
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </nav>
   );
 }
