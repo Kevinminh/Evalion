@@ -192,8 +192,6 @@ function UtforskPage() {
           {items.map((fp) => (
             <FagPratCard key={fp._id} fagprat={fp} variant="browse" />
           ))}
-          {isLoadingMore &&
-            Array.from({ length: 3 }).map((_, i) => <FagPratCardSkeleton key={`more-${i}`} />)}
         </div>
       )}
 
@@ -203,9 +201,17 @@ function UtforskPage() {
             type="button"
             onClick={() => loadMore(PAGE_SIZE)}
             disabled={isLoadingMore}
-            className="rounded-xl border-2 border-input bg-background px-6 py-3 text-sm font-semibold transition-colors hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-60"
+            className="load-more-btn"
           >
-            {isLoadingMore ? "Laster…" : "Last inn flere"}
+            {isLoadingMore ? (
+              <span className="load-more-dots" aria-label="Laster">
+                <span />
+                <span />
+                <span />
+              </span>
+            ) : (
+              "Last inn flere"
+            )}
           </button>
         </div>
       )}
