@@ -13,11 +13,13 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 
 import { ConceptTags } from "@/components/concept-tags";
+import { CustomDropdown } from "@/components/custom-dropdown";
 import { ForkunnskapSelector } from "@/components/forkunnskap-selector";
 import { ReddiModal } from "@/components/reddi-modal";
 import { StatementEditor } from "@/components/statement-editor";
-import { SUBJECT_OPTIONS, LEVEL_OPTIONS } from "@/lib/constants";
-import type { FagPratType } from "@/lib/types";
+import { VisibilityToggle } from "@/components/visibility-toggle";
+import { LABEL_CLASS, SUBJECT_OPTIONS, LEVEL_OPTIONS } from "@/lib/constants";
+import type { FagPratType, Visibility } from "@/lib/types";
 
 const searchSchema = z.object({
   draft: z.string().catch(""),
@@ -37,6 +39,7 @@ function LagFagPratPage() {
   const [fag, setFag] = useState("");
   const [trinn, setTrinn] = useState("");
   const [forkunnskap, setForkunnskap] = useState<FagPratType | null>(null);
+  const [visibility, setVisibility] = useState<Visibility>("public");
   const [reddiOpen, setReddiOpen] = useState(false);
   const {
     statements,
@@ -79,7 +82,8 @@ function LagFagPratPage() {
     });
   };
 
-  const canProceed = title.trim() && fag && trinn && forkunnskap;
+  const canProceed = fag && trinn && forkunnskap && statements.length > 0;
+  const reddiReady = fag && trinn && forkunnskap;
 
   const handleNext = () => {
     setStep(2);
@@ -88,20 +92,39 @@ function LagFagPratPage() {
   if (step === 2) {
     return (
       <div className="max-w-[900px]">
-        {/* Sticky header */}
-        <div className="sticky top-0 z-20 -mx-4 mb-6 flex items-center justify-between border-b bg-background px-4 py-4 sm:-mx-6 sm:mb-8 md:-mx-10 md:px-10">
-          <h1 className="text-xl font-extrabold text-foreground sm:text-2xl">Fullfør FagPraten</h1>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" onClick={() => setStep(1)}>
+        {/* Page header (non-sticky per design) */}
+        <div className="mb-8 flex items-start justify-between gap-4">
+          <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">Fullfør FagPraten</h1>
+          <div className="flex shrink-0 items-center gap-3">
+            <Button variant="outline" onClick={() => setStep(1)}>
               Tilbake
             </Button>
-            <Button disabled>Lagre</Button>
+            <Button disabled={!title.trim()}>Lagre</Button>
           </div>
         </div>
 
-        {/* Step 2 placeholder — wired in later phases */}
-        <div className="rounded-2xl border-[1.5px] border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
-          Step 2 placeholder (tittel, begreper, synlighet kommer i neste fase)
+        <div className="rounded-2xl border-[1.5px] border-border bg-card p-6 shadow-sm sm:p-8">
+          {/* Tittel */}
+          <div className="mb-6">
+            <label className={`mb-2 block ${LABEL_CLASS}`}>
+              Tittel på din FagPrat
+            </label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="F.eks. Newtons lover, Fotosyntesen..."
+              className="w-full rounded-xl border-[1.5px] border-border bg-muted/30 px-4 py-3 text-lg font-extrabold text-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary focus:bg-card focus:ring-3 focus:ring-primary/20 sm:text-xl"
+            />
+          </div>
+
+          {/* Viktige begreper */}
+          <div className="mb-6">
+            <ConceptTags concepts={concepts} onChange={setConcepts} showAiButton />
+          </div>
+
+          {/* Synlighet */}
+          <VisibilityToggle value={visibility} onChange={setVisibility} showDescription />
         </div>
       </div>
     );
@@ -110,10 +133,10 @@ function LagFagPratPage() {
   return (
     <div className="max-w-[900px]">
       {/* Sticky header */}
-      <div className="sticky top-0 z-20 -mx-4 mb-6 flex items-center justify-between border-b bg-background px-4 py-4 sm:-mx-6 sm:mb-8 md:-mx-10 md:px-10">
-        <h1 className="text-xl font-extrabold text-foreground sm:text-2xl">Lag en FagPrat</h1>
+      <div className="sticky top-0 z-20 -mx-4 mb-8 flex items-center justify-between border-b bg-background px-4 py-4 sm:-mx-6 md:-mx-10 md:px-10">
+        <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">Lag en FagPrat</h1>
         <div className="flex items-center gap-3">
-          <Button variant="ghost" onClick={() => navigate({ to: "/" })}>
+          <Button variant="outline" onClick={() => navigate({ to: "/" })}>
             Avbryt
           </Button>
           <Button disabled={!canProceed} onClick={handleNext}>
@@ -122,83 +145,55 @@ function LagFagPratPage() {
         </div>
       </div>
 
-      {/* Title card */}
-      <div className="mb-6 rounded-2xl border-[1.5px] border-border bg-card p-4 sm:p-6">
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Gi FagPraten en tittel..."
-          className="mb-4 w-full border-none bg-transparent text-lg font-extrabold text-foreground outline-none placeholder:text-muted-foreground/40 sm:text-xl"
-        />
-        <ConceptTags concepts={concepts} onChange={setConcepts} />
-      </div>
-
       {/* Metadata card */}
-      <div className="mb-6 rounded-2xl border-[1.5px] border-border bg-card p-4 sm:p-6">
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-foreground">
-              Fag
-            </label>
-            <select
-              value={fag}
-              onChange={(e) => setFag(e.target.value)}
-              className="w-full appearance-none rounded-xl border-2 border-input bg-card px-4 py-2.5 text-sm font-medium text-foreground outline-none transition-colors focus:border-primary focus:ring-3 focus:ring-primary/20"
-            >
-              <option value="">Velg fag...</option>
-              {SUBJECT_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-foreground">
-              Trinn
-            </label>
-            <select
-              value={trinn}
-              onChange={(e) => setTrinn(e.target.value)}
-              className="w-full appearance-none rounded-xl border-2 border-input bg-card px-4 py-2.5 text-sm font-medium text-foreground outline-none transition-colors focus:border-primary focus:ring-3 focus:ring-primary/20"
-            >
-              <option value="">Velg trinn...</option>
-              {LEVEL_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
+      <div className="mb-8 rounded-2xl border-[1.5px] border-border bg-card p-6 shadow-sm sm:p-8">
+        <div className="mb-6 grid grid-cols-1 items-end gap-4 sm:grid-cols-2">
+          <CustomDropdown
+            label="Fag"
+            value={fag}
+            onChange={setFag}
+            placeholder="Velg fag"
+            options={SUBJECT_OPTIONS}
+          />
+          <CustomDropdown
+            label="Trinn"
+            value={trinn}
+            onChange={setTrinn}
+            placeholder="Velg trinn"
+            options={LEVEL_OPTIONS}
+          />
         </div>
 
         <ForkunnskapSelector value={forkunnskap} onChange={setForkunnskap} />
       </div>
 
-      {/* REDDI button */}
-      <div className="mb-8">
-        <button
-          disabled={!fag || !trinn || !forkunnskap}
-          onClick={() => setReddiOpen(true)}
-          className="flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-primary via-teal-500 to-accent px-6 py-4 text-base font-bold text-white shadow-lg transition-all disabled:opacity-40 disabled:saturate-50"
-        >
-          <Sparkles className="size-5" />
-          Lag påstander med REDDI
-        </button>
-        {(!fag || !trinn || !forkunnskap) && (
-          <p className="mt-2 text-center text-xs text-muted-foreground">
-            Velg fag, trinn og forkunnskap for å bruke REDDI
-          </p>
-        )}
-      </div>
-
       <ReddiModal open={reddiOpen} onClose={() => setReddiOpen(false)} onSubmit={handleReddiSubmit} />
 
-      {/* Manual statements */}
+      {/* Mine påstander */}
       <div>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-extrabold text-foreground">Påstander</h2>
-          <Button variant="outline" size="sm" onClick={addStatement}>
-            <Plus className="size-4" />
-            Legg til påstand
-          </Button>
+        <div className="mb-6 flex items-center justify-between gap-3">
+          <h2 className="text-2xl font-extrabold text-foreground">Mine påstander</h2>
+          <div className="flex items-center gap-3">
+            <div className="group relative">
+              <button
+                disabled={!reddiReady}
+                onClick={() => setReddiOpen(true)}
+                className="inline-flex items-center gap-2 rounded-xl border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-purple-100/40 px-5 py-2 text-sm font-bold text-purple-600 transition-all hover:-translate-y-px hover:border-purple-500 hover:from-purple-100 hover:to-purple-50 hover:shadow-sm disabled:translate-y-0 disabled:cursor-default disabled:opacity-45 disabled:saturate-[0.7]"
+              >
+                <img src="/reddi.png" alt="Reddi" className="size-4" />
+                Lag påstander med REDDI
+              </button>
+              {!reddiReady && (
+                <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-lg bg-foreground px-3 py-2 text-xs font-semibold text-background shadow-md group-hover:block">
+                  Velg fag, trinn og forkunnskaper for å bruke REDDI
+                </div>
+              )}
+            </div>
+            <Button variant="outline" size="sm" onClick={addStatement}>
+              <Plus className="size-4" />
+              Legg til påstand
+            </Button>
+          </div>
         </div>
         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext

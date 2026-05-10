@@ -7,7 +7,7 @@ interface CustomDropdownProps {
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
-  options: { value: string; label: string }[];
+  options: readonly { value: string; label: string }[];
 }
 
 export function CustomDropdown({

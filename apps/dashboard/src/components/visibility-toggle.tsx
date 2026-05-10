@@ -15,34 +15,34 @@ export function VisibilityToggle({ value, onChange, showDescription = false }: V
       <div className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
         Synlighet
       </div>
-      <div className="flex gap-3">
+      <div className="inline-flex overflow-hidden rounded-xl border-[1.5px] border-border">
         <button
           onClick={() => onChange("public")}
           className={cn(
-            "flex flex-1 items-center gap-3 rounded-xl border-2 px-4 py-3 text-left transition-all",
+            "inline-flex items-center gap-2 border-r-[1.5px] border-border px-6 py-3 text-sm font-bold transition-all",
             value === "public"
-              ? "border-primary/40 bg-primary/5 text-primary"
-              : "border-border text-muted-foreground hover:border-muted-foreground/30",
+              ? "bg-primary/10 text-primary"
+              : "bg-card text-muted-foreground hover:bg-muted/50 hover:text-foreground",
           )}
         >
-          <Globe className="size-5 shrink-0" />
-          <span className="text-sm font-semibold">Offentlig</span>
+          <Globe className="size-4" />
+          Offentlig
         </button>
         <button
           onClick={() => onChange("private")}
           className={cn(
-            "flex flex-1 items-center gap-3 rounded-xl border-2 px-4 py-3 text-left transition-all",
+            "inline-flex items-center gap-2 px-6 py-3 text-sm font-bold transition-all",
             value === "private"
-              ? "border-primary/40 bg-primary/5 text-primary"
-              : "border-border text-muted-foreground hover:border-muted-foreground/30",
+              ? "bg-primary/10 text-primary"
+              : "bg-card text-muted-foreground hover:bg-muted/50 hover:text-foreground",
           )}
         >
-          <Lock className="size-5 shrink-0" />
-          <span className="text-sm font-semibold">Privat</span>
+          <Lock className="size-4" />
+          Privat
         </button>
       </div>
       {showDescription && (
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-xs text-muted-foreground">
           {value === "public"
             ? "Alle kan finne og bruke denne FagPraten"
             : "Bare du kan se og bruke denne FagPraten"}
