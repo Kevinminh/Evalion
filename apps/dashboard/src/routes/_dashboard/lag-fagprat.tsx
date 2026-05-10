@@ -31,6 +31,7 @@ export const Route = createFileRoute("/_dashboard/lag-fagprat")({
 function LagFagPratPage() {
   const navigate = useNavigate();
   const { draft: draftParam } = Route.useSearch();
+  const [step, setStep] = useState<1 | 2>(1);
   const [title, setTitle] = useState("");
   const [concepts, setConcepts] = useState<string[]>([]);
   const [fag, setFag] = useState("");
@@ -81,11 +82,30 @@ function LagFagPratPage() {
   const canProceed = title.trim() && fag && trinn && forkunnskap;
 
   const handleNext = () => {
-    navigate({
-      to: "/lagre-fagprat",
-      search: { draft: buildDraftJson() },
-    });
+    setStep(2);
   };
+
+  if (step === 2) {
+    return (
+      <div className="max-w-[900px]">
+        {/* Sticky header */}
+        <div className="sticky top-0 z-20 -mx-4 mb-6 flex items-center justify-between border-b bg-background px-4 py-4 sm:-mx-6 sm:mb-8 md:-mx-10 md:px-10">
+          <h1 className="text-xl font-extrabold text-foreground sm:text-2xl">Fullfør FagPraten</h1>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" onClick={() => setStep(1)}>
+              Tilbake
+            </Button>
+            <Button disabled>Lagre</Button>
+          </div>
+        </div>
+
+        {/* Step 2 placeholder — wired in later phases */}
+        <div className="rounded-2xl border-[1.5px] border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
+          Step 2 placeholder (tittel, begreper, synlighet kommer i neste fase)
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-[900px]">
