@@ -19,6 +19,8 @@ const buttonVariants = cva(
           "border-2 border-primary/25 text-primary shadow-[0_3px_0_oklch(0.78_0.08_295)] hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/5 hover:shadow-[0_5px_0_oklch(0.78_0.08_295)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.78_0.08_295)] aria-expanded:bg-primary/5 aria-expanded:text-primary dark:hover:bg-muted/50",
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+        "destructive-solid":
+          "bg-destructive text-white shadow-[0_3px_0_oklch(0.45_0.15_25)] hover:-translate-y-0.5 hover:shadow-[0_5px_0_oklch(0.45_0.15_25)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.45_0.15_25)]",
         teal: "bg-secondary-teal text-white shadow-[0_3px_0_var(--secondary-teal-dark)] hover:-translate-y-0.5 hover:shadow-[0_4px_0_var(--secondary-teal-dark)] active:translate-y-0.5 active:shadow-[0_1px_0_var(--secondary-teal-dark)]",
         accent:
           "bg-accent text-white shadow-[0_3px_0_oklch(0.35_0.16_15)] hover:-translate-y-0.5 hover:shadow-[0_5px_0_oklch(0.35_0.16_15)] active:translate-y-0.5 active:shadow-[0_1px_0_oklch(0.35_0.16_15)]",

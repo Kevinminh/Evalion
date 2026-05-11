@@ -56,7 +56,7 @@ export function ColumnChart({ items, compact = false }: ColumnChartProps) {
           >
             <span
               className={cn(
-                "font-semibold tabular-nums",
+                "font-semibold tabular-nums whitespace-nowrap",
                 countSize,
                 labelText,
                 isCorrect && "font-extrabold",
@@ -75,7 +75,17 @@ export function ColumnChart({ items, compact = false }: ColumnChartProps) {
                 )}
                 style={{ height: `${height}%`, minHeight: 2 }}
               >
-                {!showPctOutside && (
+                {showPctOutside ? (
+                  <span
+                    className={cn(
+                      "absolute left-1/2 -top-4 -translate-x-1/2 whitespace-nowrap font-semibold tabular-nums",
+                      pctSize,
+                      isCorrect ? cn(correctText, "font-extrabold") : "text-muted-foreground",
+                    )}
+                  >
+                    {item.pct}%
+                  </span>
+                ) : (
                   <span
                     className={cn(
                       pctSize,
@@ -87,22 +97,10 @@ export function ColumnChart({ items, compact = false }: ColumnChartProps) {
                   </span>
                 )}
               </div>
-              {showPctOutside && (
-                <span
-                  className={cn(
-                    "absolute left-1/2 -top-4 -translate-x-1/2 tabular-nums whitespace-nowrap",
-                    pctSize,
-                    "font-semibold",
-                    isCorrect ? cn(correctText, "font-extrabold") : "text-muted-foreground",
-                  )}
-                >
-                  {item.pct}%
-                </span>
-              )}
             </div>
             <span
               className={cn(
-                "font-semibold",
+                "font-semibold whitespace-nowrap",
                 labelSize,
                 labelText,
                 isCorrect && "font-extrabold",
