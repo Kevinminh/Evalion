@@ -52,7 +52,12 @@ export function Professor({
 
   return (
     <div className={cn("flex w-full justify-center", className)}>
-      <div className="flex w-full max-w-[640px] items-center gap-4">
+      <div
+        className={cn(
+          "flex items-center gap-4",
+          text && "w-full max-w-[640px]",
+        )}
+      >
         <div className="flex shrink-0 flex-col items-center gap-2">
           <img
             src="/professoren.png"
