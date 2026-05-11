@@ -147,7 +147,7 @@ export function TimerCard({
           isRunning ? "text-[36px]" : "text-[48px]",
         )}
         style={{
-          color: isUrgent ? "var(--color-error)" : "var(--color-text-ink-strong)",
+          color: isUrgent ? "var(--color-usant)" : "var(--color-text-ink-strong)",
           animation: isUrgent ? "var(--animate-timer-pulse)" : undefined,
         }}
       >
@@ -245,8 +245,8 @@ export function TimerCard({
             onClick={() => onStop?.()}
             className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all active:translate-y-0.5"
             style={{
-              backgroundColor: "var(--color-error)",
-              boxShadow: "0 3px 0 var(--color-usant-hover)",
+              backgroundColor: "var(--color-usant)",
+              boxShadow: "0 3px 0 #d32f2f",
             }}
           >
             <Square className="size-4 fill-current" /> Stopp
