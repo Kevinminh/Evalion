@@ -34,8 +34,8 @@ export function useStep3(): TeacherStep {
         <div className="flex w-full items-center justify-between">
           <BackButton onClick={() => goToStep(0)} />
           {timerRunning && (
-            <div className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[var(--color-vote-empty-fill)] px-4 py-2 text-sm font-semibold text-[var(--color-text-ink-soft)]">
-              <Users className="size-4 text-[var(--color-purple-400)]" />
+            <div className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-[var(--color-neutral-300)] px-4 py-2 text-sm font-semibold text-[var(--color-text-secondary)]">
+              <Users className="size-4 text-[var(--color-primary-400)]" />
               {activeRoundVotes.length} / {students.length} har stemt
             </div>
           )}

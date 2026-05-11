@@ -37,7 +37,7 @@ export function useStep5(): TeacherStep {
           <div className="z-[5] -mb-4">
             <FasitBadge fasit={statement.fasit} size="lg" />
           </div>
-          <div className="w-full overflow-hidden rounded-[24px] border-2 border-[var(--c-border)] shadow-[0_10px_15px_rgba(0,0,0,0.08),0_4px_6px_rgba(0,0,0,0.04)]">
+          <div className="w-full overflow-hidden rounded-2xl border-2 border-[var(--c-border)] shadow-lg">
             <div className="border-b-[1.5px] border-[var(--c-border)] bg-[linear-gradient(135deg,var(--c-bg),var(--c-bg2))] px-8 pt-8 pb-6 text-center">
               <p className="text-2xl font-bold leading-relaxed text-[var(--c-text)]">
                 {statement.text}
@@ -66,7 +66,7 @@ export function useStep5(): TeacherStep {
       <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-text-ink-soft)]">
         Professorens forklaring
       </p>
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-2xl bg-white p-3 shadow-[0_4px_6px_rgba(0,0,0,0.07),0_2px_4px_rgba(0,0,0,0.04)]">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-2xl bg-white p-3 shadow-[var(--shadow-card-soft)]">
         {/* Antall riktig */}
         <div className="flex items-center justify-center gap-2 rounded-xl bg-[var(--color-fasit-correct-bg)] px-3 py-2">
           <span className="shrink-0 font-mono text-xl font-extrabold leading-none tabular-nums text-[var(--color-fasit-correct-text)]">

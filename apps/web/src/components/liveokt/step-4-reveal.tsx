@@ -91,7 +91,7 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
 
   const panel = (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[#616161]">
+      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-text-secondary)]">
         Elevsvar – Andre stemmerunde
       </p>
       <PanelTabs
@@ -114,7 +114,7 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
             />
           </div>
         ) : (
-          <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto rounded-2xl bg-white p-3 shadow-[0_4px_6px_rgba(0,0,0,0.07),0_2px_4px_rgba(0,0,0,0.04)]">
+          <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto rounded-2xl bg-white p-3 shadow-[var(--shadow-card-soft)]">
             <div className="flex h-full flex-col gap-2">
               <div className="flex-1 min-h-0 py-2">
                 <DistributionChart

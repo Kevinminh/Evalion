@@ -132,6 +132,10 @@
   --color-neutral-300: #c8c8c0;
   --color-neutral-400: #a3a39a;
   --color-neutral-500: #6f6f66;
+  --color-neutral-600: #757575;
+  --color-neutral-700: #616161;
+  --color-neutral-800: #424242;
+  --color-neutral-900: #212121;
 
   /* ── Ink (text colors used by landing + workspace) ──────────────────── */
   --color-ink: #1a2420;
@@ -150,8 +154,8 @@
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-2xl: calc(var(--radius) * 1.5);
+  --radius-3xl: calc(var(--radius) * 2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
   /* ── Shadows: 3D press effect (FagPrat demo signature) ──────────────── */
@@ -261,12 +265,12 @@
   --chart-3: oklch(0.62 0.2 15);
   --chart-4: oklch(0.72 0.17 55);
   --chart-5: oklch(0.65 0.22 330);
-  --sant: oklch(0.62 0.17 142);
-  --sant-bg: oklch(0.95 0.04 145);
-  --usant: oklch(0.58 0.2 25);
-  --usant-bg: oklch(0.95 0.03 25);
-  --delvis: oklch(0.72 0.16 70);
-  --delvis-bg: oklch(0.96 0.04 80);
+  --sant: #4caf50;
+  --sant-bg: #e8f5e9;
+  --usant: #ef5350;
+  --usant-bg: #ffebee;
+  --delvis: #ff9800;
+  --delvis-bg: #fff3e0;
   --secondary-teal: oklch(0.68 0.12 180);
   --secondary-teal-dark: oklch(0.45 0.08 180);
   --radius: 1rem;
@@ -281,6 +285,10 @@
 
   /* ── Legacy aliases — kept until Phase 3 rewrite of lag-pastander.css and ── */
   /* ── velg-pastander/selection-view.tsx finishes. Do not introduce new uses. ── */
+  /* ── Text-color naming: new code in live-session surfaces must use the      ── */
+  /* ── --color-text-ink-strong/soft/faint names from @theme. The legacy       ── */
+  /* ── --color-text-primary/secondary/tertiary aliases below resolve to the    ── */
+  /* ── same hex but exist only for files not yet migrated.                    ── */
   --color-primary-50: var(--color-purple-50);
   --color-primary-100: var(--color-purple-100);
   --color-primary-200: var(--color-purple-200);

@@ -132,7 +132,7 @@ export function TimerCard({
   const card = (
     <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-[24px] transition-all",
+        "flex flex-col items-center justify-center rounded-2xl transition-all",
         isActive && !isFinished ? "h-[120px] min-h-0 gap-2 p-3" : "min-h-[210px] gap-2.5 p-4",
       )}
       style={{

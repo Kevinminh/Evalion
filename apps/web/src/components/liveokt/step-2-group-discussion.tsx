@@ -79,7 +79,7 @@ export function useStep2(): TeacherStep {
         activeTab={begrunnelseTab ? "begrunnelser" : "stemmefordeling"}
         onTabChange={setPanelTab}
       >
-        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto rounded-2xl bg-white p-3 shadow-[0_4px_6px_rgba(0,0,0,0.07),0_2px_4px_rgba(0,0,0,0.04)]">
+        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto rounded-2xl bg-white p-3 shadow-[var(--shadow-card-soft)]">
           {begrunnelseTab ? (
             highlighted ? (
               <div className="flex flex-col gap-2">
@@ -95,7 +95,7 @@ export function useStep2(): TeacherStep {
               </div>
             ) : (
               <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-6 text-center">
-                <Smartphone className="size-9 text-[var(--color-vote-empty-fill)]" strokeWidth={1.5} />
+                <Smartphone className="size-9 text-[var(--color-neutral-400)]" strokeWidth={1.5} />
                 <p className="max-w-[240px] text-sm leading-relaxed text-[var(--color-text-ink-faint)]">
                   Trykk på begrunnelser i live-statistikken på din eksterne enhet for å fremheve
                   dem her.

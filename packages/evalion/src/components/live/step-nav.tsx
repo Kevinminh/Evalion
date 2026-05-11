@@ -31,7 +31,7 @@ export function StepNav({ currentStep, completedSteps = [], onStepClick }: StepN
               onClick={() => onStepClick(step.num)}
               disabled={allDisabled}
               className={cn(
-                "flex flex-1 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-3 text-center transition-all",
+                "flex flex-1 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl px-2 py-3 text-center transition-all",
                 isActive && "bg-[var(--color-step-active-bg)]",
                 isInactive && !allDisabled && "hover:bg-[var(--color-rating-bar-track)]",
                 allDisabled && "pointer-events-none cursor-not-allowed opacity-40 saturate-50",

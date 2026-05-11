@@ -51,50 +51,47 @@ export function Professor({
   };
 
   return (
-    <div
-      className={cn(
-        "mx-auto flex w-full max-w-[640px] items-center gap-4",
-        className,
-      )}
-    >
-      <div className="flex shrink-0 flex-col items-center gap-2">
-        <img
-          src="/professoren.png"
-          alt="Professoren"
-          className={cn(
-            "rounded-full object-cover",
-            bounce && "animate-[gentle-bounce_3s_ease-in-out_infinite]",
-            imgClassName,
-          )}
-          style={imgStyle}
-        />
-        {label && <span className="text-sm font-medium text-muted-foreground">{label}</span>}
-      </div>
-      {text && (
-        <div className="relative flex flex-1 items-center">
-          <div
-            className="absolute -left-[10px] size-0 border-y-[10px] border-r-[10px] border-y-transparent border-r-white"
-            style={{ filter: "var(--shadow-chevron-soft)" }}
-          />
-          <div
+    <div className={cn("flex w-full justify-center", className)}>
+      <div className="flex w-full max-w-[640px] items-center gap-4">
+        <div className="flex shrink-0 flex-col items-center gap-2">
+          <img
+            src="/professoren.png"
+            alt="Professoren"
             className={cn(
-              "flex-1 rounded-[24px] border-[1.5px] border-[var(--color-divider-soft)] bg-white px-6 py-5 shadow-[var(--shadow-card-soft)]",
-              animate && "animate-[fadeInUp_0.5s_ease_0.2s_both]",
+              "rounded-full object-cover",
+              bounce && "animate-[gentle-bounce_3s_ease-in-out_infinite]",
+              imgClassName,
             )}
-          >
-            <p
+            style={imgStyle}
+          />
+          {label && <span className="text-sm font-medium text-muted-foreground">{label}</span>}
+        </div>
+        {text && (
+          <div className="relative min-w-0 flex-1">
+            <div
+              className="absolute top-1/2 -left-[10px] size-0 -translate-y-1/2 border-y-[10px] border-r-[10px] border-y-transparent border-r-[var(--color-neutral-0)]"
+              style={{ filter: "var(--shadow-chevron-soft)" }}
+            />
+            <div
               className={cn(
-                "text-center font-medium leading-relaxed text-[var(--color-text-ink-strong)]",
-                textSize === "sm" && "text-sm",
-                textSize === "base" && "text-base",
-                textSize === "lg" && "text-xl",
+                "rounded-2xl border-[1.5px] border-[var(--color-divider-soft)] bg-white px-6 py-5 shadow-[var(--shadow-card-soft)]",
+                animate && "animate-[fadeInUp_0.5s_ease_0.2s_both]",
               )}
             >
-              {text}
-            </p>
+              <p
+                className={cn(
+                  "text-center font-medium leading-relaxed text-[var(--color-text-ink-strong)]",
+                  textSize === "sm" && "text-sm",
+                  textSize === "base" && "text-base",
+                  textSize === "lg" && "text-xl",
+                )}
+              >
+                {text}
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
