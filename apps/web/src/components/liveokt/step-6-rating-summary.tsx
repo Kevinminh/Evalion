@@ -10,6 +10,7 @@ import { ArrowRight, BarChart3 } from "lucide-react";
 import { useState } from "react";
 
 import { DestructiveButton } from "@workspace/ui/components/destructive-button";
+import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
 import { cssVars } from "@/lib/css-vars";
 import type { TeacherStep } from "@/types/teacher-step";
@@ -173,9 +174,7 @@ export function useStep6(): TeacherStep {
 
   const panel = (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-text-ink-soft)]">
-        Resultat
-      </p>
+      <PanelSectionLabel>Resultat</PanelSectionLabel>
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-2xl bg-white p-3 shadow-[var(--shadow-card-soft)]">
         {/* conf-summary-row */}
         <div className="flex flex-wrap items-center gap-2 px-3 py-2">

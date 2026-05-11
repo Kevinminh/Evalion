@@ -1,11 +1,7 @@
 import type { Fasit } from "@workspace/evalion/lib/types";
 import { cn } from "@workspace/ui/lib/utils";
 
-const VOTE_PILL: Record<Fasit, { label: string; bg: string }> = {
-  sant: { label: "Sant", bg: "var(--color-fasit-correct-text)" },
-  delvis: { label: "Delvis sant", bg: "var(--color-vote-delvis)" },
-  usant: { label: "Usant", bg: "var(--color-error)" },
-};
+import { VoteBadge } from "./vote-badge";
 
 interface BegrunnelseCardProps {
   text: string;
@@ -26,19 +22,20 @@ export function BegrunnelseCard({
     <div
       className={cn(
         "relative rounded-l-none rounded-r-xl border-l-[3px] bg-[var(--color-highlight-strip-bg)] px-5 py-4 text-base font-medium leading-relaxed text-[var(--color-text-ink-strong)]",
+        highlighted
+          ? "border-l-[var(--color-purple-400)]"
+          : "border-l-[var(--color-highlight-strip)]",
         className,
       )}
-      style={{
-        borderLeftColor: highlighted ? "var(--color-purple-400)" : "var(--color-highlight-strip)",
-      }}
     >
       {vote && (
-        <span
-          className="mb-2 inline-flex items-center rounded-full px-[9px] py-0.5 text-[11px] font-extrabold uppercase tracking-[0.02em] text-white"
-          style={{ backgroundColor: VOTE_PILL[vote].bg }}
-        >
-          {VOTE_PILL[vote].label}
-        </span>
+        <VoteBadge
+          vote={vote}
+          variant="solid"
+          size="sm"
+          label={vote === "delvis" ? "Delvis sant" : undefined}
+          className="mb-2"
+        />
       )}
       <p className="italic leading-relaxed text-[var(--color-text-ink-strong)]">«{text}»</p>
       {studentName && (

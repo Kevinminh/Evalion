@@ -40,17 +40,10 @@ export function StepNav({ currentStep, completedSteps = [], onStepClick }: StepN
               <span
                 className={cn(
                   "flex size-8 items-center justify-center rounded-full text-sm font-extrabold leading-none",
-                  isActive && "text-white",
-                  isCompleted && "text-white",
-                  isInactive && "text-[var(--color-text-ink-faint)]",
+                  isActive && "bg-[var(--color-purple-500)] text-white",
+                  isCompleted && "bg-[var(--color-fasit-correct-text)] text-white",
+                  isInactive && "bg-[var(--color-divider-soft)] text-[var(--color-text-ink-faint)]",
                 )}
-                style={{
-                  backgroundColor: isActive
-                    ? "var(--color-purple-500)"
-                    : isCompleted
-                      ? "var(--color-fasit-correct-text)"
-                      : "var(--color-divider-soft)",
-                }}
               >
                 {step.num}
               </span>

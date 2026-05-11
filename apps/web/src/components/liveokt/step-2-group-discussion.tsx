@@ -5,6 +5,7 @@ import { PanelTabs } from "@workspace/evalion/components/live/panel-tabs";
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { TeacherStepLayout } from "@workspace/evalion/components/live/teacher-step-layout";
 import { resolveStatementHex } from "@workspace/evalion/lib/constants";
+import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { Smartphone } from "lucide-react";
 
@@ -68,9 +69,7 @@ export function useStep2(): TeacherStep {
 
   const panel = (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-text-ink-soft)]">
-        Elevsvar – Første stemmerunde
-      </p>
+      <PanelSectionLabel>Elevsvar – Første stemmerunde</PanelSectionLabel>
       <PanelTabs
         tabs={[
           { key: "begrunnelser", label: "Begrunnelser" },

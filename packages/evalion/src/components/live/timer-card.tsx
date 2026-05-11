@@ -1,3 +1,4 @@
+import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { cn } from "@workspace/ui/lib/utils";
 import { ArrowRight, Pause, Play, Square } from "lucide-react";
 import type { CSSProperties } from "react";
@@ -132,24 +133,17 @@ export function TimerCard({
   const card = (
     <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-2xl transition-all",
+        "flex flex-col items-center justify-center rounded-2xl bg-[var(--color-neutral-0)] shadow-[var(--shadow-card-soft)] transition-all",
         isActive && !isFinished ? "h-[120px] min-h-0 gap-2 p-3" : "min-h-[210px] gap-2.5 p-4",
       )}
-      style={{
-        backgroundColor: "var(--color-neutral-0)",
-        boxShadow: "var(--shadow-card-soft)",
-      }}
     >
       <div
         className={cn(
-          "text-center font-mono font-bold tabular-nums leading-none transition-colors duration-300",
-          "tracking-[2px]",
+          "text-center font-mono font-bold leading-none tabular-nums tracking-[2px] transition-colors duration-300",
           isRunning ? "text-[36px]" : "text-[48px]",
+          isUrgent ? "text-[var(--color-usant)]" : "text-[var(--color-text-ink-strong)]",
         )}
-        style={{
-          color: isUrgent ? "var(--color-usant)" : "var(--color-text-ink-strong)",
-          animation: isUrgent ? "var(--animate-timer-pulse)" : undefined,
-        }}
+        style={isUrgent ? { animation: "var(--animate-timer-pulse)" } : undefined}
       >
         {displayValue}
       </div>
@@ -159,11 +153,7 @@ export function TimerCard({
           <button
             type="button"
             onClick={() => onStart?.(selectedDuration)}
-            className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all active:translate-y-0.5"
-            style={{
-              backgroundColor: "var(--color-sant)",
-              boxShadow: "0 3px 0 var(--color-sant-hover)",
-            }}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-sant)] px-4 py-2.5 text-sm font-bold text-white shadow-[0_3px_0_var(--color-sant-hover)] transition-all active:translate-y-0.5"
           >
             <Play className="size-[18px] fill-current" /> Start
           </button>
@@ -187,19 +177,12 @@ export function TimerCard({
                   key={p.seconds}
                   type="button"
                   onClick={() => setSelectedDuration(p.seconds)}
-                  className="flex-1 rounded-full border-[1.5px] px-3 py-1.5 text-sm transition-colors"
-                  style={{
-                    backgroundColor: isSelected
-                      ? "var(--color-primary-50)"
-                      : "var(--color-neutral-0)",
-                    borderColor: isSelected
-                      ? "var(--color-primary-400)"
-                      : "var(--color-neutral-300)",
-                    color: isSelected
-                      ? "var(--color-primary-600)"
-                      : "var(--color-text-secondary)",
-                    fontWeight: isSelected ? 700 : 600,
-                  }}
+                  className={cn(
+                    "flex-1 rounded-full border-[1.5px] px-3 py-1.5 text-sm transition-colors",
+                    isSelected
+                      ? "border-[var(--color-primary-400)] bg-[var(--color-primary-50)] font-bold text-[var(--color-primary-600)]"
+                      : "border-[var(--color-neutral-300)] bg-[var(--color-neutral-0)] font-semibold text-[var(--color-text-secondary)]",
+                  )}
                 >
                   {p.label}
                 </button>
@@ -215,11 +198,7 @@ export function TimerCard({
             <button
               type="button"
               onClick={() => onPause?.()}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all active:translate-y-0.5"
-              style={{
-                backgroundColor: "var(--color-delvis)",
-                boxShadow: "0 3px 0 var(--color-delvis-hover)",
-              }}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[var(--color-delvis)] px-4 py-2.5 text-sm font-bold text-white shadow-[0_3px_0_var(--color-delvis-hover)] transition-all active:translate-y-0.5"
             >
               <Pause className="size-4 fill-current" /> Pause
             </button>
@@ -231,11 +210,7 @@ export function TimerCard({
                   onStart?.(remainingAtPause);
                 }
               }}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all active:translate-y-0.5"
-              style={{
-                backgroundColor: "var(--color-sant)",
-                boxShadow: "0 3px 0 var(--color-sant-hover)",
-              }}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[var(--color-sant)] px-4 py-2.5 text-sm font-bold text-white shadow-[0_3px_0_var(--color-sant-hover)] transition-all active:translate-y-0.5"
             >
               <Play className="size-4 fill-current" /> Fortsett
             </button>
@@ -243,11 +218,7 @@ export function TimerCard({
           <button
             type="button"
             onClick={() => onStop?.()}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all active:translate-y-0.5"
-            style={{
-              backgroundColor: "var(--color-usant)",
-              boxShadow: "0 3px 0 #d32f2f",
-            }}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[var(--color-usant)] px-4 py-2.5 text-sm font-bold text-white shadow-[0_3px_0_#d32f2f] transition-all active:translate-y-0.5"
           >
             <Square className="size-4 fill-current" /> Stopp
           </button>
@@ -258,24 +229,13 @@ export function TimerCard({
 
   return (
     <div className="flex flex-col gap-3">
-      {sectionLabel && (
-        <span
-          className="px-1 text-xs font-bold uppercase tracking-[0.08em]"
-          style={{ color: "var(--color-text-secondary)" }}
-        >
-          {sectionLabel}
-        </span>
-      )}
+      {sectionLabel && <PanelSectionLabel>{sectionLabel}</PanelSectionLabel>}
       {card}
       {isFinished && onNextStep && (
         <button
           type="button"
           onClick={onNextStep}
-          className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-4 text-sm font-bold text-white transition-all active:translate-y-0.5"
-          style={{
-            backgroundColor: "var(--color-primary-500)",
-            boxShadow: "0 3px 0 var(--color-primary-700)",
-          }}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-primary-500)] px-4 py-4 text-sm font-bold text-white shadow-[0_3px_0_var(--color-primary-700)] transition-all active:translate-y-0.5"
         >
           {nextStepLabel}
           <ArrowRight className="size-[18px]" />

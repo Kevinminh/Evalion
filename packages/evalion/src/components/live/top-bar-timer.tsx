@@ -1,3 +1,4 @@
+import { cn } from "@workspace/ui/lib/utils";
 import { Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -50,8 +51,10 @@ export function TopBarTimer({
     <div className="inline-flex items-center gap-3 rounded-full bg-[var(--color-usant-bg)] px-4 py-2">
       <Clock className="size-5 text-[var(--color-usant)]" strokeWidth={2} />
       <span
-        className="font-mono text-xl font-bold leading-none tabular-nums"
-        style={{ color: isUrgent ? "var(--color-usant)" : "var(--color-text-ink-strong)" }}
+        className={cn(
+          "font-mono text-xl font-bold leading-none tabular-nums",
+          isUrgent ? "text-[var(--color-usant)]" : "text-[var(--color-text-ink-strong)]",
+        )}
       >
         {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
       </span>

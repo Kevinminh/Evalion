@@ -2,6 +2,7 @@ import { BackButton } from "@workspace/evalion/components/live/back-button";
 import { BegrunnelseCard } from "@workspace/evalion/components/live/begrunnelse-card";
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { resolveStatementHex } from "@workspace/evalion/lib/constants";
+import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 
 import { cssVars } from "@/lib/css-vars";
 import type { TeacherStep } from "@/types/teacher-step";
@@ -63,9 +64,7 @@ export function useStep5(): TeacherStep {
 
   const panel = (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-text-ink-soft)]">
-        Professorens forklaring
-      </p>
+      <PanelSectionLabel>Professorens forklaring</PanelSectionLabel>
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-2xl bg-white p-3 shadow-[var(--shadow-card-soft)]">
         {/* Antall riktig */}
         <div className="flex items-center justify-center gap-2 rounded-xl bg-[var(--color-fasit-correct-bg)] px-3 py-2">
@@ -79,9 +78,7 @@ export function useStep5(): TeacherStep {
           </div>
         </div>
 
-        <p className="mt-2 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-text-ink-soft)]">
-          Fremhevet begrunnelse
-        </p>
+        <PanelSectionLabel className="mt-2">Fremhevet begrunnelse</PanelSectionLabel>
 
         {highlightedBegrunnelse ? (
           <BegrunnelseCard

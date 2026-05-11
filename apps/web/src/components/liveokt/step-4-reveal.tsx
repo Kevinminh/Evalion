@@ -7,6 +7,7 @@ import { PanelTabs } from "@workspace/evalion/components/live/panel-tabs";
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { TeacherStepLayout } from "@workspace/evalion/components/live/teacher-step-layout";
 import { FASIT_TEXT, resolveStatementHex } from "@workspace/evalion/lib/constants";
+import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 
 import { buildVoteBars } from "@/lib/vote-bars";
@@ -91,9 +92,7 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
 
   const panel = (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-text-secondary)]">
-        Elevsvar – Andre stemmerunde
-      </p>
+      <PanelSectionLabel>Elevsvar – Andre stemmerunde</PanelSectionLabel>
       <PanelTabs
         tabs={[
           { key: "endringer", label: "Endringer" },

@@ -1,5 +1,5 @@
 import { cn } from "@workspace/ui/lib/utils";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type ProfessorSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
 
@@ -15,13 +15,13 @@ interface ProfessorProps {
   imgClassName?: string;
 }
 
-const sizePx: Record<ProfessorSize, number> = {
-  xs: 48,
-  sm: 80,
-  md: 96,
-  lg: 112,
-  xl: 128,
-  "2xl": 220,
+const sizeClass: Record<ProfessorSize, string> = {
+  xs: "size-12",
+  sm: "size-20",
+  md: "size-24",
+  lg: "size-28",
+  xl: "size-32",
+  "2xl": "size-[220px]",
 };
 
 export function Professor({
@@ -35,47 +35,28 @@ export function Professor({
   className,
   imgClassName,
 }: ProfessorProps) {
-  const px = sizePx[size];
-  const imgStyle: CSSProperties = {
-    width: px,
-    height: px,
-    flexShrink: 0,
-    backgroundColor: bordered ? "var(--color-bg-tertiary)" : undefined,
-    ...(bordered
-      ? {
-          borderWidth: 3,
-          borderStyle: "solid",
-          borderColor: "var(--color-primary-200)",
-        }
-      : {}),
-  };
-
   return (
     <div className={cn("flex w-full justify-center", className)}>
-      <div
-        className={cn(
-          "flex items-center gap-4",
-          text && "w-full max-w-[640px]",
-        )}
-      >
+      <div className={cn("flex items-center gap-4", text && "w-full max-w-[640px]")}>
         <div className="flex shrink-0 flex-col items-center gap-2">
           <img
             src="/professoren.png"
             alt="Professoren"
             className={cn(
-              "rounded-full object-cover",
+              "shrink-0 rounded-full object-cover",
+              sizeClass[size],
+              bordered &&
+                "border-[3px] border-[var(--color-primary-200)] bg-[var(--color-bg-tertiary)]",
               bounce && "animate-[gentle-bounce_3s_ease-in-out_infinite]",
               imgClassName,
             )}
-            style={imgStyle}
           />
           {label && <span className="text-sm font-medium text-muted-foreground">{label}</span>}
         </div>
         {text && (
           <div className="relative min-w-0 flex-1">
             <div
-              className="absolute top-1/2 -left-[10px] size-0 -translate-y-1/2 border-y-[10px] border-r-[10px] border-y-transparent border-r-[var(--color-neutral-0)]"
-              style={{ filter: "var(--shadow-chevron-soft)" }}
+              className="absolute top-1/2 -left-[10px] size-0 -translate-y-1/2 border-y-[10px] border-r-[10px] border-y-transparent border-r-[var(--color-neutral-0)] [filter:var(--shadow-chevron-soft)]"
             />
             <div
               className={cn(
