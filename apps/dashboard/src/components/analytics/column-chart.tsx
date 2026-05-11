@@ -11,32 +11,43 @@ interface ColumnItem {
 
 interface ColumnChartProps {
   items: ColumnItem[];
+  compact?: boolean;
 }
 
-const BAR_BG: Record<string, string> = {
-  Sant: "bg-sant",
+const CORRECT_FILL: Record<string, string> = {
+  Sant: "bg-[#66BB6A]",
   "Delvis sant": "bg-delvis",
   Delvis: "bg-delvis",
-  Usant: "bg-usant",
+  Usant: "bg-[#EF5350]",
 };
 
-const BAR_TEXT: Record<string, string> = {
-  Sant: "text-sant",
-  "Delvis sant": "text-delvis",
-  Delvis: "text-delvis",
-  Usant: "text-usant",
+const CORRECT_TEXT: Record<string, string> = {
+  Sant: "text-[#2E7D32]",
+  "Delvis sant": "text-[#b8860b]",
+  Delvis: "text-[#b8860b]",
+  Usant: "text-[#C62828]",
 };
 
-export function ColumnChart({ items }: ColumnChartProps) {
+const OUTSIDE_THRESHOLD = 18;
+
+export function ColumnChart({ items, compact = false }: ColumnChartProps) {
   const maxPct = Math.max(...items.map((i) => i.pct), 1);
+  const trackHeight = compact ? 60 : 100;
+  const countSize = compact ? "text-[10px]" : "text-xs";
+  const labelSize = compact ? "text-[10px]" : "text-[11px]";
+  const pctSize = compact ? "text-[9px]" : "text-xs";
 
   return (
     <div className="flex items-end justify-center gap-4 px-2 pt-3 pb-1">
       {items.map((item) => {
         const height = (item.pct / maxPct) * 100;
-        const barClass = BAR_BG[item.label] ?? "bg-neutral-300";
-        const textColor = BAR_TEXT[item.label] ?? "text-muted-foreground";
-        const isFasit = item.isCorrect;
+        const isCorrect = !!item.isCorrect;
+        const fillClass = isCorrect
+          ? (CORRECT_FILL[item.label] ?? "bg-neutral-300")
+          : "bg-neutral-300";
+        const correctText = CORRECT_TEXT[item.label] ?? "text-muted-foreground";
+        const labelText = isCorrect ? correctText : "text-muted-foreground";
+        const showPctOutside = item.pct < OUTSIDE_THRESHOLD;
         return (
           <div
             key={item.label}
@@ -45,55 +56,65 @@ export function ColumnChart({ items }: ColumnChartProps) {
           >
             <span
               className={cn(
-                "text-xs font-semibold",
-                textColor,
-                isFasit && "font-extrabold",
+                "font-semibold tabular-nums",
+                countSize,
+                labelText,
+                isCorrect && "font-extrabold",
               )}
             >
               {item.count} stk
             </span>
             <div
-              className={cn(
-                "relative w-full overflow-hidden rounded-[8px] bg-neutral-100",
-                isFasit && "ring-2 ring-primary/40 ring-offset-2 ring-offset-white",
-              )}
-              style={{ height: 100 }}
+              className="relative w-full overflow-visible rounded-[8px] bg-neutral-100"
+              style={{ height: trackHeight }}
             >
               <div
                 className={cn(
                   "absolute bottom-0 w-full rounded-b-[8px] flex items-center justify-center transition-all duration-400",
-                  barClass,
+                  fillClass,
                 )}
                 style={{ height: `${height}%`, minHeight: 2 }}
               >
-                <span className="text-xs font-extrabold text-white">
+                {!showPctOutside && (
+                  <span
+                    className={cn(
+                      pctSize,
+                      "font-semibold text-white tabular-nums",
+                      isCorrect && "font-extrabold",
+                    )}
+                  >
+                    {item.pct}%
+                  </span>
+                )}
+              </div>
+              {showPctOutside && (
+                <span
+                  className={cn(
+                    "absolute left-1/2 -top-4 -translate-x-1/2 tabular-nums whitespace-nowrap",
+                    pctSize,
+                    "font-semibold",
+                    isCorrect ? cn(correctText, "font-extrabold") : "text-muted-foreground",
+                  )}
+                >
                   {item.pct}%
                 </span>
-              </div>
+              )}
             </div>
             <span
               className={cn(
-                "text-[11px] font-semibold",
-                textColor,
-                isFasit && "font-extrabold",
+                "font-semibold",
+                labelSize,
+                labelText,
+                isCorrect && "font-extrabold",
               )}
             >
               {item.label}
             </span>
             {item.delta && (
-              <span
-                className={cn(
-                  "text-[10px] font-bold tabular-nums",
-                  item.delta.count > 0 && isFasit
-                    ? "text-sant"
-                    : item.delta.count < 0 && isFasit
-                      ? "text-usant"
-                      : "text-muted-foreground",
-                )}
-              >
-                {item.delta.count > 0 ? "+" : ""}
-                {item.delta.count} stk ({item.delta.pct > 0 ? "+" : ""}
-                {item.delta.pct}%)
+              <span className="text-[10px] font-semibold tabular-nums text-muted-foreground">
+                {item.delta.pct > 0 ? "↑" : item.delta.pct < 0 ? "↓" : "±"}
+                {" "}
+                {Math.abs(item.delta.pct)}%
               </span>
             )}
           </div>

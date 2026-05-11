@@ -9,6 +9,7 @@ import { TeacherStepLayout } from "@workspace/evalion/components/live/teacher-st
 import { FASIT_TEXT, resolveStatementHex } from "@workspace/evalion/lib/constants";
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { StatementCard } from "@workspace/ui/components/statement-card";
+import { BarChart3 } from "lucide-react";
 
 import { buildVoteBars } from "@/lib/vote-bars";
 
@@ -113,16 +114,34 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
             />
           </div>
         ) : (
-          <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto rounded-2xl bg-white p-3 shadow-[var(--shadow-card-soft)]">
-            <div className="flex h-full flex-col gap-2">
-              <div className="flex-1 min-h-0 py-2">
-                <DistributionChart
-                  key={`s${selectedIdx}-reveal`}
-                  bars={buildVoteBars(r2Votes)}
-                  total={r2Total}
-                  correctKey={statement?.fasit}
-                />
+          <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-2xl bg-white p-3 shadow-[var(--shadow-card-soft)]">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-sm font-semibold text-[var(--color-text-ink-soft)]">
+                Gjennomsnittlig sikkerhet:
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xl font-extrabold leading-none tabular-nums text-[var(--color-turkis-500)]">
+                  {avgConfidenceR2 != null
+                    ? avgConfidenceR2.toFixed(1).replace(".", ",")
+                    : "–"}
+                </span>
+                <button
+                  type="button"
+                  aria-label="Vis sikkerhetsdetaljer"
+                  className="flex size-8 items-center justify-center rounded-xl border-[1.5px] border-[var(--color-divider-soft)] bg-white text-[var(--color-text-ink-faint)]"
+                >
+                  <BarChart3 className="size-4" strokeWidth={2} />
+                </button>
               </div>
+            </div>
+            <div className="h-px bg-[var(--color-divider-soft)]" />
+            <div className="flex-1 min-h-0 py-2">
+              <DistributionChart
+                key={`s${selectedIdx}-reveal`}
+                bars={buildVoteBars(r2Votes)}
+                total={r2Total}
+                correctKey={statement?.fasit}
+              />
             </div>
           </div>
         )}

@@ -8,7 +8,13 @@ import type { Fasit } from "@/lib/types";
 import { ColumnChart } from "./column-chart";
 import { ConfidenceCircles } from "./confidence-circles";
 import { MatrixHint, StudentMatrix } from "./student-matrix";
-import type { RoundDistribution, ConfidenceData, StudentData } from "./types";
+import {
+  getStatementGradient,
+  type RoundDistribution,
+  type ConfidenceData,
+  type StatementColorName,
+  type StudentData,
+} from "./types";
 
 interface RoundAnalyticsProps {
   round: 1 | 2;
@@ -18,6 +24,7 @@ interface RoundAnalyticsProps {
   prevDistribution?: RoundDistribution;
   fasit: Fasit;
   statementText: string;
+  statementColor?: StatementColorName;
   totalStudents: number;
   sessionActive: boolean;
   students: StudentData[];
@@ -32,11 +39,13 @@ export function RoundAnalytics({
   prevDistribution,
   fasit,
   statementText,
+  statementColor,
   totalStudents,
   sessionActive,
   students,
   onToggleHighlight,
 }: RoundAnalyticsProps) {
+  const gradient = getStatementGradient(statementColor);
   const [showConfDetail, setShowConfDetail] = useState(false);
   const [matrixSelected, setMatrixSelected] = useState<number | null>(null);
 
@@ -95,8 +104,14 @@ export function RoundAnalytics({
   return (
     <div className="flex flex-col gap-3.5">
       <div className="overflow-hidden rounded-[16px] border border-neutral-200 bg-white">
-        <div className="mx-3.5 mt-3.5 rounded-[12px] bg-gradient-to-br from-purple-50 to-purple-100 p-2.5 text-center">
-          <p className="text-xs font-semibold italic leading-relaxed text-purple-800">
+        <div
+          className="mx-3.5 mt-3.5 rounded-[12px] p-2.5 text-center"
+          style={{ background: gradient.background }}
+        >
+          <p
+            className="text-xs font-semibold italic leading-relaxed"
+            style={{ color: gradient.text }}
+          >
             «{statementText}»
           </p>
         </div>
@@ -208,8 +223,8 @@ export function RoundAnalytics({
             </span>
           </div>
           <div className="px-3.5 pb-3.5">
-            <div className="flex flex-col items-center gap-1 rounded-[14px] bg-primary/5 px-4 py-3">
-              <span className="font-mono text-2xl font-extrabold leading-none text-primary tabular-nums">
+            <div className="flex items-center justify-center gap-2.5 rounded-[14px] bg-primary/15 px-3.5 py-2.5">
+              <span className="font-mono text-[20px] font-extrabold leading-none text-secondary-foreground tabular-nums">
                 {changedCount}/{totalStudents}
               </span>
               <span className="text-[11px] font-semibold text-muted-foreground">
@@ -315,29 +330,29 @@ function buildR2MatrixCells(students: StudentData[]) {
     {
       label: "Endret til riktig",
       count: endretTilRiktig.length,
-      colorClass: "bg-sant/15",
-      textClass: "text-sant",
+      colorClass: "bg-[#E8F5E9]",
+      textClass: "text-[#2E7D32]",
       students: mapStudents(endretTilRiktig),
     },
     {
       label: "Endret fra riktig til feil",
       count: endretFraRiktig.length,
-      colorClass: "bg-usant/15",
-      textClass: "text-usant",
+      colorClass: "bg-[#FFEBEE]",
+      textClass: "text-[#C62828]",
       students: mapStudents(endretFraRiktig),
     },
     {
       label: "Endret, fortsatt feil",
       count: endretFortsattFeil.length,
-      colorClass: "bg-orange-100",
-      textClass: "text-orange-800",
+      colorClass: "bg-[#FFF3E0]",
+      textClass: "text-[#B35C00]",
       students: mapStudents(endretFortsattFeil),
     },
     {
       label: "Uendret",
       count: uendret.length,
-      colorClass: "bg-yellow-100",
-      textClass: "text-yellow-800",
+      colorClass: "bg-[#FFFDE7]",
+      textClass: "text-[#8D6E00]",
       students: mapStudents(uendret),
     },
   ];

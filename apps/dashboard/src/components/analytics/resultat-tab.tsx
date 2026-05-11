@@ -5,7 +5,12 @@ import { cn } from "@workspace/ui/lib/utils";
 
 import { ColumnChart } from "./column-chart";
 import { ConfidenceCircles } from "./confidence-circles";
-import type { RoundDistribution, StudentData } from "./types";
+import {
+  getStatementGradient,
+  type RoundDistribution,
+  type StatementColorName,
+  type StudentData,
+} from "./types";
 
 import type { Fasit } from "@/lib/types";
 
@@ -14,6 +19,7 @@ interface ResultatTabProps {
   round2: RoundDistribution;
   fasit: Fasit;
   statementText: string;
+  statementColor?: StatementColorName;
   avgRating: number;
   ratingDistribution: Array<{ score: number; count: number }>;
   students: StudentData[];
@@ -24,11 +30,13 @@ export function ResultatTab({
   round2,
   fasit,
   statementText,
+  statementColor,
   avgRating,
   ratingDistribution,
   students,
 }: ResultatTabProps) {
   const [showRatingDetail, setShowRatingDetail] = useState(false);
+  const gradient = getStatementGradient(statementColor);
 
   const makeItems = (dist: RoundDistribution) => [
     { label: "Sant", count: dist.sant, pct: dist.santPct, isCorrect: fasit === "sant" },
@@ -47,8 +55,14 @@ export function ResultatTab({
   return (
     <div className="flex flex-col gap-3.5">
       <div className="overflow-hidden rounded-[16px] border border-neutral-200 bg-white">
-        <div className="mx-3.5 mt-3.5 rounded-[12px] bg-gradient-to-br from-purple-50 to-purple-100 p-2.5 text-center">
-          <p className="text-xs font-semibold italic leading-relaxed text-purple-800">
+        <div
+          className="mx-3.5 mt-3.5 rounded-[12px] p-2.5 text-center"
+          style={{ background: gradient.background }}
+        >
+          <p
+            className="text-xs font-semibold italic leading-relaxed"
+            style={{ color: gradient.text }}
+          >
             «{statementText}»
           </p>
         </div>
@@ -57,18 +71,18 @@ export function ResultatTab({
           <div className="text-[10px] font-semibold text-muted-foreground">Stemmefordeling</div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2.5 px-3.5 pb-2">
+        <div className="flex flex-col gap-4 px-3.5 pt-2 pb-2">
           <div>
             <div className="mb-1 text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
               Runde 1
             </div>
-            <ColumnChart items={makeItems(round1)} />
+            <ColumnChart items={makeItems(round1)} compact />
           </div>
           <div>
             <div className="mb-1 text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
               Runde 2
             </div>
-            <ColumnChart items={makeItems(round2)} />
+            <ColumnChart items={makeItems(round2)} compact />
           </div>
         </div>
 

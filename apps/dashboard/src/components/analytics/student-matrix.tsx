@@ -172,13 +172,18 @@ function R1Matrix({
         type="button"
         onClick={() => onSelect(i)}
         className={cn(
-          "flex w-full flex-col items-center justify-center rounded-[12px] border-2 px-3 py-2.5 text-center transition-all",
+          "flex w-full flex-col items-center justify-center rounded-[12px] border-2 px-7 py-2.5 text-center transition-all",
           isSelected
             ? "border-primary/40 bg-primary/10 ring-2 ring-primary/15"
             : "border-neutral-200 bg-white hover:bg-neutral-50",
         )}
       >
-        <span className="text-base font-extrabold leading-tight text-foreground">
+        <span
+          className={cn(
+            "text-base font-extrabold leading-tight",
+            isSelected ? "text-primary" : "text-foreground",
+          )}
+        >
           {c.count} stk
         </span>
       </button>

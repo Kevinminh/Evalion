@@ -9,6 +9,8 @@ import { useMutation } from "convex/react";
 
 import { ResultatTab } from "@/components/analytics/resultat-tab";
 import { RoundAnalytics } from "@/components/analytics/round-analytics";
+import type { StatementColorName } from "@/components/analytics/types";
+import { WaitingState } from "@/components/analytics/waiting-state";
 import { liveSessionQueries } from "@/lib/convex";
 import type { Id } from "@/lib/convex";
 
@@ -62,9 +64,11 @@ function AnalyticsPage() {
 
   const statementText = session.statements[selectedStatement]?.text ?? "";
   const fasit = session.statements[selectedStatement]?.fasit ?? "sant";
+  const statementColor = session.statements[selectedStatement]?.color;
   const totalStudents = session.studentCount;
   const sessionActive = session.status === "active";
   const totalStatements = session.statements.length;
+  const showR1Comparison = (session.currentStep ?? 0) >= 4;
 
   return (
     <div className="flex min-h-svh flex-col bg-neutral-100">
@@ -96,6 +100,8 @@ function AnalyticsPage() {
             <Skeleton className="h-64 rounded-[16px]" />
             <Skeleton className="h-48 rounded-[16px]" />
           </div>
+        ) : activeTab === "runde1" && analytics.round1.total === 0 && sessionActive ? (
+          <WaitingState />
         ) : (
           <>
             {activeTab === "runde1" && (
@@ -105,6 +111,7 @@ function AnalyticsPage() {
                 confidence={analytics.confidence1}
                 fasit={fasit}
                 statementText={statementText}
+                statementColor={statementColor as StatementColorName | undefined}
                 totalStudents={totalStudents}
                 sessionActive={sessionActive}
                 students={analytics.students}
@@ -117,10 +124,11 @@ function AnalyticsPage() {
                 round={2}
                 distribution={analytics.round2}
                 confidence={analytics.confidence2}
-                prevConfidence={analytics.confidence1}
-                prevDistribution={analytics.round1}
+                prevConfidence={showR1Comparison ? analytics.confidence1 : undefined}
+                prevDistribution={showR1Comparison ? analytics.round1 : undefined}
                 fasit={fasit}
                 statementText={statementText}
+                statementColor={statementColor as StatementColorName | undefined}
                 totalStudents={totalStudents}
                 sessionActive={sessionActive}
                 students={analytics.students}
@@ -133,6 +141,7 @@ function AnalyticsPage() {
                 round2={analytics.round2}
                 fasit={fasit}
                 statementText={statementText}
+                statementColor={statementColor as StatementColorName | undefined}
                 avgRating={analytics.avgRating}
                 ratingDistribution={analytics.ratingDistribution}
                 students={analytics.students}

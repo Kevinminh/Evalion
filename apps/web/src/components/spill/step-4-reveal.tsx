@@ -21,19 +21,31 @@ export function Step4Reveal({ showCountdown, countdownNumber, countdownDone }: S
     <>
       <CountdownOverlay visible={showCountdown} number={countdownNumber} />
       <div className="flex w-full flex-col items-center gap-6">
-        {countdownDone && <FasitBadge fasit={statement.fasit} animated size="lg" />}
-
-        <StatementCard statement={statement} />
+        <div className="relative w-full">
+          {countdownDone && (
+            <div className="absolute left-1/2 -top-1 z-10 -translate-x-1/2 -translate-y-[65%]">
+              <FasitBadge fasit={statement.fasit} animated size="lg" />
+            </div>
+          )}
+          <StatementCard statement={statement} />
+        </div>
 
         {countdownDone && (
-          <Professor
-            size="sm"
-            bounce
-            textSize="sm"
-            text={`Forklar til læringspartneren din hvorfor påstanden er ${
-              FASIT_TEXT[statement.fasit]
-            }. Bruk fagbegreper, sammenligninger og eksempler.`}
-          />
+          <div className="flex w-full flex-col items-center gap-4">
+            <h2 className="text-center text-2xl font-extrabold text-[var(--color-text-ink-strong)]">
+              Snakk sammen!
+            </h2>
+            <p className="max-w-[380px] text-center text-sm leading-relaxed text-[var(--color-text-ink-soft)]">
+              Forklar til læringspartneren din hvorfor påstanden er {FASIT_TEXT[statement.fasit]}.
+            </p>
+            <Professor
+              size="sm"
+              bordered
+              bounce
+              textSize="sm"
+              text="Bruk fagbegreper, sammenligninger og eksempler for å styrke forklaringen din."
+            />
+          </div>
         )}
 
         {countdownDone && session.transcriptionEnabled && <RecordingDisclaimer />}
