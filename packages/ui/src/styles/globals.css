@@ -5,9 +5,10 @@
 @import "@fontsource-variable/nunito";
 
 @custom-variant dark (&:is(.dark *));
-@source "../../../apps/**/*.{ts,tsx}";
-@source "../../../components/**/*.{ts,tsx}";
-@source "../../../packages/**/*.{ts,tsx}";
+@source "../../../../apps/web/src/**/*.{ts,tsx}";
+@source "../../../../apps/dashboard/src/**/*.{ts,tsx}";
+@source "../../../../apps/landing/app/**/*.{ts,tsx}";
+@source "../../../evalion/src/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
 
 @theme {

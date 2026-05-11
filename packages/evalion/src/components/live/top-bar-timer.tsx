@@ -47,14 +47,11 @@ export function TopBarTimer({
   const isUrgent = remaining > 0 && remaining <= 10;
 
   return (
-    <div
-      className="inline-flex items-center gap-3 rounded-full px-4 py-2"
-      style={{ backgroundColor: "#ffebee" }}
-    >
-      <Clock className="size-5" strokeWidth={2} style={{ color: "#ef5350" }} />
+    <div className="inline-flex items-center gap-3 rounded-full bg-[var(--color-usant-bg)] px-4 py-2">
+      <Clock className="size-5 text-[var(--color-usant)]" strokeWidth={2} />
       <span
         className="font-mono text-xl font-bold leading-none tabular-nums"
-        style={{ color: isUrgent ? "#ef5350" : "var(--color-text-ink-strong)" }}
+        style={{ color: isUrgent ? "var(--color-usant)" : "var(--color-text-ink-strong)" }}
       >
         {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
       </span>
