@@ -147,7 +147,7 @@ export function TeacherPanel({
         <div className={cn("md:hidden")} style={backdropStyle} onClick={toggle} />
       )}
       <div style={panelStyle}>
-        <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
+        <div className="flex min-h-0 flex-1 flex-col justify-center gap-3 px-4 py-4">
           {children}
         </div>
         {footer && (
