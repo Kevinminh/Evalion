@@ -1,7 +1,7 @@
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import type { StatementWithId } from "@workspace/evalion/hooks/use-statements";
 import { cn } from "@workspace/ui/lib/utils";
 import { ChevronDown, GripVertical, ImageIcon, Sparkles, Trash2 } from "lucide-react";
+import { Reorder, useDragControls } from "motion/react";
 import { useRef, useState } from "react";
 
 import { ComingSoonButton } from "@/components/coming-soon-button";
@@ -10,7 +10,7 @@ import { useClickOutside } from "@/lib/use-click-outside";
 import type { Fasit } from "@/lib/types";
 
 interface StatementEditorProps {
-  id: number | string;
+  value: StatementWithId;
   index: number;
   text: string;
   fasit: Fasit;
@@ -88,7 +88,7 @@ function FasitDropdown({ value, onChange }: { value: Fasit; onChange: (v: Fasit)
 }
 
 export function StatementEditor({
-  id,
+  value,
   index,
   text,
   fasit,
@@ -98,23 +98,22 @@ export function StatementEditor({
   onExplanationChange,
   onDelete,
 }: StatementEditorProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id,
-  });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
+  const dragControls = useDragControls();
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={cn(
-        "rounded-2xl border-[1.5px] border-border bg-card px-6 py-5 transition-all hover:border-primary/30 hover:shadow-sm",
-        isDragging && "z-10 opacity-80 shadow-lg",
-      )}
+    <Reorder.Item
+      as="div"
+      value={value}
+      dragListener={false}
+      dragControls={dragControls}
+      transition={{ type: "spring", stiffness: 600, damping: 40 }}
+      whileDrag={{
+        scale: 1.02,
+        boxShadow: "0 12px 28px rgba(0, 0, 0, 0.12)",
+        zIndex: 10,
+      }}
+      style={{ position: "relative" }}
+      className="rounded-2xl border-[1.5px] border-border bg-card px-6 py-5 transition-colors hover:border-primary/30 hover:shadow-sm"
     >
       {/* Top bar: number + actions */}
       <div className="mb-4 flex items-center justify-between">
@@ -125,9 +124,8 @@ export function StatementEditor({
           <button
             type="button"
             aria-label="Dra for å sortere"
-            className={cn(ACTION_BTN_CLASS, "cursor-grab touch-none active:cursor-grabbing")}
-            {...attributes}
-            {...listeners}
+            onPointerDown={(e) => dragControls.start(e)}
+            className={cn(ACTION_BTN_CLASS, "cursor-grab touch-none select-none active:cursor-grabbing")}
           >
             <GripVertical className="size-4" />
           </button>
@@ -197,6 +195,6 @@ export function StatementEditor({
           </div>
         </div>
       </div>
-    </div>
+    </Reorder.Item>
   );
 }

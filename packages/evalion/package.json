@@ -20,8 +20,6 @@
     "@convex-dev/react-query": "catalog:",
     "better-auth": "catalog:",
     "@base-ui/react": "catalog:",
-    "@dnd-kit/core": "^6.3.1",
-    "@dnd-kit/sortable": "^10.0.0",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-start": "catalog:",
     "@tanstack/react-query": "catalog:",

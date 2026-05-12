@@ -1,5 +1,3 @@
-import { DndContext, closestCenter } from "@dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
@@ -12,6 +10,7 @@ import {
 } from "@workspace/evalion/hooks/use-statements";
 import { useMutation } from "convex/react";
 import { Plus } from "lucide-react";
+import { Reorder } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -45,7 +44,6 @@ function EditFagPratPage() {
     addStatement,
     updateStatement,
     removeStatement,
-    handleDragEnd,
   } = useStatements();
 
   // Sync local state only on first load or when navigating to a different fagprat
@@ -129,29 +127,28 @@ function EditFagPratPage() {
           Legg til påstand
         </Button>
       </div>
-      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext
-          items={statements.map((s) => s.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <div className="space-y-4">
-            {statements.map((stmt, i) => (
-              <StatementEditor
-                key={stmt.id}
-                id={stmt.id}
-                index={i}
-                text={stmt.text}
-                fasit={stmt.fasit}
-                explanation={stmt.explanation}
-                onTextChange={(v) => updateStatement(i, "text", v)}
-                onFasitChange={(v) => updateStatement(i, "fasit", v)}
-                onExplanationChange={(v) => updateStatement(i, "explanation", v)}
-                onDelete={() => removeStatement(i)}
-              />
-            ))}
-          </div>
-        </SortableContext>
-      </DndContext>
+      <Reorder.Group
+        as="div"
+        axis="y"
+        values={statements}
+        onReorder={setStatements}
+        className="space-y-4"
+      >
+        {statements.map((stmt, i) => (
+          <StatementEditor
+            key={stmt.id}
+            value={stmt}
+            index={i}
+            text={stmt.text}
+            fasit={stmt.fasit}
+            explanation={stmt.explanation}
+            onTextChange={(v) => updateStatement(i, "text", v)}
+            onFasitChange={(v) => updateStatement(i, "fasit", v)}
+            onExplanationChange={(v) => updateStatement(i, "explanation", v)}
+            onDelete={() => removeStatement(i)}
+          />
+        ))}
+      </Reorder.Group>
     </div>
   );
 }

@@ -1,5 +1,3 @@
-import { arrayMove } from "@dnd-kit/sortable";
-import type { DragEndEvent } from "@dnd-kit/core";
 import { useState } from "react";
 
 import type { Fasit } from "@workspace/evalion/lib/types";
@@ -20,8 +18,8 @@ function createStatement(
 }
 
 /**
- * Local state + handlers for a drag-and-droppable list of FagPrat statements.
- * Pairs with @dnd-kit/sortable in the caller.
+ * Local state + handlers for a reorderable list of FagPrat statements.
+ * Pair `setStatements` with motion's `Reorder.Group` `onReorder` prop in the caller.
  */
 export function useStatements(initial: StatementWithId[] = []) {
   const [statements, setStatements] = useState<StatementWithId[]>(initial);
@@ -46,24 +44,12 @@ export function useStatements(initial: StatementWithId[] = []) {
     setStatements((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      setStatements((prev) => {
-        const oldIndex = prev.findIndex((s) => s.id === active.id);
-        const newIndex = prev.findIndex((s) => s.id === over.id);
-        return arrayMove(prev, oldIndex, newIndex);
-      });
-    }
-  };
-
   return {
     statements,
     setStatements,
     addStatement,
     updateStatement,
     removeStatement,
-    handleDragEnd,
   };
 }
 

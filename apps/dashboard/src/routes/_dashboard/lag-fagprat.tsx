@@ -1,5 +1,3 @@
-import { DndContext, closestCenter } from "@dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -10,6 +8,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useMutation } from "convex/react";
 import { Plus } from "lucide-react";
+import { Reorder } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -48,7 +47,6 @@ function LagFagPratPage() {
     addStatement,
     updateStatement,
     removeStatement,
-    handleDragEnd,
   } = useStatements();
 
   const handleReddiTopicSubmit = (topic: string) => {
@@ -219,36 +217,36 @@ function LagFagPratPage() {
             </Button>
           </div>
         </div>
-        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext
-            items={statements.map((s) => s.id)}
-            strategy={verticalListSortingStrategy}
+        {statements.length === 0 ? (
+          <div className="rounded-2xl border-2 border-dashed border-border py-12 text-center">
+            <p className="text-muted-foreground">
+              Bruk REDDI eller legg til påstander manuelt
+            </p>
+          </div>
+        ) : (
+          <Reorder.Group
+            as="div"
+            axis="y"
+            values={statements}
+            onReorder={setStatements}
+            className="space-y-4"
           >
-            <div className="space-y-4">
-              {statements.map((stmt, i) => (
-                <StatementEditor
-                  key={stmt.id}
-                  id={stmt.id}
-                  index={i}
-                  text={stmt.text}
-                  fasit={stmt.fasit}
-                  explanation={stmt.explanation}
-                  onTextChange={(v) => updateStatement(i, "text", v)}
-                  onFasitChange={(v) => updateStatement(i, "fasit", v)}
-                  onExplanationChange={(v) => updateStatement(i, "explanation", v)}
-                  onDelete={() => removeStatement(i)}
-                />
-              ))}
-              {statements.length === 0 && (
-                <div className="rounded-2xl border-2 border-dashed border-border py-12 text-center">
-                  <p className="text-muted-foreground">
-                    Bruk REDDI eller legg til påstander manuelt
-                  </p>
-                </div>
-              )}
-            </div>
-          </SortableContext>
-        </DndContext>
+            {statements.map((stmt, i) => (
+              <StatementEditor
+                key={stmt.id}
+                value={stmt}
+                index={i}
+                text={stmt.text}
+                fasit={stmt.fasit}
+                explanation={stmt.explanation}
+                onTextChange={(v) => updateStatement(i, "text", v)}
+                onFasitChange={(v) => updateStatement(i, "fasit", v)}
+                onExplanationChange={(v) => updateStatement(i, "explanation", v)}
+                onDelete={() => removeStatement(i)}
+              />
+            ))}
+          </Reorder.Group>
+        )}
       </div>
     </div>
   );
