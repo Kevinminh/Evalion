@@ -8,6 +8,7 @@ interface EndringerCardProps {
   totalVotes: number;
   changedToCorrect: number;
   changedToIncorrect: number;
+  totalChanged: number;
   avgConfidenceR1?: number;
   avgConfidenceR2?: number;
 }
@@ -30,10 +31,13 @@ export function EndringerCard({
   totalVotes,
   changedToCorrect,
   changedToIncorrect,
+  totalChanged,
   avgConfidenceR1,
   avgConfidenceR2,
 }: EndringerCardProps) {
   const correctPct = totalVotes > 0 ? Math.round((correctCount / totalVotes) * 100) : 0;
+  const tilRiktigPct =
+    totalChanged > 0 ? Math.round((changedToCorrect / totalChanged) * 100) : 0;
   const hasConfDelta =
     avgConfidenceR1 !== undefined && avgConfidenceR2 !== undefined;
   const confDelta = hasConfDelta ? avgConfidenceR2! - avgConfidenceR1! : 0;
@@ -56,14 +60,14 @@ export function EndringerCard({
       </div>
 
       {/* Secondary headline: endret fra feil til riktig */}
-      {changedToCorrect > 0 && (
+      {totalChanged > 0 && (
         <div className="flex items-center justify-center gap-2 rounded-2xl bg-[var(--color-rating-bar-track)] px-3 py-2">
           <span className="shrink-0 font-mono text-lg font-extrabold leading-none tabular-nums text-[var(--color-turkis-500)]">
-            {changedToCorrect}
+            {changedToCorrect}/{totalChanged}
           </span>
           <div className="flex min-w-0 flex-col gap-px">
             <span className="text-xs font-semibold text-[var(--color-text-ink-soft)]">
-              endret fra feil til riktig svar
+              endret fra feil til riktig svar ({tilRiktigPct}%)
             </span>
           </div>
         </div>
@@ -72,12 +76,12 @@ export function EndringerCard({
       {/* Warning: changed from correct to incorrect */}
       {changedToIncorrect > 0 && (
         <div className="flex items-center justify-center gap-2 rounded-2xl border-[1.5px] border-[var(--color-error-border-light)] bg-[var(--color-error-bg-light)] px-3 py-2">
-          <AlertTriangle className="size-[18px] shrink-0 text-[var(--color-error)]" strokeWidth={2} />
-          <span className="font-mono text-base font-extrabold leading-none tabular-nums text-[var(--color-error)]">
-            {changedToIncorrect}
-          </span>
-          <span className="text-xs font-semibold text-[var(--color-text-ink-soft)]">
-            endret fra riktig til feil
+          <AlertTriangle
+            className="size-[18px] shrink-0 text-[var(--color-delvis)]"
+            strokeWidth={2}
+          />
+          <span className="text-xs font-bold text-[var(--color-text-ink-strong)]">
+            {changedToIncorrect} elev{changedToIncorrect > 1 ? "er" : ""} endret fra riktig til feil svar
           </span>
         </div>
       )}

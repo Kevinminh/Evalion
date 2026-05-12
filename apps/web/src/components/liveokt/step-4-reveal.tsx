@@ -16,6 +16,7 @@ import { buildVoteBars } from "@/lib/vote-bars";
 
 import type { TeacherStep } from "@/types/teacher-step";
 import { useTeacherSession } from "./teacher-session-context";
+import { useState } from "react";
 
 interface Step4Args {
   showCountdown: boolean;
@@ -32,13 +33,16 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
     r2Total,
     changedToCorrect,
     changedToIncorrect,
+    totalChanged,
     r2Votes,
     selectedIdx,
     avgConfidenceR1,
     avgConfidenceR2,
+    avgConfidenceR2ByVote,
     goToStep,
   } = useTeacherSession();
   const endringerTab = panelTab === "default" || panelTab === "endringer";
+  const [showAvgBreakdown, setShowAvgBreakdown] = useState(false);
 
   const statementColor = resolveStatementHex(statement?.color, selectedIdx);
 
@@ -114,13 +118,14 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
               totalVotes={r2Total}
               changedToCorrect={changedToCorrect}
               changedToIncorrect={changedToIncorrect}
+              totalChanged={totalChanged}
               avgConfidenceR1={avgConfidenceR1}
               avgConfidenceR2={avgConfidenceR2}
             />
           </div>
         ) : (
           <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-2xl bg-white p-3 shadow-[var(--shadow-card-soft)]">
-            <div className="flex items-center justify-between gap-2">
+            <div className="relative flex items-center justify-between gap-2">
               <span className="text-sm font-semibold text-[var(--color-text-ink-soft)]">
                 Gjennomsnittlig sikkerhet:
               </span>
@@ -130,12 +135,26 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
                 </span>
                 <button
                   type="button"
-                  aria-label="Vis sikkerhetsdetaljer"
-                  className="flex size-8 items-center justify-center rounded-xl border-[1.5px] border-[var(--color-divider-soft)] bg-white text-[var(--color-text-ink-faint)]"
+                  aria-label="Vis sikkerhet fordelt på kategori"
+                  aria-pressed={showAvgBreakdown}
+                  onClick={() => setShowAvgBreakdown((s) => !s)}
+                  className={
+                    "flex size-8 items-center justify-center rounded-xl border-[1.5px] border-[var(--color-divider-soft)] text-[var(--color-text-ink-faint)] transition-colors " +
+                    (showAvgBreakdown
+                      ? "bg-[var(--color-divider-soft)] text-[var(--color-text-ink-soft)]"
+                      : "bg-white hover:bg-[var(--color-divider-soft)]")
+                  }
                 >
                   <BarChart3 className="size-4" strokeWidth={2} />
                 </button>
               </div>
+              {showAvgBreakdown && (
+                <div className="absolute top-full right-0 z-10 mt-2 flex min-w-[160px] flex-col gap-1.5 rounded-xl border-[1.5px] border-[var(--color-divider-soft)] bg-white p-3 shadow-[var(--shadow-card-soft)]">
+                  <AvgBreakdownRow label="Sant:" value={avgConfidenceR2ByVote.sant} />
+                  <AvgBreakdownRow label="Delvis sant:" value={avgConfidenceR2ByVote.delvis} />
+                  <AvgBreakdownRow label="Usant:" value={avgConfidenceR2ByVote.usant} />
+                </div>
+              )}
             </div>
             <div className="h-px bg-[var(--color-divider-soft)]" />
             <div className="flex-1 min-h-0 py-2">
@@ -155,4 +174,15 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
   );
 
   return { main, panel, panelFooter: null };
+}
+
+function AvgBreakdownRow({ label, value }: { label: string; value: number | undefined }) {
+  return (
+    <div className="flex items-center justify-between gap-4 text-sm font-semibold">
+      <span className="text-[var(--color-text-ink-soft)]">{label}</span>
+      <span className="font-mono font-bold tabular-nums text-[var(--color-text-ink-strong)]">
+        {value === undefined ? "–" : formatDecimal1(value)}
+      </span>
+    </div>
+  );
 }

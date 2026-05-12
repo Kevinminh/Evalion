@@ -67,6 +67,11 @@ export function StatementAnalytics({
             totalVotes={analytics.totalR2}
             changedToCorrect={analytics.wrongToRight}
             changedToIncorrect={analytics.rightToWrong}
+            totalChanged={analytics.students.reduce(
+              (sum, s) =>
+                s.round1 && s.round2 && s.round1.vote !== s.round2.vote ? sum + 1 : sum,
+              0,
+            )}
           />
         </div>
         {analytics.ratingDistribution.some((d) => d.count > 0) && (

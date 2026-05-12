@@ -31,8 +31,14 @@ export interface VoteAnalysis {
   r2Total: number;
   changedToCorrect: number;
   changedToIncorrect: number;
+  totalChanged: number;
   avgConfidenceR1?: number;
   avgConfidenceR2?: number;
+  avgConfidenceR2ByVote: {
+    sant?: number;
+    delvis?: number;
+    usant?: number;
+  };
   confidenceR1: ConfidenceLevelCount[];
   confidenceR2: ConfidenceLevelCount[];
 }
@@ -67,6 +73,13 @@ export function useVoteAnalysis({ votes, analytics, step }: VoteAnalysisInput): 
     }
     const activeRoundVotes = step <= 2 ? r1 : r2;
 
+    const r1ByStudent = new Map(r1.map((v) => [v.studentId, v.vote]));
+    let totalChanged = 0;
+    for (const r2Vote of r2) {
+      const r1Vote = r1ByStudent.get(r2Vote.studentId);
+      if (r1Vote !== undefined && r1Vote !== r2Vote.vote) totalChanged++;
+    }
+
     return {
       r1Votes: r1,
       r2Votes: r2,
@@ -77,8 +90,14 @@ export function useVoteAnalysis({ votes, analytics, step }: VoteAnalysisInput): 
       r2Total: analytics?.totalR2 ?? 0,
       changedToCorrect: analytics?.wrongToRight ?? 0,
       changedToIncorrect: analytics?.rightToWrong ?? 0,
+      totalChanged,
       avgConfidenceR1: avgConfidence(r1),
       avgConfidenceR2: avgConfidence(r2),
+      avgConfidenceR2ByVote: {
+        sant: avgConfidence(r2.filter((v) => v.vote === "sant")),
+        delvis: avgConfidence(r2.filter((v) => v.vote === "delvis")),
+        usant: avgConfidence(r2.filter((v) => v.vote === "usant")),
+      },
       confidenceR1: confidenceDistribution(r1),
       confidenceR2: confidenceDistribution(r2),
     };
