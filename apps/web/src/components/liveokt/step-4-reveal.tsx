@@ -112,7 +112,7 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
         onTabChange={setPanelTab}
       >
         {endringerTab ? (
-          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto py-1">
+          <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-2xl bg-white p-3 shadow-[var(--shadow-card-soft)]">
             <EndringerCard
               correctCount={r2CorrectCount}
               totalVotes={r2Total}
