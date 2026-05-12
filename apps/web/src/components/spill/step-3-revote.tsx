@@ -14,9 +14,10 @@ export function Step3Revote() {
   const [selectedVote, setSelectedVote] = useState<Fasit | null>(null);
   const [selectedConfidence, setSelectedConfidence] = useState<number | null>(null);
   const [sent, setSent] = useState(false);
+  const [showWaiting, setShowWaiting] = useState(false);
 
   if (!statement) return null;
-  if (hasVoted || sent) {
+  if ((!sent && hasVoted) || showWaiting) {
     return <WaitingScreen />;
   }
 
@@ -27,6 +28,7 @@ export function Step3Revote() {
     setSent(true);
     try {
       await castVote({ vote: selectedVote!, confidence: selectedConfidence! });
+      setTimeout(() => setShowWaiting(true), 500);
     } catch {
       setSent(false);
       toast.error("Svaret ble ikke sendt. Prøv igjen.");

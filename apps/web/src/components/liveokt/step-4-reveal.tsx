@@ -140,7 +140,9 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
                 key={`s${selectedIdx}-reveal`}
                 bars={buildVoteBars(r2Votes)}
                 total={r2Total}
-                correctKey={statement?.fasit}
+                // Keep bars gray until the countdown finishes — colored bars
+                // signal the correct answer, so they would spoil the reveal.
+                correctKey={countdownDone ? statement?.fasit : undefined}
               />
             </div>
           </div>

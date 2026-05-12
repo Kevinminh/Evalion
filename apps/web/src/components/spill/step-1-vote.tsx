@@ -24,9 +24,13 @@ export function Step1Vote() {
   const [selectedVote, setSelectedVote] = useState<Fasit | null>(null);
   const [selectedConfidence, setSelectedConfidence] = useState<number | null>(null);
   const [sent, setSent] = useState(false);
+  const [showWaiting, setShowWaiting] = useState(false);
 
   if (!statement) return null;
-  if (hasVoted || sent) {
+  // While `sent` is true we keep showing the green "Sendt!" button for ~500ms
+  // before swapping to the waiting screen — otherwise the Convex subscription
+  // would flip `hasVoted` immediately and skip the confirmation flash.
+  if ((!sent && hasVoted) || showWaiting) {
     return <WaitingScreen />;
   }
 
@@ -45,6 +49,7 @@ export function Step1Vote() {
         trimmed ? submitBegrunnelse({ text: trimmed }) : Promise.resolve(),
       ]);
       if (trimmed) clearBegrunnelseDraft();
+      setTimeout(() => setShowWaiting(true), 500);
     } catch {
       setSent(false);
       toast.error("Svaret ble ikke sendt. Prøv igjen.");

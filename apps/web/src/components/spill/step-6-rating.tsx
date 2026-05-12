@@ -12,9 +12,10 @@ export function Step6Rating() {
   const { statement, submitRating } = useStudentGame();
   const [selected, setSelected] = useState<number | null>(null);
   const [sent, setSent] = useState(false);
+  const [showWaiting, setShowWaiting] = useState(false);
 
   if (!statement) return null;
-  if (sent) {
+  if (showWaiting) {
     return <WaitingScreen title="Takk for svaret ditt!" />;
   }
 
@@ -23,6 +24,7 @@ export function Step6Rating() {
     setSent(true);
     try {
       await submitRating(selected);
+      setTimeout(() => setShowWaiting(true), 500);
     } catch {
       setSent(false);
       toast.error("Vurderingen ble ikke sendt. Prøv igjen.");

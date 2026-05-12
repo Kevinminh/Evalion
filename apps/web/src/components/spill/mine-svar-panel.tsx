@@ -1,4 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
+import {
+  LEVEL_CIRCLE_COLORS,
+  VOTE_DOT_COLORS,
+  VOTE_LABELS,
+} from "@workspace/evalion/lib/constants";
 import type { Fasit } from "@workspace/evalion/lib/types";
 import { cn } from "@workspace/ui/lib/utils";
 import { MessageSquare, X } from "lucide-react";
@@ -7,26 +12,6 @@ import { useEffect, useState } from "react";
 import { liveSessionQueries } from "@/lib/convex";
 
 import { useStudentGame } from "./student-game-context";
-
-const VOTE_LABEL: Record<Fasit, string> = {
-  sant: "Sant",
-  delvis: "Delvis sant",
-  usant: "Usant",
-};
-
-const VOTE_BADGE_BG: Record<Fasit, string> = {
-  sant: "bg-sant",
-  delvis: "bg-delvis",
-  usant: "bg-usant",
-};
-
-const CONF_RING: Record<number, string> = {
-  1: "border-[var(--color-rating-1)] text-[var(--color-rating-1)]",
-  2: "border-[var(--color-rating-2)] text-[var(--color-rating-2)]",
-  3: "border-[var(--color-rating-3)] text-[var(--color-rating-3-text)]",
-  4: "border-[var(--color-rating-4)] text-[var(--color-rating-4)]",
-  5: "border-[var(--color-rating-5)] text-[var(--color-rating-5)]",
-};
 
 interface RoundData {
   vote: Fasit;
@@ -40,6 +25,7 @@ interface ColumnProps {
 }
 
 function Column({ label, data }: ColumnProps) {
+  const ring = data ? LEVEL_CIRCLE_COLORS[data.confidence] : null;
   return (
     <div className="min-w-0 text-center">
       <div className="mb-2.5 text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">
@@ -50,15 +36,16 @@ function Column({ label, data }: ColumnProps) {
           <span
             className={cn(
               "inline-flex items-center rounded-full px-2.5 py-[3px] text-xs font-bold text-white",
-              VOTE_BADGE_BG[data.vote],
+              VOTE_DOT_COLORS[data.vote],
             )}
           >
-            {VOTE_LABEL[data.vote]}
+            {VOTE_LABELS[data.vote]}
           </span>
           <span
             className={cn(
-              "inline-flex size-6 items-center justify-center rounded-full border-[2.5px] text-[11px] font-extrabold",
-              CONF_RING[data.confidence],
+              "inline-flex size-6 items-center justify-center rounded-full border-[2.5px] bg-transparent text-[11px] font-extrabold",
+              ring?.border,
+              ring?.text,
             )}
           >
             {data.confidence}
@@ -80,8 +67,14 @@ export function MineSvarPanel() {
   const { session, student, statementIndex, votes } = useStudentGame();
   const [open, setOpen] = useState(false);
 
+  // Subscribe to begrunnelser only while the panel is open — keeps the
+  // long-running Convex WebSocket cost off all the other students' steps.
   const { data: begrunnelser } = useQuery(
-    liveSessionQueries.getMyBegrunnelser(session._id, student._id, statementIndex),
+    liveSessionQueries.getMyBegrunnelser(
+      open ? session._id : "skip",
+      student._id,
+      statementIndex,
+    ),
   );
 
   useEffect(() => {
@@ -93,10 +86,14 @@ export function MineSvarPanel() {
     return () => window.removeEventListener("keydown", handler);
   }, [open]);
 
-  const myR1Vote = votes.find((v) => v.studentId === student._id && v.round === 1);
-  const myR2Vote = votes.find((v) => v.studentId === student._id && v.round === 2);
+  let myR1Vote: (typeof votes)[number] | undefined;
+  let myR2Vote: (typeof votes)[number] | undefined;
+  for (const v of votes) {
+    if (v.studentId !== student._id) continue;
+    if (v.round === 1) myR1Vote = v;
+    else if (v.round === 2) myR2Vote = v;
+  }
 
-  // Only show the FAB once the student has voted at least once.
   if (!myR1Vote && !myR2Vote) return null;
 
   const r1Begrunnelse = begrunnelser?.find((b) => b.round === 1)?.text;
@@ -131,8 +128,7 @@ export function MineSvarPanel() {
             aria-modal="true"
             aria-label="Mine svar"
             onClick={(e) => e.stopPropagation()}
-            style={{ animation: "mineSvarSlideUp 0.25s ease both" }}
-            className="w-[60%] max-w-[420px] overflow-y-auto rounded-2xl bg-white text-left shadow-lg"
+            className="w-[60%] max-w-[420px] animate-mine-svar-slide-up overflow-y-auto rounded-2xl bg-white text-left shadow-lg"
           >
             <div className="relative flex items-center justify-center border-b border-neutral-100 px-4 py-3">
               <span className="text-[15px] font-extrabold text-foreground">Mine svar</span>
@@ -159,13 +155,6 @@ export function MineSvarPanel() {
           </div>
         </div>
       )}
-
-      <style>{`
-        @keyframes mineSvarSlideUp {
-          from { transform: translateY(30px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-      `}</style>
     </>
   );
 }

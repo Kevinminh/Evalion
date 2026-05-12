@@ -36,15 +36,17 @@ export const liveSessionQueries = {
   getBegrunnelser: (sessionId: Id<"liveSessions">, statementIndex: number) =>
     convexQuery(api.liveSessions.getBegrunnelser, { sessionId, statementIndex }),
   getMyBegrunnelser: (
-    sessionId: Id<"liveSessions">,
+    sessionId: Id<"liveSessions"> | Skip,
     studentId: Id<"sessionStudents">,
     statementIndex: number,
   ) =>
-    convexQuery(api.liveSessions.getMyBegrunnelser, {
-      sessionId,
-      studentId,
-      statementIndex,
-    }),
+    sessionId === "skip"
+      ? convexQuery(api.liveSessions.getMyBegrunnelser, "skip")
+      : convexQuery(api.liveSessions.getMyBegrunnelser, {
+          sessionId,
+          studentId,
+          statementIndex,
+        }),
 };
 
 export { api };

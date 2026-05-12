@@ -117,7 +117,8 @@ export function useStep2(): TeacherStep {
                   key={`s${selectedIdx}-discussion`}
                   bars={voteBars}
                   total={totalVotes}
-                  correctKey={statement?.fasit}
+                  // No correctKey — keep bars gray until step 4 reveal so
+                  // students aren't influenced toward the answer during discussion.
                 />
               </div>
             </div>

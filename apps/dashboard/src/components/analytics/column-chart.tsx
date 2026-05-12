@@ -108,26 +108,26 @@ export function ColumnChart({ items, compact = false }: ColumnChartProps) {
             >
               {item.label}
             </span>
-            {item.delta && item.delta.count !== 0 && (
-              <span
-                className={cn(
-                  "inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-extrabold tabular-nums",
-                  // Green when the delta moves toward the correct answer
-                  // (more votes on the right answer or fewer on a wrong one).
-                  (isCorrect ? item.delta.count > 0 : item.delta.count < 0)
-                    ? "bg-sant/15 text-sant"
-                    : "bg-usant/15 text-usant",
-                )}
-              >
-                {item.delta.count > 0 ? "+" : ""}
-                {item.delta.count} stk
-              </span>
-            )}
-            {item.delta && item.delta.count === 0 && (
-              <span className="text-[10px] font-semibold tabular-nums text-muted-foreground">
-                ±0 stk
-              </span>
-            )}
+            {item.delta &&
+              (item.delta.count === 0 ? (
+                <span className="text-[10px] font-semibold tabular-nums text-muted-foreground">
+                  ±0 stk
+                </span>
+              ) : (
+                <span
+                  className={cn(
+                    "inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-extrabold tabular-nums",
+                    // Green when the shift moves toward the correct answer
+                    // (more votes on the right one, or fewer on a wrong one).
+                    (isCorrect ? item.delta.count > 0 : item.delta.count < 0)
+                      ? "bg-sant/15 text-sant"
+                      : "bg-usant/15 text-usant",
+                  )}
+                >
+                  {item.delta.count > 0 ? "+" : ""}
+                  {item.delta.count} stk
+                </span>
+              ))}
           </div>
         );
       })}

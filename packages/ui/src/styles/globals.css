@@ -186,6 +186,8 @@
   --animate-bar-grow: bar-grow 600ms cubic-bezier(0.25, 0.1, 0.25, 1) both;
   --animate-card-in: cardIn 0.3s ease;
   --animate-group-fade-in: groupFadeIn 0.4s ease both;
+  --animate-back-button-pulse: back-button-pulse 1.4s ease-in-out 3 forwards;
+  --animate-mine-svar-slide-up: mine-svar-slide-up 0.25s ease both;
 
   /* ── Live-session ink + surface tokens (apps/web liveokt + spill) ───── */
   --color-text-ink-strong: #212121;
@@ -743,5 +745,16 @@ input[type="range"].timer-range::-moz-range-thumb {
   }
   50% {
     box-shadow: 0 0 0 8px rgba(108, 63, 197, 0.3);
+  }
+}
+
+@keyframes mine-svar-slide-up {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
