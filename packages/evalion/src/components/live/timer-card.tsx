@@ -214,7 +214,7 @@ export function TimerCard({
   );
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-1 flex-col justify-center gap-3">
       {sectionLabel && <PanelSectionLabel>{sectionLabel}</PanelSectionLabel>}
       {card}
       {isFinished && onNextStep && (
