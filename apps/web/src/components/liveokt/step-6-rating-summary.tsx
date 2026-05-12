@@ -159,15 +159,15 @@ export function useStep6(): TeacherStep {
 
   const main = (
     <TeacherStepLayout
-      top={
-        <div className="flex w-full items-center justify-between">
-          <BackButton onClick={() => goToStep(0)} pulse />
-          {statement && <FasitBadge fasit={statement.fasit} size="lg" />}
-        </div>
-      }
+      top={<BackButton onClick={() => goToStep(0)} pulse />}
       statement={
         statement && (
-          <StatementCard statement={statement} size="lg" color={statementColor} gradient />
+          <div className="relative w-full">
+            <div className="absolute left-1/2 -top-1 z-10 -translate-x-1/2 -translate-y-[65%]">
+              <FasitBadge fasit={statement.fasit} size="lg" />
+            </div>
+            <StatementCard statement={statement} size="lg" color={statementColor} gradient />
+          </div>
         )
       }
       professor={

@@ -33,8 +33,12 @@ export function Step6Rating() {
 
   return (
     <div className="flex w-full flex-col items-center gap-5">
-      <FasitBadge fasit={statement.fasit} />
-      <StatementCard statement={statement} />
+      <div className="relative w-full">
+        <div className="absolute left-1/2 -top-1 z-10 -translate-x-1/2 -translate-y-[65%]">
+          <FasitBadge fasit={statement.fasit} size="lg" />
+        </div>
+        <StatementCard statement={statement} />
+      </div>
 
       <div className="w-full max-w-md space-y-4">
         <p className="text-center text-2xl font-extrabold text-[var(--color-text-ink-strong)]">

@@ -50,17 +50,17 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
     <>
       <CountdownOverlay visible={showCountdown} number={countdownNumber} />
       <TeacherStepLayout
-        top={
-          <div className="flex w-full items-center justify-between">
-            <BackButton onClick={() => goToStep(0)} />
-            {countdownDone && statement && (
-              <FasitBadge fasit={statement.fasit} animated size="lg" />
-            )}
-          </div>
-        }
+        top={<BackButton onClick={() => goToStep(0)} />}
         statement={
           statement && (
-            <StatementCard statement={statement} size="lg" color={statementColor} gradient />
+            <div className="relative w-full">
+              {countdownDone && (
+                <div className="absolute left-1/2 -top-1 z-10 -translate-x-1/2 -translate-y-[65%]">
+                  <FasitBadge fasit={statement.fasit} animated size="lg" />
+                </div>
+              )}
+              <StatementCard statement={statement} size="lg" color={statementColor} gradient />
+            </div>
           )
         }
         professor={
