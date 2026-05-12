@@ -12,6 +12,10 @@ interface ColumnItem {
 interface ColumnChartProps {
   items: ColumnItem[];
   compact?: boolean;
+  /** Stretch to fill the parent's available height. Bar height becomes raw
+   * percentage (not normalized against max). Used by RoundAnalytics so the
+   * Stemmefordeling chart fills its panel card vertically. */
+  fill?: boolean;
 }
 
 const CORRECT_FILL: Record<string, string> = {
@@ -30,7 +34,7 @@ const CORRECT_TEXT: Record<string, string> = {
 
 const OUTSIDE_THRESHOLD = 18;
 
-export function ColumnChart({ items, compact = false }: ColumnChartProps) {
+export function ColumnChart({ items, compact = false, fill = false }: ColumnChartProps) {
   const maxPct = Math.max(...items.map((i) => i.pct), 1);
   const trackHeight = compact ? 60 : 100;
   const countSize = compact ? "text-[10px]" : "text-xs";
@@ -38,9 +42,17 @@ export function ColumnChart({ items, compact = false }: ColumnChartProps) {
   const pctSize = compact ? "text-[9px]" : "text-xs";
 
   return (
-    <div className="flex items-end justify-center gap-4 px-2 pt-3 pb-1">
+    <div
+      className={cn(
+        "flex justify-center gap-4 px-2",
+        fill ? "h-full min-h-0 items-stretch pt-2 pb-1" : "items-end pt-3 pb-1",
+      )}
+    >
       {items.map((item) => {
-        const height = (item.pct / maxPct) * 100;
+        // In fill mode the bar represents its raw percentage of the available
+        // track. Otherwise we normalize against the largest bar so short bars
+        // remain visually readable inside the fixed track height.
+        const height = fill ? item.pct : (item.pct / maxPct) * 100;
         const isCorrect = !!item.isCorrect;
         const fillClass = isCorrect
           ? (CORRECT_FILL[item.label] ?? "bg-neutral-300")
@@ -51,7 +63,10 @@ export function ColumnChart({ items, compact = false }: ColumnChartProps) {
         return (
           <div
             key={item.label}
-            className="flex flex-1 flex-col items-center gap-1"
+            className={cn(
+              "flex flex-1 flex-col items-center gap-1",
+              fill && "min-h-0",
+            )}
             style={{ maxWidth: 110 }}
           >
             <span
@@ -65,17 +80,23 @@ export function ColumnChart({ items, compact = false }: ColumnChartProps) {
               {item.count} stk
             </span>
             <div
-              className="relative w-full overflow-visible rounded-[8px] bg-neutral-100"
-              style={{ height: trackHeight }}
+              className={cn(
+                "relative w-full overflow-visible rounded-[12px] bg-neutral-100",
+                fill && "flex min-h-0 flex-1 flex-col justify-end",
+              )}
+              style={fill ? undefined : { height: trackHeight }}
             >
               <div
                 className={cn(
-                  "absolute bottom-0 w-full rounded-b-[8px] flex items-center justify-center transition-all duration-400",
+                  "flex items-center justify-center transition-all duration-400",
+                  fill
+                    ? "relative w-full rounded-[12px]"
+                    : "absolute bottom-0 w-full rounded-b-[8px]",
                   fillClass,
                 )}
-                style={{ height: `${height}%`, minHeight: 2 }}
+                style={{ height: `${height}%`, minHeight: fill ? 0 : 2 }}
               >
-                {showPctOutside ? (
+                {item.pct === 0 ? null : showPctOutside ? (
                   <span
                     className={cn(
                       "absolute left-1/2 -top-4 -translate-x-1/2 whitespace-nowrap font-semibold tabular-nums",

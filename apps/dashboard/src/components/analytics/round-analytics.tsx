@@ -1,4 +1,5 @@
 import type { Id } from "@workspace/backend/convex/_generated/dataModel";
+import { Popover, PopoverContent, PopoverTrigger } from "@workspace/ui/components/popover";
 import { cn } from "@workspace/ui/lib/utils";
 import { BarChart3 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -6,7 +7,6 @@ import { useMemo, useState } from "react";
 import type { Fasit } from "@/lib/types";
 
 import { ColumnChart } from "./column-chart";
-import { ConfidenceCircles } from "./confidence-circles";
 import { MatrixHint, StudentMatrix } from "./student-matrix";
 import {
   getStatementGradient,
@@ -46,7 +46,6 @@ export function RoundAnalytics({
   onToggleHighlight,
 }: RoundAnalyticsProps) {
   const gradient = getStatementGradient(statementColor);
-  const [showConfDetail, setShowConfDetail] = useState(false);
   const [matrixSelected, setMatrixSelected] = useState<number | null>(null);
 
   const voteItems = [
@@ -133,15 +132,8 @@ export function RoundAnalytics({
           )}
         </div>
 
-        <div className="px-3.5 pt-0 pb-1">
-          <div className="text-[10px] font-semibold text-muted-foreground">Stemmefordeling</div>
-        </div>
-        <div className="px-2 pb-2">
-          <ColumnChart items={voteItems} />
-        </div>
-
-        <div className="flex items-center justify-between border-t border-neutral-100 px-3.5 py-2.5">
-          <div className="flex items-center gap-1.5 flex-wrap">
+        <div className="flex items-center justify-between px-3.5 py-2.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-[11px] font-semibold text-muted-foreground">
               Gjennomsnittlig sikkerhet:
             </span>
@@ -174,45 +166,44 @@ export function RoundAnalytics({
               </span>
             )}
           </div>
-          <button
-            onClick={() => setShowConfDetail(!showConfDetail)}
-            className={`flex size-8 items-center justify-center rounded-[10px] border-[1.5px] transition-all ${
-              showConfDetail
-                ? "border-primary/30 bg-primary/5"
-                : "border-neutral-200 bg-white hover:bg-neutral-100"
-            }`}
-          >
-            <BarChart3
-              className={`size-4 ${showConfDetail ? "text-primary" : "text-muted-foreground"}`}
+          <Popover>
+            <PopoverTrigger
+              render={
+                <button
+                  type="button"
+                  className="flex size-8 items-center justify-center rounded-[10px] border-[1.5px] border-neutral-200 bg-white text-muted-foreground transition-all hover:bg-neutral-100 data-[popup-open]:border-primary/30 data-[popup-open]:bg-primary/5 data-[popup-open]:text-primary"
+                  aria-label="Vis fordelt på kategori"
+                >
+                  <BarChart3 className="size-4" />
+                </button>
+              }
             />
-          </button>
-        </div>
-
-        {showConfDetail && (
-          <div className="border-t border-neutral-100 px-3.5 py-2.5">
-            <ConfidenceCircles distribution={confidence.confidenceDistribution} />
-            <div className="mt-2.5 flex flex-wrap justify-center gap-6 border-t border-neutral-100 pt-2.5">
-              <div className="flex items-center gap-2.5 text-xs font-semibold">
+            <PopoverContent side="bottom" align="end" sideOffset={8} className="w-44 gap-1.5">
+              <div className="flex items-center justify-between text-sm font-semibold">
                 <span className="text-muted-foreground">Sant:</span>
                 <span className="font-mono font-bold">
                   {confidence.confidenceByVote.sant.toFixed(1)}
                 </span>
               </div>
-              <div className="flex items-center gap-2.5 text-xs font-semibold">
+              <div className="flex items-center justify-between text-sm font-semibold">
                 <span className="text-muted-foreground">Delvis sant:</span>
                 <span className="font-mono font-bold">
                   {confidence.confidenceByVote.delvis.toFixed(1)}
                 </span>
               </div>
-              <div className="flex items-center gap-2.5 text-xs font-semibold">
+              <div className="flex items-center justify-between text-sm font-semibold">
                 <span className="text-muted-foreground">Usant:</span>
                 <span className="font-mono font-bold">
                   {confidence.confidenceByVote.usant.toFixed(1)}
                 </span>
               </div>
-            </div>
-          </div>
-        )}
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        <div className="flex min-h-[280px] flex-col border-t border-neutral-100 px-2 pt-2 pb-3">
+          <ColumnChart items={voteItems} fill />
+        </div>
       </div>
 
       {round === 2 && (
