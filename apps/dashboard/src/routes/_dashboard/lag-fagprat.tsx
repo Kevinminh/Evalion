@@ -8,8 +8,10 @@ import {
   toStatementsWithId,
   useStatements,
 } from "@workspace/evalion/hooks/use-statements";
-import { Plus, Sparkles } from "lucide-react";
+import { useMutation } from "convex/react";
+import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { ConceptTags } from "@/components/concept-tags";
@@ -18,6 +20,7 @@ import { ForkunnskapSelector } from "@/components/forkunnskap-selector";
 import { ReddiModal } from "@/components/reddi-modal";
 import { StatementEditor } from "@/components/statement-editor";
 import { VisibilityToggle } from "@/components/visibility-toggle";
+import { api } from "@/lib/convex";
 import { LABEL_CLASS, SUBJECT_OPTIONS, LEVEL_OPTIONS } from "@/lib/constants";
 import type { FagPratType, Visibility } from "@/lib/types";
 
@@ -41,6 +44,8 @@ function LagFagPratPage() {
   const [forkunnskap, setForkunnskap] = useState<FagPratType | null>(null);
   const [visibility, setVisibility] = useState<Visibility>("public");
   const [reddiOpen, setReddiOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const createFagPrat = useMutation(api.fagprats.create);
   const {
     statements,
     setStatements,
@@ -59,6 +64,7 @@ function LagFagPratPage() {
     if (draft.subject) setFag(draft.subject);
     if (draft.level) setTrinn(draft.level);
     if (draft.type) setForkunnskap(draft.type);
+    if (draft.visibility) setVisibility(draft.visibility);
     if (draft.statements) {
       setStatements(toStatementsWithId(draft.statements));
     }
@@ -72,6 +78,7 @@ function LagFagPratPage() {
       level: trinn,
       type: forkunnskap,
       statements: toStatementPayload(statements),
+      visibility,
     });
 
   const handleReddiSubmit = (topic: string) => {
@@ -89,6 +96,27 @@ function LagFagPratPage() {
     setStep(2);
   };
 
+  const handleSave = async () => {
+    if (!forkunnskap) return;
+    setSaving(true);
+    try {
+      const id = await createFagPrat({
+        title: title.trim(),
+        subject: fag,
+        level: trinn,
+        type: forkunnskap,
+        concepts,
+        statements: toStatementPayload(statements),
+        visibility,
+      });
+      navigate({ to: "/fagprat/$id", params: { id } });
+    } catch {
+      toast.error("Kunne ikke lagre FagPraten. Prøv igjen.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (step === 2) {
     return (
       <div className="max-w-[900px]">
@@ -96,10 +124,12 @@ function LagFagPratPage() {
         <div className="mb-8 flex items-start justify-between gap-4">
           <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">Fullfør FagPraten</h1>
           <div className="flex shrink-0 items-center gap-3">
-            <Button variant="outline" onClick={() => setStep(1)}>
+            <Button variant="outline" onClick={() => setStep(1)} disabled={saving}>
               Tilbake
             </Button>
-            <Button disabled={!title.trim()}>Lagre</Button>
+            <Button onClick={handleSave} disabled={!title.trim() || saving}>
+              {saving ? "Lagrer..." : "Lagre"}
+            </Button>
           </div>
         </div>
 

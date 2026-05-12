@@ -29,4 +29,5 @@ export interface FagPratDraft {
   level: string;
   type: FagPratType;
   statements: FagPratStatement[];
+  visibility?: Visibility;
 }
