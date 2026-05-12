@@ -2,7 +2,6 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
-import { parseDraftJson } from "@workspace/evalion/lib/draft-utils";
 import {
   toStatementPayload,
   toStatementsWithId,
@@ -11,32 +10,26 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useMutation } from "convex/react";
 import { Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { z } from "zod";
 
 import { ConceptTags } from "@/components/concept-tags";
 import { CustomDropdown } from "@/components/custom-dropdown";
 import { ForkunnskapSelector } from "@/components/forkunnskap-selector";
 import { ReddiModal } from "@/components/reddi-modal";
+import { ReddiPanel } from "@/components/reddi/reddi-panel";
 import { StatementEditor } from "@/components/statement-editor";
 import { VisibilityToggle } from "@/components/visibility-toggle";
 import { api, fagpratQueries } from "@/lib/convex";
 import { LABEL_CLASS, SUBJECT_OPTIONS, LEVEL_OPTIONS } from "@/lib/constants";
-import type { FagPratType, Visibility } from "@/lib/types";
-
-const searchSchema = z.object({
-  draft: z.string().catch(""),
-});
+import type { Fasit, FagPratType, Visibility } from "@/lib/types";
 
 export const Route = createFileRoute("/_dashboard/lag-fagprat")({
-  validateSearch: searchSchema,
   component: LagFagPratPage,
 });
 
 function LagFagPratPage() {
   const navigate = useNavigate();
-  const { draft: draftParam } = Route.useSearch();
   const [step, setStep] = useState<1 | 2>(1);
   const [title, setTitle] = useState("");
   const [concepts, setConcepts] = useState<string[]>([]);
@@ -44,7 +37,8 @@ function LagFagPratPage() {
   const [trinn, setTrinn] = useState("");
   const [forkunnskap, setForkunnskap] = useState<FagPratType | null>(null);
   const [visibility, setVisibility] = useState<Visibility>("public");
-  const [reddiOpen, setReddiOpen] = useState(false);
+  const [reddiModalOpen, setReddiModalOpen] = useState(false);
+  const [reddiTopic, setReddiTopic] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const createFagPrat = useMutation(api.fagprats.create);
   const queryClient = useQueryClient();
@@ -57,38 +51,18 @@ function LagFagPratPage() {
     handleDragEnd,
   } = useStatements();
 
-  useEffect(() => {
-    if (!draftParam) return;
-    const draft = parseDraftJson(draftParam);
-    if (!draft) return;
-    if (draft.title) setTitle(draft.title);
-    if (draft.concepts) setConcepts(draft.concepts);
-    if (draft.subject) setFag(draft.subject);
-    if (draft.level) setTrinn(draft.level);
-    if (draft.type) setForkunnskap(draft.type);
-    if (draft.visibility) setVisibility(draft.visibility);
-    if (draft.statements) {
-      setStatements(toStatementsWithId(draft.statements));
-    }
-  }, [draftParam]);
+  const handleReddiTopicSubmit = (topic: string) => {
+    setReddiModalOpen(false);
+    setReddiTopic(topic);
+  };
 
-  const buildDraftJson = () =>
-    JSON.stringify({
-      title,
-      concepts,
-      subject: fag,
-      level: trinn,
-      type: forkunnskap,
-      statements: toStatementPayload(statements),
-      visibility,
-    });
+  const handleReddiAdd = (chosen: { text: string; fasit: Fasit; explanation: string }[]) => {
+    setStatements([...statements, ...toStatementsWithId(chosen)]);
+    setReddiTopic(null);
+  };
 
-  const handleReddiSubmit = (topic: string) => {
-    setReddiOpen(false);
-    navigate({
-      to: "/velg-pastander",
-      search: { draft: buildDraftJson(), statements: "", topic },
-    });
+  const handleReddiClose = () => {
+    setReddiTopic(null);
   };
 
   const canProceed = fag && trinn && forkunnskap && statements.length > 0;
@@ -119,6 +93,19 @@ function LagFagPratPage() {
       setSaving(false);
     }
   };
+
+  if (reddiTopic !== null && forkunnskap) {
+    return (
+      <ReddiPanel
+        subject={fag}
+        level={trinn}
+        type={forkunnskap}
+        topic={reddiTopic}
+        onClose={handleReddiClose}
+        onAdd={handleReddiAdd}
+      />
+    );
+  }
 
   if (step === 2) {
     return (
@@ -200,7 +187,11 @@ function LagFagPratPage() {
         <ForkunnskapSelector value={forkunnskap} onChange={setForkunnskap} />
       </div>
 
-      <ReddiModal open={reddiOpen} onClose={() => setReddiOpen(false)} onSubmit={handleReddiSubmit} />
+      <ReddiModal
+        open={reddiModalOpen}
+        onClose={() => setReddiModalOpen(false)}
+        onSubmit={handleReddiTopicSubmit}
+      />
 
       {/* Mine påstander */}
       <div>
@@ -210,7 +201,7 @@ function LagFagPratPage() {
             <div className="group relative">
               <button
                 disabled={!reddiReady}
-                onClick={() => setReddiOpen(true)}
+                onClick={() => setReddiModalOpen(true)}
                 className="inline-flex items-center gap-2 rounded-xl border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-purple-100/40 px-5 py-2 text-sm font-bold text-purple-600 transition-all hover:-translate-y-px hover:border-purple-500 hover:from-purple-100 hover:to-purple-50 hover:shadow-sm disabled:translate-y-0 disabled:cursor-default disabled:opacity-45 disabled:saturate-[0.7]"
               >
                 <img src="/reddi.png" alt="Reddi" className="size-4" />

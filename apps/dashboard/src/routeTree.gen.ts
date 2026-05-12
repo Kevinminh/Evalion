@@ -15,7 +15,6 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
-import { Route as DashboardVelgPastanderRouteImport } from './routes/_dashboard/velg-pastander'
 import { Route as DashboardProfileRouteImport } from './routes/_dashboard/profile'
 import { Route as DashboardMinSamlingRouteImport } from './routes/_dashboard/min-samling'
 import { Route as DashboardLagFagpratRouteImport } from './routes/_dashboard/lag-fagprat'
@@ -53,11 +52,6 @@ const AuthedRoute = AuthedRouteImport.update({
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardVelgPastanderRoute = DashboardVelgPastanderRouteImport.update({
-  id: '/velg-pastander',
-  path: '/velg-pastander',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardProfileRoute = DashboardProfileRouteImport.update({
@@ -122,7 +116,6 @@ export interface FileRoutesByFullPath {
   '/lag-fagprat': typeof DashboardLagFagpratRoute
   '/min-samling': typeof DashboardMinSamlingRoute
   '/profile': typeof DashboardProfileRoute
-  '/velg-pastander': typeof DashboardVelgPastanderRoute
   '/analytics/$id': typeof AuthedAnalyticsIdRoute
   '/liveokt/$id': typeof AuthedLiveoktIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -139,7 +132,6 @@ export interface FileRoutesByTo {
   '/lag-fagprat': typeof DashboardLagFagpratRoute
   '/min-samling': typeof DashboardMinSamlingRoute
   '/profile': typeof DashboardProfileRoute
-  '/velg-pastander': typeof DashboardVelgPastanderRoute
   '/analytics/$id': typeof AuthedAnalyticsIdRoute
   '/liveokt/$id': typeof AuthedLiveoktIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -158,7 +150,6 @@ export interface FileRoutesById {
   '/_dashboard/lag-fagprat': typeof DashboardLagFagpratRoute
   '/_dashboard/min-samling': typeof DashboardMinSamlingRoute
   '/_dashboard/profile': typeof DashboardProfileRoute
-  '/_dashboard/velg-pastander': typeof DashboardVelgPastanderRoute
   '/_dashboard/': typeof DashboardIndexRoute
   '/_authed/analytics/$id': typeof AuthedAnalyticsIdRoute
   '/_authed/liveokt/$id': typeof AuthedLiveoktIdRoute
@@ -178,7 +169,6 @@ export interface FileRouteTypes {
     | '/lag-fagprat'
     | '/min-samling'
     | '/profile'
-    | '/velg-pastander'
     | '/analytics/$id'
     | '/liveokt/$id'
     | '/api/auth/$'
@@ -195,7 +185,6 @@ export interface FileRouteTypes {
     | '/lag-fagprat'
     | '/min-samling'
     | '/profile'
-    | '/velg-pastander'
     | '/analytics/$id'
     | '/liveokt/$id'
     | '/api/auth/$'
@@ -213,7 +202,6 @@ export interface FileRouteTypes {
     | '/_dashboard/lag-fagprat'
     | '/_dashboard/min-samling'
     | '/_dashboard/profile'
-    | '/_dashboard/velg-pastander'
     | '/_dashboard/'
     | '/_authed/analytics/$id'
     | '/_authed/liveokt/$id'
@@ -273,13 +261,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof DashboardIndexRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/velg-pastander': {
-      id: '/_dashboard/velg-pastander'
-      path: '/velg-pastander'
-      fullPath: '/velg-pastander'
-      preLoaderRoute: typeof DashboardVelgPastanderRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/profile': {
@@ -375,7 +356,6 @@ interface DashboardRouteChildren {
   DashboardLagFagpratRoute: typeof DashboardLagFagpratRoute
   DashboardMinSamlingRoute: typeof DashboardMinSamlingRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
-  DashboardVelgPastanderRoute: typeof DashboardVelgPastanderRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardFagpratIdRedigerRoute: typeof DashboardFagpratIdRedigerRoute
   DashboardFagpratIdIndexRoute: typeof DashboardFagpratIdIndexRoute
@@ -386,7 +366,6 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardLagFagpratRoute: DashboardLagFagpratRoute,
   DashboardMinSamlingRoute: DashboardMinSamlingRoute,
   DashboardProfileRoute: DashboardProfileRoute,
-  DashboardVelgPastanderRoute: DashboardVelgPastanderRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardFagpratIdRedigerRoute: DashboardFagpratIdRedigerRoute,
   DashboardFagpratIdIndexRoute: DashboardFagpratIdIndexRoute,

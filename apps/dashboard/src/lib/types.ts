@@ -1,6 +1,5 @@
 export type {
   FagPrat,
-  FagPratDraft,
   FagPratId,
   FagPratStatement,
   FagPratType,

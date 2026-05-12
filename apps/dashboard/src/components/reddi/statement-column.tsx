@@ -7,6 +7,15 @@ interface Statement {
   explanation: string;
 }
 
+export interface StatementColumnConfig {
+  title: string;
+  headerBg: string;
+  headerText: string;
+  headerBorderBottom: string;
+  selectedBorder: string;
+  selectedRing: string;
+}
+
 export function StatementColumn({
   title,
   statements,
@@ -14,38 +23,27 @@ export function StatementColumn({
   onToggle,
   headerBg,
   headerText,
+  headerBorderBottom,
   selectedBorder,
-  selectedGlow,
-  borderTopColor,
-}: {
-  title: string;
+  selectedRing,
+}: StatementColumnConfig & {
   statements: Statement[];
   selected: Set<string>;
   onToggle: (id: string) => void;
-  headerBg: string;
-  headerText: string;
-  selectedBorder: string;
-  selectedGlow: string;
-  borderTopColor: string;
 }) {
   return (
-    <div
-      className={cn(
-        "flex flex-col rounded-2xl border-[1.5px] border-border bg-card p-4",
-        "border-t-4",
-        borderTopColor,
-      )}
-    >
+    <div className="overflow-hidden rounded-2xl border-[1.5px] border-neutral-200 bg-card shadow-sm">
       <div
         className={cn(
-          "mb-4 rounded-xl px-4 py-3 text-center text-sm font-extrabold uppercase tracking-wider",
+          "flex items-center justify-center border-b-[3px] px-6 py-4 text-base font-extrabold",
           headerBg,
           headerText,
+          headerBorderBottom,
         )}
       >
         {title}
       </div>
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3 p-4">
         {statements.map((stmt) => {
           const isSelected = selected.has(stmt.id);
           return (
@@ -53,10 +51,10 @@ export function StatementColumn({
               key={stmt.id}
               onClick={() => onToggle(stmt.id)}
               className={cn(
-                "w-full rounded-xl border-2 p-4 text-left text-sm leading-relaxed transition-all",
+                "cursor-pointer rounded-xl border-[1.5px] px-4 py-3.5 text-left text-sm leading-normal text-foreground transition-all",
                 isSelected
-                  ? `${selectedBorder} ${selectedGlow} bg-card`
-                  : "border-border bg-muted/30 hover:border-muted-foreground/30 hover:bg-muted/60",
+                  ? cn("bg-card", selectedBorder, selectedRing)
+                  : "border-neutral-200 bg-neutral-50 hover:border-neutral-300 hover:bg-neutral-100",
               )}
             >
               {stmt.text}

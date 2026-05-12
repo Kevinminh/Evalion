@@ -50,7 +50,7 @@ export function AppSidebar() {
       </div>
 
       <div className="sidebar-cta">
-        <Link to="/lag-fagprat" search={{ draft: "" }} className="sidebar-cta-btn">
+        <Link to="/lag-fagprat" className="sidebar-cta-btn">
           <span className="sidebar-cta-icon">+</span>
           <span>Lag en FagPrat</span>
         </Link>
