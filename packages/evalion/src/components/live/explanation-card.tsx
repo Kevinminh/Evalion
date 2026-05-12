@@ -2,7 +2,8 @@ import { cn } from "@workspace/ui/lib/utils";
 
 interface ExplanationCardColor {
   bg: string;
-  bg2: string;
+  /** Optional second gradient stop. Falls back to a light tint of `bg`. */
+  bg2?: string;
   border: string;
   text: string;
 }
@@ -33,7 +34,9 @@ export function ExplanationCard({
   const s = SIZE[size];
   const quoteStyle = color
     ? {
-        background: `linear-gradient(135deg, ${color.bg}, ${color.bg2})`,
+        background: `linear-gradient(135deg, ${color.bg}, ${
+          color.bg2 ?? `color-mix(in srgb, ${color.bg} 70%, #ffffff)`
+        })`,
         color: color.text,
       }
     : undefined;

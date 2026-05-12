@@ -27,7 +27,7 @@ export function useStep5(): TeacherStep {
       <div className="flex-1" />
       {statement && (
         <div
-          className="relative flex w-full max-w-[760px] animate-[fadeInUp_0.5s_ease_0.2s_both] flex-col items-center"
+          className="relative w-full max-w-[760px] animate-[fadeInUp_0.5s_ease_0.2s_both]"
           style={cssVars({
             "--c-border": statementColor.border,
             "--c-bg": statementColor.bg,
@@ -35,7 +35,7 @@ export function useStep5(): TeacherStep {
             "--c-text": statementColor.text,
           })}
         >
-          <div className="z-[5] -mb-4">
+          <div className="absolute left-1/2 -top-1 z-10 -translate-x-1/2 -translate-y-[65%]">
             <FasitBadge fasit={statement.fasit} size="lg" />
           </div>
           <div className="w-full overflow-hidden rounded-2xl border-2 border-[var(--c-border)] shadow-lg">

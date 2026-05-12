@@ -1,7 +1,7 @@
 import { CountdownOverlay } from "@workspace/evalion/components/live/countdown-overlay";
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { Professor } from "@workspace/evalion/components/live/professor";
-import { FASIT_TEXT } from "@workspace/evalion/lib/constants";
+import { FASIT_TEXT, resolveStatementStudentHex } from "@workspace/evalion/lib/constants";
 
 import { RecordingDisclaimer } from "@workspace/ui/components/recording-disclaimer";
 import { StatementCard } from "@workspace/ui/components/statement-card";
@@ -14,8 +14,10 @@ interface Step4RevealProps {
 }
 
 export function Step4Reveal({ showCountdown, countdownNumber, countdownDone }: Step4RevealProps) {
-  const { statement, session } = useStudentGame();
+  const { statement, statementIndex, session } = useStudentGame();
   if (!statement) return null;
+
+  const statementColor = resolveStatementStudentHex(statement.color, statementIndex);
 
   return (
     <>
@@ -27,7 +29,7 @@ export function Step4Reveal({ showCountdown, countdownNumber, countdownDone }: S
               <FasitBadge fasit={statement.fasit} animated size="lg" />
             </div>
           )}
-          <StatementCard statement={statement} />
+          <StatementCard statement={statement} color={statementColor} />
         </div>
 
         {countdownDone && (

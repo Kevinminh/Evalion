@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
+import { resolveStatementStudentHex } from "@workspace/evalion/lib/constants";
 import { toast } from "sonner";
 
 import { StatementCard } from "@workspace/ui/components/statement-card";
@@ -9,7 +10,7 @@ import { SubmitButton } from "@workspace/ui/components/submit-button";
 import { WaitingScreen } from "./waiting-screen";
 
 export function Step6Rating() {
-  const { statement, submitRating } = useStudentGame();
+  const { statement, statementIndex, submitRating } = useStudentGame();
   const [selected, setSelected] = useState<number | null>(null);
   const [sent, setSent] = useState(false);
   const [showWaiting, setShowWaiting] = useState(false);
@@ -18,6 +19,8 @@ export function Step6Rating() {
   if (showWaiting) {
     return <WaitingScreen title="Takk for svaret ditt!" />;
   }
+
+  const statementColor = resolveStatementStudentHex(statement.color, statementIndex);
 
   const handleSubmit = async () => {
     if (selected === null) return;
@@ -37,7 +40,7 @@ export function Step6Rating() {
         <div className="absolute left-1/2 -top-1 z-10 -translate-x-1/2 -translate-y-[65%]">
           <FasitBadge fasit={statement.fasit} size="lg" />
         </div>
-        <StatementCard statement={statement} />
+        <StatementCard statement={statement} color={statementColor} />
       </div>
 
       <div className="w-full max-w-md space-y-4">

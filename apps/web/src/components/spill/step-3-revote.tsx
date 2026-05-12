@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { resolveStatementStudentHex } from "@workspace/evalion/lib/constants";
 import type { Fasit } from "@workspace/evalion/lib/types";
 import { toast } from "sonner";
 
@@ -10,7 +11,7 @@ import { VoteOptions } from "./vote-options";
 import { WaitingScreen } from "./waiting-screen";
 
 export function Step3Revote() {
-  const { statement, hasVoted, castVote } = useStudentGame();
+  const { statement, statementIndex, hasVoted, castVote } = useStudentGame();
   const [selectedVote, setSelectedVote] = useState<Fasit | null>(null);
   const [selectedConfidence, setSelectedConfidence] = useState<number | null>(null);
   const [sent, setSent] = useState(false);
@@ -21,6 +22,7 @@ export function Step3Revote() {
     return <WaitingScreen />;
   }
 
+  const statementColor = resolveStatementStudentHex(statement.color, statementIndex);
   const canSubmit = selectedVote !== null && selectedConfidence !== null;
 
   const handleSubmit = async () => {
@@ -37,7 +39,7 @@ export function Step3Revote() {
 
   return (
     <div className="flex w-full flex-col items-center gap-5">
-      <StatementCard statement={statement} />
+      <StatementCard statement={statement} color={statementColor} />
 
       <div className="w-full max-w-md space-y-2">
         <p className="text-center text-sm font-bold text-foreground">Hva mener du?</p>

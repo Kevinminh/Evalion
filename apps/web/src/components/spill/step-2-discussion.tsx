@@ -1,4 +1,5 @@
 import { Professor } from "@workspace/evalion/components/live/professor";
+import { resolveStatementStudentHex } from "@workspace/evalion/lib/constants";
 import { RecordingDisclaimer } from "@workspace/ui/components/recording-disclaimer";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { StudentAvatar } from "@workspace/ui/components/student-avatar";
@@ -6,8 +7,10 @@ import { StudentAvatar } from "@workspace/ui/components/student-avatar";
 import { useStudentGame } from "./student-game-context";
 
 export function Step2Discussion() {
-  const { statement, groupMembers, session } = useStudentGame();
+  const { statement, statementIndex, groupMembers, session } = useStudentGame();
   if (!statement) return null;
+
+  const statementColor = resolveStatementStudentHex(statement.color, statementIndex);
 
   return (
     <div className="flex w-full flex-col items-center gap-6">
@@ -30,7 +33,7 @@ export function Step2Discussion() {
         </div>
       )}
 
-      <StatementCard statement={statement} />
+      <StatementCard statement={statement} color={statementColor} />
 
       <h2 className="text-xl font-extrabold text-foreground">Snakk sammen!</h2>
       <p className="-mt-3 max-w-[380px] text-center text-sm leading-relaxed text-muted-foreground">
