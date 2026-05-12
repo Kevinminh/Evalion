@@ -1,12 +1,14 @@
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
 import { BackButton } from "@workspace/evalion/components/live/back-button";
-import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
+import { BreakdownRow } from "@workspace/evalion/components/live/breakdown-row";
+import { FasitBadgeOverlay } from "@workspace/evalion/components/live/fasit-badge-overlay";
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { TeacherStepLayout } from "@workspace/evalion/components/live/teacher-step-layout";
 import { resolveStatementHex } from "@workspace/evalion/lib/constants";
-import { formatDecimal1 } from "@workspace/evalion/lib/format";
+import { formatDecimal1, percentage } from "@workspace/evalion/lib/format";
 import type { Fasit } from "@workspace/evalion/lib/types";
 import { DestructiveButton } from "@workspace/ui/components/destructive-button";
+import { PanelCard } from "@workspace/ui/components/panel-card";
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
 import { StatementCard } from "@workspace/ui/components/statement-card";
@@ -71,7 +73,7 @@ function DualDistColumn({ title, votes, correctKey }: DualDistColumnProps) {
       <div className="flex items-end justify-center gap-2 px-0 py-1">
         {order.map((key) => {
           const count = counts[key];
-          const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+          const pct = percentage(count, total);
           const fillHeight = total > 0 ? (count / maxCount) * 100 : 0;
           const isCorrect = key === correctKey;
           const fillBg = isCorrect ? CORRECT_FILL[key] : "var(--color-vote-empty-fill)";
@@ -162,12 +164,9 @@ export function useStep6(): TeacherStep {
       top={<BackButton onClick={() => goToStep(0)} pulse />}
       statement={
         statement && (
-          <div className="relative w-full">
-            <div className="absolute left-1/2 -top-1 z-10 -translate-x-1/2 -translate-y-[65%]">
-              <FasitBadge fasit={statement.fasit} size="lg" />
-            </div>
+          <FasitBadgeOverlay fasit={statement.fasit}>
             <StatementCard statement={statement} size="lg" color={statementColor} gradient />
-          </div>
+          </FasitBadgeOverlay>
         )
       }
       professor={
@@ -187,7 +186,7 @@ export function useStep6(): TeacherStep {
   const panel = (
     <div className="flex h-full min-h-0 flex-col gap-3">
       <PanelSectionLabel>Resultat</PanelSectionLabel>
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-2xl bg-white p-3 shadow-[var(--shadow-card-soft)]">
+      <PanelCard>
         {/* conf-summary-row */}
         <div className="flex flex-wrap items-center gap-2 px-3 py-2">
           <span className="text-xs font-semibold text-[var(--color-text-ink-faint)]">
@@ -234,8 +233,8 @@ export function useStep6(): TeacherStep {
               })}
             </div>
             <div className="mt-2.5 flex justify-center gap-6 border-t border-[var(--color-rating-bar-track)] pt-2.5">
-              <ConfBreakdownRow label="Riktig svar:" value={r2AvgConfCorrect} />
-              <ConfBreakdownRow label="Feil svar:" value={r2AvgConfWrong} />
+              <BreakdownRow label="Riktig svar:" value={r2AvgConfCorrect} layout="inline" />
+              <BreakdownRow label="Feil svar:" value={r2AvgConfWrong} layout="inline" />
             </div>
           </div>
         )}
@@ -256,7 +255,7 @@ export function useStep6(): TeacherStep {
             Venter på elevenes vurderinger…
           </p>
         )}
-      </div>
+      </PanelCard>
     </div>
   );
 
@@ -285,15 +284,4 @@ export function useStep6(): TeacherStep {
   );
 
   return { main, panel, panelFooter };
-}
-
-function ConfBreakdownRow({ label, value }: { label: string; value: number | undefined }) {
-  return (
-    <div className="flex items-center gap-2">
-      <span className="text-xs font-semibold text-[var(--color-text-ink-soft)]">{label}</span>
-      <span className="font-mono text-xs font-bold tabular-nums text-[var(--color-text-ink-strong)]">
-        {value === undefined ? "–" : formatDecimal1(value)}
-      </span>
-    </div>
-  );
 }

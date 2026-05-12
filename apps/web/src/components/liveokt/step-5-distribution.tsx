@@ -1,7 +1,9 @@
 import { BackButton } from "@workspace/evalion/components/live/back-button";
 import { BegrunnelseCard } from "@workspace/evalion/components/live/begrunnelse-card";
-import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
+import { FasitBadgeOverlay } from "@workspace/evalion/components/live/fasit-badge-overlay";
 import { resolveStatementHex } from "@workspace/evalion/lib/constants";
+import { percentage } from "@workspace/evalion/lib/format";
+import { PanelCard } from "@workspace/ui/components/panel-card";
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 
 import { cssVars } from "@/lib/css-vars";
@@ -17,7 +19,7 @@ export function useStep5(): TeacherStep {
     : null;
 
   const statementColor = resolveStatementHex(statement?.color, selectedIdx);
-  const correctPct = r2Total > 0 ? Math.round((r2CorrectCount / r2Total) * 100) : 0;
+  const correctPct = percentage(r2CorrectCount, r2Total);
 
   const main = (
     <div className="flex h-full min-h-0 w-full flex-col items-center px-8 py-5">
@@ -26,19 +28,19 @@ export function useStep5(): TeacherStep {
       </div>
       <div className="flex-1" />
       {statement && (
-        <div
-          className="relative w-full max-w-[760px] animate-[fadeInUp_0.5s_ease_0.2s_both]"
-          style={cssVars({
-            "--c-border": statementColor.border,
-            "--c-bg": statementColor.bg,
-            "--c-bg2": statementColor.bg2,
-            "--c-text": statementColor.text,
-          })}
+        <FasitBadgeOverlay
+          fasit={statement.fasit}
+          className="max-w-[760px] animate-[fadeInUp_0.5s_ease_0.2s_both]"
         >
-          <div className="absolute left-1/2 -top-1 z-10 -translate-x-1/2 -translate-y-[65%]">
-            <FasitBadge fasit={statement.fasit} size="lg" />
-          </div>
-          <div className="w-full overflow-hidden rounded-2xl border-2 border-[var(--c-border)] shadow-lg">
+          <div
+            style={cssVars({
+              "--c-border": statementColor.border,
+              "--c-bg": statementColor.bg,
+              "--c-bg2": statementColor.bg2,
+              "--c-text": statementColor.text,
+            })}
+            className="w-full overflow-hidden rounded-2xl border-2 border-[var(--c-border)] shadow-lg"
+          >
             <div className="border-b-[1.5px] border-[var(--c-border)] bg-[linear-gradient(135deg,var(--c-bg),var(--c-bg2))] px-8 pt-8 pb-6 text-center">
               <p className="text-2xl font-bold leading-relaxed text-[var(--c-text)]">
                 {statement.text}
@@ -55,7 +57,7 @@ export function useStep5(): TeacherStep {
               </p>
             </div>
           </div>
-        </div>
+        </FasitBadgeOverlay>
       )}
       <div className="flex-[2]" />
       <div className="flex-[1.5]" />
@@ -65,7 +67,7 @@ export function useStep5(): TeacherStep {
   const panel = (
     <div className="flex h-full min-h-0 flex-col gap-3">
       <PanelSectionLabel>Professorens forklaring</PanelSectionLabel>
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-2xl bg-white p-3 shadow-[var(--shadow-card-soft)]">
+      <PanelCard>
         {/* Antall riktig */}
         <div className="flex items-center justify-center gap-2 rounded-xl bg-[var(--color-fasit-correct-bg)] px-3 py-2">
           <span className="shrink-0 font-mono text-xl font-extrabold leading-none tabular-nums text-[var(--color-fasit-correct-text)]">
@@ -91,7 +93,7 @@ export function useStep5(): TeacherStep {
             Ingen fremhevet begrunnelse ennå.
           </div>
         )}
-      </div>
+      </PanelCard>
     </div>
   );
 

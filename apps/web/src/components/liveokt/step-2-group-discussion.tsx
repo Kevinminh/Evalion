@@ -6,6 +6,7 @@ import { Professor } from "@workspace/evalion/components/live/professor";
 import { TeacherStepLayout } from "@workspace/evalion/components/live/teacher-step-layout";
 import { resolveStatementHex } from "@workspace/evalion/lib/constants";
 import { formatDecimal1 } from "@workspace/evalion/lib/format";
+import { PanelCard } from "@workspace/ui/components/panel-card";
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { Smartphone } from "lucide-react";
@@ -79,7 +80,7 @@ export function useStep2(): TeacherStep {
         activeTab={begrunnelseTab ? "begrunnelser" : "stemmefordeling"}
         onTabChange={setPanelTab}
       >
-        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto rounded-2xl bg-white p-3 shadow-[var(--shadow-card-soft)]">
+        <PanelCard gap="2">
           {begrunnelseTab ? (
             highlighted ? (
               <div className="flex flex-col gap-2">
@@ -124,7 +125,7 @@ export function useStep2(): TeacherStep {
               </div>
             </div>
           )}
-        </div>
+        </PanelCard>
       </PanelTabs>
     </div>
   );

@@ -1,13 +1,15 @@
 import { BackButton } from "@workspace/evalion/components/live/back-button";
+import { BreakdownRow } from "@workspace/evalion/components/live/breakdown-row";
 import { CountdownOverlay } from "@workspace/evalion/components/live/countdown-overlay";
 import { DistributionChart } from "@workspace/evalion/components/live/distribution-chart";
 import { EndringerCard } from "@workspace/evalion/components/live/endringer-card";
-import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
+import { FasitBadgeOverlay } from "@workspace/evalion/components/live/fasit-badge-overlay";
 import { PanelTabs } from "@workspace/evalion/components/live/panel-tabs";
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { TeacherStepLayout } from "@workspace/evalion/components/live/teacher-step-layout";
 import { FASIT_TEXT, resolveStatementHex } from "@workspace/evalion/lib/constants";
 import { formatDecimal1 } from "@workspace/evalion/lib/format";
+import { PanelCard } from "@workspace/ui/components/panel-card";
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { BarChart3 } from "lucide-react";
@@ -53,14 +55,9 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
         top={<BackButton onClick={() => goToStep(0)} />}
         statement={
           statement && (
-            <div className="relative w-full">
-              {countdownDone && (
-                <div className="absolute left-1/2 -top-1 z-10 -translate-x-1/2 -translate-y-[65%]">
-                  <FasitBadge fasit={statement.fasit} animated size="lg" />
-                </div>
-              )}
+            <FasitBadgeOverlay fasit={statement.fasit} show={countdownDone} animated>
               <StatementCard statement={statement} size="lg" color={statementColor} gradient />
-            </div>
+            </FasitBadgeOverlay>
           )
         }
         professor={
@@ -112,7 +109,7 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
         onTabChange={setPanelTab}
       >
         {endringerTab ? (
-          <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-2xl bg-white p-3 shadow-[var(--shadow-card-soft)]">
+          <PanelCard>
             <EndringerCard
               correctCount={r2CorrectCount}
               totalVotes={r2Total}
@@ -122,9 +119,9 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
               avgConfidenceR1={avgConfidenceR1}
               avgConfidenceR2={avgConfidenceR2}
             />
-          </div>
+          </PanelCard>
         ) : (
-          <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-2xl bg-white p-3 shadow-[var(--shadow-card-soft)]">
+          <PanelCard>
             <div className="relative flex items-center justify-between gap-2">
               <span className="text-sm font-semibold text-[var(--color-text-ink-soft)]">
                 Gjennomsnittlig sikkerhet:
@@ -150,9 +147,9 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
               </div>
               {showAvgBreakdown && (
                 <div className="absolute top-full right-0 z-10 mt-2 flex min-w-[160px] flex-col gap-1.5 rounded-xl border-[1.5px] border-[var(--color-divider-soft)] bg-white p-3 shadow-[var(--shadow-card-soft)]">
-                  <AvgBreakdownRow label="Sant:" value={avgConfidenceR2ByVote.sant} />
-                  <AvgBreakdownRow label="Delvis sant:" value={avgConfidenceR2ByVote.delvis} />
-                  <AvgBreakdownRow label="Usant:" value={avgConfidenceR2ByVote.usant} />
+                  <BreakdownRow label="Sant:" value={avgConfidenceR2ByVote.sant} />
+                  <BreakdownRow label="Delvis sant:" value={avgConfidenceR2ByVote.delvis} />
+                  <BreakdownRow label="Usant:" value={avgConfidenceR2ByVote.usant} />
                 </div>
               )}
             </div>
@@ -167,22 +164,11 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
                 correctKey={countdownDone ? statement?.fasit : undefined}
               />
             </div>
-          </div>
+          </PanelCard>
         )}
       </PanelTabs>
     </div>
   );
 
   return { main, panel, panelFooter: null };
-}
-
-function AvgBreakdownRow({ label, value }: { label: string; value: number | undefined }) {
-  return (
-    <div className="flex items-center justify-between gap-4 text-sm font-semibold">
-      <span className="text-[var(--color-text-ink-soft)]">{label}</span>
-      <span className="font-mono font-bold tabular-nums text-[var(--color-text-ink-strong)]">
-        {value === undefined ? "–" : formatDecimal1(value)}
-      </span>
-    </div>
-  );
 }
