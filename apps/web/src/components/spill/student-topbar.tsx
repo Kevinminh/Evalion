@@ -43,7 +43,12 @@ export function StudentTopbar({
         {rightSlot}
         {currentStep !== undefined && !hideStepBadge && (
           <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-semibold text-muted-foreground sm:text-xs">
-            {stepLabel ?? `Steg ${currentStep} av ${totalSteps}`}
+            {stepLabel ?? (
+              <>
+                <span className="hidden sm:inline">{`Steg ${currentStep} av ${totalSteps}`}</span>
+                <span className="sm:hidden">{`${currentStep}/${totalSteps}`}</span>
+              </>
+            )}
           </span>
         )}
         {onLeave && (
