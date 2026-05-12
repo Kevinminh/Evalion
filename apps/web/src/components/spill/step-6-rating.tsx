@@ -36,11 +36,11 @@ export function Step6Rating() {
       <FasitBadge fasit={statement.fasit} />
       <StatementCard statement={statement} />
 
-      <div className="w-full max-w-md space-y-3">
-        <p className="text-center text-sm font-bold text-foreground">
+      <div className="w-full max-w-md space-y-4">
+        <p className="text-center text-2xl font-extrabold text-[var(--color-text-ink-strong)]">
           Hvor godt forstår du dette nå?
         </p>
-        <p className="text-center text-xs text-muted-foreground">
+        <p className="text-center text-sm leading-relaxed text-[var(--color-text-ink-soft)]">
           Vurder forståelsen din fra 1 til 5
         </p>
 

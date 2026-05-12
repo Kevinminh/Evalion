@@ -142,11 +142,18 @@ export function useStep6(): TeacherStep {
     avgRating,
     r1Votes,
     r2Votes,
-    r2CorrectCount,
-    r2Total,
   } = useTeacherSession();
   const [confDetailOpen, setConfDetailOpen] = useState(false);
-  const r2WrongCount = Math.max(0, r2Total - r2CorrectCount);
+  const fasit = statement?.fasit;
+  const r2WithConf = r2Votes.filter((v) => typeof v.confidence === "number");
+  const r2Correct = fasit ? r2WithConf.filter((v) => v.vote === fasit) : [];
+  const r2Wrong = fasit ? r2WithConf.filter((v) => v.vote !== fasit) : [];
+  const r2AvgConfCorrect = r2Correct.length
+    ? r2Correct.reduce((s, v) => s + (v.confidence ?? 0), 0) / r2Correct.length
+    : undefined;
+  const r2AvgConfWrong = r2Wrong.length
+    ? r2Wrong.reduce((s, v) => s + (v.confidence ?? 0), 0) / r2Wrong.length
+    : undefined;
 
   const statementColor = resolveStatementHex(statement?.color, selectedIdx);
 
@@ -226,27 +233,9 @@ export function useStep6(): TeacherStep {
                 );
               })}
             </div>
-          </div>
-        )}
-
-        {/* Riktig / Feil breakdown */}
-        {r2Total > 0 && (
-          <div className="flex items-center gap-2 px-3 pt-1">
-            <div className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[var(--color-fasit-correct-bg)] px-2 py-1.5">
-              <span className="font-mono text-base font-extrabold leading-none tabular-nums text-[var(--color-fasit-correct-text)]">
-                {r2CorrectCount}
-              </span>
-              <span className="text-[11px] font-semibold text-[var(--color-text-ink-soft)]">
-                riktig
-              </span>
-            </div>
-            <div className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[var(--color-error-bg-light)] px-2 py-1.5">
-              <span className="font-mono text-base font-extrabold leading-none tabular-nums text-[var(--color-usant)]">
-                {r2WrongCount}
-              </span>
-              <span className="text-[11px] font-semibold text-[var(--color-text-ink-soft)]">
-                feil
-              </span>
+            <div className="mt-2.5 flex justify-center gap-6 border-t border-[var(--color-rating-bar-track)] pt-2.5">
+              <ConfBreakdownRow label="Riktig svar:" value={r2AvgConfCorrect} />
+              <ConfBreakdownRow label="Feil svar:" value={r2AvgConfWrong} />
             </div>
           </div>
         )}
@@ -296,4 +285,15 @@ export function useStep6(): TeacherStep {
   );
 
   return { main, panel, panelFooter };
+}
+
+function ConfBreakdownRow({ label, value }: { label: string; value: number | undefined }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-xs font-semibold text-[var(--color-text-ink-soft)]">{label}</span>
+      <span className="font-mono text-xs font-bold tabular-nums text-[var(--color-text-ink-strong)]">
+        {value === undefined ? "–" : formatDecimal1(value)}
+      </span>
+    </div>
+  );
 }
