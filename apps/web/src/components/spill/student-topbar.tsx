@@ -28,7 +28,7 @@ export function StudentTopbar({
   return (
     <div className="fixed top-0 right-0 left-0 z-40 flex h-14 items-center justify-between border-b border-neutral-200 bg-white px-4">
       <div className="flex items-center gap-3 min-w-0">
-        <img src="/co-lab-logo.png" alt="CO-LAB" className="h-7 shrink-0 object-contain" />
+        <img src="/fagprat-logo.png" alt="FagPrat" className="h-7 shrink-0 object-contain" />
         {fagpratTitle && (
           <>
             <div className="h-5 w-px shrink-0 bg-neutral-300" />

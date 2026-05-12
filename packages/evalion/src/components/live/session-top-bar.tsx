@@ -12,7 +12,7 @@ export function SessionTopBar({ title, onExit, center, children }: SessionTopBar
   return (
     <div className="fixed top-0 right-0 left-0 z-40 flex h-20 min-h-20 items-center justify-between border-b-[1.5px] border-[var(--color-divider-soft)] bg-white px-8">
       <div className="flex items-center gap-4">
-        <img src="/co-lab-logo.png" alt="CO-LAB" className="h-12 object-contain" />
+        <img src="/fagprat-logo.png" alt="FagPrat" className="h-12 object-contain" />
         <Separator orientation="vertical" />
         <span className="text-lg font-bold text-[var(--color-text-ink-strong)]">{title}</span>
       </div>
