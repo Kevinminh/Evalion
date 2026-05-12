@@ -4,6 +4,7 @@ import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { TeacherStepLayout } from "@workspace/evalion/components/live/teacher-step-layout";
 import { resolveStatementHex } from "@workspace/evalion/lib/constants";
+import { formatDecimal1 } from "@workspace/evalion/lib/format";
 import type { Fasit } from "@workspace/evalion/lib/types";
 import { DestructiveButton } from "@workspace/ui/components/destructive-button";
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
@@ -186,7 +187,7 @@ export function useStep6(): TeacherStep {
             Gjennomsnittlig forståelse:
           </span>
           <span className="font-mono text-[22px] font-extrabold leading-none tabular-nums text-[var(--color-turkis-500)]">
-            {avgRating !== undefined ? avgRating.toFixed(1).replace(".", ",") : "–"}
+            {formatDecimal1(avgRating)}
           </span>
           <button
             type="button"

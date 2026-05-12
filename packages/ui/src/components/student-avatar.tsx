@@ -1,5 +1,11 @@
 import { cn } from "@workspace/ui/lib/utils";
 
+const SIZE_CLASSES = {
+  xs: "size-6 text-xs",
+  sm: "size-8 text-sm",
+  lg: "size-16 text-2xl",
+} as const;
+
 export function StudentAvatar({
   name,
   avatarColor,
@@ -7,16 +13,13 @@ export function StudentAvatar({
 }: {
   name: string;
   avatarColor: string;
-  size?: "sm" | "lg";
+  size?: keyof typeof SIZE_CLASSES;
 }) {
-  const sizeClasses =
-    size === "sm" ? "size-8 text-sm" : "size-16 text-2xl";
-
   return (
     <div
       className={cn(
         "flex items-center justify-center rounded-full font-bold text-white",
-        sizeClasses,
+        SIZE_CLASSES[size],
         avatarColor,
       )}
     >

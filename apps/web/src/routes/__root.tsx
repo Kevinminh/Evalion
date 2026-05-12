@@ -10,10 +10,9 @@ import {
 } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { RootErrorFallback, RootNotFound } from "@workspace/evalion/components/root-fallbacks";
+import { authClient } from "@workspace/evalion/lib/auth-client";
+import { getToken } from "@workspace/evalion/lib/auth-server";
 import { Toaster } from "@workspace/ui/components/sonner";
-
-import { authClient } from "@/lib/auth-client";
-import { getToken } from "@/lib/auth-server";
 
 import appCss from "@workspace/ui/globals.css?url";
 

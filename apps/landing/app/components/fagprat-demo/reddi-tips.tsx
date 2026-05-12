@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDecimal1 } from "@workspace/evalion/lib/format";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   forwardRef,
@@ -53,10 +54,6 @@ function totalOf(c: Counts): number {
 function pctOf(num: number, denom: number): number {
   if (denom <= 0) return 0;
   return Math.round((num / denom) * 100);
-}
-
-function fmtAvg(n: number): string {
-  return n.toFixed(1).replace(".", ",");
 }
 
 function asStats(value: unknown): StatsSlice | null {
@@ -144,7 +141,7 @@ function buildSteg2Tip(pastandIdx: number, stats: StatsSlice): string {
   const wrong = total - correct;
   const cPct = pctOf(correct, total);
   const wPct = pctOf(wrong, total);
-  const avg = fmtAvg(stats.avgTotal);
+  const avg = formatDecimal1(stats.avgTotal);
 
   switch (pastandIdx) {
     case 0:
@@ -183,8 +180,8 @@ function buildSteg4Tip(pastandIdx: number, r1: StatsSlice, r2: StatsSlice): stri
   const r2Correct = r2.counts[fasit];
   const r1Pct = pctOf(r1Correct, r1Total);
   const r2Pct = pctOf(r2Correct, r2Total);
-  const r1Avg = fmtAvg(r1.avgTotal);
-  const r2Avg = fmtAvg(r2.avgTotal);
+  const r1Avg = formatDecimal1(r1.avgTotal);
+  const r2Avg = formatDecimal1(r2.avgTotal);
 
   switch (pastandIdx) {
     case 0:
@@ -216,7 +213,7 @@ function buildSteg4Tip(pastandIdx: number, r1: StatsSlice, r2: StatsSlice): stri
 }
 
 function buildSteg6Tip(pastandIdx: number, resultat: ResultatSlice): string {
-  const avg = fmtAvg(resultat.avgConf);
+  const avg = formatDecimal1(resultat.avgConf);
   switch (pastandIdx) {
     case 0:
       return (

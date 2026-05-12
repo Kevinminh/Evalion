@@ -1,7 +1,7 @@
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { RecordingDisclaimer } from "@workspace/ui/components/recording-disclaimer";
 import { StatementCard } from "@workspace/ui/components/statement-card";
-import { cn } from "@workspace/ui/lib/utils";
+import { StudentAvatar } from "@workspace/ui/components/student-avatar";
 
 import { useStudentGame } from "./student-game-context";
 
@@ -22,14 +22,7 @@ export function Step2Discussion() {
                 key={m._id}
                 className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5 shadow-xs"
               >
-                <div
-                  className={cn(
-                    "flex size-6 items-center justify-center rounded-full text-xs font-bold text-white",
-                    m.avatarColor,
-                  )}
-                >
-                  {m.name?.[0]?.toUpperCase() ?? "?"}
-                </div>
+                <StudentAvatar name={m.name} avatarColor={m.avatarColor} size="xs" />
                 <span className="text-sm font-medium text-foreground">{m.name}</span>
               </div>
             ))}

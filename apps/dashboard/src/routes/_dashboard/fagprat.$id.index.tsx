@@ -14,13 +14,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { FagPratDetailSkeleton } from "@workspace/evalion/components/skeletons/fagprat-detail-skeleton";
+import { authClient } from "@workspace/evalion/lib/auth-client";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { AuthorAvatar } from "@/components/author-avatar";
 import { DeleteFagPratDialog } from "@/components/delete-fagprat-dialog";
 import { StatementTable } from "@/components/statement-table";
 import { TypeIcon } from "@/components/type-icon";
-import { authClient } from "@/lib/auth-client";
 import { api, fagpratQueries } from "@/lib/convex";
 import type { FagPratId } from "@/lib/types";
 

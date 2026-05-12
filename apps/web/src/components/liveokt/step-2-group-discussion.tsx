@@ -5,6 +5,7 @@ import { PanelTabs } from "@workspace/evalion/components/live/panel-tabs";
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { TeacherStepLayout } from "@workspace/evalion/components/live/teacher-step-layout";
 import { resolveStatementHex } from "@workspace/evalion/lib/constants";
+import { formatDecimal1 } from "@workspace/evalion/lib/format";
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { Smartphone } from "lucide-react";
@@ -108,7 +109,7 @@ export function useStep2(): TeacherStep {
                   Gjennomsnittlig sikkerhet:
                 </span>
                 <span className="font-mono text-xl font-extrabold leading-none tabular-nums text-[var(--color-turkis-500)]">
-                  {avgConfidence !== null ? avgConfidence.toFixed(1).replace(".", ",") : "–"}
+                  {formatDecimal1(avgConfidence)}
                 </span>
               </div>
               <div className="h-px bg-[var(--color-divider-soft)]" />

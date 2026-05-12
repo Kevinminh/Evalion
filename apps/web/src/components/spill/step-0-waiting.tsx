@@ -1,4 +1,4 @@
-import { STATEMENT_COLORS_STUDENT_HEX } from "@workspace/evalion/lib/constants";
+import { getStatementColorStudentHex } from "@workspace/evalion/lib/constants";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 
 import { useStudentGame } from "./student-game-context";
@@ -22,7 +22,7 @@ export function Step0Waiting() {
       {statements.length > 0 && (
         <div className="grid w-full max-w-md gap-3 sm:max-w-sm sm:flex-1">
           {statements.map((stmt, i) => {
-            const color = STATEMENT_COLORS_STUDENT_HEX[i % STATEMENT_COLORS_STUDENT_HEX.length]!;
+            const color = getStatementColorStudentHex(i);
             return (
               <div
                 key={i}

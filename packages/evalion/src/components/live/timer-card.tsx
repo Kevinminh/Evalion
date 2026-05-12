@@ -1,8 +1,9 @@
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { cn } from "@workspace/ui/lib/utils";
 import { ArrowRight, Pause, Play, Square } from "lucide-react";
-import type { CSSProperties } from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
+
+import { computeRemainingSeconds } from "../../lib/timer";
 
 export interface TimerPreset {
   /** Preset duration in seconds. */
@@ -42,21 +43,6 @@ interface TimerCardProps {
   sectionLabel?: string;
 }
 
-function computeRemaining(
-  duration?: number,
-  startedAt?: number,
-  pausedAt?: number,
-  remainingAtPause?: number,
-): number {
-  if (pausedAt && remainingAtPause !== undefined) {
-    return Math.max(0, Math.floor(remainingAtPause));
-  }
-  if (startedAt && duration !== undefined) {
-    return Math.max(0, Math.floor(duration - (Date.now() - startedAt) / 1000));
-  }
-  return 0;
-}
-
 export function TimerCard({
   duration,
   startedAt,
@@ -86,7 +72,7 @@ export function TimerCard({
   const isRunning = isActive && !isPaused;
 
   const calcRemaining = useCallback(
-    () => computeRemaining(duration, startedAt, pausedAt, remainingAtPause),
+    () => computeRemainingSeconds(duration, startedAt, pausedAt, remainingAtPause),
     [duration, startedAt, pausedAt, remainingAtPause],
   );
 
@@ -166,7 +152,7 @@ export function TimerCard({
               value={selectedDuration}
               onChange={(e) => setSelectedDuration(Number(e.target.value))}
               className="timer-range w-full"
-              style={{ "--timer-pct": `${sliderPct}%` } as CSSProperties}
+              style={{ "--timer-pct": `${sliderPct}%` }}
             />
           </div>
           <div className="flex w-full justify-center gap-2">

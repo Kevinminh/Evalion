@@ -1,5 +1,6 @@
 import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { UserMenu } from "@workspace/evalion/components/auth/user-menu";
+import { authClient } from "@workspace/evalion/lib/auth-client";
 import { Button } from "@workspace/ui/components/button";
 import { DropdownMenuItem } from "@workspace/ui/components/dropdown-menu";
 import {
@@ -15,8 +16,6 @@ import {
 } from "@workspace/ui/components/sidebar";
 import { Search, FolderOpen, Clock, Plus, Settings, HelpCircle } from "lucide-react";
 import type { ComponentProps } from "react";
-
-import { authClient } from "@/lib/auth-client";
 
 const navItems = [
   { label: "Utforsk", path: "/" as const, icon: Search },

@@ -1,29 +1,15 @@
+import { computeRemainingSeconds } from "@workspace/evalion/lib/timer";
 import { Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { useStudentGame } from "./student-game-context";
-
-function computeRemaining(
-  duration?: number,
-  startedAt?: number,
-  pausedAt?: number,
-  remainingAtPause?: number,
-): number {
-  if (pausedAt && remainingAtPause !== undefined) {
-    return Math.max(0, Math.floor(remainingAtPause));
-  }
-  if (startedAt && duration !== undefined) {
-    return Math.max(0, Math.floor(duration - (Date.now() - startedAt) / 1000));
-  }
-  return 0;
-}
 
 export function StudentTimerBadge() {
   const { session } = useStudentGame();
   const { timerDuration, timerStartedAt, timerPausedAt, timerRemainingAtPause } = session;
 
   const [remaining, setRemaining] = useState(() =>
-    computeRemaining(timerDuration, timerStartedAt, timerPausedAt, timerRemainingAtPause),
+    computeRemainingSeconds(timerDuration, timerStartedAt, timerPausedAt, timerRemainingAtPause),
   );
 
   const isActive = !!timerStartedAt;
@@ -32,12 +18,12 @@ export function StudentTimerBadge() {
 
   useEffect(() => {
     setRemaining(
-      computeRemaining(timerDuration, timerStartedAt, timerPausedAt, timerRemainingAtPause),
+      computeRemainingSeconds(timerDuration, timerStartedAt, timerPausedAt, timerRemainingAtPause),
     );
     if (!isRunning) return;
     const interval = setInterval(() => {
       setRemaining(
-        computeRemaining(timerDuration, timerStartedAt, timerPausedAt, timerRemainingAtPause),
+        computeRemainingSeconds(timerDuration, timerStartedAt, timerPausedAt, timerRemainingAtPause),
       );
     }, 1000);
     return () => clearInterval(interval);

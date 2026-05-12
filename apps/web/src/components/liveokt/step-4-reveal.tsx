@@ -7,6 +7,7 @@ import { PanelTabs } from "@workspace/evalion/components/live/panel-tabs";
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { TeacherStepLayout } from "@workspace/evalion/components/live/teacher-step-layout";
 import { FASIT_TEXT, resolveStatementHex } from "@workspace/evalion/lib/constants";
+import { formatDecimal1 } from "@workspace/evalion/lib/format";
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { BarChart3 } from "lucide-react";
@@ -125,9 +126,7 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
               </span>
               <div className="flex items-center gap-2">
                 <span className="font-mono text-xl font-extrabold leading-none tabular-nums text-[var(--color-turkis-500)]">
-                  {avgConfidenceR2 != null
-                    ? avgConfidenceR2.toFixed(1).replace(".", ",")
-                    : "–"}
+                  {formatDecimal1(avgConfidenceR2)}
                 </span>
                 <button
                   type="button"

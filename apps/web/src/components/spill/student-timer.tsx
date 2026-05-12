@@ -1,6 +1,7 @@
+import { computeRemainingSeconds } from "@workspace/evalion/lib/timer";
 import { cn } from "@workspace/ui/lib/utils";
 import { Clock } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export function StudentTimer({
   timerDuration,
@@ -16,16 +17,6 @@ export function StudentTimer({
   const [remaining, setRemaining] = useState(0);
   const [expired, setExpired] = useState(false);
 
-  const calcRemaining = useCallback(() => {
-    if (timerPausedAt && timerRemainingAtPause !== undefined) {
-      return Math.max(0, Math.floor(timerRemainingAtPause));
-    }
-    if (timerStartedAt && timerDuration !== undefined) {
-      return Math.max(0, Math.floor(timerDuration - (Date.now() - timerStartedAt) / 1000));
-    }
-    return 0;
-  }, [timerDuration, timerStartedAt, timerPausedAt, timerRemainingAtPause]);
-
   const isActive = timerStartedAt !== undefined && timerStartedAt !== null;
   const isPaused = isActive && timerPausedAt !== undefined && timerPausedAt !== null;
   const isRunning = isActive && !isPaused;
@@ -35,16 +26,23 @@ export function StudentTimer({
       setExpired(false);
       return;
     }
-    setRemaining(calcRemaining());
+    setRemaining(
+      computeRemainingSeconds(timerDuration, timerStartedAt, timerPausedAt, timerRemainingAtPause),
+    );
     if (isRunning) {
       const interval = setInterval(() => {
-        const r = calcRemaining();
+        const r = computeRemainingSeconds(
+          timerDuration,
+          timerStartedAt,
+          timerPausedAt,
+          timerRemainingAtPause,
+        );
         setRemaining(r);
         if (r <= 0) setExpired(true);
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [isActive, isRunning, calcRemaining]);
+  }, [isActive, isRunning, timerDuration, timerStartedAt, timerPausedAt, timerRemainingAtPause]);
 
   useEffect(() => {
     if (!expired) return;

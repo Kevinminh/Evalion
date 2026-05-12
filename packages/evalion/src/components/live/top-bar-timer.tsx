@@ -2,26 +2,13 @@ import { cn } from "@workspace/ui/lib/utils";
 import { Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { computeRemainingSeconds } from "../../lib/timer";
+
 interface TopBarTimerProps {
   duration?: number;
   startedAt?: number;
   pausedAt?: number;
   remainingAtPause?: number;
-}
-
-function computeRemaining(
-  duration?: number,
-  startedAt?: number,
-  pausedAt?: number,
-  remainingAtPause?: number,
-): number {
-  if (pausedAt && remainingAtPause !== undefined) {
-    return Math.max(0, Math.floor(remainingAtPause));
-  }
-  if (startedAt && duration !== undefined) {
-    return Math.max(0, Math.floor(duration - (Date.now() - startedAt) / 1000));
-  }
-  return 0;
 }
 
 export function TopBarTimer({
@@ -31,14 +18,14 @@ export function TopBarTimer({
   remainingAtPause,
 }: TopBarTimerProps) {
   const [remaining, setRemaining] = useState(() =>
-    computeRemaining(duration, startedAt, pausedAt, remainingAtPause),
+    computeRemainingSeconds(duration, startedAt, pausedAt, remainingAtPause),
   );
 
   useEffect(() => {
-    setRemaining(computeRemaining(duration, startedAt, pausedAt, remainingAtPause));
+    setRemaining(computeRemainingSeconds(duration, startedAt, pausedAt, remainingAtPause));
     if (!startedAt || pausedAt) return;
     const id = setInterval(() => {
-      setRemaining(computeRemaining(duration, startedAt, pausedAt, remainingAtPause));
+      setRemaining(computeRemainingSeconds(duration, startedAt, pausedAt, remainingAtPause));
     }, 1000);
     return () => clearInterval(id);
   }, [duration, startedAt, pausedAt, remainingAtPause]);

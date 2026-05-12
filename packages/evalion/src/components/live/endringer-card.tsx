@@ -1,6 +1,8 @@
 import { cn } from "@workspace/ui/lib/utils";
 import { AlertTriangle, ArrowRight } from "lucide-react";
 
+import { formatDecimal1 } from "../../lib/format";
+
 interface EndringerCardProps {
   correctCount: number;
   totalVotes: number;
@@ -86,11 +88,11 @@ export function EndringerCard({
           <SectionLabel className="-mb-2 mt-2">Gjennomsnittlig sikkerhet</SectionLabel>
           <div className="flex items-center justify-center gap-3 rounded-2xl bg-[var(--color-highlight-strip-bg)] px-3 py-2">
             <span className="font-mono text-xl font-extrabold leading-none tabular-nums text-[var(--color-text-ink-faint)]">
-              {avgConfidenceR1!.toFixed(1).replace(".", ",")}
+              {formatDecimal1(avgConfidenceR1)}
             </span>
             <ArrowRight className="size-[14px] text-[var(--color-text-ink-faint)]" strokeWidth={2.5} />
             <span className="font-mono text-xl font-extrabold leading-none tabular-nums text-[var(--color-turkis-500)]">
-              {avgConfidenceR2!.toFixed(1).replace(".", ",")}
+              {formatDecimal1(avgConfidenceR2)}
             </span>
             {showConfDelta && (
               <span
@@ -102,7 +104,7 @@ export function EndringerCard({
                 )}
               >
                 {confDelta > 0 ? "+" : ""}
-                {confDelta.toFixed(1).replace(".", ",")}
+                {formatDecimal1(confDelta)}
               </span>
             )}
           </div>

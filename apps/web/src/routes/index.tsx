@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-router";
 import { UserAvatar } from "@workspace/evalion/components/auth/user-menu";
+import { authClient } from "@workspace/evalion/lib/auth-client";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Play, LogOut, User, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { authClient } from "@/lib/auth-client";
 import { liveSessionQueries } from "@/lib/convex";
 import { DASHBOARD_URL } from "@/lib/env";
 

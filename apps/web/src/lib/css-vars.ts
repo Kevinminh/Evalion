@@ -1,8 +1,14 @@
 import type { CSSProperties } from "react";
 
-// React's CSSProperties type rejects custom properties (--foo) by design.
-// Centralize the single sanctioned cast here so callsites stay clean.
+// React's CSSProperties intentionally omits an index signature for CSS custom
+// properties. Augment it once here so `style={{ "--foo": 1 }}` typechecks
+// everywhere without casts at the callsite.
+declare module "react" {
+  interface CSSProperties {
+    [variable: `--${string}`]: string | number | undefined;
+  }
+}
+
 export function cssVars(vars: Record<`--${string}`, string | number | undefined>): CSSProperties {
-  // oxlint-disable-next-line typescript/consistent-type-assertions
-  return vars as CSSProperties;
+  return vars;
 }
