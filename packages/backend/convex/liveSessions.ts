@@ -790,6 +790,25 @@ export const getBegrunnelser = query({
   },
 });
 
+export const getMyBegrunnelser = query({
+  args: {
+    sessionId: v.id("liveSessions"),
+    studentId: v.id("sessionStudents"),
+    statementIndex: v.number(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("sessionBegrunnelser")
+      .withIndex("by_session_statement_student_round", (q) =>
+        q
+          .eq("sessionId", args.sessionId)
+          .eq("statementIndex", args.statementIndex)
+          .eq("studentId", args.studentId),
+      )
+      .collect();
+  },
+});
+
 export const highlightBegrunnelse = mutation({
   args: {
     id: v.id("sessionBegrunnelser"),

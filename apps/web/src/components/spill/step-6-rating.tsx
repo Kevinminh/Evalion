@@ -15,7 +15,7 @@ export function Step6Rating() {
 
   if (!statement) return null;
   if (sent) {
-    return <WaitingScreen />;
+    return <WaitingScreen title="Takk for svaret ditt!" />;
   }
 
   const handleSubmit = async () => {

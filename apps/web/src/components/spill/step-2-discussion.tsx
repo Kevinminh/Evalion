@@ -40,6 +40,10 @@ export function Step2Discussion() {
       <StatementCard statement={statement} />
 
       <h2 className="text-xl font-extrabold text-foreground">Snakk sammen!</h2>
+      <p className="-mt-3 max-w-[380px] text-center text-sm leading-relaxed text-muted-foreground">
+        Diskuter påstanden med læringspartneren din. Avslør hva du stemte, og forsøk å forklare
+        hvordan du tenker.
+      </p>
 
       <Professor
         size="sm"

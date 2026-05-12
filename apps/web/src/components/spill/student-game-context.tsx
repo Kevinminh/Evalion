@@ -12,6 +12,7 @@ export interface StudentGameValue {
   fagprat: Doc<"fagprats">;
   student: Doc<"sessionStudents">;
   students: Doc<"sessionStudents">[];
+  votes: Doc<"sessionVotes">[];
 
   statement: FagPratStatement | undefined;
   statementIndex: number;
@@ -79,6 +80,7 @@ export function StudentGameProvider({
       fagprat,
       student,
       students,
+      votes,
       statement,
       statementIndex,
       phase,

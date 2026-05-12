@@ -48,8 +48,8 @@ export function VoteOptions({ selected, onSelect, disabled }: VoteOptionsProps) 
               "flex-1 rounded-2xl py-3 text-[15px] font-bold text-white transition-all duration-150 ease-out",
               VOTE_BUTTON_3D_CLASSES,
               opt.classes,
-              isSelected && "outline-3 outline outline-white outline-offset-[-3px] scale-[1.04]",
-              isDimmed && "opacity-50 scale-[0.97]",
+              isSelected && "outline-3 outline outline-white outline-offset-[-3px]",
+              isDimmed && "opacity-[0.45]",
               disabled && "pointer-events-none opacity-70",
             )}
           >
