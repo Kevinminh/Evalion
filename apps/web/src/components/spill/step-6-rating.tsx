@@ -1,19 +1,21 @@
 import { useState } from "react";
-import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
+import { FasitBadgeOverlay } from "@workspace/evalion/components/live/fasit-badge-overlay";
 import { resolveStatementStudentHex } from "@workspace/evalion/lib/constants";
-import { toast } from "sonner";
 
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { RatingScale } from "@workspace/ui/components/rating-scale";
 import { useStudentGame } from "./student-game-context";
 import { SubmitButton } from "@workspace/ui/components/submit-button";
 import { WaitingScreen } from "./waiting-screen";
+import { useSubmitWithWaiting } from "@/hooks/use-submit-with-waiting";
 
 export function Step6Rating() {
   const { statement, statementIndex, submitRating } = useStudentGame();
   const [selected, setSelected] = useState<number | null>(null);
-  const [sent, setSent] = useState(false);
-  const [showWaiting, setShowWaiting] = useState(false);
+  const { sent, showWaiting, handleSubmit } = useSubmitWithWaiting(
+    (rating: number) => submitRating(rating),
+    { errorMessage: "Vurderingen ble ikke sendt. Prøv igjen." },
+  );
 
   if (!statement) return null;
   if (showWaiting) {
@@ -22,26 +24,11 @@ export function Step6Rating() {
 
   const statementColor = resolveStatementStudentHex(statement.color, statementIndex);
 
-  const handleSubmit = async () => {
-    if (selected === null) return;
-    setSent(true);
-    try {
-      await submitRating(selected);
-      setTimeout(() => setShowWaiting(true), 500);
-    } catch {
-      setSent(false);
-      toast.error("Vurderingen ble ikke sendt. Prøv igjen.");
-    }
-  };
-
   return (
     <div className="flex w-full flex-col items-center gap-5">
-      <div className="relative w-full">
-        <div className="absolute left-1/2 -top-1 z-10 -translate-x-1/2 -translate-y-[65%]">
-          <FasitBadge fasit={statement.fasit} size="lg" />
-        </div>
+      <FasitBadgeOverlay fasit={statement.fasit}>
         <StatementCard statement={statement} color={statementColor} />
-      </div>
+      </FasitBadgeOverlay>
 
       <div className="w-full max-w-md space-y-4">
         <p className="text-center text-2xl font-extrabold text-[var(--color-text-ink-strong)]">
@@ -63,7 +50,11 @@ export function Step6Rating() {
         </div>
       </div>
 
-      <SubmitButton sent={sent} disabled={selected === null} onClick={handleSubmit} />
+      <SubmitButton
+        sent={sent}
+        disabled={selected === null}
+        onClick={() => selected !== null && handleSubmit(selected)}
+      />
     </div>
   );
 }

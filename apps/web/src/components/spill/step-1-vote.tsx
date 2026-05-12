@@ -3,10 +3,10 @@ import type { Fasit } from "@workspace/evalion/lib/types";
 import { RatingScale } from "@workspace/ui/components/rating-scale";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { SubmitButton } from "@workspace/ui/components/submit-button";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useCallback, useState } from "react";
 
 import { useBegrunnelseDraft } from "@/hooks/use-begrunnelse-draft";
+import { useSubmitWithWaiting } from "@/hooks/use-submit-with-waiting";
 
 import { useStudentGame } from "./student-game-context";
 import { VoteOptions } from "./vote-options";
@@ -23,8 +23,22 @@ export function Step1Vote() {
 
   const [selectedVote, setSelectedVote] = useState<Fasit | null>(null);
   const [selectedConfidence, setSelectedConfidence] = useState<number | null>(null);
-  const [sent, setSent] = useState(false);
-  const [showWaiting, setShowWaiting] = useState(false);
+
+  const submitVoteAndBegrunnelse = useCallback(
+    async (vote: Fasit, confidence: number) => {
+      const trimmed = begrunnelseText.trim();
+      await Promise.all([
+        castVote({ vote, confidence }),
+        trimmed ? submitBegrunnelse({ text: trimmed }) : Promise.resolve(),
+      ]);
+      if (trimmed) clearBegrunnelseDraft();
+    },
+    [begrunnelseText, castVote, submitBegrunnelse, clearBegrunnelseDraft],
+  );
+
+  const { sent, showWaiting, handleSubmit } = useSubmitWithWaiting(submitVoteAndBegrunnelse, {
+    errorMessage: "Svaret ble ikke sendt. Prøv igjen.",
+  });
 
   if (!statement) return null;
   // While `sent` is true we keep showing the green "Sendt!" button for ~500ms
@@ -39,20 +53,9 @@ export function Step1Vote() {
   const canSubmit = selectedVote !== null && selectedConfidence !== null && isTimerStarted;
   const statementColor = resolveStatementStudentHex(statement.color, statementIndex);
 
-  const handleSubmit = async () => {
-    if (!canSubmit) return;
-    setSent(true);
-    const trimmed = begrunnelseText.trim();
-    try {
-      await Promise.all([
-        castVote({ vote: selectedVote!, confidence: selectedConfidence! }),
-        trimmed ? submitBegrunnelse({ text: trimmed }) : Promise.resolve(),
-      ]);
-      if (trimmed) clearBegrunnelseDraft();
-      setTimeout(() => setShowWaiting(true), 500);
-    } catch {
-      setSent(false);
-      toast.error("Svaret ble ikke sendt. Prøv igjen.");
+  const onSubmit = () => {
+    if (selectedVote !== null && selectedConfidence !== null && isTimerStarted) {
+      handleSubmit(selectedVote, selectedConfidence);
     }
   };
 
@@ -101,7 +104,7 @@ export function Step1Vote() {
         </div>
       </div>
 
-      <SubmitButton sent={sent} disabled={!canSubmit} onClick={handleSubmit} />
+      <SubmitButton sent={sent} disabled={!canSubmit} onClick={onSubmit} />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { CountdownOverlay } from "@workspace/evalion/components/live/countdown-overlay";
-import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
+import { FasitBadgeOverlay } from "@workspace/evalion/components/live/fasit-badge-overlay";
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { FASIT_TEXT, resolveStatementStudentHex } from "@workspace/evalion/lib/constants";
 
@@ -23,14 +23,9 @@ export function Step4Reveal({ showCountdown, countdownNumber, countdownDone }: S
     <>
       <CountdownOverlay visible={showCountdown} number={countdownNumber} />
       <div className="flex w-full flex-col items-center gap-6">
-        <div className="relative w-full">
-          {countdownDone && (
-            <div className="absolute left-1/2 -top-1 z-10 -translate-x-1/2 -translate-y-[65%]">
-              <FasitBadge fasit={statement.fasit} animated size="lg" />
-            </div>
-          )}
+        <FasitBadgeOverlay fasit={statement.fasit} show={countdownDone} animated>
           <StatementCard statement={statement} color={statementColor} />
-        </div>
+        </FasitBadgeOverlay>
 
         {countdownDone && (
           <div className="flex w-full flex-col items-center gap-4">

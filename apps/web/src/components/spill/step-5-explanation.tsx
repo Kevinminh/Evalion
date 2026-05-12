@@ -1,5 +1,5 @@
 import { ExplanationCard } from "@workspace/evalion/components/live/explanation-card";
-import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
+import { FasitBadgeOverlay } from "@workspace/evalion/components/live/fasit-badge-overlay";
 import { resolveStatementStudentHex } from "@workspace/evalion/lib/constants";
 
 import { useStudentGame } from "./student-game-context";
@@ -12,16 +12,13 @@ export function Step5Explanation() {
 
   return (
     <div className="flex w-full flex-col items-center gap-4">
-      <div className="relative w-full max-w-md">
-        <div className="absolute left-1/2 -top-1 z-10 -translate-x-1/2 -translate-y-[65%]">
-          <FasitBadge fasit={statement.fasit} size="lg" />
-        </div>
+      <FasitBadgeOverlay fasit={statement.fasit} className="max-w-md">
         <ExplanationCard
           statementText={statement.text}
           explanation={statement.explanation}
           color={color}
         />
-      </div>
+      </FasitBadgeOverlay>
     </div>
   );
 }
