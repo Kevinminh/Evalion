@@ -85,7 +85,7 @@ function FagPratPreviewPage() {
         <div className="flex shrink-0 flex-wrap items-center gap-2 sm:gap-3">
           <Button
             variant="teal"
-            size="lg"
+            className="h-auto rounded-xl px-6 py-3 text-sm"
             onClick={() => navigate({ to: "/liveokt/$id", params: { id } })}
           >
             <Users className="size-4" />
@@ -93,17 +93,16 @@ function FagPratPreviewPage() {
           </Button>
 
           {isAuthor ? (
-            /* Author view: Edit + More menu with duplicate/delete */
-            (<>
+            <>
               <button
                 onClick={() => navigate({ to: "/fagprat/$id/rediger", params: { id } })}
-                className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-4 py-2.5 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5 sm:px-5 sm:py-3"
+                className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/20 bg-card px-5 py-3 text-sm font-bold text-primary transition-all hover:border-primary/50 hover:bg-primary/10"
               >
                 <Pencil className="size-4" />
                 Endre
               </button>
               <DropdownMenu>
-                <DropdownMenuTrigger className="inline-flex items-center gap-1 rounded-xl border-2 border-border px-4 py-3 text-sm font-bold text-muted-foreground transition-all hover:border-muted-foreground/50 hover:bg-muted">
+                <DropdownMenuTrigger className="inline-flex items-center gap-1 rounded-xl border-2 border-border bg-transparent px-4 py-3 text-sm font-bold text-muted-foreground transition-all hover:border-muted-foreground/50 hover:bg-muted hover:text-foreground">
                   <MoreVertical className="size-4" />
                   Mer
                 </DropdownMenuTrigger>
@@ -119,15 +118,15 @@ function FagPratPreviewPage() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </>)
+            </>
           ) : (
-            /* Browse view: Add to collection */
-            (<button
+            <button
               onClick={handleDuplicate}
-              className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-4 py-2.5 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5 sm:px-5 sm:py-3"
+              className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/20 bg-card px-5 py-3 text-sm font-bold text-primary transition-all hover:border-primary/50 hover:bg-primary/10"
             >
-              <FolderPlus className="size-4" />Legg til i min samling
-            </button>)
+              <FolderPlus className="size-4" />
+              Legg til i min samling
+            </button>
           )}
 
           <DeleteFagPratDialog
@@ -162,7 +161,7 @@ function FagPratPreviewPage() {
         {fagprat.concepts.map((concept) => (
           <span
             key={concept}
-            className="inline-block rounded-full bg-primary/15 px-3 py-1 text-sm font-semibold text-primary"
+            className="inline-block rounded-full bg-purple-100 px-3 py-1 text-sm font-semibold text-purple-600"
           >
             {concept}
           </span>
