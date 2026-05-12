@@ -1,20 +1,21 @@
+import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
 import { BackButton } from "@workspace/evalion/components/live/back-button";
 import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
 import { Professor } from "@workspace/evalion/components/live/professor";
 import { TeacherStepLayout } from "@workspace/evalion/components/live/teacher-step-layout";
 import { resolveStatementHex } from "@workspace/evalion/lib/constants";
 import type { Fasit } from "@workspace/evalion/lib/types";
+import { DestructiveButton } from "@workspace/ui/components/destructive-button";
+import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
+import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { cn } from "@workspace/ui/lib/utils";
 import { ArrowRight, BarChart3 } from "lucide-react";
 import { useState } from "react";
 
-import { DestructiveButton } from "@workspace/ui/components/destructive-button";
-import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
-import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
 import { cssVars } from "@/lib/css-vars";
 import type { TeacherStep } from "@/types/teacher-step";
-import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
+
 import { useTeacherSession } from "./teacher-session-context";
 
 const CIRCLE_STYLE: { border: string; text: string }[] = [
@@ -140,8 +141,11 @@ export function useStep6(): TeacherStep {
     avgRating,
     r1Votes,
     r2Votes,
+    r2CorrectCount,
+    r2Total,
   } = useTeacherSession();
   const [confDetailOpen, setConfDetailOpen] = useState(false);
+  const r2WrongCount = Math.max(0, r2Total - r2CorrectCount);
 
   const statementColor = resolveStatementHex(statement?.color, selectedIdx);
 
@@ -149,7 +153,7 @@ export function useStep6(): TeacherStep {
     <TeacherStepLayout
       top={
         <div className="flex w-full items-center justify-between">
-          <BackButton onClick={() => goToStep(0)} />
+          <BackButton onClick={() => goToStep(0)} pulse />
           {statement && <FasitBadge fasit={statement.fasit} size="lg" />}
         </div>
       }
@@ -220,6 +224,28 @@ export function useStep6(): TeacherStep {
                   </div>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {/* Riktig / Feil breakdown */}
+        {r2Total > 0 && (
+          <div className="flex items-center gap-2 px-3 pt-1">
+            <div className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[var(--color-fasit-correct-bg)] px-2 py-1.5">
+              <span className="font-mono text-base font-extrabold leading-none tabular-nums text-[var(--color-fasit-correct-text)]">
+                {r2CorrectCount}
+              </span>
+              <span className="text-[11px] font-semibold text-[var(--color-text-ink-soft)]">
+                riktig
+              </span>
+            </div>
+            <div className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[var(--color-error-bg-light)] px-2 py-1.5">
+              <span className="font-mono text-base font-extrabold leading-none tabular-nums text-[var(--color-usant)]">
+                {r2WrongCount}
+              </span>
+              <span className="text-[11px] font-semibold text-[var(--color-text-ink-soft)]">
+                feil
+              </span>
             </div>
           </div>
         )}
