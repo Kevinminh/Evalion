@@ -1,6 +1,11 @@
 import { cn } from "@workspace/ui/lib/utils";
 
-export function SkeletonColumn({ title, headerBg, headerText, borderTopColor }: {
+export function SkeletonColumn({
+  title,
+  headerBg,
+  headerText,
+  borderTopColor,
+}: {
   title: string;
   headerBg: string;
   headerText: string;

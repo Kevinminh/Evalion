@@ -2,7 +2,6 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Button } from "@workspace/ui/components/button";
 import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
 import { FagPratDetailSkeleton } from "@workspace/evalion/components/skeletons/fagprat-detail-skeleton";
 import {
@@ -10,14 +9,15 @@ import {
   toStatementsWithId,
   useStatements,
 } from "@workspace/evalion/hooks/use-statements";
+import { Button } from "@workspace/ui/components/button";
+import { ErrorState } from "@workspace/ui/components/states/error-state";
+import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { useMutation } from "convex/react";
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { MetadataCard } from "@/components/metadata-card";
-import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { StatementEditor } from "@/components/statement-editor";
 import { api, fagpratQueries } from "@/lib/convex";
 import type { FagPratId, FagPratType, Visibility } from "@/lib/types";
@@ -130,10 +130,7 @@ function EditFagPratPage() {
         </Button>
       </div>
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext
-          items={statements.map((s) => s.id)}
-          strategy={verticalListSortingStrategy}
-        >
+        <SortableContext items={statements.map((s) => s.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-4">
             {statements.map((stmt, i) => (
               <StatementEditor

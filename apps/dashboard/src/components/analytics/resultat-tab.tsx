@@ -1,7 +1,13 @@
+import {
+  VOTE_DOT_COLORS,
+  VOTE_LABELS,
+  LEVEL_CIRCLE_COLORS,
+} from "@workspace/evalion/lib/constants";
+import { cn } from "@workspace/ui/lib/utils";
 import { BarChart3 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { VOTE_DOT_COLORS, VOTE_LABELS, LEVEL_CIRCLE_COLORS } from "@workspace/evalion/lib/constants";
-import { cn } from "@workspace/ui/lib/utils";
+
+import type { Fasit } from "@/lib/types";
 
 import { ColumnChart } from "./column-chart";
 import { ConfidenceCircles } from "./confidence-circles";
@@ -11,8 +17,6 @@ import {
   type StatementColorName,
   type StudentData,
 } from "./types";
-
-import type { Fasit } from "@/lib/types";
 
 interface ResultatTabProps {
   round1: RoundDistribution;
@@ -40,7 +44,12 @@ export function ResultatTab({
 
   const makeItems = (dist: RoundDistribution) => [
     { label: "Sant", count: dist.sant, pct: dist.santPct, isCorrect: fasit === "sant" },
-    { label: "Delvis sant", count: dist.delvis, pct: dist.delvisPct, isCorrect: fasit === "delvis" },
+    {
+      label: "Delvis sant",
+      count: dist.delvis,
+      pct: dist.delvisPct,
+      isCorrect: fasit === "delvis",
+    },
     { label: "Usant", count: dist.usant, pct: dist.usantPct, isCorrect: fasit === "usant" },
   ];
 

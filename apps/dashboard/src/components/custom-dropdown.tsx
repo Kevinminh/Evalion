@@ -59,7 +59,9 @@ export function CustomDropdown({
         }}
         className="flex w-full items-center justify-between rounded-lg border-[1.5px] border-border bg-card px-3 py-2 text-sm font-medium text-foreground outline-none transition-colors hover:border-primary/40 focus:border-primary focus:ring-3 focus:ring-primary/20"
       >
-        <span className={!value ? "text-muted-foreground" : ""}>{selected?.label ?? placeholder}</span>
+        <span className={!value ? "text-muted-foreground" : ""}>
+          {selected?.label ?? placeholder}
+        </span>
         <ChevronDown className="size-4 text-muted-foreground" />
       </button>
       {open && (

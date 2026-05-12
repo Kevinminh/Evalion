@@ -1,5 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { FagPratDetailSkeleton } from "@workspace/evalion/components/skeletons/fagprat-detail-skeleton";
+import { authClient } from "@workspace/evalion/lib/auth-client";
+import { Button } from "@workspace/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -7,16 +10,13 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@workspace/ui/components/dropdown-menu";
+import { ErrorState } from "@workspace/ui/components/states/error-state";
+import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { useMutation } from "convex/react";
-import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, Users, Pencil, MoreVertical, Copy, Trash2, FolderPlus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { FagPratDetailSkeleton } from "@workspace/evalion/components/skeletons/fagprat-detail-skeleton";
-import { authClient } from "@workspace/evalion/lib/auth-client";
-import { ErrorState } from "@workspace/ui/components/states/error-state";
-import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { AuthorAvatar } from "@/components/author-avatar";
 import { DeleteFagPratDialog } from "@/components/delete-fagprat-dialog";
 import { StatementTable } from "@/components/statement-table";
@@ -94,7 +94,7 @@ function FagPratPreviewPage() {
 
           {isAuthor ? (
             /* Author view: Edit + More menu with duplicate/delete */
-            (<>
+            <>
               <button
                 onClick={() => navigate({ to: "/fagprat/$id/rediger", params: { id } })}
                 className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-4 py-2.5 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5 sm:px-5 sm:py-3"
@@ -119,15 +119,16 @@ function FagPratPreviewPage() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </>)
+            </>
           ) : (
             /* Browse view: Add to collection */
-            (<button
+            <button
               onClick={handleDuplicate}
               className="inline-flex items-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-4 py-2.5 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5 sm:px-5 sm:py-3"
             >
-              <FolderPlus className="size-4" />Legg til i min samling
-            </button>)
+              <FolderPlus className="size-4" />
+              Legg til i min samling
+            </button>
           )}
 
           <DeleteFagPratDialog

@@ -1,13 +1,13 @@
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Button } from "@workspace/ui/components/button";
-import { parseDraftJson } from "@workspace/evalion/lib/draft-utils";
 import {
   toStatementPayload,
   toStatementsWithId,
   useStatements,
 } from "@workspace/evalion/hooks/use-statements";
+import { parseDraftJson } from "@workspace/evalion/lib/draft-utils";
+import { Button } from "@workspace/ui/components/button";
 import { Plus, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
@@ -128,7 +128,9 @@ function LagFagPratPage() {
             >
               <option value="">Velg fag...</option>
               {SUBJECT_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
               ))}
             </select>
           </div>
@@ -143,7 +145,9 @@ function LagFagPratPage() {
             >
               <option value="">Velg trinn...</option>
               {LEVEL_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
               ))}
             </select>
           </div>
@@ -169,7 +173,11 @@ function LagFagPratPage() {
         )}
       </div>
 
-      <ReddiModal open={reddiOpen} onClose={() => setReddiOpen(false)} onSubmit={handleReddiSubmit} />
+      <ReddiModal
+        open={reddiOpen}
+        onClose={() => setReddiOpen(false)}
+        onSubmit={handleReddiSubmit}
+      />
 
       {/* Manual statements */}
       <div>

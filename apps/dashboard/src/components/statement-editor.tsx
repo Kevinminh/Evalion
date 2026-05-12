@@ -60,9 +60,7 @@ export function StatementEditor({
           <div
             className={cn(
               "flex size-7 items-center justify-center rounded-full text-xs font-extrabold",
-              color
-                ? `${color.bg} ${color.text}`
-                : "bg-primary text-white",
+              color ? `${color.bg} ${color.text}` : "bg-primary text-white",
             )}
           >
             {index + 1}
@@ -89,9 +87,7 @@ export function StatementEditor({
       <div className="space-y-4 p-5">
         {/* Påstand */}
         <div>
-          <label className={`mb-1.5 block ${LABEL_CLASS}`}>
-            Påstand
-          </label>
+          <label className={`mb-1.5 block ${LABEL_CLASS}`}>Påstand</label>
           <div className="flex gap-2">
             <textarea
               value={text}
@@ -109,9 +105,7 @@ export function StatementEditor({
 
         {/* Fasit */}
         <div>
-          <label className={`mb-1.5 block ${LABEL_CLASS}`}>
-            Fasit
-          </label>
+          <label className={`mb-1.5 block ${LABEL_CLASS}`}>Fasit</label>
           <div className="flex gap-2">
             {FASIT_OPTIONS.map((option) => (
               <button
@@ -132,9 +126,7 @@ export function StatementEditor({
 
         {/* Forklaring */}
         <div>
-          <label className={`mb-1.5 block ${LABEL_CLASS}`}>
-            Forklaring
-          </label>
+          <label className={`mb-1.5 block ${LABEL_CLASS}`}>Forklaring</label>
           <div className="flex gap-2">
             <textarea
               value={explanation}

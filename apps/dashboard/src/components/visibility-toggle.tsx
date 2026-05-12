@@ -9,7 +9,11 @@ interface VisibilityToggleProps {
   showDescription?: boolean;
 }
 
-export function VisibilityToggle({ value, onChange, showDescription = false }: VisibilityToggleProps) {
+export function VisibilityToggle({
+  value,
+  onChange,
+  showDescription = false,
+}: VisibilityToggleProps) {
   return (
     <div>
       <div className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">

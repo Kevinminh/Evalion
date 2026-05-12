@@ -168,16 +168,11 @@ export function RoundAnalytics({
           </div>
           <Popover>
             <PopoverTrigger
-              render={
-                <button
-                  type="button"
-                  className="flex size-8 items-center justify-center rounded-[10px] border-[1.5px] border-neutral-200 bg-white text-muted-foreground transition-all hover:bg-neutral-100 data-[popup-open]:border-primary/30 data-[popup-open]:bg-primary/5 data-[popup-open]:text-primary"
-                  aria-label="Vis fordelt på kategori"
-                >
-                  <BarChart3 className="size-4" />
-                </button>
-              }
-            />
+              aria-label="Vis fordelt på kategori"
+              className="flex size-8 items-center justify-center rounded-[10px] border-[1.5px] border-neutral-200 bg-white text-muted-foreground transition-all hover:bg-neutral-100 data-[popup-open]:border-primary/30 data-[popup-open]:bg-primary/5 data-[popup-open]:text-primary"
+            >
+              <BarChart3 className="size-4" />
+            </PopoverTrigger>
             <PopoverContent side="bottom" align="end" sideOffset={8} className="w-44 gap-1.5">
               <div className="flex items-center justify-between text-sm font-semibold">
                 <span className="text-muted-foreground">Sant:</span>

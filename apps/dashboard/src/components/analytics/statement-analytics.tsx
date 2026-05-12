@@ -6,8 +6,8 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 import { AnalyticsRatingChart } from "@/components/analytics/rating-chart-analytics";
 import { VoteChart } from "@/components/analytics/vote-chart";
 import { liveSessionQueries } from "@/lib/convex";
-import type { Fasit } from "@/lib/types";
 import type { Id } from "@/lib/convex";
+import type { Fasit } from "@/lib/types";
 
 interface StatementAnalyticsProps {
   sessionId: Id<"liveSessions">;
@@ -68,8 +68,7 @@ export function StatementAnalytics({
             changedToCorrect={analytics.wrongToRight}
             changedToIncorrect={analytics.rightToWrong}
             totalChanged={analytics.students.reduce(
-              (sum, s) =>
-                s.round1 && s.round2 && s.round1.vote !== s.round2.vote ? sum + 1 : sum,
+              (sum, s) => (s.round1 && s.round2 && s.round1.vote !== s.round2.vote ? sum + 1 : sum),
               0,
             )}
           />

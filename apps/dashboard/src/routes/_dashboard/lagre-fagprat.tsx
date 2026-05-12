@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Button } from "@workspace/ui/components/button";
 import { parseDraftJson } from "@workspace/evalion/lib/draft-utils";
+import { Button } from "@workspace/ui/components/button";
+import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { useMutation } from "convex/react";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
@@ -8,10 +9,9 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { ConceptTags } from "@/components/concept-tags";
-import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { VisibilityToggle } from "@/components/visibility-toggle";
-import { api } from "@/lib/convex";
 import { LABEL_CLASS } from "@/lib/constants";
+import { api } from "@/lib/convex";
 import type { Visibility } from "@/lib/types";
 
 const searchSchema = z.object({
@@ -57,7 +57,9 @@ function LagreFagPratPage() {
   };
 
   if (!draft) {
-    return <NotFoundState message="Ingen FagPrat-data funnet. Gå tilbake og lag en FagPrat først." />;
+    return (
+      <NotFoundState message="Ingen FagPrat-data funnet. Gå tilbake og lag en FagPrat først." />
+    );
   }
 
   return (
@@ -83,9 +85,7 @@ function LagreFagPratPage() {
       <div className="rounded-2xl border-[1.5px] border-border bg-card p-4 sm:p-6">
         {/* Title input */}
         <div className="mb-6">
-          <label className={`mb-2 block ${LABEL_CLASS}`}>
-            Tittel
-          </label>
+          <label className={`mb-2 block ${LABEL_CLASS}`}>Tittel</label>
           <input
             type="text"
             value={title}

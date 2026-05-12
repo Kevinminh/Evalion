@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { FagPratCardSkeleton } from "@workspace/evalion/components/skeletons/fagprat-card-skeleton";
+import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { Search, SlidersHorizontal, Sprout, Target } from "lucide-react";
 import { useState, useRef } from "react";
 
 import { CustomDropdown } from "@/components/custom-dropdown";
-import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { FagPratCard } from "@/components/fagprat-card";
-import { FagPratCardSkeleton } from "@workspace/evalion/components/skeletons/fagprat-card-skeleton";
 import { SUBJECT_OPTIONS, LEVEL_OPTIONS, CARD_GRID_CLASS, SKELETON_COUNT } from "@/lib/constants";
 import { fagpratQueries } from "@/lib/convex";
 import { useClickOutside } from "@/lib/use-click-outside";
@@ -37,7 +37,11 @@ function UtforskPage() {
 
   const showNone = !forkunnskapIntro && !forkunnskapOppsummering;
 
-  const { data: searchResults, isPending, isError } = useQuery(
+  const {
+    data: searchResults,
+    isPending,
+    isError,
+  } = useQuery(
     fagpratQueries.search({
       searchText: searchQuery || undefined,
       subject: selectedFag || undefined,
@@ -168,7 +172,9 @@ function UtforskPage() {
       </div>
 
       {/* Section title */}
-      <h2 className="mb-4 text-xl font-extrabold text-foreground sm:mb-6 sm:text-2xl">Populære FagPrater</h2>
+      <h2 className="mb-4 text-xl font-extrabold text-foreground sm:mb-6 sm:text-2xl">
+        Populære FagPrater
+      </h2>
 
       {/* Error state */}
       {isError && <ErrorState className="py-12 text-center" />}

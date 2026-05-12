@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { FagPratCardSkeleton } from "@workspace/evalion/components/skeletons/fagprat-card-skeleton";
+import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { CustomDropdown } from "@/components/custom-dropdown";
-import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { FagPratCard } from "@/components/fagprat-card";
-import { FagPratCardSkeleton } from "@workspace/evalion/components/skeletons/fagprat-card-skeleton";
 import { CARD_GRID_CLASS, SKELETON_COUNT } from "@/lib/constants";
 import { fagpratQueries } from "@/lib/convex";
 
@@ -25,9 +25,7 @@ function MinSamlingPage() {
     if (!searchQuery) return allFagPrats;
     const query = searchQuery.toLowerCase();
     return allFagPrats.filter(
-      (fp) =>
-        fp.title.toLowerCase().includes(query) ||
-        fp.subject.toLowerCase().includes(query),
+      (fp) => fp.title.toLowerCase().includes(query) || fp.subject.toLowerCase().includes(query),
     );
   }, [allFagPrats, searchQuery]);
 

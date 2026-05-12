@@ -63,10 +63,7 @@ export function ColumnChart({ items, compact = false, fill = false }: ColumnChar
         return (
           <div
             key={item.label}
-            className={cn(
-              "flex flex-1 flex-col items-center gap-1",
-              fill && "min-h-0",
-            )}
+            className={cn("flex flex-1 flex-col items-center gap-1", fill && "min-h-0")}
             style={{ maxWidth: 110 }}
           >
             <span

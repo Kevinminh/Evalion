@@ -31,7 +31,8 @@ export function LaunchModal({ open, onOpenChange, analyticsUrl, onGoToSession }:
         <AlertDialogHeader>
           <AlertDialogTitle>Liveøkt opprettet!</AlertDialogTitle>
           <AlertDialogDescription>
-            Skann QR-koden for å se sanntidsanalyse på en annen enhet (f.eks. mobil eller nettbrett).
+            Skann QR-koden for å se sanntidsanalyse på en annen enhet (f.eks. mobil eller
+            nettbrett).
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="flex flex-col items-center gap-4 py-4">

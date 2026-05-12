@@ -1,20 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Button } from "@workspace/ui/components/button";
-import { ConfirmDialog } from "@workspace/ui/components/confirm-dialog";
+import { SessionTopBar } from "@workspace/evalion/components/live/session-top-bar";
 import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
 import { LiveoktSetupSkeleton } from "@workspace/evalion/components/skeletons/liveokt-setup-skeleton";
-import { SessionTopBar } from "@workspace/evalion/components/live/session-top-bar";
+import { Button } from "@workspace/ui/components/button";
+import { ConfirmDialog } from "@workspace/ui/components/confirm-dialog";
+import { ErrorState } from "@workspace/ui/components/states/error-state";
+import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
+import { Stepper } from "@workspace/ui/components/stepper";
 import { useMutation } from "convex/react";
 import { Users, Mic, CheckSquare, ArrowRight, BarChart3 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { ErrorState } from "@workspace/ui/components/states/error-state";
-import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { LaunchModal } from "@/components/live/launch-modal";
 import { OptionCard } from "@/components/live/option-card";
-import { Stepper } from "@workspace/ui/components/stepper";
 import { DEFAULT_GROUP_COUNT, MIN_GROUP_COUNT, MAX_GROUP_COUNT } from "@/lib/constants";
 import { fagpratQueries, api } from "@/lib/convex";
 import { PLAY_URL } from "@/lib/env";
@@ -83,7 +83,9 @@ function LiveoktSetupPage() {
       <SessionTopBar title={fagprat.title} onExit={() => setCancelOpen(true)} />
 
       <div className="mx-auto max-w-[1100px] px-4 pt-20 pb-12 sm:px-8 sm:pt-24">
-        <h1 className="mb-6 text-2xl font-extrabold text-foreground sm:mb-8 sm:text-3xl">Oppsett for liveøkt</h1>
+        <h1 className="mb-6 text-2xl font-extrabold text-foreground sm:mb-8 sm:text-3xl">
+          Oppsett for liveøkt
+        </h1>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px] lg:gap-8">
           {/* Left: Options */}
@@ -144,12 +146,7 @@ function LiveoktSetupPage() {
               </div>
 
               {/* Launch button */}
-              <Button
-                variant="teal"
-                className="w-full"
-                onClick={handleLaunch}
-                disabled={launching}
-              >
+              <Button variant="teal" className="w-full" onClick={handleLaunch} disabled={launching}>
                 {launching ? "Oppretter..." : "Neste — opprett lobby"}
                 <ArrowRight className="size-4" />
               </Button>
