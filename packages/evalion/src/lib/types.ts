@@ -21,13 +21,3 @@ export interface FagPratStatement {
   color?: StatementColorName;
   begrunnelse?: string;
 }
-
-export interface FagPratDraft {
-  title: string;
-  concepts: string[];
-  subject: string;
-  level: string;
-  type: FagPratType;
-  statements: FagPratStatement[];
-  visibility?: Visibility;
-}
