@@ -8,6 +8,7 @@ import {
   toStatementsWithId,
   useStatements,
 } from "@workspace/evalion/hooks/use-statements";
+import { useQueryClient } from "@tanstack/react-query";
 import { useMutation } from "convex/react";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -20,7 +21,7 @@ import { ForkunnskapSelector } from "@/components/forkunnskap-selector";
 import { ReddiModal } from "@/components/reddi-modal";
 import { StatementEditor } from "@/components/statement-editor";
 import { VisibilityToggle } from "@/components/visibility-toggle";
-import { api } from "@/lib/convex";
+import { api, fagpratQueries } from "@/lib/convex";
 import { LABEL_CLASS, SUBJECT_OPTIONS, LEVEL_OPTIONS } from "@/lib/constants";
 import type { FagPratType, Visibility } from "@/lib/types";
 
@@ -46,6 +47,7 @@ function LagFagPratPage() {
   const [reddiOpen, setReddiOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const createFagPrat = useMutation(api.fagprats.create);
+  const queryClient = useQueryClient();
   const {
     statements,
     setStatements,
@@ -100,7 +102,7 @@ function LagFagPratPage() {
     if (!forkunnskap) return;
     setSaving(true);
     try {
-      const id = await createFagPrat({
+      const fagprat = await createFagPrat({
         title: title.trim(),
         subject: fag,
         level: trinn,
@@ -109,7 +111,8 @@ function LagFagPratPage() {
         statements: toStatementPayload(statements),
         visibility,
       });
-      navigate({ to: "/fagprat/$id", params: { id } });
+      queryClient.setQueryData(fagpratQueries.getById(fagprat._id).queryKey, fagprat);
+      navigate({ to: "/fagprat/$id", params: { id: fagprat._id } });
     } catch {
       toast.error("Kunne ikke lagre FagPraten. Prøv igjen.");
     } finally {

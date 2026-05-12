@@ -58,13 +58,16 @@ export const create = mutation({
       throw new Error("Concept too long (max 100 characters)");
     if (args.statements.length > 20) throw new Error("Too many statements (max 20)");
 
-    return await ctx.db.insert("fagprats", {
+    const id = await ctx.db.insert("fagprats", {
       ...args,
       usageCount: 0,
       authorId: identity.subject,
       authorName: identity.name ?? "Ukjent",
       updatedAt: Date.now(),
     });
+    const doc = await ctx.db.get(id);
+    if (!doc) throw new Error("Failed to read inserted FagPrat");
+    return doc;
   },
 });
 
