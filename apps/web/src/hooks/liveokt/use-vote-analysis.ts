@@ -34,6 +34,11 @@ export interface VoteAnalysis {
   totalChanged: number;
   avgConfidenceR1?: number;
   avgConfidenceR2?: number;
+  avgConfidenceR1ByVote: {
+    sant?: number;
+    delvis?: number;
+    usant?: number;
+  };
   avgConfidenceR2ByVote: {
     sant?: number;
     delvis?: number;
@@ -93,6 +98,11 @@ export function useVoteAnalysis({ votes, analytics, step }: VoteAnalysisInput): 
       totalChanged,
       avgConfidenceR1: avgConfidence(r1),
       avgConfidenceR2: avgConfidence(r2),
+      avgConfidenceR1ByVote: {
+        sant: avgConfidence(r1.filter((v) => v.vote === "sant")),
+        delvis: avgConfidence(r1.filter((v) => v.vote === "delvis")),
+        usant: avgConfidence(r1.filter((v) => v.vote === "usant")),
+      },
       avgConfidenceR2ByVote: {
         sant: avgConfidence(r2.filter((v) => v.vote === "sant")),
         delvis: avgConfidence(r2.filter((v) => v.vote === "delvis")),

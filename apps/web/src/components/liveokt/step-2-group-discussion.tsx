@@ -1,5 +1,6 @@
 import { BackButton } from "@workspace/evalion/components/live/back-button";
 import { BegrunnelseCard } from "@workspace/evalion/components/live/begrunnelse-card";
+import { BreakdownRow } from "@workspace/evalion/components/live/breakdown-row";
 import { DistributionChart } from "@workspace/evalion/components/live/distribution-chart";
 import { PanelTabs } from "@workspace/evalion/components/live/panel-tabs";
 import { Professor } from "@workspace/evalion/components/live/professor";
@@ -9,7 +10,8 @@ import { formatDecimal1 } from "@workspace/evalion/lib/format";
 import { PanelCard } from "@workspace/ui/components/panel-card";
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { StatementCard } from "@workspace/ui/components/statement-card";
-import { Smartphone } from "lucide-react";
+import { BarChart3, Smartphone } from "lucide-react";
+import { useState } from "react";
 
 import type { TeacherStep } from "@/types/teacher-step";
 
@@ -25,10 +27,13 @@ export function useStep2(): TeacherStep {
     voteBars,
     totalVotes,
     activeRoundVotes,
+    avgConfidenceR1,
+    avgConfidenceR1ByVote,
     selectedIdx,
     goToStep,
   } = useTeacherSession();
   const begrunnelseTab = panelTab === "default" || panelTab === "begrunnelser";
+  const [showAvgBreakdown, setShowAvgBreakdown] = useState(false);
 
   const statementColor = resolveStatementHex(statement?.color, selectedIdx);
 
@@ -64,11 +69,6 @@ export function useStep2(): TeacherStep {
     ? activeRoundVotes.find((v) => v.studentId === highlighted.studentId)?.vote
     : undefined;
 
-  const withConfidence = activeRoundVotes.filter((v) => typeof v.confidence === "number");
-  const avgConfidence = withConfidence.length
-    ? withConfidence.reduce((sum, v) => sum + (v.confidence ?? 0), 0) / withConfidence.length
-    : null;
-
   const panel = (
     <div className="flex h-full min-h-0 flex-col gap-3">
       <PanelSectionLabel>Elevsvar – Første stemmerunde</PanelSectionLabel>
@@ -80,9 +80,9 @@ export function useStep2(): TeacherStep {
         activeTab={begrunnelseTab ? "begrunnelser" : "stemmefordeling"}
         onTabChange={setPanelTab}
       >
-        <PanelCard gap="2">
-          {begrunnelseTab ? (
-            highlighted ? (
+        {begrunnelseTab ? (
+          <PanelCard gap="2">
+            {highlighted ? (
               <div className="flex flex-col gap-2">
                 <p className="px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-highlight-strip-text)]">
                   Fremhevet
@@ -102,30 +102,51 @@ export function useStep2(): TeacherStep {
                   dem her.
                 </p>
               </div>
-            )
-          ) : (
-            <div className="flex h-full flex-col gap-2">
+            )}
+          </PanelCard>
+        ) : (
+          <PanelCard>
+            <div className="relative flex items-center justify-between gap-2">
+              <span className="text-sm font-semibold text-[var(--color-text-ink-soft)]">
+                Gjennomsnittlig sikkerhet:
+              </span>
               <div className="flex items-center gap-2">
-                <span className="flex-1 text-sm font-semibold text-[var(--color-text-ink-soft)]">
-                  Gjennomsnittlig sikkerhet:
-                </span>
                 <span className="font-mono text-xl font-extrabold leading-none tabular-nums text-[var(--color-turkis-500)]">
-                  {formatDecimal1(avgConfidence)}
+                  {formatDecimal1(avgConfidenceR1)}
                 </span>
+                <button
+                  type="button"
+                  aria-label="Vis sikkerhet fordelt på kategori"
+                  aria-pressed={showAvgBreakdown}
+                  onClick={() => setShowAvgBreakdown((s) => !s)}
+                  className={
+                    "flex size-8 items-center justify-center rounded-xl border-[1.5px] border-[var(--color-divider-soft)] text-[var(--color-text-ink-faint)] transition-colors " +
+                    (showAvgBreakdown
+                      ? "bg-[var(--color-divider-soft)] text-[var(--color-text-ink-soft)]"
+                      : "bg-white hover:bg-[var(--color-divider-soft)]")
+                  }
+                >
+                  <BarChart3 className="size-4" strokeWidth={2} />
+                </button>
               </div>
-              <div className="h-px bg-[var(--color-divider-soft)]" />
-              <div className="flex-1 min-h-0 py-2">
-                <DistributionChart
-                  key={`s${selectedIdx}-discussion`}
-                  bars={voteBars}
-                  total={totalVotes}
-                  // No correctKey — keep bars gray until step 4 reveal so
-                  // students aren't influenced toward the answer during discussion.
-                />
-              </div>
+              {showAvgBreakdown && (
+                <div className="absolute top-full right-0 z-10 mt-2 flex min-w-[160px] flex-col gap-1.5 rounded-xl border-[1.5px] border-[var(--color-divider-soft)] bg-white p-3 shadow-[var(--shadow-card-soft)]">
+                  <BreakdownRow label="Sant:" value={avgConfidenceR1ByVote.sant} />
+                  <BreakdownRow label="Delvis sant:" value={avgConfidenceR1ByVote.delvis} />
+                  <BreakdownRow label="Usant:" value={avgConfidenceR1ByVote.usant} />
+                </div>
+              )}
             </div>
-          )}
-        </PanelCard>
+            <div className="h-px bg-[var(--color-divider-soft)]" />
+            <div className="flex-1 min-h-0 py-2">
+              <DistributionChart
+                key={`s${selectedIdx}-discussion`}
+                bars={voteBars}
+                total={totalVotes}
+              />
+            </div>
+          </PanelCard>
+        )}
       </PanelTabs>
     </div>
   );
