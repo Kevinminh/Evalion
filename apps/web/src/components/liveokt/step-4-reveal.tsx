@@ -59,33 +59,37 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
           )
         }
         professor={
-          countdownDone && statement ? (
-            <Professor
-              size="md"
-              bordered
-              animate
-              textSize="lg"
-              text={
-                <>
-                  Hvorfor er denne påstanden <strong>{FASIT_TEXT[statement.fasit]}</strong>?
-                </>
-              }
-            />
-          ) : (
-            <Professor
-              size="md"
-              bordered
-              animate
-              textSize="lg"
-              text={
-                <>
-                  Har du endret mening etter diskusjonen?
-                  <br />
-                  Stem på nytt!
-                </>
-              }
-            />
-          )
+          // Remount on countdownDone so the mockup's pre→post text swap fades
+          // in (via fadeInUp with a 200ms delay) instead of switching instantly.
+          <div key={countdownDone ? "after" : "before"} className="animate-fade-in-up">
+            {countdownDone && statement ? (
+              <Professor
+                size="md"
+                bordered
+                animate
+                textSize="lg"
+                text={
+                  <>
+                    Hvorfor er denne påstanden <strong>{FASIT_TEXT[statement.fasit]}</strong>?
+                  </>
+                }
+              />
+            ) : (
+              <Professor
+                size="md"
+                bordered
+                animate
+                textSize="lg"
+                text={
+                  <>
+                    Har du endret mening etter diskusjonen?
+                    <br />
+                    Stem på nytt!
+                  </>
+                }
+              />
+            )}
+          </div>
         }
       />
     </>

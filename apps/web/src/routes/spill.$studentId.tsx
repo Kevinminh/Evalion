@@ -112,6 +112,7 @@ function StudentGameLayout({ onLeave }: { onLeave: () => void }) {
         stepLabel={session.status === "lobby" ? "Lobby" : undefined}
         onLeave={() => setShowLeaveConfirm(true)}
         rightSlot={<StudentTimerBadge />}
+        hideStepBadge={!!session.timerStartedAt}
       />
 
       <div

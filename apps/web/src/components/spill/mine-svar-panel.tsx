@@ -112,7 +112,7 @@ export function MineSvarPanel() {
         onClick={() => setOpen(true)}
         title="Mine svar"
         aria-label="Mine svar"
-        className="fixed bottom-6 left-4 z-40 flex size-10 items-center justify-center rounded-full bg-neutral-400 text-white shadow-md transition-all hover:scale-110 hover:bg-neutral-500 active:scale-95"
+        className="fixed bottom-[27px] left-[14px] z-40 flex size-10 items-center justify-center rounded-full bg-neutral-400 text-white shadow-md transition-all hover:scale-110 hover:bg-neutral-500 active:scale-95"
       >
         <MessageSquare className="size-5" strokeWidth={2} />
       </button>

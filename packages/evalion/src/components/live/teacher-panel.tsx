@@ -30,6 +30,10 @@ interface TeacherPanelProps {
   onOpenChange?: (open: boolean) => void;
   /** Pulse the toggle when the panel is closed to hint that a panel exists. */
   attentionWhenClosed?: boolean;
+  /** When this flips from false to true, the panel auto-collapses (matches the
+   * mockup behavior on steg 1/3 where starting the timer focuses the main
+   * area). The teacher can re-open the panel manually. */
+  forceCollapse?: boolean;
 }
 
 export function TeacherPanel({
@@ -38,6 +42,7 @@ export function TeacherPanel({
   footer,
   onOpenChange,
   attentionWhenClosed = false,
+  forceCollapse = false,
 }: TeacherPanelProps) {
   const isMobile = useIsMobile();
 
@@ -58,6 +63,14 @@ export function TeacherPanel({
       onOpenChange?.(false);
     }
   }, [isMobile]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (forceCollapse && open) {
+      setOpen(false);
+      onOpenChange?.(false);
+      if (!isMobile) localStorage.setItem(STORAGE_KEY, "true");
+    }
+  }, [forceCollapse]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggle = () => {
     const next = !open;

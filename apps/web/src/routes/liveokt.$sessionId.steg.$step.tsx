@@ -177,8 +177,13 @@ function TeacherSessionLayout() {
         </main>
         {teacherStep && (
           <TeacherPanel
-            defaultOpen={step !== 5}
-            attentionWhenClosed={timerIsRunning}
+            // Mockup auto-collapses the panel on steg 2/4/5 to draw the
+            // teacher's attention toward the main content (recording, fasit
+            // reveal, explanation) and pulses the toggle so the panel is
+            // discoverable. On steg 1/3 it only pulses while the timer runs.
+            defaultOpen={step !== 2 && step !== 4 && step !== 5}
+            attentionWhenClosed={step === 2 || step === 4 || step === 5 || timerIsRunning}
+            forceCollapse={timerIsRunning && (step === 1 || step === 3)}
             footer={
               teacherStep.panelFooter === null ? null : (
                 <PanelFooter footer={teacherStep.panelFooter} />
