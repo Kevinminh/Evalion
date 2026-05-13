@@ -1,5 +1,4 @@
 import { convexQuery } from "@convex-dev/react-query";
-import type { ConvexHttpClient } from "convex/browser";
 
 import { api } from "@workspace/backend/convex/_generated/api";
 
@@ -12,7 +11,3 @@ export const pastandDraftsMutations = {
   appendStatements: api.pastandDrafts.appendStatements,
   setLastParams: api.pastandDrafts.setLastParams,
 } as const;
-
-export const pastandDraftsFetch = {
-  get: (client: ConvexHttpClient) => client.query(api.pastandDrafts.get, {}),
-};

@@ -14,10 +14,13 @@ export type FagPratType = "intro" | "oppsummering";
 export type Visibility = "public" | "private";
 export type StatementColorName = "yellow" | "blue" | "orange" | "purple" | "red";
 
-// Pass "skip" instead of an Id to opt the underlying Convex subscription out
-// entirely — `enabled: false` on the wrapping useQuery does NOT prevent the
-// WebSocket subscription, only the queryFn execution.
-export type Skip = "skip";
+/**
+ * Sentinel passed instead of args to opt the underlying Convex subscription
+ * out entirely — `enabled: false` on the wrapping useQuery does NOT close
+ * the WebSocket subscription, only short-circuits the queryFn execution.
+ */
+export const SKIP = "skip" as const;
+export type Skip = typeof SKIP;
 
 // ── Interfaces ──────────────────────────────────────────────────────────────
 export interface FagPratStatement {
