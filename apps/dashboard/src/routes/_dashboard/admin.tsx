@@ -149,18 +149,16 @@ function CurrentLiveSessionsSection() {
             <Card key={session._id} size="sm">
               <CardHeader>
                 <CardTitle>{session.fagpratTitle}</CardTitle>
-                <CardDescription>
-                  <span className="inline-flex flex-wrap items-center gap-2">
-                    {session.status === "active" ? (
-                      <Badge variant="default">I gang</Badge>
-                    ) : (
-                      <Badge variant="outline">Venter på elever</Badge>
-                    )}
-                    <span className="inline-block rounded-lg bg-muted px-2 py-0.5 text-xs font-semibold tracking-wide text-muted-foreground">
-                      Kode {session.joinCode}
-                    </span>
-                    <span>{session.studentCount} elever</span>
+                <CardDescription className="flex flex-wrap items-center gap-2">
+                  {session.status === "active" ? (
+                    <Badge variant="default">I gang</Badge>
+                  ) : (
+                    <Badge variant="outline">Venter på elever</Badge>
+                  )}
+                  <span className="rounded-lg bg-muted px-2 py-0.5 text-xs font-semibold tracking-wide text-muted-foreground">
+                    Kode {session.joinCode}
                   </span>
+                  <span>{session.studentCount} elever</span>
                 </CardDescription>
                 <CardAction>
                   <div className="flex items-center gap-2">

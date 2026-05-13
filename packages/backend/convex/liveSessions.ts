@@ -55,90 +55,56 @@ const AVATAR_EMOJIS = [
 
 // ── Session queries ──
 
+async function listTeacherSessionsWhere(
+  ctx: QueryCtx,
+  predicate: (status: Doc<"liveSessions">["status"]) => boolean,
+) {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    return [];
+  }
+  const sessions = await ctx.db
+    .query("liveSessions")
+    .withIndex("by_teacher", (q) => q.eq("teacherId", identity.subject))
+    .order("desc")
+    .collect();
+
+  const filtered = sessions.filter((s) => predicate(s.status));
+
+  const uniqueFagpratIds = [...new Set(filtered.map((s) => s.fagpratId))];
+  const fagpratEntries = await Promise.all(
+    uniqueFagpratIds.map(async (id) => [id, await ctx.db.get(id)] as const),
+  );
+  const fagpratMap = new Map(fagpratEntries);
+
+  const allStudents = await Promise.all(
+    filtered.map((session) =>
+      ctx.db
+        .query("sessionStudents")
+        .withIndex("by_session", (q) => q.eq("sessionId", session._id))
+        .collect(),
+    ),
+  );
+  const studentCountMap = new Map<string, number>();
+  for (let i = 0; i < filtered.length; i++) {
+    studentCountMap.set(filtered[i]!._id, allStudents[i]!.length);
+  }
+
+  return filtered.map((session) => ({
+    ...session,
+    fagpratTitle: fagpratMap.get(session.fagpratId)?.title ?? "Slettet FagPrat",
+    studentCount: studentCountMap.get(session._id) ?? 0,
+  }));
+}
+
 export const listByTeacher = query({
   args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      return [];
-    }
-    const sessions = await ctx.db
-      .query("liveSessions")
-      .withIndex("by_teacher", (q) => q.eq("teacherId", identity.subject))
-      .order("desc")
-      .collect();
-
-    const ended = sessions.filter((s) => s.status === "ended");
-
-    // Deduplicate fagprat lookups to avoid redundant queries
-    const uniqueFagpratIds = [...new Set(ended.map((s) => s.fagpratId))];
-    const fagpratEntries = await Promise.all(
-      uniqueFagpratIds.map(async (id) => [id, await ctx.db.get(id)] as const),
-    );
-    const fagpratMap = new Map(fagpratEntries);
-
-    // Batch-fetch all students for ended sessions and count by session
-    const allStudents = await Promise.all(
-      ended.map((session) =>
-        ctx.db
-          .query("sessionStudents")
-          .withIndex("by_session", (q) => q.eq("sessionId", session._id))
-          .collect(),
-      ),
-    );
-    const studentCountMap = new Map<string, number>();
-    for (let i = 0; i < ended.length; i++) {
-      studentCountMap.set(ended[i]!._id, allStudents[i]!.length);
-    }
-
-    return ended.map((session) => ({
-      ...session,
-      fagpratTitle: fagpratMap.get(session.fagpratId)?.title ?? "Slettet FagPrat",
-      studentCount: studentCountMap.get(session._id) ?? 0,
-    }));
-  },
+  handler: (ctx) => listTeacherSessionsWhere(ctx, (status) => status === "ended"),
 });
 
 export const listCurrentByTeacher = query({
   args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      return [];
-    }
-    const sessions = await ctx.db
-      .query("liveSessions")
-      .withIndex("by_teacher", (q) => q.eq("teacherId", identity.subject))
-      .order("desc")
-      .collect();
-
-    const current = sessions.filter((s) => s.status !== "ended");
-
-    const uniqueFagpratIds = [...new Set(current.map((s) => s.fagpratId))];
-    const fagpratEntries = await Promise.all(
-      uniqueFagpratIds.map(async (id) => [id, await ctx.db.get(id)] as const),
-    );
-    const fagpratMap = new Map(fagpratEntries);
-
-    const allStudents = await Promise.all(
-      current.map((session) =>
-        ctx.db
-          .query("sessionStudents")
-          .withIndex("by_session", (q) => q.eq("sessionId", session._id))
-          .collect(),
-      ),
-    );
-    const studentCountMap = new Map<string, number>();
-    for (let i = 0; i < current.length; i++) {
-      studentCountMap.set(current[i]!._id, allStudents[i]!.length);
-    }
-
-    return current.map((session) => ({
-      ...session,
-      fagpratTitle: fagpratMap.get(session.fagpratId)?.title ?? "Slettet FagPrat",
-      studentCount: studentCountMap.get(session._id) ?? 0,
-    }));
-  },
+  handler: (ctx) => listTeacherSessionsWhere(ctx, (status) => status !== "ended"),
 });
 
 export const getById = query({
