@@ -14,7 +14,6 @@ interface DistributionBar {
 interface DistributionChartProps {
   bars: DistributionBar[];
   total: number;
-  height?: number;
   /** Marks the bar whose `key` matches as the correct answer (extrabold + accent). */
   correctKey?: string;
 }
@@ -34,11 +33,10 @@ const CORRECT_TEXT_HEX: Record<string, string> = {
 export function DistributionChart({
   bars,
   total,
-  height = 160,
   correctKey,
 }: DistributionChartProps) {
   return (
-    <div className="flex w-full gap-4" style={{ height }}>
+    <div className="flex h-full w-full gap-4">
       {bars.map((bar) => {
         const pct = total > 0 ? Math.round((bar.value / total) * 100) : 0;
         const isCorrect = correctKey !== undefined && bar.key === correctKey;
