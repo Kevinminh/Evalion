@@ -7,7 +7,6 @@ import { TeacherStepLayout } from "@workspace/evalion/components/live/teacher-st
 import { resolveStatementHex } from "@workspace/evalion/lib/constants";
 import { formatDecimal1, percentage } from "@workspace/evalion/lib/format";
 import type { Fasit } from "@workspace/evalion/lib/types";
-import { DestructiveButton } from "@workspace/ui/components/destructive-button";
 import { PanelCard } from "@workspace/ui/components/panel-card";
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
@@ -139,7 +138,6 @@ export function useStep6(): TeacherStep {
     usedStatements,
     markStatementUsed,
     goToStep,
-    endSession,
     ratingDistribution,
     avgRating,
     r1Votes,
@@ -263,25 +261,18 @@ export function useStep6(): TeacherStep {
     fagprat.statements.length - usedStatements.size - (usedStatements.has(selectedIdx) ? 0 : 1);
   const hasMoreStatements = unusedCount > 0;
 
-  const panelFooter = (
-    <div className="flex gap-2">
-      {hasMoreStatements && (
-        <PrimaryActionButton
-          className="flex-1"
-          onClick={() => {
-            markStatementUsed(selectedIdx);
-            goToStep(0);
-          }}
-        >
-          Neste påstand
-          <ArrowRight className="size-4" />
-        </PrimaryActionButton>
-      )}
-      <DestructiveButton className="flex-1" onClick={endSession}>
-        Avslutt
-      </DestructiveButton>
-    </div>
-  );
+  const panelFooter = hasMoreStatements ? (
+    <PrimaryActionButton
+      className="w-full"
+      onClick={() => {
+        markStatementUsed(selectedIdx);
+        goToStep(0);
+      }}
+    >
+      Neste påstand
+      <ArrowRight className="size-4" />
+    </PrimaryActionButton>
+  ) : null;
 
   return { main, panel, panelFooter };
 }

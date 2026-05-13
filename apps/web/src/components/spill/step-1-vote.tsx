@@ -72,8 +72,8 @@ export function Step1Vote() {
       <div
         className={
           formDisabled
-            ? "pointer-events-none flex w-full max-w-md flex-col items-stretch gap-5 opacity-40 transition-opacity"
-            : "flex w-full max-w-md flex-col items-stretch gap-5 transition-opacity"
+            ? "pointer-events-none flex w-full max-w-md flex-col items-stretch gap-5 opacity-40 transition-opacity md:max-w-lg lg:max-w-2xl"
+            : "flex w-full max-w-md flex-col items-stretch gap-5 transition-opacity md:max-w-lg lg:max-w-2xl"
         }
         aria-disabled={formDisabled}
       >

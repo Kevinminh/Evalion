@@ -118,7 +118,7 @@ function StudentGameLayout({ onLeave }: { onLeave: () => void }) {
       <div
         className={cn(
           "flex w-full flex-col items-center pt-8",
-          useWideLayout ? "max-w-3xl" : "max-w-md",
+          useWideLayout ? "max-w-3xl" : "max-w-md md:max-w-lg lg:max-w-2xl",
         )}
       >
         <StudentGameContent onLeave={onLeave} />
