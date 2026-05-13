@@ -138,7 +138,7 @@ function LagFagPratPage() {
 
           {/* Viktige begreper */}
           <div className="mb-6">
-            <ConceptTags concepts={concepts} onChange={setConcepts} showAiButton />
+            <ConceptTags concepts={concepts} onChange={setConcepts} />
           </div>
 
           {/* Synlighet */}

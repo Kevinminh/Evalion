@@ -1,10 +1,9 @@
 import type { StatementWithId } from "@workspace/evalion/hooks/use-statements";
 import { cn } from "@workspace/ui/lib/utils";
-import { ChevronDown, GripVertical, ImageIcon, Sparkles, Trash2 } from "lucide-react";
+import { ChevronDown, GripVertical, Trash2 } from "lucide-react";
 import { Reorder, useDragControls } from "motion/react";
 import { useRef, useState } from "react";
 
-import { ComingSoonButton } from "@/components/coming-soon-button";
 import { FASIT_OPTIONS } from "@/lib/fasit-config";
 import { useClickOutside } from "@/lib/use-click-outside";
 import type { Fasit } from "@/lib/types";
@@ -129,11 +128,6 @@ export function StatementEditor({
           >
             <GripVertical className="size-4" />
           </button>
-          <ComingSoonButton
-            icon={<Sparkles className="size-4" />}
-            ariaLabel="Foreslå med AI"
-            className={cn(ACTION_BTN_CLASS, "p-0")}
-          />
           <button
             type="button"
             onClick={onDelete}
@@ -160,11 +154,6 @@ export function StatementEditor({
           placeholder="Skriv en påstand..."
           className="flex-1 rounded-lg border-[1.5px] border-border bg-muted/40 px-4 py-3 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-primary focus:bg-card focus:ring-3 focus:ring-primary/20"
         />
-        <ComingSoonButton
-          icon={<ImageIcon className="size-5" />}
-          ariaLabel="Legg til bilde for påstand"
-          className="flex w-11 shrink-0 items-center justify-center self-stretch rounded-lg border-[1.5px] border-dashed border-neutral-300 bg-card p-0"
-        />
       </div>
 
       {/* Bottom: Fasit + Forklaring */}
@@ -186,11 +175,6 @@ export function StatementEditor({
               onChange={(e) => onExplanationChange(e.target.value)}
               placeholder="Forklar hvorfor svaret er riktig..."
               className="flex-1 rounded-lg border-[1.5px] border-border bg-muted/40 px-4 py-3 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-primary focus:bg-card focus:ring-3 focus:ring-primary/20"
-            />
-            <ComingSoonButton
-              icon={<ImageIcon className="size-5" />}
-              ariaLabel="Legg til bilde for forklaring"
-              className="flex w-11 shrink-0 items-center justify-center self-stretch rounded-lg border-[1.5px] border-dashed border-neutral-300 bg-card p-0"
             />
           </div>
         </div>
