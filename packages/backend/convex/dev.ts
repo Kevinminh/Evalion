@@ -146,60 +146,65 @@ export const castDummyVotes = mutation({
       throw new Error("Round must be 1 or 2");
     }
 
-    const students = await ctx.db
-      .query("sessionStudents")
-      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
-      .collect();
+    const [students, existingVotes, existingBegrunnelser] = await Promise.all([
+      ctx.db
+        .query("sessionStudents")
+        .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
+        .collect(),
+      ctx.db
+        .query("sessionVotes")
+        .withIndex("by_session_statement", (q) =>
+          q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
+        )
+        .collect(),
+      ctx.db
+        .query("sessionBegrunnelser")
+        .withIndex("by_session_statement", (q) =>
+          q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
+        )
+        .collect(),
+    ]);
     const dummies = students.filter((s) => s.isDummy);
+    const votedStudentIds = new Set(
+      existingVotes.filter((v) => v.round === args.round).map((v) => v.studentId),
+    );
+    const begrunnelseStudentIds = new Set(
+      existingBegrunnelser.filter((b) => b.round === args.round).map((b) => b.studentId),
+    );
 
+    const voteInserts: Promise<unknown>[] = [];
+    const begrunnelseInserts: Promise<unknown>[] = [];
     let inserted = 0;
     for (const student of dummies) {
-      const existing = await ctx.db
-        .query("sessionVotes")
-        .withIndex("by_session_statement_student_round", (q) =>
-          q
-            .eq("sessionId", args.sessionId)
-            .eq("statementIndex", args.statementIndex)
-            .eq("studentId", student._id)
-            .eq("round", args.round),
-        )
-        .first();
-      if (existing) continue;
-
+      if (votedStudentIds.has(student._id)) continue;
       const vote = VOTE_OPTIONS[Math.floor(Math.random() * VOTE_OPTIONS.length)]!;
       const confidence = Math.floor(Math.random() * 5) + 1;
-
-      await ctx.db.insert("sessionVotes", {
-        sessionId: args.sessionId,
-        studentId: student._id,
-        statementIndex: args.statementIndex,
-        round: args.round,
-        vote,
-        confidence,
-      });
-      inserted++;
-
-      const existingBegrunnelse = await ctx.db
-        .query("sessionBegrunnelser")
-        .withIndex("by_session_statement_student_round", (q) =>
-          q
-            .eq("sessionId", args.sessionId)
-            .eq("statementIndex", args.statementIndex)
-            .eq("studentId", student._id)
-            .eq("round", args.round),
-        )
-        .first();
-      if (!existingBegrunnelse) {
-        const text = DUMMY_BEGRUNNELSER[Math.floor(Math.random() * DUMMY_BEGRUNNELSER.length)]!;
-        await ctx.db.insert("sessionBegrunnelser", {
+      voteInserts.push(
+        ctx.db.insert("sessionVotes", {
           sessionId: args.sessionId,
           studentId: student._id,
           statementIndex: args.statementIndex,
           round: args.round,
-          text,
-        });
+          vote,
+          confidence,
+        }),
+      );
+      inserted++;
+
+      if (!begrunnelseStudentIds.has(student._id)) {
+        const text = DUMMY_BEGRUNNELSER[Math.floor(Math.random() * DUMMY_BEGRUNNELSER.length)]!;
+        begrunnelseInserts.push(
+          ctx.db.insert("sessionBegrunnelser", {
+            sessionId: args.sessionId,
+            studentId: student._id,
+            statementIndex: args.statementIndex,
+            round: args.round,
+            text,
+          }),
+        );
       }
     }
+    await Promise.all([...voteInserts, ...begrunnelseInserts]);
 
     return { dummyCount: dummies.length, inserted };
   },
