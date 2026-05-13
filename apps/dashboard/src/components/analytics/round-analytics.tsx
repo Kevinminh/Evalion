@@ -240,7 +240,7 @@ export function RoundAnalytics({
         />
       )}
 
-      {matrixSelected === null && <MatrixHint />}
+      <MatrixHint />
     </div>
   );
 }
