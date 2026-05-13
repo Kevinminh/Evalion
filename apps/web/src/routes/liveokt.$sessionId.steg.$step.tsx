@@ -19,6 +19,7 @@ import { DestructiveButton } from "@workspace/ui/components/destructive-button";
 import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
 import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
 import { RecordingButton } from "@/components/liveokt/recording-button";
+import { SessionEndedScreen } from "@/components/liveokt/session-ended-screen";
 import { StatementPicker } from "@/components/liveokt/statement-picker";
 import { useStep1 } from "@/components/liveokt/step-1-vote-in-progress";
 import { useStep2 } from "@/components/liveokt/step-2-group-discussion";
@@ -82,6 +83,10 @@ function LiveStepPage() {
         <p className="text-muted-foreground">FagPrat ikke funnet.</p>
       </EmptyStateMessage>
     );
+  }
+
+  if (session.status === "ended") {
+    return <SessionEndedScreen />;
   }
 
   if (step > 0 && !fagprat.statements[selectedIdx]) {

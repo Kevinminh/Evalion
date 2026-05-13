@@ -11,6 +11,7 @@ import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 import { Users } from "lucide-react";
 
 import { JoinCard } from "@/components/liveokt/lobby/join-card";
+import { SessionEndedScreen } from "@/components/liveokt/session-ended-screen";
 import { StudentGrid } from "@/components/liveokt/lobby/student-grid";
 import { useLobbyActions } from "@/hooks/liveokt/use-lobby-actions";
 import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
@@ -66,6 +67,10 @@ function TeacherLobbyPage() {
         <p className="text-muted-foreground">Økt ikke funnet.</p>
       </EmptyStateMessage>
     );
+  }
+
+  if (session.status === "ended") {
+    return <SessionEndedScreen />;
   }
 
   const studentList = students ?? [];
