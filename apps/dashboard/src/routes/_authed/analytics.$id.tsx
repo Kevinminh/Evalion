@@ -1,7 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { api } from "@workspace/backend/convex/_generated/api";
 import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
+import { Button } from "@workspace/ui/components/button";
+import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
@@ -61,6 +63,7 @@ function AnalyticsPage() {
   if (sessionPending) return <AnalyticsSkeleton />;
   if (sessionError) return <ErrorState className="flex min-h-svh items-center justify-center" />;
   if (!session) return <NotFoundState className="flex min-h-svh items-center justify-center" />;
+  if (session.status === "ended") return <SessionEndedScreen />;
 
   const statementText = session.statements[selectedStatement]?.text ?? "";
   const fasit = session.statements[selectedStatement]?.fasit ?? "sant";
@@ -151,6 +154,18 @@ function AnalyticsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+function SessionEndedScreen() {
+  return (
+    <EmptyStateMessage>
+      <h1 className="font-heading text-2xl font-medium">Økten er avsluttet</h1>
+      <p className="text-muted-foreground">Stemmene er talt opp og aktiviteten er ferdig.</p>
+      <Button render={<Link to="/min-samling" />} size="sm" className="mt-2">
+        Gå til Min samling
+      </Button>
+    </EmptyStateMessage>
   );
 }
 
