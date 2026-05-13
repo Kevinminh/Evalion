@@ -102,7 +102,14 @@ function FagPratCardImpl({ fagprat, variant }: FagPratCardProps) {
         <TypeIcon type={fagprat.type} />
       </div>
 
-      <h3 className="fp-card-title">{fagprat.title}</h3>
+      <h3 className="fp-card-title flex items-center gap-2">
+        {fagprat.title}
+        {isPublic ? (
+          <Globe className="size-4 shrink-0 text-muted-foreground" />
+        ) : (
+          <Lock className="size-4 shrink-0 text-muted-foreground" />
+        )}
+      </h3>
       <p className="fp-card-count">{fagprat.statementsCount} påstander</p>
 
       {variant === "browse" ? (
