@@ -122,14 +122,6 @@ export function StatementEditor({
         <div className="flex gap-1">
           <button
             type="button"
-            aria-label="Dra for å sortere"
-            onPointerDown={(e) => dragControls.start(e)}
-            className={cn(ACTION_BTN_CLASS, "cursor-grab touch-none select-none active:cursor-grabbing")}
-          >
-            <GripVertical className="size-4" />
-          </button>
-          <button
-            type="button"
             onClick={onDelete}
             aria-label="Slett påstand"
             className={cn(
@@ -138,6 +130,14 @@ export function StatementEditor({
             )}
           >
             <Trash2 className="size-4" />
+          </button>
+          <button
+            type="button"
+            aria-label="Dra for å sortere"
+            onPointerDown={(e) => dragControls.start(e)}
+            className={cn(ACTION_BTN_CLASS, "cursor-grab touch-none select-none active:cursor-grabbing")}
+          >
+            <GripVertical className="size-4" />
           </button>
         </div>
       </div>
