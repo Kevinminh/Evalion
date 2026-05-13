@@ -1,4 +1,7 @@
+import { convexQuery } from "@convex-dev/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { api } from "@workspace/backend/convex/_generated/api";
 import { UserMenu } from "@workspace/features/components/auth/user-menu";
 import { authClient } from "@workspace/features/lib/auth-client";
 import { Button } from "@workspace/ui/components/button";
@@ -14,7 +17,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@workspace/ui/components/sidebar";
-import { Search, FolderOpen, Clock, Plus, Settings, HelpCircle } from "lucide-react";
+import { Search, FolderOpen, Clock, Plus, Settings, HelpCircle, ShieldCheck } from "lucide-react";
 import type { ComponentProps } from "react";
 
 const navItems = [
@@ -27,6 +30,8 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
   const matchRoute = useMatchRoute();
   const navigate = useNavigate();
   const { data: session } = authClient.useSession();
+  const { data: me } = useQuery(convexQuery(api.users.getMe, {}));
+  const isAdmin = me?.role === "admin";
   const isActive = (path: string) => {
     if (path === "/") return matchRoute({ to: "/", fuzzy: false });
     return matchRoute({ to: path, fuzzy: true });
@@ -70,6 +75,18 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              {isAdmin && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    isActive={!!isActive("/admin")}
+                    tooltip="Admin"
+                    render={<Link to="/admin" />}
+                  >
+                    <ShieldCheck />
+                    <span>Admin</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

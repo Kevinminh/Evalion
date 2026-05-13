@@ -69,6 +69,7 @@ export default defineSchema({
     avatarColor: v.string(),
     avatarEmoji: v.optional(v.string()),
     groupIndex: v.optional(v.number()),
+    isDummy: v.optional(v.boolean()),
   }).index("by_session", ["sessionId"]),
 
   sessionVotes: defineTable({
@@ -80,7 +81,12 @@ export default defineSchema({
     confidence: v.optional(v.number()),
   })
     .index("by_session_statement", ["sessionId", "statementIndex"])
-    .index("by_session_statement_student_round", ["sessionId", "statementIndex", "studentId", "round"]),
+    .index("by_session_statement_student_round", [
+      "sessionId",
+      "statementIndex",
+      "studentId",
+      "round",
+    ]),
 
   sessionRatings: defineTable({
     sessionId: v.id("liveSessions"),
@@ -100,7 +106,12 @@ export default defineSchema({
     highlighted: v.optional(v.boolean()),
   })
     .index("by_session_statement", ["sessionId", "statementIndex"])
-    .index("by_session_statement_student_round", ["sessionId", "statementIndex", "studentId", "round"])
+    .index("by_session_statement_student_round", [
+      "sessionId",
+      "statementIndex",
+      "studentId",
+      "round",
+    ])
     .index("by_session_student", ["sessionId", "studentId"]),
 
   emailSubscribers: defineTable({
@@ -114,23 +125,26 @@ export default defineSchema({
       v.object({
         clientId: v.string(),
         text: v.string(),
-        fasit: v.optional(
-          v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis")),
-        ),
+        fasit: v.optional(v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis"))),
         forklaring: v.string(),
       }),
     ),
     lastFag: v.optional(v.string()),
     lastTrinn: v.optional(v.string()),
-    lastForkunnskap: v.optional(
-      v.union(v.literal("intro"), v.literal("oppsummering")),
-    ),
+    lastForkunnskap: v.optional(v.union(v.literal("intro"), v.literal("oppsummering"))),
     updatedAt: v.number(),
   }).index("by_user", ["userId"]),
 
   aiPrompts: defineTable({
     key: v.string(),
     content: v.string(),
+    updatedAt: v.number(),
+    updatedBy: v.optional(v.string()),
+  }).index("by_key", ["key"]),
+
+  featureFlags: defineTable({
+    key: v.string(),
+    enabled: v.boolean(),
     updatedAt: v.number(),
     updatedBy: v.optional(v.string()),
   }).index("by_key", ["key"]),
