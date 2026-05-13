@@ -157,42 +157,53 @@ function FagPratCardImpl({ fagprat, variant }: FagPratCardProps) {
             >
               ⋮
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" sideOffset={4}>
-              <DropdownMenuItem onClick={handleDuplicate} disabled={duplicating}>
-                <Copy className="size-4" />
+            <DropdownMenuContent align="end" sideOffset={6} className="card-menu-content">
+              <DropdownMenuItem
+                className="card-menu-item"
+                onClick={handleDuplicate}
+                disabled={duplicating}
+              >
+                <Copy className="group-focus/dropdown-menu-item:!text-inherit" />
                 {duplicating ? "Dupliserer..." : "Dupliser"}
               </DropdownMenuItem>
               <DropdownMenuItem
+                className="card-menu-item"
                 onClick={(e) => {
                   e.stopPropagation();
                   setShareOpen(true);
                 }}
               >
-                <Share2 className="size-4" />
+                <Share2 className="hover:text-inherit!" />
                 Del
               </DropdownMenuItem>
               <DropdownMenuItem
+                className="card-menu-item"
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate({ to: "/fagprat/$id/pdf", params: { id: fagprat._id } });
                 }}
               >
-                <FileText className="size-4" />
+                <FileText className="group-focus/dropdown-menu-item:!text-inherit" />
                 Lag PDF
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleToggleVisibility}>
-                {isPublic ? <Lock className="size-4" /> : <Globe className="size-4" />}
+              <DropdownMenuItem className="card-menu-item" onClick={handleToggleVisibility}>
+                {isPublic ? (
+                  <Lock className="group-focus/dropdown-menu-item:!text-inherit" />
+                ) : (
+                  <Globe className="group-focus/dropdown-menu-item:!text-inherit" />
+                )}
                 {isPublic ? "Gjør privat" : "Gjør offentlig"}
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className="card-menu-separator" />
               <DropdownMenuItem
+                className="card-menu-item"
                 variant="destructive"
                 onClick={(e) => {
                   e.stopPropagation();
                   setDeleteOpen(true);
                 }}
               >
-                <Trash2 className="size-4" />
+                <Trash2 className="group-focus/dropdown-menu-item:!text-inherit" />
                 Slett
               </DropdownMenuItem>
             </DropdownMenuContent>
