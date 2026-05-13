@@ -106,13 +106,17 @@ function FagPratPreviewPage() {
                   <MoreVertical className="size-4" />
                   Mer
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" sideOffset={4}>
-                  <DropdownMenuItem onClick={handleDuplicate}>
+                <DropdownMenuContent align="end" sideOffset={4} className="card-menu-content">
+                  <DropdownMenuItem className="card-menu-item" onClick={handleDuplicate}>
                     <Copy className="size-4" />
                     Dupliser
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
+                  <DropdownMenuSeparator className="card-menu-separator" />
+                  <DropdownMenuItem
+                    className="card-menu-item"
+                    variant="destructive"
+                    onClick={() => setDeleteOpen(true)}
+                  >
                     <Trash2 className="size-4" />
                     Slett
                   </DropdownMenuItem>
