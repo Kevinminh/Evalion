@@ -3,10 +3,11 @@ import { EndringerCard } from "@workspace/features/components/live/endringer-car
 import { FasitBadge } from "@workspace/features/components/live/fasit-badge";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 
+import { sessionVotesQueries } from "@workspace/api/sessionVotes";
+import type { Id } from "@workspace/api/types";
+
 import { AnalyticsRatingChart } from "@/components/analytics/rating-chart-analytics";
 import { VoteChart } from "@/components/analytics/vote-chart";
-import { liveSessionQueries } from "@/lib/convex";
-import type { Id } from "@workspace/api/types";
 import type { Fasit } from "@/lib/types";
 
 interface StatementAnalyticsProps {
@@ -23,7 +24,7 @@ export function StatementAnalytics({
   fasit,
 }: StatementAnalyticsProps) {
   const { data: analytics, isPending } = useQuery(
-    liveSessionQueries.getVoteAnalytics(sessionId, statementIndex),
+    sessionVotesQueries.analytics(sessionId, statementIndex),
   );
 
   if (isPending || !analytics) {
