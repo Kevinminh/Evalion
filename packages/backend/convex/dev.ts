@@ -68,6 +68,19 @@ const DUMMY_NAMES = [
 
 const VOTE_OPTIONS = ["sant", "usant", "delvis"] as const;
 
+const DUMMY_BEGRUNNELSER = [
+  "Jeg tror dette stemmer fordi vi lærte om det i forrige uke.",
+  "Jeg er ikke helt sikker, men jeg tipper at det er riktig.",
+  "Læreren sa noe lignende i timen, så jeg tror det er sant.",
+  "Det høres logisk ut når jeg tenker over det.",
+  "Jeg har lest om dette før, men husker ikke alle detaljene.",
+  "Jeg er litt usikker fordi det avhenger av situasjonen.",
+  "Det stemmer i de fleste tilfeller, men ikke alltid.",
+  "Jeg tror dette er feil fordi jeg har hørt noe annet.",
+  "Etter å ha tenkt litt, virker dette delvis riktig.",
+  "Jeg er ganske sikker på dette, det stemmer med det jeg vet.",
+];
+
 export const addDummyStudents = mutation({
   args: {
     sessionId: v.id("liveSessions"),
@@ -165,6 +178,27 @@ export const castDummyVotes = mutation({
         confidence,
       });
       inserted++;
+
+      const existingBegrunnelse = await ctx.db
+        .query("sessionBegrunnelser")
+        .withIndex("by_session_statement_student_round", (q) =>
+          q
+            .eq("sessionId", args.sessionId)
+            .eq("statementIndex", args.statementIndex)
+            .eq("studentId", student._id)
+            .eq("round", args.round),
+        )
+        .first();
+      if (!existingBegrunnelse) {
+        const text = DUMMY_BEGRUNNELSER[Math.floor(Math.random() * DUMMY_BEGRUNNELSER.length)]!;
+        await ctx.db.insert("sessionBegrunnelser", {
+          sessionId: args.sessionId,
+          studentId: student._id,
+          statementIndex: args.statementIndex,
+          round: args.round,
+          text,
+        });
+      }
     }
 
     return { dummyCount: dummies.length, inserted };
