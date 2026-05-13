@@ -6,9 +6,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@workspace/ui/components/dropdown-menu";
-import { Button } from "@workspace/ui/components/button";
 import { useMutation } from "convex/react";
-import { Users, Pencil, MoreVertical, Copy, Trash2 } from "lucide-react";
+import { Copy, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -87,36 +86,37 @@ export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
           <AuthorAvatar name={fagprat.authorName} />
         </>
       ) : (
-        <div className="mt-auto flex items-center gap-3">
-          <Button
-            variant="teal"
-            className="flex-1"
+        <div className="fp-card-actions">
+          <button
+            type="button"
+            className="btn-liveokt"
             onClick={(e) => {
               e.stopPropagation();
               navigate({ to: "/liveokt/$id", params: { id: fagprat._id } });
             }}
           >
-            <Users className="size-4" />
+            <span className="btn-liveokt-icon">👥</span>
             Start liveøkt
-          </Button>
+          </button>
           <button
+            type="button"
             aria-label="Rediger"
-            className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border-2 border-primary/30 bg-card text-primary transition-all hover:border-primary/60 hover:bg-primary/5"
+            className="btn-endre"
             onClick={(e) => {
               e.stopPropagation();
               navigate({ to: "/fagprat/$id/rediger", params: { id: fagprat._id } });
             }}
           >
-            <Pencil className="size-4" />
+            ✏️
           </button>
 
           <DropdownMenu>
             <DropdownMenuTrigger
               aria-label="Flere valg"
-              className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border-2 border-border text-muted-foreground transition-all hover:border-muted-foreground/50 hover:bg-muted"
+              className="btn-more"
               onClick={(e) => e.stopPropagation()}
             >
-              <MoreVertical className="size-4" />
+              ⋮
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" sideOffset={4}>
               <DropdownMenuItem onClick={handleDuplicate} disabled={duplicating}>

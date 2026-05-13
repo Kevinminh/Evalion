@@ -324,6 +324,24 @@
   color: var(--color-text-tertiary);
 }
 
+/* Inline variant: title + controls on one row */
+.page-header-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+  flex-wrap: wrap;
+}
+.page-header-inline .page-title {
+  margin-bottom: 0;
+}
+.page-header-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-left: auto;
+}
+
 /* ════════ Search + filter ════════ */
 
 .search-bar {
@@ -366,6 +384,13 @@
 }
 .search-input::placeholder {
   color: var(--color-text-muted);
+}
+
+/* Inline variant: fixed-width 280px, smaller padding, no filter button slot */
+.search-input--inline {
+  width: 280px;
+  padding: var(--space-3) var(--space-4) var(--space-3) 52px;
+  font-size: 0.875rem;
 }
 
 .filter-toggle {
@@ -534,9 +559,34 @@
   font-weight: 600;
 }
 
+/* Pill-shaped sort dropdown (used in inline page headers) */
+.sort-pill .filter-dropdown-trigger {
+  padding: var(--space-2-5) var(--space-4);
+  padding-right: var(--space-8);
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  background-color: var(--color-neutral-0);
+  background-position: right 10px center;
+}
+.sort-pill .filter-dropdown-trigger:hover {
+  border-color: var(--color-neutral-400);
+}
+
 /* ════════ Section title ════════ */
 
 .section-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-6);
+}
+
+/* ════════ Fag group (grouped-by-subject view) ════════ */
+
+.fag-group {
+  margin-bottom: var(--space-10);
+}
+.fag-group-title {
   font-size: 1.5rem;
   font-weight: 800;
   color: var(--color-text-primary);
@@ -658,6 +708,90 @@
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--color-text-secondary);
+}
+
+/* ────── FagPrat card action row (collection variant) ────── */
+.fp-card-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: auto;
+}
+
+.btn-liveokt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  flex: 1;
+  padding: var(--space-2-5) var(--space-4);
+  background: var(--color-secondary-400);
+  color: white;
+  border: none;
+  border-radius: var(--radius-xl);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 3px 0 var(--color-secondary-700);
+  white-space: nowrap;
+}
+.btn-liveokt:hover {
+  background: var(--color-secondary-300);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 var(--color-secondary-700);
+}
+.btn-liveokt:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--color-secondary-700);
+}
+.btn-liveokt-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.btn-endre {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--color-neutral-0);
+  color: var(--color-primary-500);
+  border: 2px solid var(--color-primary-200);
+  border-radius: var(--radius-lg);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+.btn-endre:hover {
+  background: var(--color-primary-50);
+  border-color: var(--color-primary-400);
+}
+
+.btn-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 2px solid var(--color-neutral-200);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-tertiary);
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1;
+  letter-spacing: 1px;
+}
+.btn-more:hover {
+  border-color: var(--color-neutral-400);
+  color: var(--color-text-secondary);
+  background: var(--color-neutral-50);
 }
 
 .load-more-btn {
