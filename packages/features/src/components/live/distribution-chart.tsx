@@ -41,7 +41,10 @@ export function DistributionChart({
         const pct = total > 0 ? Math.round((bar.value / total) * 100) : 0;
         const isCorrect = correctKey !== undefined && bar.key === correctKey;
         const variantKey = bar.variant ?? bar.key ?? "";
-        const fill = FILL_HEX[variantKey] ?? "var(--color-text-ink-faint)";
+        const showColor = correctKey === undefined || isCorrect;
+        const fill = showColor
+          ? (FILL_HEX[variantKey] ?? "var(--color-text-ink-faint)")
+          : "var(--color-text-ink-faint)";
         const correctText = CORRECT_TEXT_HEX[variantKey] ?? "var(--color-text-ink-strong)";
 
         return (
