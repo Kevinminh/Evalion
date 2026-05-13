@@ -220,6 +220,39 @@ export const end = mutation({
     if (!session || session.teacherId !== identity.subject) {
       throw new Error("Not authorized");
     }
+
+    const students = await ctx.db
+      .query("sessionStudents")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.id))
+      .collect();
+    const dummyIds = new Set(students.filter((s) => s.isDummy).map((s) => s._id));
+
+    if (dummyIds.size > 0) {
+      const [votes, ratings, begrunnelser] = await Promise.all([
+        ctx.db
+          .query("sessionVotes")
+          .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
+          .collect(),
+        ctx.db
+          .query("sessionRatings")
+          .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
+          .collect(),
+        ctx.db
+          .query("sessionBegrunnelser")
+          .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
+          .collect(),
+      ]);
+
+      await Promise.all([
+        ...students.filter((s) => s.isDummy).map((s) => ctx.db.delete(s._id)),
+        ...votes
+          .filter((vote) => dummyIds.has(vote.studentId))
+          .map((vote) => ctx.db.delete(vote._id)),
+        ...ratings.filter((r) => dummyIds.has(r.studentId)).map((r) => ctx.db.delete(r._id)),
+        ...begrunnelser.filter((b) => dummyIds.has(b.studentId)).map((b) => ctx.db.delete(b._id)),
+      ]);
+    }
+
     await ctx.db.patch(args.id, { status: "ended" });
     return args.id;
   },
