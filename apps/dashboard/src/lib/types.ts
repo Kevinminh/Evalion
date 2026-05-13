@@ -2,6 +2,7 @@ export type {
   FagPrat,
   FagPratId,
   FagPratStatement,
+  FagPratSummary,
   FagPratType,
   Fasit,
   Visibility,

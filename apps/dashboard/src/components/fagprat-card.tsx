@@ -15,10 +15,10 @@ import { AuthorAvatar } from "@/components/author-avatar";
 import { DeleteFagPratDialog } from "@/components/delete-fagprat-dialog";
 import { TypeIcon } from "@/components/type-icon";
 import { api } from "@/lib/convex";
-import type { FagPrat } from "@/lib/types";
+import type { FagPratSummary } from "@/lib/types";
 
 interface FagPratCardProps {
-  fagprat: FagPrat;
+  fagprat: FagPratSummary;
   variant: "browse" | "collection";
 }
 
@@ -66,7 +66,7 @@ function FagPratCardImpl({ fagprat, variant }: FagPratCardProps) {
       </div>
 
       <h3 className="fp-card-title">{fagprat.title}</h3>
-      <p className="fp-card-count">{fagprat.statements.length} påstander</p>
+      <p className="fp-card-count">{fagprat.statementsCount} påstander</p>
 
       {variant === "browse" ? (
         <>

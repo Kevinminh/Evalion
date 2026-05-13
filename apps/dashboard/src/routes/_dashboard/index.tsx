@@ -190,7 +190,23 @@ function UtforskPage() {
       {!isFirstLoad && items.length > 0 && (
         <div className="fp-grid">
           {items.map((fp) => (
-            <FagPratCard key={fp._id} fagprat={fp} variant="browse" />
+            <FagPratCard
+              key={fp._id}
+              fagprat={{
+                _id: fp._id,
+                _creationTime: fp._creationTime,
+                title: fp.title,
+                subject: fp.subject,
+                level: fp.level,
+                type: fp.type,
+                visibility: fp.visibility,
+                usageCount: fp.usageCount,
+                authorName: fp.authorName,
+                updatedAt: fp.updatedAt,
+                statementsCount: fp.statements.length,
+              }}
+              variant="browse"
+            />
           ))}
         </div>
       )}

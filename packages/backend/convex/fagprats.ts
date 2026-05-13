@@ -29,10 +29,24 @@ export const listByAuthor = query({
     if (!identity) {
       return [];
     }
-    return await ctx.db
+    const docs = await ctx.db
       .query("fagprats")
-      .withIndex("by_author", (q) => q.eq("authorId", identity.subject))
+      .withIndex("by_author_updatedAt", (q) => q.eq("authorId", identity.subject))
+      .order("desc")
       .collect();
+    return docs.map((doc) => ({
+      _id: doc._id,
+      _creationTime: doc._creationTime,
+      title: doc.title,
+      subject: doc.subject,
+      level: doc.level,
+      type: doc.type,
+      visibility: doc.visibility,
+      usageCount: doc.usageCount,
+      authorName: doc.authorName,
+      updatedAt: doc.updatedAt,
+      statementsCount: doc.statements.length,
+    }));
   },
 });
 
@@ -122,6 +136,52 @@ export const remove = mutation({
     if (existing.authorId !== identity.subject) {
       throw new Error("Not authorized");
     }
+
+    const sessions = await ctx.db
+      .query("liveSessions")
+      .withIndex("by_fagprat", (q) => q.eq("fagpratId", args.id))
+      .collect();
+    for (const session of sessions) {
+      const students = await ctx.db
+        .query("sessionStudents")
+        .withIndex("by_session", (q) => q.eq("sessionId", session._id))
+        .collect();
+      for (const student of students) {
+        await ctx.db.delete(student._id);
+      }
+      const votes = await ctx.db
+        .query("sessionVotes")
+        .withIndex("by_session_statement", (q) => q.eq("sessionId", session._id))
+        .collect();
+      for (const vote of votes) {
+        await ctx.db.delete(vote._id);
+      }
+      const ratings = await ctx.db
+        .query("sessionRatings")
+        .withIndex("by_session_statement", (q) => q.eq("sessionId", session._id))
+        .collect();
+      for (const rating of ratings) {
+        await ctx.db.delete(rating._id);
+      }
+      const begrunnelser = await ctx.db
+        .query("sessionBegrunnelser")
+        .withIndex("by_session_statement", (q) => q.eq("sessionId", session._id))
+        .collect();
+      for (const b of begrunnelser) {
+        await ctx.db.delete(b._id);
+      }
+      await ctx.db.delete(session._id);
+    }
+
+    for (const statement of existing.statements) {
+      if (statement.image) {
+        await ctx.storage.delete(statement.image);
+      }
+      if (statement.explanationImage) {
+        await ctx.storage.delete(statement.explanationImage);
+      }
+    }
+
     await ctx.db.delete(args.id);
     return args.id;
   },
@@ -134,6 +194,9 @@ export const duplicate = mutation({
     const existing = await ctx.db.get(args.id);
     if (!existing) {
       throw new Error("FagPrat not found");
+    }
+    if (existing.visibility !== "public" && existing.authorId !== identity.subject) {
+      throw new Error("Not authorized");
     }
     const {
       _id: _removedId,

@@ -34,6 +34,7 @@ export default defineSchema({
     updatedAt: v.optional(v.number()),
   })
     .index("by_author", ["authorId"])
+    .index("by_author_updatedAt", ["authorId", "updatedAt"])
     .index("by_visibility", ["visibility"])
     .index("by_visibility_subject", ["visibility", "subject"])
     .index("by_visibility_level", ["visibility", "level"])
@@ -69,7 +70,8 @@ export default defineSchema({
     timerRemainingAtPause: v.optional(v.number()),
   })
     .index("by_joinCode", ["joinCode"])
-    .index("by_teacher", ["teacherId"]),
+    .index("by_teacher", ["teacherId"])
+    .index("by_fagprat", ["fagpratId"]),
 
   sessionStudents: defineTable({
     sessionId: v.id("liveSessions"),
