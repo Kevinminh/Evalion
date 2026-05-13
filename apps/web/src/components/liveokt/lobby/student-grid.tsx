@@ -2,7 +2,7 @@ import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
 import { X } from "lucide-react";
 
 import { pastelFor } from "@/lib/avatar";
-import type { Id } from "@/lib/convex";
+import type { Id } from "@workspace/api/types";
 import { cssVars } from "@/lib/css-vars";
 
 interface StudentGridProps {

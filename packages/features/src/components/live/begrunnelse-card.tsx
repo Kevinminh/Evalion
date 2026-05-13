@@ -1,4 +1,4 @@
-import type { Fasit } from "@workspace/features/lib/types";
+import type { Fasit } from "@workspace/api/types";
 import { cn } from "@workspace/ui/lib/utils";
 import { X } from "lucide-react";
 

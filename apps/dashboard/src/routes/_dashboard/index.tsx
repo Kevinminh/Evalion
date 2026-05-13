@@ -5,10 +5,11 @@ import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { Search, SlidersHorizontal, Sprout, Target } from "lucide-react";
 import { useState, useRef } from "react";
 
+import { fagpratsQueries } from "@workspace/api/fagprats";
+
 import { CustomDropdown } from "@/components/custom-dropdown";
 import { FagPratCard } from "@/components/fagprat-card";
 import { SUBJECT_OPTIONS, LEVEL_OPTIONS, CARD_GRID_CLASS, SKELETON_COUNT } from "@/lib/constants";
-import { fagpratQueries } from "@/lib/convex";
 import { useClickOutside } from "@/lib/use-click-outside";
 
 export const Route = createFileRoute("/_dashboard/")({
@@ -42,7 +43,7 @@ function UtforskPage() {
     isPending,
     isError,
   } = useQuery(
-    fagpratQueries.search({
+    fagpratsQueries.search({
       searchText: searchQuery || undefined,
       subject: selectedFag || undefined,
       level: selectedTrinn || undefined,

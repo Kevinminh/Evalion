@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { liveSessionsMutations, liveSessionsQueries } from "@workspace/api/liveSessions";
+import type { Id } from "@workspace/api/types";
 import { SessionCardSkeleton } from "@workspace/features/components/skeletons/session-card-skeleton";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { useMutation } from "convex/react";
@@ -9,8 +11,6 @@ import { toast } from "sonner";
 
 import { DeleteFagPratDialog } from "@/components/delete-fagprat-dialog";
 import { SKELETON_COUNT } from "@/lib/constants";
-import { api, liveSessionQueries } from "@/lib/convex";
-import type { Id } from "@/lib/convex";
 import { formatDate } from "@/lib/format-date";
 
 export const Route = createFileRoute("/_dashboard/historikk")({
@@ -19,8 +19,8 @@ export const Route = createFileRoute("/_dashboard/historikk")({
 
 function HistorikkPage() {
   const navigate = useNavigate();
-  const { data: sessions, isPending, isError } = useQuery(liveSessionQueries.listByTeacher());
-  const removeSession = useMutation(api.liveSessions.remove);
+  const { data: sessions, isPending, isError } = useQuery(liveSessionsQueries.listByTeacher());
+  const removeSession = useMutation(liveSessionsMutations.remove);
 
   const [deleteSession, setDeleteSession] = useState<{
     id: Id<"liveSessions">;

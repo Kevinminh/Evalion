@@ -1,4 +1,4 @@
-import type { Fasit } from "./types";
+import type { Fasit } from "@workspace/api/types";
 
 // ── Vote labels & colors ────────────────────────────────────────────────────
 export const VOTE_LABELS: Record<Fasit, string> = {

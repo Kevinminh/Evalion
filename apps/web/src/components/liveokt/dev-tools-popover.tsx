@@ -1,7 +1,10 @@
-import { convexQuery } from "@convex-dev/react-query";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
-import { isValidConvexId } from "@workspace/features/lib/convex-id";
+import { isValidConvexId } from "@workspace/api/convex-id";
+import { devMutations } from "@workspace/api/dev";
+import { featureFlagsQueries } from "@workspace/api/featureFlags";
+import { liveSessionsQueries } from "@workspace/api/liveSessions";
+import { usersQueries } from "@workspace/api/users";
 import { FEATURE_FLAGS } from "@workspace/features/lib/feature-flags";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -15,7 +18,6 @@ import { useMutation } from "convex/react";
 import { Users, Vote, Wrench } from "lucide-react";
 import { toast } from "sonner";
 
-import { api, liveSessionQueries } from "@/lib/convex";
 import { parseSessionId } from "@/lib/route-params";
 
 const DUMMY_BATCH_SIZE = 10;
@@ -30,18 +32,14 @@ export function DevToolsPopover() {
 
   // Skip the admin-only flag query for non-admins so we don't spam "Not
   // authorized" errors into Convex logs on every teacher pageview.
-  const { data: me } = useQuery(convexQuery(api.users.getMe, {}));
+  const { data: me } = useQuery(usersQueries.me());
   const isAdmin = me?.role === "admin";
   const { data: flagEnabled } = useQuery(
-    isAdmin
-      ? convexQuery(api.featureFlags.isEnabled, {
-          key: FEATURE_FLAGS.liveoktDummyData.key,
-        })
-      : convexQuery(api.featureFlags.isEnabled, "skip"),
+    featureFlagsQueries.isEnabled(isAdmin ? FEATURE_FLAGS.liveoktDummyData.key : "skip"),
   );
-  const { data: session } = useQuery(liveSessionQueries.getById(sessionIdArg));
-  const addDummyStudents = useMutation(api.dev.addDummyStudents);
-  const castDummyVotes = useMutation(api.dev.castDummyVotes);
+  const { data: session } = useQuery(liveSessionsQueries.byId(sessionIdArg));
+  const addDummyStudents = useMutation(devMutations.addDummyStudents);
+  const castDummyVotes = useMutation(devMutations.castDummyVotes);
 
   if (sessionIdArg === "skip") return null;
   if (flagEnabled !== true) return null;

@@ -17,9 +17,10 @@ import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { fagpratsMutations, fagpratsQueries } from "@workspace/api/fagprats";
+
 import { MetadataCard } from "@/components/metadata-card";
 import { StatementEditor } from "@/components/statement-editor";
-import { api, fagpratQueries } from "@/lib/convex";
 import type { FagPratId, FagPratType, Visibility } from "@/lib/types";
 
 export const Route = createFileRoute("/_dashboard/fagprat/$id/rediger")({
@@ -30,8 +31,8 @@ export const Route = createFileRoute("/_dashboard/fagprat/$id/rediger")({
 function EditFagPratPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const { data: fagprat, isPending, isError } = useQuery(fagpratQueries.getById(id as FagPratId));
-  const updateFagPrat = useMutation(api.fagprats.update);
+  const { data: fagprat, isPending, isError } = useQuery(fagpratsQueries.byId(id as FagPratId));
+  const updateFagPrat = useMutation(fagpratsMutations.update);
 
   const [title, setTitle] = useState("");
   const [fag, setFag] = useState("");

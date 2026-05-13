@@ -2,7 +2,7 @@ import { arrayMove } from "@dnd-kit/sortable";
 import type { DragEndEvent } from "@dnd-kit/core";
 import { useState } from "react";
 
-import type { Fasit } from "@workspace/features/lib/types";
+import type { Fasit } from "@workspace/api/types";
 
 export interface StatementWithId {
   id: string;

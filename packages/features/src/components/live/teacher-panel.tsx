@@ -34,6 +34,10 @@ interface TeacherPanelProps {
    * mockup behavior on steg 1/3 where starting the timer focuses the main
    * area). The teacher can re-open the panel manually. */
   forceCollapse?: boolean;
+  /** Transition-keyed push of a desired open/closed state. Whenever `key`
+   * changes, the panel applies `open` if it differs from the current state.
+   * Used to auto-flip the panel on step transitions. */
+  forceState?: { open: boolean; key: number | string };
 }
 
 export function TeacherPanel({
@@ -43,11 +47,13 @@ export function TeacherPanel({
   onOpenChange,
   attentionWhenClosed = false,
   forceCollapse = false,
+  forceState,
 }: TeacherPanelProps) {
   const isMobile = useIsMobile();
 
   const [open, setOpen] = useState(() => {
     if (typeof window !== "undefined" && window.innerWidth < MD_BREAKPOINT) return false;
+    if (forceState) return forceState.open;
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored !== null) return stored !== "true";
     return defaultOpen;
@@ -71,6 +77,14 @@ export function TeacherPanel({
       if (!isMobile) localStorage.setItem(STORAGE_KEY, "true");
     }
   }, [forceCollapse]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!forceState) return;
+    if (forceState.open === open) return;
+    setOpen(forceState.open);
+    onOpenChange?.(forceState.open);
+    if (!isMobile) localStorage.setItem(STORAGE_KEY, forceState.open ? "false" : "true");
+  }, [forceState?.key]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggle = () => {
     const next = !open;

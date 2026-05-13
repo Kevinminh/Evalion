@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { api } from "@workspace/backend/convex/_generated/api";
+import { liveSessionsQueries } from "@workspace/api/liveSessions";
+import { sessionBegrunnelserMutations } from "@workspace/api/sessionBegrunnelser";
+import { sessionVotesQueries } from "@workspace/api/sessionVotes";
+import type { Id } from "@workspace/api/types";
 import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
 import { Button } from "@workspace/ui/components/button";
 import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
@@ -13,8 +16,6 @@ import { ResultatTab } from "@/components/analytics/resultat-tab";
 import { RoundAnalytics } from "@/components/analytics/round-analytics";
 import type { StatementColorName } from "@/components/analytics/types";
 import { WaitingState } from "@/components/analytics/waiting-state";
-import { liveSessionQueries } from "@/lib/convex";
-import type { Id } from "@/lib/convex";
 
 export const Route = createFileRoute("/_authed/analytics/$id")({
   component: AnalyticsPage,
@@ -46,7 +47,7 @@ function AnalyticsPage() {
     data: session,
     isPending: sessionPending,
     isError: sessionError,
-  } = useQuery(liveSessionQueries.getSessionWithFagprat(sessionId));
+  } = useQuery(liveSessionsQueries.sessionWithFagprat(sessionId));
 
   // The analytics view passively follows the live session — no manual
   // statement selector or round/resultat tabs. The current påstand and
@@ -55,10 +56,10 @@ function AnalyticsPage() {
   const activeTab: TabId = STEP_TO_TAB[session?.currentStep ?? 1] ?? "runde1";
 
   const { data: analytics } = useQuery(
-    liveSessionQueries.getVoteAnalytics(sessionId, selectedStatement),
+    sessionVotesQueries.analytics(sessionId, selectedStatement),
   );
 
-  const highlightBegrunnelse = useMutation(api.liveSessions.highlightBegrunnelse);
+  const highlightBegrunnelse = useMutation(sessionBegrunnelserMutations.highlight);
 
   if (sessionPending) return <AnalyticsSkeleton />;
   if (sessionError) return <ErrorState className="flex min-h-svh items-center justify-center" />;
@@ -79,7 +80,7 @@ function AnalyticsPage() {
       <div className="sticky top-0 z-40 border-b border-neutral-200 bg-white px-4 pb-2.5 pt-3">
         <div className="mx-auto flex max-w-lg items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-1.5">
-            <img src="/co-lab-logo.png" alt="CO-LAB" className="h-5 object-contain" />
+            <img src="/fagprat-logo.png" alt="FagPrat" className="h-5 object-contain" />
             <div className="h-3.5 w-px bg-neutral-300" />
             <span className="text-xs font-bold text-foreground">Live-statistikk</span>
           </div>

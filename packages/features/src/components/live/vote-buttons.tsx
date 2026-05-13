@@ -1,5 +1,5 @@
 import { STUDENT_VOTE_OPTIONS, VOTE_BUTTON_3D_CLASSES } from "@workspace/features/lib/constants";
-import type { Fasit } from "@workspace/features/lib/types";
+import type { Fasit } from "@workspace/api/types";
 import { cn } from "@workspace/ui/lib/utils";
 
 interface VoteButtonsProps {

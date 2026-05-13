@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { cn } from "@workspace/ui/lib/utils";
 
-import type { Fasit } from "../../lib/types";
+import type { Fasit } from "@workspace/api/types";
 
 import { FasitBadge } from "./fasit-badge";
 

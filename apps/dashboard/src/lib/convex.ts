@@ -1,32 +1,24 @@
-import { convexQuery } from "@convex-dev/react-query";
-import { api } from "@workspace/backend/convex/_generated/api";
-import type { Id } from "@workspace/backend/convex/_generated/dataModel";
+import { fagpratsQueries } from "@workspace/api/fagprats";
+import { liveSessionsQueries } from "@workspace/api/liveSessions";
+import { sessionStudentsQueries } from "@workspace/api/sessionStudents";
+import { sessionVotesQueries } from "@workspace/api/sessionVotes";
 
-import type { FagPratType } from "@/lib/types";
+export { api } from "@workspace/backend/convex/_generated/api";
+export type { Id } from "@workspace/api/types";
 
+// Backwards-compat aliases for legacy call sites. New code should import the
+// wrapper modules from @workspace/api/<module> directly.
 export const fagpratQueries = {
-  list: () => convexQuery(api.fagprats.list, {}),
-  getById: (id: Id<"fagprats">) => convexQuery(api.fagprats.getById, { id }),
-  listByAuthor: () => convexQuery(api.fagprats.listByAuthor, {}),
-  search: (args: {
-    searchText?: string;
-    subject?: string;
-    level?: string;
-    type?: FagPratType;
-    sortBy?: "relevant" | "recent";
-  }) => convexQuery(api.fagprats.search, args),
+  list: fagpratsQueries.list,
+  getById: fagpratsQueries.byId,
+  listByAuthor: fagpratsQueries.listByAuthor,
+  search: fagpratsQueries.search,
 };
 
 export const liveSessionQueries = {
-  listByTeacher: () => convexQuery(api.liveSessions.listByTeacher, {}),
-  listCurrentByTeacher: () => convexQuery(api.liveSessions.listCurrentByTeacher, {}),
-  getSessionWithFagprat: (id: Id<"liveSessions">) =>
-    convexQuery(api.liveSessions.getSessionWithFagprat, { id }),
-  listStudents: (sessionId: Id<"liveSessions">) =>
-    convexQuery(api.liveSessions.listStudents, { sessionId }),
-  getVoteAnalytics: (sessionId: Id<"liveSessions">, statementIndex: number) =>
-    convexQuery(api.liveSessions.getVoteAnalytics, { sessionId, statementIndex }),
+  listByTeacher: liveSessionsQueries.listByTeacher,
+  listCurrentByTeacher: liveSessionsQueries.listCurrentByTeacher,
+  getSessionWithFagprat: liveSessionsQueries.sessionWithFagprat,
+  listStudents: sessionStudentsQueries.listBySession,
+  getVoteAnalytics: sessionVotesQueries.analytics,
 };
-
-export { api };
-export type { Id };

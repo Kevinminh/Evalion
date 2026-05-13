@@ -17,11 +17,12 @@ import { ArrowLeft, Users, Pencil, MoreVertical, Copy, Trash2, FolderPlus } from
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { fagpratsMutations, fagpratsQueries } from "@workspace/api/fagprats";
+
 import { AuthorAvatar } from "@/components/author-avatar";
 import { DeleteFagPratDialog } from "@/components/delete-fagprat-dialog";
 import { StatementTable } from "@/components/statement-table";
 import { TypeIcon } from "@/components/type-icon";
-import { api, fagpratQueries } from "@/lib/convex";
 import type { FagPratId } from "@/lib/types";
 
 export const Route = createFileRoute("/_dashboard/fagprat/$id/")({
@@ -31,10 +32,10 @@ export const Route = createFileRoute("/_dashboard/fagprat/$id/")({
 function FagPratPreviewPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const { data: fagprat, isPending, isError } = useQuery(fagpratQueries.getById(id as FagPratId));
+  const { data: fagprat, isPending, isError } = useQuery(fagpratsQueries.byId(id as FagPratId));
   const { data: session } = authClient.useSession();
-  const duplicateFagPrat = useMutation(api.fagprats.duplicate);
-  const removeFagPrat = useMutation(api.fagprats.remove);
+  const duplicateFagPrat = useMutation(fagpratsMutations.duplicate);
+  const removeFagPrat = useMutation(fagpratsMutations.remove);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   if (isPending) {

@@ -1,5 +1,5 @@
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
-import type { Fasit } from "@workspace/features/lib/types";
+import type { Fasit } from "@workspace/api/types";
 
 export interface VoteBar {
   label: string;

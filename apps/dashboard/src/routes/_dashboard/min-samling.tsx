@@ -5,10 +5,11 @@ import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { fagpratsQueries } from "@workspace/api/fagprats";
+
 import { CustomDropdown } from "@/components/custom-dropdown";
 import { FagPratCard } from "@/components/fagprat-card";
 import { CARD_GRID_CLASS, SKELETON_COUNT } from "@/lib/constants";
-import { fagpratQueries } from "@/lib/convex";
 
 export const Route = createFileRoute("/_dashboard/min-samling")({
   component: MinSamlingPage,
@@ -18,7 +19,7 @@ function MinSamlingPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"sist-endret" | "fag">("sist-endret");
 
-  const { data: allFagPrats, isPending, isError } = useQuery(fagpratQueries.listByAuthor());
+  const { data: allFagPrats, isPending, isError } = useQuery(fagpratsQueries.listByAuthor());
 
   const filtered = useMemo(() => {
     if (!allFagPrats) return [];

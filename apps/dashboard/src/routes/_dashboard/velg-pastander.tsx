@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { api } from "@workspace/backend/convex/_generated/api";
+import { reddiActions } from "@workspace/api/reddi";
 import { parseDraftJson } from "@workspace/features/lib/draft-utils";
 import { cn } from "@workspace/ui/lib/utils";
 import { useAction } from "convex/react";
@@ -38,7 +38,7 @@ function VelgPastanderPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const generate = useAction(api.reddi.generateStatements);
+  const generate = useAction(reddiActions.generateStatements);
 
   // Parse draft to extract context for AI generation
   const parsedDraft = parseDraftJson(draftJson);

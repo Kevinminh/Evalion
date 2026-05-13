@@ -1,15 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
+import { sessionBegrunnelserQueries } from "@workspace/api/sessionBegrunnelser";
+import type { Fasit } from "@workspace/api/types";
 import {
   LEVEL_CIRCLE_COLORS,
   VOTE_DOT_COLORS,
   VOTE_LABELS,
 } from "@workspace/features/lib/constants";
-import type { Fasit } from "@workspace/features/lib/types";
 import { cn } from "@workspace/ui/lib/utils";
 import { MessageSquare, X } from "lucide-react";
 import { useEffect, useState } from "react";
-
-import { liveSessionQueries } from "@/lib/convex";
 
 import { useStudentGame } from "./student-game-context";
 
@@ -70,7 +69,7 @@ export function MineSvarPanel() {
   // Subscribe to begrunnelser only while the panel is open — keeps the
   // long-running Convex WebSocket cost off all the other students' steps.
   const { data: begrunnelser } = useQuery(
-    liveSessionQueries.getMyBegrunnelser(
+    sessionBegrunnelserQueries.mine(
       open ? session._id : "skip",
       student._id,
       statementIndex,

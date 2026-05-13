@@ -4,7 +4,7 @@ import {
   VOTE_LABELS,
   LEVEL_CIRCLE_COLORS,
 } from "@workspace/features/lib/constants";
-import type { Fasit } from "@workspace/features/lib/types";
+import type { Fasit } from "@workspace/api/types";
 import { cn } from "@workspace/ui/lib/utils";
 
 import type { BegrunnelseRef } from "./types";

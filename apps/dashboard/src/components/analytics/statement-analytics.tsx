@@ -6,7 +6,7 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 import { AnalyticsRatingChart } from "@/components/analytics/rating-chart-analytics";
 import { VoteChart } from "@/components/analytics/vote-chart";
 import { liveSessionQueries } from "@/lib/convex";
-import type { Id } from "@/lib/convex";
+import type { Id } from "@workspace/api/types";
 import type { Fasit } from "@/lib/types";
 
 interface StatementAnalyticsProps {

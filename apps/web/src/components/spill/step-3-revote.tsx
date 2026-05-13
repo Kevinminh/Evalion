@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { resolveStatementStudentHex } from "@workspace/features/lib/constants";
-import type { Fasit } from "@workspace/features/lib/types";
+import type { Fasit } from "@workspace/api/types";
 
 import { RatingScale } from "@workspace/ui/components/rating-scale";
 import { StatementCard } from "@workspace/ui/components/statement-card";

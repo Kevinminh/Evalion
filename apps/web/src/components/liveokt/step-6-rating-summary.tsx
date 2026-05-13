@@ -6,7 +6,7 @@ import { Professor } from "@workspace/features/components/live/professor";
 import { TeacherStepLayout } from "@workspace/features/components/live/teacher-step-layout";
 import { resolveStatementHex } from "@workspace/features/lib/constants";
 import { formatDecimal1, percentage } from "@workspace/features/lib/format";
-import type { Fasit } from "@workspace/features/lib/types";
+import type { Fasit } from "@workspace/api/types";
 import { PanelCard } from "@workspace/ui/components/panel-card";
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";

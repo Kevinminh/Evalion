@@ -1,8 +1,8 @@
 import { notFound } from "@tanstack/react-router";
 import type { TableNames } from "@workspace/backend/convex/_generated/dataModel";
-import { isValidConvexId } from "@workspace/features/lib/convex-id";
+import { isValidConvexId } from "@workspace/api/convex-id";
 
-import type { Id } from "@/lib/convex";
+import type { Id } from "@workspace/api/types";
 
 // Convex Id<T> is a branded string type. The single sanctioned cast in this
 // file keeps every other callsite in apps/web free of `as` assertions.

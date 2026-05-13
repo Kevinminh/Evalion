@@ -7,9 +7,14 @@ import { TeacherPanel } from "@workspace/features/components/live/teacher-panel"
 import { TopBarTimer } from "@workspace/features/components/live/top-bar-timer";
 import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
 import { ArrowRight } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
-import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
+import { fagpratsQueries } from "@workspace/api/fagprats";
+import { liveSessionsQueries } from "@workspace/api/liveSessions";
+import { sessionBegrunnelserQueries } from "@workspace/api/sessionBegrunnelser";
+import { sessionStudentsQueries } from "@workspace/api/sessionStudents";
+import { sessionVotesQueries } from "@workspace/api/sessionVotes";
+
 import { cssVars } from "@/lib/css-vars";
 import { DASHBOARD_URL } from "@/lib/env";
 import { parseSessionId } from "@/lib/route-params";
@@ -51,25 +56,25 @@ function LiveStepPage() {
   const typedSessionId = parseSessionId(sessionId);
 
   const { data: session, isPending: sessionLoading } = useQuery(
-    liveSessionQueries.getById(typedSessionId),
+    liveSessionsQueries.byId(typedSessionId),
   );
   const { data: fagprat, isPending: fagpratLoading } = useQuery(
-    fagpratQueries.getById(session?.fagpratId ?? "skip"),
+    fagpratsQueries.byId(session?.fagpratId ?? "skip"),
   );
-  const { data: students } = useQuery(liveSessionQueries.listStudents(typedSessionId));
+  const { data: students } = useQuery(sessionStudentsQueries.listBySession(typedSessionId));
 
   const selectedIdx = session?.currentStatementIndex ?? 0;
 
   const { data: votes } = useQuery({
-    ...liveSessionQueries.getVotes(typedSessionId, selectedIdx),
+    ...sessionVotesQueries.bySessionStatement(typedSessionId, selectedIdx),
     enabled: !!fagprat,
   });
   const { data: analytics } = useQuery({
-    ...liveSessionQueries.getVoteAnalytics(typedSessionId, selectedIdx),
+    ...sessionVotesQueries.analytics(typedSessionId, selectedIdx),
     enabled: !!fagprat && step >= 4,
   });
   const { data: begrunnelser } = useQuery({
-    ...liveSessionQueries.getBegrunnelser(typedSessionId, selectedIdx),
+    ...sessionBegrunnelserQueries.bySessionStatement(typedSessionId, selectedIdx),
     enabled: !!fagprat && [2, 4, 5].includes(step),
   });
 
@@ -154,6 +159,11 @@ function TeacherSessionLayout() {
     timer.startedAt !== undefined && timer.pausedAt === undefined;
   const showTopbarTimer = timerIsRunning && !panelOpen;
 
+  const stepIntent = useMemo(
+    () => ({ open: step === 1 || step === 3, key: step }),
+    [step],
+  );
+
   return (
     <div className="flex h-svh flex-col overflow-hidden bg-[var(--color-bg-primary)]">
       <SessionTopBar
@@ -182,13 +192,15 @@ function TeacherSessionLayout() {
         </main>
         {teacherStep && (
           <TeacherPanel
-            // Mockup auto-collapses the panel on steg 2/4/5 to draw the
-            // teacher's attention toward the main content (recording, fasit
-            // reveal, explanation) and pulses the toggle so the panel is
-            // discoverable. On steg 1/3 it only pulses while the timer runs.
-            defaultOpen={step !== 2 && step !== 4 && step !== 5}
-            attentionWhenClosed={step === 2 || step === 4 || step === 5 || timerIsRunning}
+            // Panel auto-flips on every step transition: open on 1 & 3, closed
+            // on 2, 4, 5, 6. Driven by `forceState` keyed on `step`. The toggle
+            // pulses on "closed" steps and while the timer is running.
+            defaultOpen={step === 1 || step === 3}
+            attentionWhenClosed={
+              step === 2 || step === 4 || step === 5 || step === 6 || timerIsRunning
+            }
             forceCollapse={timerIsRunning && (step === 1 || step === 3)}
+            forceState={stepIntent}
             footer={
               teacherStep.panelFooter === null ? null : (
                 <PanelFooter footer={teacherStep.panelFooter} />

@@ -1,4 +1,4 @@
-import type { Fasit } from "@workspace/features/lib/types";
+import type { Fasit } from "@workspace/api/types";
 import { cn } from "@workspace/ui/lib/utils";
 
 const FASIT_CONFIG: Record<Fasit, { label: string; bg: string }> = {

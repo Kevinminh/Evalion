@@ -1,9 +1,11 @@
+import { sessionBegrunnelserMutations } from "@workspace/api/sessionBegrunnelser";
+import { sessionRatingsMutations } from "@workspace/api/sessionRatings";
+import { sessionStudentsMutations } from "@workspace/api/sessionStudents";
+import { sessionVotesMutations } from "@workspace/api/sessionVotes";
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
-import type { FagPratStatement, Fasit } from "@workspace/features/lib/types";
+import type { FagPratStatement, Fasit } from "@workspace/api/types";
 import { useMutation } from "convex/react";
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-
-import { api } from "@/lib/convex";
 
 import { phaseFromSession, phaseRound, type StudentPhase } from "@/types/student-phase";
 
@@ -53,10 +55,10 @@ export function StudentGameProvider({
   votes,
   children,
 }: StudentGameProviderProps) {
-  const castVoteMutation = useMutation(api.liveSessions.castVote);
-  const submitRatingMutation = useMutation(api.liveSessions.submitRating);
-  const submitBegrunnelseMutation = useMutation(api.liveSessions.submitBegrunnelse);
-  const removeStudentMutation = useMutation(api.liveSessions.removeStudent);
+  const castVoteMutation = useMutation(sessionVotesMutations.cast);
+  const submitRatingMutation = useMutation(sessionRatingsMutations.submit);
+  const submitBegrunnelseMutation = useMutation(sessionBegrunnelserMutations.submit);
+  const removeStudentMutation = useMutation(sessionStudentsMutations.remove);
 
   const value = useMemo<StudentGameValue>(() => {
     const sessionId = session._id;

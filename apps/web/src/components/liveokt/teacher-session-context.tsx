@@ -10,7 +10,7 @@ import {
   type SetStateAction,
 } from "react";
 
-import type { Id } from "@/lib/convex";
+import type { Id } from "@workspace/api/types";
 import type { TimerControls } from "@/hooks/use-timer-controls";
 import { useTimerControls } from "@/hooks/use-timer-controls";
 

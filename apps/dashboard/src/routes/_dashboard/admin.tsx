@@ -1,7 +1,9 @@
-import { convexQuery } from "@convex-dev/react-query";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { api } from "@workspace/backend/convex/_generated/api";
+import { featureFlagsMutations, featureFlagsQueries } from "@workspace/api/featureFlags";
+import { liveSessionsMutations, liveSessionsQueries } from "@workspace/api/liveSessions";
+import type { Id } from "@workspace/api/types";
+import { usersQueries } from "@workspace/api/users";
 import { FEATURE_FLAG_LIST } from "@workspace/features/lib/feature-flags";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
@@ -20,15 +22,12 @@ import { ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { liveSessionQueries } from "@/lib/convex";
-import type { Id } from "@/lib/convex";
-
 export const Route = createFileRoute("/_dashboard/admin")({
   component: AdminPage,
 });
 
 function AdminPage() {
-  const { data: me, isPending: meLoading } = useQuery(convexQuery(api.users.getMe, {}));
+  const { data: me, isPending: meLoading } = useQuery(usersQueries.me());
 
   if (meLoading) {
     return (
@@ -56,8 +55,8 @@ function AdminPage() {
 }
 
 function AdminPanel() {
-  const { data: flags } = useQuery(convexQuery(api.featureFlags.list, {}));
-  const setEnabled = useMutation(api.featureFlags.setEnabled);
+  const { data: flags } = useQuery(featureFlagsQueries.list());
+  const setEnabled = useMutation(featureFlagsMutations.setEnabled);
 
   const flagState = new Map((flags ?? []).map((f) => [f.key, f.enabled]));
 
@@ -114,8 +113,8 @@ function AdminPanel() {
 }
 
 function CurrentLiveSessionsSection() {
-  const { data: sessions, isPending } = useQuery(liveSessionQueries.listCurrentByTeacher());
-  const endSession = useMutation(api.liveSessions.end);
+  const { data: sessions, isPending } = useQuery(liveSessionsQueries.listCurrentByTeacher());
+  const endSession = useMutation(liveSessionsMutations.end);
   const [endTarget, setEndTarget] = useState<{
     id: Id<"liveSessions">;
     title: string;

@@ -1,7 +1,6 @@
-import { convexQuery } from "@convex-dev/react-query";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
-import { api } from "@workspace/backend/convex/_generated/api";
+import { usersQueries } from "@workspace/api/users";
 import { UserMenu } from "@workspace/features/components/auth/user-menu";
 import { authClient } from "@workspace/features/lib/auth-client";
 import { Button } from "@workspace/ui/components/button";
@@ -30,7 +29,7 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
   const matchRoute = useMatchRoute();
   const navigate = useNavigate();
   const { data: session } = authClient.useSession();
-  const { data: me } = useQuery(convexQuery(api.users.getMe, {}));
+  const { data: me } = useQuery(usersQueries.me());
   const isAdmin = me?.role === "admin";
   const isActive = (path: string) => {
     if (path === "/") return matchRoute({ to: "/", fuzzy: false });

@@ -19,6 +19,7 @@
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-start": "catalog:",
     "@tanstack/router-plugin": "catalog:",
+    "@workspace/api": "workspace:*",
     "@workspace/backend": "workspace:*",
     "@workspace/features": "workspace:*",
     "@workspace/ui": "workspace:*",

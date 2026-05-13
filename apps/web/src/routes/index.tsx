@@ -7,7 +7,8 @@ import { Input } from "@workspace/ui/components/input";
 import { Play, LogOut, User, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { liveSessionQueries } from "@/lib/convex";
+import { liveSessionsQueries } from "@workspace/api/liveSessions";
+
 import { DASHBOARD_URL } from "@/lib/env";
 
 export const Route = createFileRoute("/")({ component: App });
@@ -24,7 +25,7 @@ function App() {
   // Live query for the entered code — only enabled when user submits
   const [submittedCode, setSubmittedCode] = useState("");
   const { data: foundSession, isFetching } = useQuery({
-    ...liveSessionQueries.getByJoinCode(submittedCode),
+    ...liveSessionsQueries.byJoinCode(submittedCode),
     enabled: submittedCode.length === 6,
   });
 

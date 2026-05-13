@@ -1,10 +1,10 @@
+import { liveSessionsMutations } from "@workspace/api/liveSessions";
+import { sessionBegrunnelserMutations } from "@workspace/api/sessionBegrunnelser";
+import type { Id } from "@workspace/api/types";
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-
-import { api } from "@/lib/convex";
-import type { Id } from "@/lib/convex";
 
 interface UseSessionMutationsArgs {
   sessionId: Id<"liveSessions">;
@@ -32,9 +32,9 @@ export function useSessionMutations({
   onSessionEnded,
   onResetStatement,
 }: UseSessionMutationsArgs): SessionMutations {
-  const updateStepMutation = useMutation(api.liveSessions.updateStep);
-  const endSessionMutation = useMutation(api.liveSessions.end);
-  const highlightBegrunnelseMutation = useMutation(api.liveSessions.highlightBegrunnelse);
+  const updateStepMutation = useMutation(liveSessionsMutations.updateStep);
+  const endSessionMutation = useMutation(liveSessionsMutations.end);
+  const highlightBegrunnelseMutation = useMutation(sessionBegrunnelserMutations.highlight);
 
   const [usedStatements, setUsedStatements] = useState<Set<number>>(new Set());
 

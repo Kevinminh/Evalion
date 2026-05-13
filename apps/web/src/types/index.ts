@@ -5,4 +5,4 @@ export type {
   Fasit,
   LiveSession,
   SessionStudent,
-} from "@workspace/features/lib/types";
+} from "@workspace/api/types";

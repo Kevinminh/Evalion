@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import { fagpratsMutations } from "@workspace/api/fagprats";
 import { Button } from "@workspace/ui/components/button";
 import {
   DropdownMenu,
@@ -15,7 +16,6 @@ import { toast } from "sonner";
 import { AuthorAvatar } from "@/components/author-avatar";
 import { DeleteFagPratDialog } from "@/components/delete-fagprat-dialog";
 import { TypeIcon } from "@/components/type-icon";
-import { api } from "@/lib/convex";
 import type { FagPrat } from "@/lib/types";
 
 interface FagPratCardProps {
@@ -25,8 +25,8 @@ interface FagPratCardProps {
 
 export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
   const navigate = useNavigate();
-  const duplicateFagPrat = useMutation(api.fagprats.duplicate);
-  const removeFagPrat = useMutation(api.fagprats.remove);
+  const duplicateFagPrat = useMutation(fagpratsMutations.duplicate);
+  const removeFagPrat = useMutation(fagpratsMutations.remove);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [duplicating, setDuplicating] = useState(false);
 

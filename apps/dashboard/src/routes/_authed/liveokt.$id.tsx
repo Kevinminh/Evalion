@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { fagpratsQueries } from "@workspace/api/fagprats";
+import { liveSessionsMutations } from "@workspace/api/liveSessions";
 import { SessionTopBar } from "@workspace/features/components/live/session-top-bar";
 import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
 import { LiveoktSetupSkeleton } from "@workspace/features/components/skeletons/liveokt-setup-skeleton";
@@ -16,7 +18,6 @@ import { toast } from "sonner";
 import { LaunchModal } from "@/components/live/launch-modal";
 import { OptionCard } from "@/components/live/option-card";
 import { DEFAULT_GROUP_COUNT, MIN_GROUP_COUNT, MAX_GROUP_COUNT } from "@/lib/constants";
-import { fagpratQueries, api } from "@/lib/convex";
 import { PLAY_URL } from "@/lib/env";
 import type { FagPratId } from "@/lib/types";
 
@@ -28,8 +29,8 @@ export const Route = createFileRoute("/_authed/liveokt/$id")({
 function LiveoktSetupPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const { data: fagprat, isPending, isError } = useQuery(fagpratQueries.getById(id as FagPratId));
-  const createSession = useMutation(api.liveSessions.create);
+  const { data: fagprat, isPending, isError } = useQuery(fagpratsQueries.byId(id as FagPratId));
+  const createSession = useMutation(liveSessionsMutations.create);
 
   const [groupsEnabled, setGroupsEnabled] = useState(true);
   const [groupCount, setGroupCount] = useState(DEFAULT_GROUP_COUNT);

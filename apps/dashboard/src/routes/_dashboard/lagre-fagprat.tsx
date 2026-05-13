@@ -8,10 +8,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { fagpratsMutations } from "@workspace/api/fagprats";
+
 import { ConceptTags } from "@/components/concept-tags";
 import { VisibilityToggle } from "@/components/visibility-toggle";
 import { LABEL_CLASS } from "@/lib/constants";
-import { api } from "@/lib/convex";
 import type { Visibility } from "@/lib/types";
 
 const searchSchema = z.object({
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/_dashboard/lagre-fagprat")({
 function LagreFagPratPage() {
   const navigate = useNavigate();
   const { draft: draftJson } = Route.useSearch();
-  const createFagPrat = useMutation(api.fagprats.create);
+  const createFagPrat = useMutation(fagpratsMutations.create);
 
   const draft = parseDraftJson(draftJson);
 
