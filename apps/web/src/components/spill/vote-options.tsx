@@ -7,9 +7,9 @@ interface VoteOptionsProps {
   disabled?: boolean;
 }
 
-// Class strings declared inline (not imported from packages/evalion constants)
+// Class strings declared inline (not imported from packages/features constants)
 // so Tailwind sees the literal arbitrary-value shadow utilities and generates
-// the corresponding CSS rules. See memory: packages/evalion is not in @source.
+// the corresponding CSS rules. See memory: packages/features is not in @source.
 const VOTE_OPTIONS: { value: Fasit; label: string; classes: string }[] = [
   {
     value: "sant",
