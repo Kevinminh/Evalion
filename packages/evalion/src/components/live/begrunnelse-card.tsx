@@ -5,7 +5,6 @@ import { VoteBadge } from "./vote-badge";
 
 interface BegrunnelseCardProps {
   text: string;
-  studentName?: string;
   vote?: Fasit;
   highlighted?: boolean;
   className?: string;
@@ -13,7 +12,6 @@ interface BegrunnelseCardProps {
 
 export function BegrunnelseCard({
   text,
-  studentName,
   vote,
   highlighted = false,
   className,
@@ -38,11 +36,6 @@ export function BegrunnelseCard({
         />
       )}
       <p className="italic leading-relaxed text-[var(--color-text-ink-strong)]">«{text}»</p>
-      {studentName && (
-        <p className="mt-3 text-xs font-bold uppercase tracking-wider text-[var(--color-text-ink-faint)]">
-          — {studentName}
-        </p>
-      )}
     </div>
   );
 }

@@ -11,12 +11,9 @@ import type { TeacherStep } from "@/types/teacher-step";
 import { useTeacherSession } from "./teacher-session-context";
 
 export function useStep5(): TeacherStep {
-  const { statement, r2CorrectCount, r2Total, begrunnelser, students, selectedIdx, goToStep } =
+  const { statement, r2CorrectCount, r2Total, begrunnelser, selectedIdx, goToStep } =
     useTeacherSession();
   const highlightedBegrunnelse = begrunnelser?.find((b) => b.highlighted);
-  const highlightedStudent = highlightedBegrunnelse
-    ? students.find((s) => s._id === highlightedBegrunnelse.studentId)
-    : null;
 
   const statementColor = resolveStatementHex(statement?.color, selectedIdx);
   const correctPct = percentage(r2CorrectCount, r2Total);
@@ -83,11 +80,7 @@ export function useStep5(): TeacherStep {
         <PanelSectionLabel className="mt-2">Fremhevet begrunnelse</PanelSectionLabel>
 
         {highlightedBegrunnelse ? (
-          <BegrunnelseCard
-            text={highlightedBegrunnelse.text}
-            studentName={highlightedStudent?.name}
-            highlighted
-          />
+          <BegrunnelseCard text={highlightedBegrunnelse.text} highlighted />
         ) : (
           <div className="rounded-l-none rounded-r-xl border-l-[3px] border-[var(--color-highlight-strip)] bg-[var(--color-highlight-strip-bg)] px-5 py-4 text-base font-medium italic leading-relaxed text-[var(--color-text-ink-faint)]">
             Ingen fremhevet begrunnelse ennå.

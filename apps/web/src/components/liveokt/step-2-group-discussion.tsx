@@ -23,7 +23,6 @@ export function useStep2(): TeacherStep {
     panelTab,
     setPanelTab,
     begrunnelser,
-    students,
     voteBars,
     totalVotes,
     activeRoundVotes,
@@ -62,9 +61,6 @@ export function useStep2(): TeacherStep {
   );
 
   const highlighted = begrunnelser?.find((b) => b.highlighted) ?? null;
-  const highlightedStudent = highlighted
-    ? students.find((s) => s._id === highlighted.studentId)
-    : undefined;
   const highlightedVote = highlighted
     ? activeRoundVotes.find((v) => v.studentId === highlighted.studentId)?.vote
     : undefined;
@@ -89,7 +85,6 @@ export function useStep2(): TeacherStep {
                 </p>
                 <BegrunnelseCard
                   text={highlighted.text}
-                  studentName={highlightedStudent?.name}
                   vote={highlightedVote}
                   highlighted
                 />
