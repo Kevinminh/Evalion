@@ -7,7 +7,6 @@ export const getMe = query({
     const user = await authComponent.getAuthUser(ctx);
     if (!user) return null;
     return {
-      _id: user._id,
       email: user.email,
       name: user.name,
       role: user.role ?? "user",
