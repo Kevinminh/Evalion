@@ -98,6 +98,48 @@ export const listByTeacher = query({
   },
 });
 
+export const listCurrentByTeacher = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return [];
+    }
+    const sessions = await ctx.db
+      .query("liveSessions")
+      .withIndex("by_teacher", (q) => q.eq("teacherId", identity.subject))
+      .order("desc")
+      .collect();
+
+    const current = sessions.filter((s) => s.status !== "ended");
+
+    const uniqueFagpratIds = [...new Set(current.map((s) => s.fagpratId))];
+    const fagpratEntries = await Promise.all(
+      uniqueFagpratIds.map(async (id) => [id, await ctx.db.get(id)] as const),
+    );
+    const fagpratMap = new Map(fagpratEntries);
+
+    const allStudents = await Promise.all(
+      current.map((session) =>
+        ctx.db
+          .query("sessionStudents")
+          .withIndex("by_session", (q) => q.eq("sessionId", session._id))
+          .collect(),
+      ),
+    );
+    const studentCountMap = new Map<string, number>();
+    for (let i = 0; i < current.length; i++) {
+      studentCountMap.set(current[i]!._id, allStudents[i]!.length);
+    }
+
+    return current.map((session) => ({
+      ...session,
+      fagpratTitle: fagpratMap.get(session.fagpratId)?.title ?? "Slettet FagPrat",
+      studentCount: studentCountMap.get(session._id) ?? 0,
+    }));
+  },
+});
+
 export const getById = query({
   args: { id: v.id("liveSessions") },
   handler: async (ctx, args) => {
@@ -853,19 +895,6 @@ export const highlightBegrunnelse = mutation({
 
     await requireSessionOwner(ctx, begrunnelse.sessionId);
 
-    // Clear any other highlighted begrunnelse for the same statement
-    if (args.highlighted) {
-      const others = await ctx.db
-        .query("sessionBegrunnelser")
-        .withIndex("by_session_statement", (q) =>
-          q.eq("sessionId", begrunnelse.sessionId).eq("statementIndex", begrunnelse.statementIndex),
-        )
-        .filter((q) => q.eq(q.field("highlighted"), true))
-        .collect();
-      for (const other of others) {
-        await ctx.db.patch(other._id, { highlighted: false });
-      }
-    }
     await ctx.db.patch(args.id, { highlighted: args.highlighted });
   },
 });

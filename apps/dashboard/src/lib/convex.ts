@@ -19,6 +19,7 @@ export const fagpratQueries = {
 
 export const liveSessionQueries = {
   listByTeacher: () => convexQuery(api.liveSessions.listByTeacher, {}),
+  listCurrentByTeacher: () => convexQuery(api.liveSessions.listCurrentByTeacher, {}),
   getSessionWithFagprat: (id: Id<"liveSessions">) =>
     convexQuery(api.liveSessions.getSessionWithFagprat, { id }),
   listStudents: (sessionId: Id<"liveSessions">) =>

@@ -1,16 +1,17 @@
 import { BackButton } from "@workspace/features/components/live/back-button";
-import { BegrunnelseCard } from "@workspace/features/components/live/begrunnelse-card";
 import { BreakdownRow } from "@workspace/features/components/live/breakdown-row";
 import { DistributionChart } from "@workspace/features/components/live/distribution-chart";
+import { FremhevetCarousel } from "@workspace/features/components/live/fremhevet-carousel";
 import { PanelTabs } from "@workspace/features/components/live/panel-tabs";
 import { Professor } from "@workspace/features/components/live/professor";
 import { TeacherStepLayout } from "@workspace/features/components/live/teacher-step-layout";
 import { resolveStatementHex } from "@workspace/features/lib/constants";
 import { formatDecimal1 } from "@workspace/features/lib/format";
+import type { Fasit } from "@workspace/features/lib/types";
 import { PanelCard } from "@workspace/ui/components/panel-card";
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { StatementCard } from "@workspace/ui/components/statement-card";
-import { BarChart3, Smartphone } from "lucide-react";
+import { BarChart3 } from "lucide-react";
 import { useState } from "react";
 
 import type { TeacherStep } from "@/types/teacher-step";
@@ -30,6 +31,7 @@ export function useStep2(): TeacherStep {
     avgConfidenceR1ByVote,
     selectedIdx,
     goToStep,
+    highlightBegrunnelse,
   } = useTeacherSession();
   const begrunnelseTab = panelTab === "default" || panelTab === "begrunnelser";
   const [showAvgBreakdown, setShowAvgBreakdown] = useState(false);

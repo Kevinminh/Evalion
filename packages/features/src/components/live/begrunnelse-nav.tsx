@@ -1,13 +1,15 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { ReactNode } from "react";
 
 interface BegrunnelseNavProps {
   current: number;
   total: number;
   onPrev: () => void;
   onNext: () => void;
+  label?: ReactNode;
 }
 
-export function BegrunnelseNav({ current, total, onPrev, onNext }: BegrunnelseNavProps) {
+export function BegrunnelseNav({ current, total, onPrev, onNext, label }: BegrunnelseNavProps) {
   return (
     <div className="flex items-center justify-center gap-4">
       <button
@@ -18,7 +20,7 @@ export function BegrunnelseNav({ current, total, onPrev, onNext }: BegrunnelseNa
         <ChevronLeft className="size-5" />
       </button>
       <span className="text-sm font-semibold text-muted-foreground">
-        {current} av {total}
+        {label ?? `${current} av ${total}`}
       </span>
       <button
         onClick={onNext}

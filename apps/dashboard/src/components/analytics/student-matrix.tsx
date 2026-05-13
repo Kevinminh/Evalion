@@ -63,7 +63,7 @@ export function StudentMatrix({
             <div className="pb-2 text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
               {selected.label} ({selected.students.length})
             </div>
-            <div className="-mx-3.5 flex flex-col">
+            <div className="-mx-3.5 flex max-h-96 flex-col overflow-y-auto">
               {selected.students.map((s, j) => {
                 const canHighlight = !!s.begrunnelse && !!onToggleHighlight;
                 const highlighted = s.begrunnelse?.highlighted ?? false;

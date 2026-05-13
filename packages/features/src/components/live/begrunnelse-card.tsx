@@ -1,5 +1,6 @@
 import type { Fasit } from "@workspace/features/lib/types";
 import { cn } from "@workspace/ui/lib/utils";
+import { X } from "lucide-react";
 
 import { VoteBadge } from "./vote-badge";
 
@@ -8,6 +9,7 @@ interface BegrunnelseCardProps {
   vote?: Fasit;
   highlighted?: boolean;
   className?: string;
+  onDismiss?: () => void;
 }
 
 export function BegrunnelseCard({
@@ -15,6 +17,7 @@ export function BegrunnelseCard({
   vote,
   highlighted = false,
   className,
+  onDismiss,
 }: BegrunnelseCardProps) {
   return (
     <div
@@ -23,9 +26,20 @@ export function BegrunnelseCard({
         highlighted
           ? "border-l-[var(--color-purple-400)]"
           : "border-l-[var(--color-highlight-strip)]",
+        onDismiss && "pr-10",
         className,
       )}
     >
+      {onDismiss && (
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label="Fjern fra fremhevet"
+          className="absolute right-2 top-2 flex size-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <X className="size-4" />
+        </button>
+      )}
       {vote && (
         <VoteBadge
           vote={vote}
