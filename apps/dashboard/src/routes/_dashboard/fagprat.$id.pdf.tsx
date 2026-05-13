@@ -66,7 +66,7 @@ function FagPratPdfPage() {
   }
 
   return (
-    <div className="-mx-6 -my-6 grid h-[calc(100vh-64px)] grid-cols-[360px_1fr] grid-rows-[56px_1fr] bg-muted/40 font-sans max-[820px]:h-auto max-[820px]:min-h-[calc(100vh-64px)] max-[820px]:grid-cols-[1fr] max-[820px]:grid-rows-[52px_auto_1fr]">
+    <div className="fixed inset-y-0 right-0 left-[var(--sidebar-width)] z-40 grid grid-cols-[300px_1fr] grid-rows-[56px_1fr] bg-muted/40 font-sans max-[820px]:left-0 max-[820px]:grid-cols-[1fr] max-[820px]:grid-rows-[52px_auto_1fr] print:static print:inset-auto">
       <header className="col-span-2 flex items-center justify-between border-b border-border bg-card px-5 max-[820px]:col-span-1">
         <button
           type="button"
@@ -156,7 +156,7 @@ function FagPratPdfPage() {
         </form>
       </aside>
 
-      <main className="col-start-2 row-start-2 overflow-y-auto px-6 pt-8 pb-20 max-[820px]:col-start-1 max-[820px]:row-start-3 max-[820px]:px-3 max-[820px]:pt-5 max-[820px]:pb-14">
+      <main className="col-start-2 row-start-2 overflow-y-auto px-3 pt-8 pb-20 max-[820px]:col-start-1 max-[820px]:row-start-3 max-[820px]:px-3 max-[820px]:pt-5 max-[820px]:pb-14">
         <PdfPreview
           title={title || fagprat.title}
           fag={fagprat.subject}
