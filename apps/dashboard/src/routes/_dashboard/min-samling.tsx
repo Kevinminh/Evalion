@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { CustomDropdown } from "@/components/custom-dropdown";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
@@ -8,14 +8,49 @@ import { FagPratCard } from "@/components/fagprat-card";
 import { FagPratCardSkeleton } from "@workspace/evalion/components/skeletons/fagprat-card-skeleton";
 import { SKELETON_COUNT } from "@/lib/constants";
 import { fagpratQueries } from "@/lib/convex";
+import { useDebouncedValue } from "@/lib/use-debounced-value";
+
+type SortBy = "sist-endret" | "fag";
+
+interface MinSamlingSearch {
+  q?: string;
+  sort?: SortBy;
+}
 
 export const Route = createFileRoute("/_dashboard/min-samling")({
+  validateSearch: (search: Record<string, unknown>): MinSamlingSearch => ({
+    q: typeof search.q === "string" && search.q ? search.q : undefined,
+    sort: search.sort === "fag" ? "fag" : undefined,
+  }),
   component: MinSamlingPage,
 });
 
 function MinSamlingPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<"sist-endret" | "fag">("sist-endret");
+  const { q, sort } = Route.useSearch();
+  const sortBy: SortBy = sort ?? "sist-endret";
+  const navigate = useNavigate({ from: Route.fullPath });
+
+  const [searchQuery, setSearchQuery] = useState(() => q ?? "");
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, 250);
+
+  useEffect(() => {
+    const next = debouncedSearchQuery || undefined;
+    if (next === q) return;
+    navigate({
+      search: (prev) => ({ ...prev, q: next }),
+      replace: true,
+    });
+  }, [debouncedSearchQuery, q, navigate]);
+
+  const setSortBy = useCallback(
+    (value: SortBy) => {
+      navigate({
+        search: (prev) => ({ ...prev, sort: value === "sist-endret" ? undefined : value }),
+        replace: true,
+      });
+    },
+    [navigate],
+  );
 
   const { data: allFagPrats, isPending, isError } = useQuery(fagpratQueries.listByAuthor());
 
@@ -64,7 +99,7 @@ function MinSamlingPage() {
             <CustomDropdown
               label=""
               value={sortBy}
-              onChange={(v) => setSortBy(v as "sist-endret" | "fag")}
+              onChange={(v) => { setSortBy(v as SortBy); }}
               placeholder="Sorter"
               options={[
                 { value: "sist-endret", label: "Sist endret" },

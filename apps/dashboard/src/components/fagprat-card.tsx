@@ -8,7 +8,7 @@ import {
 } from "@workspace/ui/components/dropdown-menu";
 import { useMutation } from "convex/react";
 import { Copy, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { toast } from "sonner";
 
 import { AuthorAvatar } from "@/components/author-avatar";
@@ -22,7 +22,9 @@ interface FagPratCardProps {
   variant: "browse" | "collection";
 }
 
-export function FagPratCard({ fagprat, variant }: FagPratCardProps) {
+export const FagPratCard = memo(FagPratCardImpl);
+
+function FagPratCardImpl({ fagprat, variant }: FagPratCardProps) {
   const navigate = useNavigate();
   const duplicateFagPrat = useMutation(api.fagprats.duplicate);
   const removeFagPrat = useMutation(api.fagprats.remove);

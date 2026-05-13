@@ -561,6 +561,7 @@
 
 /* Pill-shaped sort dropdown (used in inline page headers) */
 .sort-pill .filter-dropdown-trigger {
+  min-width: 140px;
   padding: var(--space-2-5) var(--space-4);
   padding-right: var(--space-8);
   font-weight: 600;
