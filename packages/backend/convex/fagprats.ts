@@ -125,6 +125,25 @@ export const update = mutation({
   },
 });
 
+export const setVisibility = mutation({
+  args: {
+    id: v.id("fagprats"),
+    visibility: v.union(v.literal("public"), v.literal("private")),
+  },
+  handler: async (ctx, args) => {
+    const identity = await requireAuth(ctx);
+    const existing = await ctx.db.get(args.id);
+    if (!existing) {
+      throw new Error("FagPrat not found");
+    }
+    if (existing.authorId !== identity.subject) {
+      throw new Error("Not authorized");
+    }
+    await ctx.db.patch(args.id, { visibility: args.visibility, updatedAt: Date.now() });
+    return args.visibility;
+  },
+});
+
 export const remove = mutation({
   args: { id: v.id("fagprats") },
   handler: async (ctx, args) => {

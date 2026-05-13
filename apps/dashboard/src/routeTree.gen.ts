@@ -25,6 +25,7 @@ import { Route as AuthedLiveoktIdRouteImport } from './routes/_authed/liveokt.$i
 import { Route as AuthedAnalyticsIdRouteImport } from './routes/_authed/analytics.$id'
 import { Route as DashboardFagpratIdIndexRouteImport } from './routes/_dashboard/fagprat.$id.index'
 import { Route as DashboardFagpratIdRedigerRouteImport } from './routes/_dashboard/fagprat.$id.rediger'
+import { Route as DashboardFagpratIdPdfRouteImport } from './routes/_dashboard/fagprat.$id.pdf'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -105,6 +106,11 @@ const DashboardFagpratIdRedigerRoute =
     path: '/fagprat/$id/rediger',
     getParentRoute: () => DashboardRoute,
   } as any)
+const DashboardFagpratIdPdfRoute = DashboardFagpratIdPdfRouteImport.update({
+  id: '/fagprat/$id/pdf',
+  path: '/fagprat/$id/pdf',
+  getParentRoute: () => DashboardRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof DashboardIndexRoute
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/analytics/$id': typeof AuthedAnalyticsIdRoute
   '/liveokt/$id': typeof AuthedLiveoktIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/fagprat/$id/pdf': typeof DashboardFagpratIdPdfRoute
   '/fagprat/$id/rediger': typeof DashboardFagpratIdRedigerRoute
   '/fagprat/$id/': typeof DashboardFagpratIdIndexRoute
 }
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/analytics/$id': typeof AuthedAnalyticsIdRoute
   '/liveokt/$id': typeof AuthedLiveoktIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/fagprat/$id/pdf': typeof DashboardFagpratIdPdfRoute
   '/fagprat/$id/rediger': typeof DashboardFagpratIdRedigerRoute
   '/fagprat/$id': typeof DashboardFagpratIdIndexRoute
 }
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/_authed/analytics/$id': typeof AuthedAnalyticsIdRoute
   '/_authed/liveokt/$id': typeof AuthedLiveoktIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_dashboard/fagprat/$id/pdf': typeof DashboardFagpratIdPdfRoute
   '/_dashboard/fagprat/$id/rediger': typeof DashboardFagpratIdRedigerRoute
   '/_dashboard/fagprat/$id/': typeof DashboardFagpratIdIndexRoute
 }
@@ -172,6 +181,7 @@ export interface FileRouteTypes {
     | '/analytics/$id'
     | '/liveokt/$id'
     | '/api/auth/$'
+    | '/fagprat/$id/pdf'
     | '/fagprat/$id/rediger'
     | '/fagprat/$id/'
   fileRoutesByTo: FileRoutesByTo
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/analytics/$id'
     | '/liveokt/$id'
     | '/api/auth/$'
+    | '/fagprat/$id/pdf'
     | '/fagprat/$id/rediger'
     | '/fagprat/$id'
   id:
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/_authed/analytics/$id'
     | '/_authed/liveokt/$id'
     | '/api/auth/$'
+    | '/_dashboard/fagprat/$id/pdf'
     | '/_dashboard/fagprat/$id/rediger'
     | '/_dashboard/fagprat/$id/'
   fileRoutesById: FileRoutesById
@@ -333,6 +345,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardFagpratIdRedigerRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/fagprat/$id/pdf': {
+      id: '/_dashboard/fagprat/$id/pdf'
+      path: '/fagprat/$id/pdf'
+      fullPath: '/fagprat/$id/pdf'
+      preLoaderRoute: typeof DashboardFagpratIdPdfRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
 
@@ -357,6 +376,7 @@ interface DashboardRouteChildren {
   DashboardMinSamlingRoute: typeof DashboardMinSamlingRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardFagpratIdPdfRoute: typeof DashboardFagpratIdPdfRoute
   DashboardFagpratIdRedigerRoute: typeof DashboardFagpratIdRedigerRoute
   DashboardFagpratIdIndexRoute: typeof DashboardFagpratIdIndexRoute
 }
@@ -367,6 +387,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardMinSamlingRoute: DashboardMinSamlingRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardFagpratIdPdfRoute: DashboardFagpratIdPdfRoute,
   DashboardFagpratIdRedigerRoute: DashboardFagpratIdRedigerRoute,
   DashboardFagpratIdIndexRoute: DashboardFagpratIdIndexRoute,
 }
