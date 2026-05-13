@@ -6,11 +6,29 @@ import { CustomDropdown } from "@/components/custom-dropdown";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { FagPratCard } from "@/components/fagprat-card";
 import { FagPratCardSkeleton } from "@workspace/evalion/components/skeletons/fagprat-card-skeleton";
-import { SKELETON_COUNT } from "@/lib/constants";
+import { LEVEL_OPTIONS, SKELETON_COUNT } from "@/lib/constants";
 import { fagpratQueries } from "@/lib/convex";
 import { useDebouncedValue } from "@/lib/use-debounced-value";
 
-type SortBy = "sist-endret" | "fag";
+const SORT_OPTIONS = [
+  { value: "sist-endret", label: "Sist endret" },
+  { value: "opprettet", label: "Opprettet" },
+  { value: "fag", label: "Fag" },
+  { value: "trinn", label: "Trinn" },
+] as const;
+
+type SortBy = (typeof SORT_OPTIONS)[number]["value"];
+
+const LEVEL_ORDER = new Map<string, number>(LEVEL_OPTIONS.map((opt, i) => [opt.value, i]));
+const compareLevel = (a: string, b: string) => {
+  const aIdx = LEVEL_ORDER.get(a) ?? Number.POSITIVE_INFINITY;
+  const bIdx = LEVEL_ORDER.get(b) ?? Number.POSITIVE_INFINITY;
+  if (aIdx !== bIdx) return aIdx - bIdx;
+  return a.localeCompare(b, "nb");
+};
+
+const isSortBy = (value: string): value is SortBy =>
+  value === "sist-endret" || value === "opprettet" || value === "fag" || value === "trinn";
 
 interface MinSamlingSearch {
   q?: string;
@@ -18,10 +36,14 @@ interface MinSamlingSearch {
 }
 
 export const Route = createFileRoute("/_dashboard/min-samling")({
-  validateSearch: (search: Record<string, unknown>): MinSamlingSearch => ({
-    q: typeof search.q === "string" && search.q ? search.q : undefined,
-    sort: search.sort === "fag" ? "fag" : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): MinSamlingSearch => {
+    const { sort } = search;
+    return {
+      q: typeof search.q === "string" && search.q ? search.q : undefined,
+      sort:
+        sort === "fag" || sort === "trinn" || sort === "opprettet" ? sort : undefined,
+    };
+  },
   component: MinSamlingPage,
 });
 
@@ -54,6 +76,8 @@ function MinSamlingPage() {
 
   const { data: allFagPrats, isPending, isError } = useQuery(fagpratQueries.listByAuthor());
 
+  // Backend returns docs ordered by updatedAt desc (via `by_author_updatedAt` index),
+  // so "sist-endret" needs no client-side sort.
   const filtered = useMemo(() => {
     if (!allFagPrats) return [];
     if (!searchQuery) return allFagPrats;
@@ -65,19 +89,34 @@ function MinSamlingPage() {
     );
   }, [allFagPrats, searchQuery]);
 
-  const grouped = useMemo(
-    () =>
-      filtered.reduce(
-        (acc, fp) => {
-          const key = fp.subject;
-          if (!acc[key]) acc[key] = [];
-          acc[key].push(fp);
-          return acc;
-        },
-        {} as Record<string, typeof filtered>,
-      ),
-    [filtered],
-  );
+  const sortedList = useMemo(() => {
+    if (sortBy === "opprettet") {
+      return [...filtered].sort((a, b) => b._creationTime - a._creationTime);
+    }
+    return filtered;
+  }, [filtered, sortBy]);
+
+  const groups = useMemo(() => {
+    if (sortBy !== "fag" && sortBy !== "trinn") return [];
+    const useSubject = sortBy === "fag";
+    const map = new Map<string, typeof filtered>();
+    for (const fp of filtered) {
+      const key = useSubject ? fp.subject : fp.level;
+      const bucket = map.get(key);
+      if (bucket) {
+        bucket.push(fp);
+      } else {
+        map.set(key, [fp]);
+      }
+    }
+    const entries = Array.from(map);
+    if (!useSubject) {
+      entries.sort(([a], [b]) => compareLevel(a, b));
+    }
+    return entries;
+  }, [filtered, sortBy]);
+
+  const showLinear = sortBy === "sist-endret" || sortBy === "opprettet";
 
   return (
     <>
@@ -99,12 +138,11 @@ function MinSamlingPage() {
             <CustomDropdown
               label=""
               value={sortBy}
-              onChange={(v) => { setSortBy(v as SortBy); }}
+              onChange={(v) => {
+                if (isSortBy(v)) setSortBy(v);
+              }}
               placeholder="Sorter"
-              options={[
-                { value: "sist-endret", label: "Sist endret" },
-                { value: "fag", label: "Fag" },
-              ]}
+              options={SORT_OPTIONS}
             />
           </div>
         </div>
@@ -120,19 +158,19 @@ function MinSamlingPage() {
         </div>
       )}
 
-      {!isPending && sortBy === "sist-endret" && filtered.length > 0 && (
+      {!isPending && showLinear && sortedList.length > 0 && (
         <div className="fp-grid">
-          {filtered.map((fp) => (
+          {sortedList.map((fp) => (
             <FagPratCard key={fp._id} fagprat={fp} variant="collection" />
           ))}
         </div>
       )}
 
       {!isPending &&
-        sortBy === "fag" &&
-        Object.entries(grouped).map(([subject, items]) => (
-          <div key={subject} className="fag-group">
-            <h2 className="fag-group-title">{subject}</h2>
+        !showLinear &&
+        groups.map(([title, items]) => (
+          <div key={title} className="fag-group">
+            <h2 className="fag-group-title">{title}</h2>
             <div className="fp-grid">
               {items.map((fp) => (
                 <FagPratCard key={fp._id} fagprat={fp} variant="collection" />
