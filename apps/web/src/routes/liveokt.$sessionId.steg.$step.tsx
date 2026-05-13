@@ -70,7 +70,7 @@ function LiveStepPage() {
   });
   const { data: begrunnelser } = useQuery({
     ...liveSessionQueries.getBegrunnelser(typedSessionId, selectedIdx),
-    enabled: !!fagprat && [2, 5].includes(step),
+    enabled: !!fagprat && [2, 4, 5].includes(step),
   });
 
   if (sessionLoading || fagpratLoading) {

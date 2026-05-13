@@ -62,10 +62,14 @@ export function useStep2(): TeacherStep {
     />
   );
 
-  const highlighted = begrunnelser?.find((b) => b.highlighted) ?? null;
-  const highlightedVote = highlighted
-    ? activeRoundVotes.find((v) => v.studentId === highlighted.studentId)?.vote
-    : undefined;
+  const voteByStudent = new Map(activeRoundVotes.map((v) => [v.studentId, v.vote]));
+  const highlightedItems = (begrunnelser ?? [])
+    .filter((b) => b.highlighted && b.round === 1)
+    .map((b) => ({
+      id: b._id,
+      text: b.text,
+      vote: voteByStudent.get(b.studentId) as Fasit | undefined,
+    }));
 
   const panel = (
     <div className="flex h-full min-h-0 flex-col gap-3">
@@ -80,26 +84,13 @@ export function useStep2(): TeacherStep {
       >
         {begrunnelseTab ? (
           <PanelCard gap="2">
-            {highlighted ? (
-              <div className="flex flex-col gap-2">
-                <p className="px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-highlight-strip-text)]">
-                  Fremhevet
-                </p>
-                <BegrunnelseCard
-                  text={highlighted.text}
-                  vote={highlightedVote}
-                  highlighted
-                />
-              </div>
-            ) : (
-              <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-6 text-center">
-                <Smartphone className="size-9 text-[var(--color-neutral-400)]" strokeWidth={1.5} />
-                <p className="max-w-[240px] text-sm leading-relaxed text-[var(--color-text-ink-faint)]">
-                  Trykk på begrunnelser i live-statistikken på din eksterne enhet for å fremheve
-                  dem her.
-                </p>
-              </div>
-            )}
+            <FremhevetCarousel
+              items={highlightedItems}
+              onDismiss={(id) => {
+                const target = begrunnelser?.find((b) => b._id === id);
+                if (target) void highlightBegrunnelse(target);
+              }}
+            />
           </PanelCard>
         ) : (
           <PanelCard>

@@ -4,11 +4,13 @@ import { CountdownOverlay } from "@workspace/features/components/live/countdown-
 import { DistributionChart } from "@workspace/features/components/live/distribution-chart";
 import { EndringerCard } from "@workspace/features/components/live/endringer-card";
 import { FasitBadgeOverlay } from "@workspace/features/components/live/fasit-badge-overlay";
+import { FremhevetCarousel } from "@workspace/features/components/live/fremhevet-carousel";
 import { PanelTabs } from "@workspace/features/components/live/panel-tabs";
 import { Professor } from "@workspace/features/components/live/professor";
 import { TeacherStepLayout } from "@workspace/features/components/live/teacher-step-layout";
 import { FASIT_TEXT, resolveStatementHex } from "@workspace/features/lib/constants";
 import { formatDecimal1 } from "@workspace/features/lib/format";
+import type { Fasit } from "@workspace/features/lib/types";
 import { PanelCard } from "@workspace/ui/components/panel-card";
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { StatementCard } from "@workspace/ui/components/statement-card";
@@ -36,15 +38,28 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
     changedToCorrect,
     changedToIncorrect,
     totalChanged,
+    r1Votes,
     r2Votes,
     selectedIdx,
     avgConfidenceR1,
     avgConfidenceR2,
     avgConfidenceR2ByVote,
     goToStep,
+    begrunnelser,
+    highlightBegrunnelse,
   } = useTeacherSession();
   const endringerTab = panelTab === "default" || panelTab === "endringer";
+  const fremhevetTab = panelTab === "fremhevet";
   const [showAvgBreakdown, setShowAvgBreakdown] = useState(false);
+
+  const voteByStudentR1 = new Map(r1Votes.map((v) => [v.studentId, v.vote]));
+  const highlightedItems = (begrunnelser ?? [])
+    .filter((b) => b.highlighted && b.round === 1)
+    .map((b) => ({
+      id: b._id,
+      text: b.text,
+      vote: voteByStudentR1.get(b.studentId) as Fasit | undefined,
+    }));
 
   const statementColor = resolveStatementHex(statement?.color, selectedIdx);
 
@@ -103,12 +118,23 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
       <PanelTabs
         tabs={[
           { key: "endringer", label: "Endringer" },
+          { key: "fremhevet", label: "Fremhevet" },
           { key: "stemmefordeling", label: "Stemmefordeling" },
         ]}
-        activeTab={endringerTab ? "endringer" : "stemmefordeling"}
+        activeTab={fremhevetTab ? "fremhevet" : endringerTab ? "endringer" : "stemmefordeling"}
         onTabChange={setPanelTab}
       >
-        {endringerTab ? (
+        {fremhevetTab ? (
+          <PanelCard gap="2">
+            <FremhevetCarousel
+              items={highlightedItems}
+              onDismiss={(id) => {
+                const target = begrunnelser?.find((b) => b._id === id);
+                if (target) void highlightBegrunnelse(target);
+              }}
+            />
+          </PanelCard>
+        ) : endringerTab ? (
           <PanelCard>
             <EndringerCard
               correctCount={r2CorrectCount}

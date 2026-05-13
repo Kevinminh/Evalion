@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 
-import { query, mutation } from "./_generated/server";
+import type { Doc } from "./_generated/dataModel";
+import { query, mutation, type QueryCtx } from "./_generated/server";
 import { requireAuth, requireSessionOwner, validateStatementIndex } from "./helpers";
 
 function generateJoinCode(): string {
