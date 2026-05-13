@@ -7,7 +7,6 @@ import { Professor } from "@workspace/features/components/live/professor";
 import { TeacherStepLayout } from "@workspace/features/components/live/teacher-step-layout";
 import { resolveStatementHex } from "@workspace/features/lib/constants";
 import { formatDecimal1 } from "@workspace/features/lib/format";
-import type { Fasit } from "@workspace/features/lib/types";
 import { PanelCard } from "@workspace/ui/components/panel-card";
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { StatementCard } from "@workspace/ui/components/statement-card";
@@ -62,15 +61,6 @@ export function useStep2(): TeacherStep {
     />
   );
 
-  const voteByStudent = new Map(activeRoundVotes.map((v) => [v.studentId, v.vote]));
-  const highlightedItems = (begrunnelser ?? [])
-    .filter((b) => b.highlighted && b.round === 1)
-    .map((b) => ({
-      id: b._id,
-      text: b.text,
-      vote: voteByStudent.get(b.studentId) as Fasit | undefined,
-    }));
-
   const panel = (
     <div className="flex h-full min-h-0 flex-col gap-3">
       <PanelSectionLabel>Elevsvar – Første stemmerunde</PanelSectionLabel>
@@ -85,11 +75,10 @@ export function useStep2(): TeacherStep {
         {begrunnelseTab ? (
           <PanelCard gap="2">
             <FremhevetCarousel
-              items={highlightedItems}
-              onDismiss={(id) => {
-                const target = begrunnelser?.find((b) => b._id === id);
-                if (target) void highlightBegrunnelse(target);
-              }}
+              begrunnelser={begrunnelser}
+              votes={activeRoundVotes}
+              round={1}
+              onDismiss={(b) => void highlightBegrunnelse(b)}
             />
           </PanelCard>
         ) : (

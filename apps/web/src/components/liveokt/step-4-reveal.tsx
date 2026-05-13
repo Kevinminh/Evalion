@@ -10,7 +10,6 @@ import { Professor } from "@workspace/features/components/live/professor";
 import { TeacherStepLayout } from "@workspace/features/components/live/teacher-step-layout";
 import { FASIT_TEXT, resolveStatementHex } from "@workspace/features/lib/constants";
 import { formatDecimal1 } from "@workspace/features/lib/format";
-import type { Fasit } from "@workspace/features/lib/types";
 import { PanelCard } from "@workspace/ui/components/panel-card";
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { StatementCard } from "@workspace/ui/components/statement-card";
@@ -51,15 +50,6 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
   const endringerTab = panelTab === "default" || panelTab === "endringer";
   const fremhevetTab = panelTab === "fremhevet";
   const [showAvgBreakdown, setShowAvgBreakdown] = useState(false);
-
-  const voteByStudentR1 = new Map(r1Votes.map((v) => [v.studentId, v.vote]));
-  const highlightedItems = (begrunnelser ?? [])
-    .filter((b) => b.highlighted && b.round === 1)
-    .map((b) => ({
-      id: b._id,
-      text: b.text,
-      vote: voteByStudentR1.get(b.studentId) as Fasit | undefined,
-    }));
 
   const statementColor = resolveStatementHex(statement?.color, selectedIdx);
 
@@ -127,11 +117,10 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
         {fremhevetTab ? (
           <PanelCard gap="2">
             <FremhevetCarousel
-              items={highlightedItems}
-              onDismiss={(id) => {
-                const target = begrunnelser?.find((b) => b._id === id);
-                if (target) void highlightBegrunnelse(target);
-              }}
+              begrunnelser={begrunnelser}
+              votes={r1Votes}
+              round={1}
+              onDismiss={(b) => void highlightBegrunnelse(b)}
             />
           </PanelCard>
         ) : endringerTab ? (

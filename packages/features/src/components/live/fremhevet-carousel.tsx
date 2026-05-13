@@ -1,26 +1,35 @@
-import type { Id } from "@workspace/backend/convex/_generated/dataModel";
-import type { Fasit } from "@workspace/features/lib/types";
+import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
 import { Smartphone } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { BegrunnelseCard } from "./begrunnelse-card";
 import { BegrunnelseNav } from "./begrunnelse-nav";
 
 const PAGE_SIZE = 3;
 
-interface FremhevetItem {
-  id: Id<"sessionBegrunnelser">;
-  text: string;
-  vote?: Fasit;
-}
-
 interface FremhevetCarouselProps {
-  items: FremhevetItem[];
-  onDismiss: (id: Id<"sessionBegrunnelser">) => void;
+  begrunnelser: Doc<"sessionBegrunnelser">[] | undefined;
+  votes: Doc<"sessionVotes">[];
+  round: number;
+  onDismiss: (begrunnelse: Doc<"sessionBegrunnelser">) => void;
 }
 
-export function FremhevetCarousel({ items, onDismiss }: FremhevetCarouselProps) {
+export function FremhevetCarousel({
+  begrunnelser,
+  votes,
+  round,
+  onDismiss,
+}: FremhevetCarouselProps) {
+  const voteByStudent = new Map(votes.map((v) => [v.studentId, v.vote]));
+  const items = (begrunnelser ?? []).filter((b) => b.highlighted && b.round === round);
+
+  const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
   const [page, setPage] = useState(0);
+
+  // Keep `page` in range when items shrink (e.g. teacher dismisses the last card on a non-first page).
+  useEffect(() => {
+    if (page > totalPages - 1) setPage(Math.max(0, totalPages - 1));
+  }, [page, totalPages]);
 
   if (items.length === 0) {
     return (
@@ -33,9 +42,7 @@ export function FremhevetCarousel({ items, onDismiss }: FremhevetCarouselProps) 
     );
   }
 
-  const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages - 1);
-  const start = safePage * PAGE_SIZE;
+  const start = page * PAGE_SIZE;
   const visible = items.slice(start, start + PAGE_SIZE);
   const rangeEnd = Math.min(start + PAGE_SIZE, items.length);
 
@@ -47,7 +54,7 @@ export function FremhevetCarousel({ items, onDismiss }: FremhevetCarouselProps) 
         </p>
         {items.length > PAGE_SIZE && (
           <BegrunnelseNav
-            current={safePage + 1}
+            current={page + 1}
             total={totalPages}
             onPrev={() => setPage((p) => Math.max(0, p - 1))}
             onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
@@ -56,13 +63,13 @@ export function FremhevetCarousel({ items, onDismiss }: FremhevetCarouselProps) 
         )}
       </div>
       <div className="flex flex-col gap-2">
-        {visible.map((item) => (
+        {visible.map((b) => (
           <BegrunnelseCard
-            key={item.id}
-            text={item.text}
-            vote={item.vote}
+            key={b._id}
+            text={b.text}
+            vote={voteByStudent.get(b.studentId)}
             highlighted
-            onDismiss={() => onDismiss(item.id)}
+            onDismiss={() => onDismiss(b)}
           />
         ))}
       </div>
