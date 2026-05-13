@@ -196,8 +196,9 @@ export function RoundAnalytics({
           </Popover>
         </div>
 
-        <div className="flex min-h-[280px] flex-col border-t border-neutral-100 px-2 pt-2 pb-3">
-          <ColumnChart items={voteItems} fill />
+        <div className="border-t border-neutral-100 px-3.5 pb-3.5">
+          <p className="pt-1.5 text-[10px] font-semibold text-muted-foreground">Stemmefordeling</p>
+          <ColumnChart items={voteItems} />
         </div>
       </div>
 
