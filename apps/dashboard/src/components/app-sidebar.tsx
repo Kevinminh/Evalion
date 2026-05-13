@@ -79,18 +79,23 @@ export function AppSidebar() {
             <span className="sidebar-user-email">{email}</span>
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" side="top" sideOffset={8}>
-          <DropdownMenuItem render={<Link to="/profile" />}>
-            <Settings className="size-4" />
+        <DropdownMenuContent
+          align="end"
+          side="top"
+          sideOffset={8}
+          className="card-menu-content"
+        >
+          <DropdownMenuItem className="card-menu-item" render={<Link to="/profile" />}>
+            <Settings />
             Innstillinger
           </DropdownMenuItem>
-          <DropdownMenuItem disabled>
-            <HelpCircle className="size-4" />
+          <DropdownMenuItem className="card-menu-item" disabled>
+            <HelpCircle />
             Hjelp
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout}>
-            <LogOut className="size-4" />
+          <DropdownMenuSeparator className="card-menu-separator" />
+          <DropdownMenuItem className="card-menu-item" onClick={handleLogout}>
+            <LogOut />
             Logg ut
           </DropdownMenuItem>
         </DropdownMenuContent>
