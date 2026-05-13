@@ -139,7 +139,7 @@ export function ResultatTab({
             Alle elever
           </span>
         </div>
-        <div className="flex flex-col px-3.5">
+        <div className="flex max-h-96 flex-col overflow-y-auto px-3.5">
           {sortedStudents.map((s) => (
             <div
               key={s.studentId}
