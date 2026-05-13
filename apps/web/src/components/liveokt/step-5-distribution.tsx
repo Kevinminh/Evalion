@@ -1,8 +1,8 @@
-import { BackButton } from "@workspace/evalion/components/live/back-button";
-import { BegrunnelseCard } from "@workspace/evalion/components/live/begrunnelse-card";
-import { FasitBadgeOverlay } from "@workspace/evalion/components/live/fasit-badge-overlay";
-import { resolveStatementHex } from "@workspace/evalion/lib/constants";
-import { percentage } from "@workspace/evalion/lib/format";
+import { BackButton } from "@workspace/features/components/live/back-button";
+import { BegrunnelseCard } from "@workspace/features/components/live/begrunnelse-card";
+import { FasitBadgeOverlay } from "@workspace/features/components/live/fasit-badge-overlay";
+import { resolveStatementHex } from "@workspace/features/lib/constants";
+import { percentage } from "@workspace/features/lib/format";
 import { PanelCard } from "@workspace/ui/components/panel-card";
 import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 

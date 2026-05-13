@@ -1,5 +1,5 @@
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
-import type { FagPratStatement, Fasit } from "@workspace/evalion/lib/types";
+import type { FagPratStatement, Fasit } from "@workspace/features/lib/types";
 import { useMutation } from "convex/react";
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 

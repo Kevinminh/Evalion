@@ -17,7 +17,7 @@ All three apps speak to the same Convex deployment and share a single Better Aut
 ```
 packages/
 ├── backend/        @workspace/backend   Convex schema, functions, HTTP, auth
-├── evalion/        @workspace/evalion   Cross-app feature code (depends on backend + ui)
+├── features/       @workspace/features  Cross-app feature code (depends on backend + ui)
 ├── ui/             @workspace/ui        Pure UI primitives (no backend deps)
 └── config/         @evalion/config      Shared base tsconfig
 ```
@@ -27,7 +27,7 @@ packages/
 ```
                          ┌─ touches Convex/auth or shared by 2+ apps?
                          │
-new component ──┬──── yes ┴──→  packages/evalion
+new component ──┬──── yes ┴──→  packages/features
                 │
                 ├──── no, pure presentational primitive ──→  packages/ui
                 │
@@ -37,8 +37,8 @@ new component ──┬──── yes ┴──→  packages/evalion
 Rules of thumb:
 
 - **`packages/ui` must not import from `@workspace/backend`** — it stays a dumb presentation layer so it can be consumed without pulling Convex into the bundle.
-- **`packages/evalion` is the right home** for things like the live-session teacher panel, the auth login/register forms, the workspace shell, and route-level skeletons that two or more apps render.
-- **`apps/<app>` owns its own routes, providers, and one-off UI**. Don't promote a component to `@workspace/evalion` until a second app actually needs it.
+- **`packages/features` is the right home** for things like the live-session teacher panel, the auth login/register forms, the workspace shell, and route-level skeletons that two or more apps render.
+- **`apps/<app>` owns its own routes, providers, and one-off UI**. Don't promote a component to `@workspace/features` until a second app actually needs it.
 
 ## Routing layout
 
@@ -115,7 +115,7 @@ app/
 │  apps/web   │      │ apps/landing│      │apps/dashboard│
 └──────┬──────┘      └──────┬──────┘      └──────┬──────┘
        │                    │                    │
-       │  @workspace/evalion (shared UI + lib)   │
+       │  @workspace/features (shared UI + lib)   │
        └────────────────────┼────────────────────┘
                             │
                   @workspace/backend (Convex)

@@ -3,8 +3,8 @@ import {
   VOTE_DOT_COLORS,
   VOTE_LABELS,
   LEVEL_CIRCLE_COLORS,
-} from "@workspace/evalion/lib/constants";
-import type { Fasit } from "@workspace/evalion/lib/types";
+} from "@workspace/features/lib/constants";
+import type { Fasit } from "@workspace/features/lib/types";
 import { cn } from "@workspace/ui/lib/utils";
 
 import type { BegrunnelseRef } from "./types";

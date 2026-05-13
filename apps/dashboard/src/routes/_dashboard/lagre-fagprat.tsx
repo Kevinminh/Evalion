@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { parseDraftJson } from "@workspace/evalion/lib/draft-utils";
+import { parseDraftJson } from "@workspace/features/lib/draft-utils";
 import { Button } from "@workspace/ui/components/button";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { useMutation } from "convex/react";

@@ -2,13 +2,13 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
-import { FagPratDetailSkeleton } from "@workspace/evalion/components/skeletons/fagprat-detail-skeleton";
+import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
+import { FagPratDetailSkeleton } from "@workspace/features/components/skeletons/fagprat-detail-skeleton";
 import {
   toStatementPayload,
   toStatementsWithId,
   useStatements,
-} from "@workspace/evalion/hooks/use-statements";
+} from "@workspace/features/hooks/use-statements";
 import { Button } from "@workspace/ui/components/button";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";

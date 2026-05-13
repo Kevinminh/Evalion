@@ -131,4 +131,4 @@ export const someAdminThing = mutation({
 
 ## Shared auth UI
 
-Login, register, logout, and the user menu live in `packages/evalion/src/components/auth/` so all three apps render the same forms. Pull them in via `@workspace/evalion/components/auth/login-form` etc. — don't fork copies into individual apps.
+Login, register, logout, and the user menu live in `packages/features/src/components/auth/` so all three apps render the same forms. Pull them in via `@workspace/features/components/auth/login-form` etc. — don't fork copies into individual apps.

@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { SessionTopBar } from "@workspace/evalion/components/live/session-top-bar";
-import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
-import { TeacherLobbySkeleton } from "@workspace/evalion/components/skeletons/teacher-lobby-skeleton";
+import { SessionTopBar } from "@workspace/features/components/live/session-top-bar";
+import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
+import { TeacherLobbySkeleton } from "@workspace/features/components/skeletons/teacher-lobby-skeleton";
 import { DestructiveButton } from "@workspace/ui/components/destructive-button";
 import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
 import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";

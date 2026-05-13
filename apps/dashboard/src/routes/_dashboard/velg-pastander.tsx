@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { api } from "@workspace/backend/convex/_generated/api";
-import { parseDraftJson } from "@workspace/evalion/lib/draft-utils";
+import { parseDraftJson } from "@workspace/features/lib/draft-utils";
 import { cn } from "@workspace/ui/lib/utils";
 import { useAction } from "convex/react";
 import { AlertTriangle, ArrowLeft, ArrowRight, RefreshCw, Sparkles } from "lucide-react";

@@ -1,6 +1,6 @@
 import { notFound } from "@tanstack/react-router";
 import type { TableNames } from "@workspace/backend/convex/_generated/dataModel";
-import { isValidConvexId } from "@workspace/evalion/lib/convex-id";
+import { isValidConvexId } from "@workspace/features/lib/convex-id";
 
 import type { Id } from "@/lib/convex";
 

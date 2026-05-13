@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Professor } from "@workspace/evalion/components/live/professor";
-import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
-import { StudentGameSkeleton } from "@workspace/evalion/components/skeletons/student-game-skeleton";
+import { Professor } from "@workspace/features/components/live/professor";
+import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
+import { StudentGameSkeleton } from "@workspace/features/components/skeletons/student-game-skeleton";
 import { ConfirmDialog } from "@workspace/ui/components/confirm-dialog";
 import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
 import { StudentAvatar } from "@workspace/ui/components/student-avatar";

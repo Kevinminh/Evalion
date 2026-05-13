@@ -20,7 +20,7 @@
     "@tanstack/react-start": "catalog:",
     "@tanstack/router-plugin": "catalog:",
     "@workspace/backend": "workspace:*",
-    "@workspace/evalion": "workspace:*",
+    "@workspace/features": "workspace:*",
     "@workspace/ui": "workspace:*",
     "better-auth": "catalog:",
     "convex": "catalog:",

@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
-import { LiveStepSkeleton } from "@workspace/evalion/components/skeletons/live-step-skeleton";
-import { SessionTopBar } from "@workspace/evalion/components/live/session-top-bar";
-import { StepNav } from "@workspace/evalion/components/live/step-nav";
-import { TeacherPanel } from "@workspace/evalion/components/live/teacher-panel";
-import { TopBarTimer } from "@workspace/evalion/components/live/top-bar-timer";
-import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
+import { LiveStepSkeleton } from "@workspace/features/components/skeletons/live-step-skeleton";
+import { SessionTopBar } from "@workspace/features/components/live/session-top-bar";
+import { StepNav } from "@workspace/features/components/live/step-nav";
+import { TeacherPanel } from "@workspace/features/components/live/teacher-panel";
+import { TopBarTimer } from "@workspace/features/components/live/top-bar-timer";
+import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
 import { ArrowRight } from "lucide-react";
 import { useEffect, useRef } from "react";
 

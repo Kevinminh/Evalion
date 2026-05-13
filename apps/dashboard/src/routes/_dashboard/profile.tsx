@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { authClient } from "@workspace/evalion/lib/auth-client";
+import { authClient } from "@workspace/features/lib/auth-client";
 import { ProfileContactCard } from "@workspace/ui/components/profile-contact-card";
 import { ProfileDangerZoneCard } from "@workspace/ui/components/profile-danger-zone-card";
 import {

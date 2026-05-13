@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { FagPratCardSkeleton } from "@workspace/evalion/components/skeletons/fagprat-card-skeleton";
+import { FagPratCardSkeleton } from "@workspace/features/components/skeletons/fagprat-card-skeleton";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { Search, SlidersHorizontal, Sprout, Target } from "lucide-react";
 import { useState, useRef } from "react";

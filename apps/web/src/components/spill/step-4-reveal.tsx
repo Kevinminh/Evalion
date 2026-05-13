@@ -1,7 +1,7 @@
-import { CountdownOverlay } from "@workspace/evalion/components/live/countdown-overlay";
-import { FasitBadgeOverlay } from "@workspace/evalion/components/live/fasit-badge-overlay";
-import { Professor } from "@workspace/evalion/components/live/professor";
-import { FASIT_TEXT, resolveStatementStudentHex } from "@workspace/evalion/lib/constants";
+import { CountdownOverlay } from "@workspace/features/components/live/countdown-overlay";
+import { FasitBadgeOverlay } from "@workspace/features/components/live/fasit-badge-overlay";
+import { Professor } from "@workspace/features/components/live/professor";
+import { FASIT_TEXT, resolveStatementStudentHex } from "@workspace/features/lib/constants";
 
 import { RecordingDisclaimer } from "@workspace/ui/components/recording-disclaimer";
 import { StatementCard } from "@workspace/ui/components/statement-card";

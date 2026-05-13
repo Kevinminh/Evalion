@@ -1,6 +1,6 @@
 import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
-import { UserMenu } from "@workspace/evalion/components/auth/user-menu";
-import { authClient } from "@workspace/evalion/lib/auth-client";
+import { UserMenu } from "@workspace/features/components/auth/user-menu";
+import { authClient } from "@workspace/features/lib/auth-client";
 import { Button } from "@workspace/ui/components/button";
 import { DropdownMenuItem } from "@workspace/ui/components/dropdown-menu";
 import {

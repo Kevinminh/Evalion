@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-router";
-import { UserAvatar } from "@workspace/evalion/components/auth/user-menu";
-import { authClient } from "@workspace/evalion/lib/auth-client";
+import { UserAvatar } from "@workspace/features/components/auth/user-menu";
+import { authClient } from "@workspace/features/lib/auth-client";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Play, LogOut, User, Loader2 } from "lucide-react";

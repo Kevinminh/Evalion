@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createAuthHandler } from "@workspace/evalion/lib/auth-api-handler";
+import { createAuthHandler } from "@workspace/features/lib/auth-api-handler";
 
 const authHandler = createAuthHandler(process.env.COOKIE_DOMAIN);
 

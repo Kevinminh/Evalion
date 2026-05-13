@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { api } from "@workspace/backend/convex/_generated/api";
-import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
+import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";

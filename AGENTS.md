@@ -3,8 +3,8 @@
 ## Essentials
 
 - Stack: TypeScript + React (TanStack Start for `apps/web` & `apps/dashboard`, Next.js 15 for `apps/landing`) in a pnpm + Turborepo monorepo. Backend is Convex; auth is Better Auth via `@convex-dev/better-auth`.
-- Three workspace packages: `@workspace/backend` (Convex), `@workspace/evalion` (cross-app feature code), `@workspace/ui` (pure UI primitives).
-- Prefer shared `@workspace/ui` components; add primitives via shadcn CLI (`pnpm dlx shadcn@latest add <component> -c apps/web`). Promote anything that needs Convex/auth into `@workspace/evalion` instead of duplicating it across apps.
+- Three workspace packages: `@workspace/backend` (Convex), `@workspace/features` (cross-app feature code), `@workspace/ui` (pure UI primitives).
+- Prefer shared `@workspace/ui` components; add primitives via shadcn CLI (`pnpm dlx shadcn@latest add <component> -c apps/web`). Promote anything that needs Convex/auth into `@workspace/features` instead of duplicating it across apps.
 - Use shared pnpm catalog versions (`pnpm-workspace.yaml`) via `catalog:`.
 - Don't build after every little change. If `pnpm lint` and `pnpm typecheck` pass, assume changes work.
 

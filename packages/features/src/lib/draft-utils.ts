@@ -1,4 +1,4 @@
-import type { FagPratDraft } from "@workspace/evalion/lib/types";
+import type { FagPratDraft } from "@workspace/features/lib/types";
 
 /**
  * Safely parse a FagPrat draft from a JSON string.

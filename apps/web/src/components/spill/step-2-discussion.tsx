@@ -1,5 +1,5 @@
-import { Professor } from "@workspace/evalion/components/live/professor";
-import { resolveStatementStudentHex } from "@workspace/evalion/lib/constants";
+import { Professor } from "@workspace/features/components/live/professor";
+import { resolveStatementStudentHex } from "@workspace/features/lib/constants";
 import { RecordingDisclaimer } from "@workspace/ui/components/recording-disclaimer";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { StudentAvatar } from "@workspace/ui/components/student-avatar";

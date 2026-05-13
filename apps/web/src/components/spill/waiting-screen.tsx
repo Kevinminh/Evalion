@@ -1,4 +1,4 @@
-import { Professor } from "@workspace/evalion/components/live/professor";
+import { Professor } from "@workspace/features/components/live/professor";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 
 interface WaitingScreenProps {

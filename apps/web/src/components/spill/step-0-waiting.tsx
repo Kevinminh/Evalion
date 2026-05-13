@@ -1,4 +1,4 @@
-import { getStatementColorStudentHex } from "@workspace/evalion/lib/constants";
+import { getStatementColorStudentHex } from "@workspace/features/lib/constants";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 
 import { useStudentGame } from "./student-game-context";

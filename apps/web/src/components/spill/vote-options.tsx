@@ -1,4 +1,4 @@
-import type { Fasit } from "@workspace/evalion/lib/types";
+import type { Fasit } from "@workspace/features/lib/types";
 import { cn } from "@workspace/ui/lib/utils";
 
 interface VoteOptionsProps {

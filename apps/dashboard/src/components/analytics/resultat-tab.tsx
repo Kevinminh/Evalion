@@ -2,7 +2,7 @@ import {
   VOTE_DOT_COLORS,
   VOTE_LABELS,
   LEVEL_CIRCLE_COLORS,
-} from "@workspace/evalion/lib/constants";
+} from "@workspace/features/lib/constants";
 import { cn } from "@workspace/ui/lib/utils";
 import { BarChart3 } from "lucide-react";
 import { useMemo, useState } from "react";

@@ -1,4 +1,4 @@
-import { computeRemainingSeconds } from "@workspace/evalion/lib/timer";
+import { computeRemainingSeconds } from "@workspace/features/lib/timer";
 import { cn } from "@workspace/ui/lib/utils";
 import { Clock } from "lucide-react";
 import { useEffect, useState } from "react";

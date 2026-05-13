@@ -3,8 +3,8 @@ import {
   LEVEL_CIRCLE_COLORS,
   VOTE_DOT_COLORS,
   VOTE_LABELS,
-} from "@workspace/evalion/lib/constants";
-import type { Fasit } from "@workspace/evalion/lib/types";
+} from "@workspace/features/lib/constants";
+import type { Fasit } from "@workspace/features/lib/types";
 import { cn } from "@workspace/ui/lib/utils";
 import { MessageSquare, X } from "lucide-react";
 import { useEffect, useState } from "react";

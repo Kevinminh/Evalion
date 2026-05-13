@@ -1,6 +1,6 @@
 "use client";
 
-import { formatDecimal1 } from "@workspace/evalion/lib/format";
+import { formatDecimal1 } from "@workspace/features/lib/format";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   forwardRef,

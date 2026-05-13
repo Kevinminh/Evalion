@@ -1,8 +1,8 @@
-import { BackButton } from "@workspace/evalion/components/live/back-button";
-import { Professor } from "@workspace/evalion/components/live/professor";
-import { TeacherStepLayout } from "@workspace/evalion/components/live/teacher-step-layout";
-import { TimerCard } from "@workspace/evalion/components/live/timer-card";
-import { resolveStatementHex } from "@workspace/evalion/lib/constants";
+import { BackButton } from "@workspace/features/components/live/back-button";
+import { Professor } from "@workspace/features/components/live/professor";
+import { TeacherStepLayout } from "@workspace/features/components/live/teacher-step-layout";
+import { TimerCard } from "@workspace/features/components/live/timer-card";
+import { resolveStatementHex } from "@workspace/features/lib/constants";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { Users } from "lucide-react";
 

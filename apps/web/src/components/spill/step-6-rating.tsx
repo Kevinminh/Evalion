@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { FasitBadgeOverlay } from "@workspace/evalion/components/live/fasit-badge-overlay";
-import { resolveStatementStudentHex } from "@workspace/evalion/lib/constants";
+import { FasitBadgeOverlay } from "@workspace/features/components/live/fasit-badge-overlay";
+import { resolveStatementStudentHex } from "@workspace/features/lib/constants";
 
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { RatingScale } from "@workspace/ui/components/rating-scale";

@@ -1,4 +1,4 @@
-import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
+import { FasitBadge } from "@workspace/features/components/live/fasit-badge";
 
 import type { FagPratStatement } from "@/lib/types";
 

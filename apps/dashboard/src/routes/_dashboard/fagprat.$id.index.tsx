@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { FagPratDetailSkeleton } from "@workspace/evalion/components/skeletons/fagprat-detail-skeleton";
-import { authClient } from "@workspace/evalion/lib/auth-client";
+import { FagPratDetailSkeleton } from "@workspace/features/components/skeletons/fagprat-detail-skeleton";
+import { authClient } from "@workspace/features/lib/auth-client";
 import { Button } from "@workspace/ui/components/button";
 import {
   DropdownMenu,

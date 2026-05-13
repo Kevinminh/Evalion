@@ -56,7 +56,7 @@ This is a **pnpm monorepo** orchestrated by **Turborepo**. Node >=20, pnpm 9.15.
 ### Packages
 
 - **`packages/backend`** (`@workspace/backend`) — Convex backend. Owns schema, queries, mutations, actions, HTTP routes, and Better Auth integration. All three apps share the same Convex deployment. Exports generated types via `@workspace/backend/convex/_generated/*`. See [`.agents/backend.md`](.agents/backend.md) for details on files and tables.
-- **`packages/evalion`** (`@workspace/evalion`) — Shared application code that depends on the Convex backend. Cross-app components (auth forms, live-session UI, skeletons, root error/not-found fallbacks, workspace shell), hooks, and lib helpers (auth client/server, draft utils, convex-id helpers, shared types). Subpath exports: `@workspace/evalion/components/*`, `@workspace/evalion/hooks/*`, `@workspace/evalion/lib/*`. Use this package whenever logic or UI is shared across two or more apps.
+- **`packages/features`** (`@workspace/features`) — Shared application code that depends on the Convex backend. Cross-app components (auth forms, live-session UI, skeletons, root error/not-found fallbacks, workspace shell), hooks, and lib helpers (auth client/server, draft utils, convex-id helpers, shared types). Subpath exports: `@workspace/features/components/*`, `@workspace/features/hooks/*`, `@workspace/features/lib/*`. Use this package whenever logic or UI is shared across two or more apps.
 - **`packages/ui`** (`@workspace/ui`) — Pure UI primitives. Components built on @base-ui/react with CVA variants, styled via Tailwind CSS 4 with oklch CSS variables. No Convex/auth dependencies. Subpath exports: `@workspace/ui/components/*`, `@workspace/ui/hooks/*`, `@workspace/ui/lib/*`, `@workspace/ui/globals.css`, `@workspace/ui/styles/*.css` (e.g. `pdf-print.css`).
 - **`packages/config`** (`@evalion/config`) — Shared base tsconfig.
 
@@ -65,7 +65,7 @@ This is a **pnpm monorepo** orchestrated by **Turborepo**. Node >=20, pnpm 9.15.
 | Code type | Location |
 | --- | --- |
 | Pure presentational primitive (button, card, sheet) | `packages/ui` |
-| Cross-app feature UI that talks to Convex/auth (live session widgets, login form, skeletons) | `packages/evalion` |
+| Cross-app feature UI that talks to Convex/auth (live session widgets, login form, skeletons) | `packages/features` |
 | App-specific routes, layouts, or one-off UI | `apps/<app>/src` (or `apps/landing/app`) |
 | Schema, queries, mutations, actions, HTTP routes | `packages/backend/convex` |
 

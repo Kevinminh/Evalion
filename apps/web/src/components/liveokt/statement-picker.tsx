@@ -1,4 +1,4 @@
-import { getStatementColorHex } from "@workspace/evalion/lib/constants";
+import { getStatementColorHex } from "@workspace/features/lib/constants";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 import { cn } from "@workspace/ui/lib/utils";
 import { Check } from "lucide-react";

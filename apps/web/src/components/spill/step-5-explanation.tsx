@@ -1,6 +1,6 @@
-import { ExplanationCard } from "@workspace/evalion/components/live/explanation-card";
-import { FasitBadgeOverlay } from "@workspace/evalion/components/live/fasit-badge-overlay";
-import { resolveStatementStudentHex } from "@workspace/evalion/lib/constants";
+import { ExplanationCard } from "@workspace/features/components/live/explanation-card";
+import { FasitBadgeOverlay } from "@workspace/features/components/live/fasit-badge-overlay";
+import { resolveStatementStudentHex } from "@workspace/features/lib/constants";
 
 import { useStudentGame } from "./student-game-context";
 

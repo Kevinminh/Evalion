@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { SessionTopBar } from "@workspace/evalion/components/live/session-top-bar";
-import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
-import { LiveoktSetupSkeleton } from "@workspace/evalion/components/skeletons/liveokt-setup-skeleton";
+import { SessionTopBar } from "@workspace/features/components/live/session-top-bar";
+import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
+import { LiveoktSetupSkeleton } from "@workspace/features/components/skeletons/liveokt-setup-skeleton";
 import { Button } from "@workspace/ui/components/button";
 import { ConfirmDialog } from "@workspace/ui/components/confirm-dialog";
 import { ErrorState } from "@workspace/ui/components/states/error-state";

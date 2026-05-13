@@ -5,8 +5,8 @@ import {
   toStatementPayload,
   toStatementsWithId,
   useStatements,
-} from "@workspace/evalion/hooks/use-statements";
-import { parseDraftJson } from "@workspace/evalion/lib/draft-utils";
+} from "@workspace/features/hooks/use-statements";
+import { parseDraftJson } from "@workspace/features/lib/draft-utils";
 import { Button } from "@workspace/ui/components/button";
 import { Plus, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";

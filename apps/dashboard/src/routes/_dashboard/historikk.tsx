@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { SessionCardSkeleton } from "@workspace/evalion/components/skeletons/session-card-skeleton";
+import { SessionCardSkeleton } from "@workspace/features/components/skeletons/session-card-skeleton";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { useMutation } from "convex/react";
 import { Users, Calendar, BarChart3, Trash2 } from "lucide-react";
