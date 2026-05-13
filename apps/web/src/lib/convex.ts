@@ -14,6 +14,10 @@ export const fagpratQueries = {
       : convexQuery(api.fagprats.getById, { id }),
 };
 
+export const featureFlagQueries = {
+  isEnabled: (key: string) => convexQuery(api.featureFlags.isEnabled, { key }),
+};
+
 export const liveSessionQueries = {
   getById: (id: Id<"liveSessions"> | Skip) =>
     id === "skip"

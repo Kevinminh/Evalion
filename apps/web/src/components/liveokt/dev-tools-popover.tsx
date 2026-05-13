@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import { isValidConvexId } from "@workspace/features/lib/convex-id";
+import { FEATURE_FLAGS } from "@workspace/features/lib/feature-flags";
 import { Button } from "@workspace/ui/components/button";
 import {
   Popover,
@@ -13,18 +14,12 @@ import { useMutation } from "convex/react";
 import { Users, Vote, Wrench } from "lucide-react";
 import { toast } from "sonner";
 
-import { api, liveSessionQueries } from "@/lib/convex";
+import { api, featureFlagQueries, liveSessionQueries } from "@/lib/convex";
 import { parseSessionId } from "@/lib/route-params";
 
 const DUMMY_BATCH_SIZE = 10;
 
 export function DevToolsPopover() {
-  if (!import.meta.env.DEV) return null;
-
-  return <DevToolsPopoverInner />;
-}
-
-function DevToolsPopoverInner() {
   const params = useParams({ strict: false });
   const rawSessionId = params.sessionId;
   const rawStep = params.step;
@@ -34,11 +29,16 @@ function DevToolsPopoverInner() {
   const sessionIdArg = isValidConvexId(rawSessionId) ? parseSessionId(rawSessionId) : "skip";
   const step = rawStep && /^\d+$/.test(rawStep) ? Number(rawStep) : 0;
 
+  // Admin-only flag read. Non-admins (and anonymous visitors) hit a server-side
+  // "Not authorized" error which TanStack Query surfaces as `error`; we treat
+  // that the same as "flag off" and render nothing.
+  const flagQuery = useQuery(featureFlagQueries.isEnabled(FEATURE_FLAGS.liveoktDummyData.key));
   const { data: session } = useQuery(liveSessionQueries.getById(sessionIdArg));
   const addDummyStudents = useMutation(api.dev.addDummyStudents);
   const castDummyVotes = useMutation(api.dev.castDummyVotes);
 
   if (sessionIdArg === "skip") return null;
+  if (flagQuery.data !== true) return null;
   const sessionId = sessionIdArg;
 
   const isVotingStep = step === 1 || step === 3;
