@@ -798,12 +798,19 @@
 /* ────── FagPrat card three-dots action menu ────── */
 .card-menu-content {
   min-width: 200px;
+  padding: var(--space-2);
   background: var(--color-neutral-0);
   border: 1.5px solid var(--color-neutral-200);
   border-radius: var(--radius-xl);
-  padding: var(--space-2);
   box-shadow: var(--shadow-lg);
 }
+
+.card-menu-separator {
+  height: 1px;
+  margin: var(--space-1) 0;
+  background: var(--color-neutral-200);
+}
+
 .card-menu-item {
   display: flex;
   align-items: center;
@@ -811,48 +818,55 @@
   width: 100%;
   padding: var(--space-2-5) var(--space-3);
   border: none;
-  background: transparent;
   border-radius: var(--radius-lg);
-  font-family: inherit;
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--color-text-primary);
-  cursor: pointer;
   text-align: left;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  cursor: pointer;
   outline: none;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 .card-menu-item + .card-menu-item {
   margin-top: 2px;
 }
-.card-menu-item:hover,
-.card-menu-item:focus,
-.card-menu-item[data-highlighted] {
+
+.card-menu-item:is(:hover, :focus, [data-highlighted]) {
   background: var(--color-primary-50);
   color: var(--color-primary-600);
 }
+
 .card-menu-item[data-variant="destructive"] {
   color: var(--color-error);
 }
-.card-menu-item[data-variant="destructive"]:hover,
-.card-menu-item[data-variant="destructive"]:focus,
-.card-menu-item[data-variant="destructive"][data-highlighted] {
+.card-menu-item[data-variant="destructive"]:is(:hover, :focus, [data-highlighted]) {
   background: var(--color-error-bg-light);
   color: var(--color-error-hover);
 }
+
 .card-menu-item[data-disabled] {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Icon sizing — color is handled by the descendant rule below. */
 .card-menu-item svg {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
 }
-.card-menu-separator {
-  height: 1px;
-  background: var(--color-neutral-200);
-  margin: var(--space-1) 0;
+
+/* Force every descendant (SVG + its inner <path>/<rect>) to inherit `color`
+   from the menu item. Mirrors — and overrides — DropdownMenuItem's
+   `not-data-[variant=destructive]:focus:**:text-accent-foreground`, which
+   uses the same descendant combinator (`& *`) to recolor every nested
+   element (paths included) to white on focus. Setting color only on <svg>
+   isn't enough: lucide paths resolve `stroke="currentColor"` against their
+   own computed color, and Tailwind's rule sets that directly on each path. */
+.card-menu-item * {
+  color: inherit !important;
 }
 
 .load-more-btn {

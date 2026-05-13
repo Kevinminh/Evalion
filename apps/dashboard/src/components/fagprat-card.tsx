@@ -163,7 +163,7 @@ function FagPratCardImpl({ fagprat, variant }: FagPratCardProps) {
                 onClick={handleDuplicate}
                 disabled={duplicating}
               >
-                <Copy className="group-focus/dropdown-menu-item:!text-inherit" />
+                <Copy />
                 {duplicating ? "Dupliserer..." : "Dupliser"}
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -173,7 +173,7 @@ function FagPratCardImpl({ fagprat, variant }: FagPratCardProps) {
                   setShareOpen(true);
                 }}
               >
-                <Share2 className="hover:text-inherit!" />
+                <Share2 />
                 Del
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -183,15 +183,11 @@ function FagPratCardImpl({ fagprat, variant }: FagPratCardProps) {
                   navigate({ to: "/fagprat/$id/pdf", params: { id: fagprat._id } });
                 }}
               >
-                <FileText className="group-focus/dropdown-menu-item:!text-inherit" />
+                <FileText />
                 Lag PDF
               </DropdownMenuItem>
               <DropdownMenuItem className="card-menu-item" onClick={handleToggleVisibility}>
-                {isPublic ? (
-                  <Lock className="group-focus/dropdown-menu-item:!text-inherit" />
-                ) : (
-                  <Globe className="group-focus/dropdown-menu-item:!text-inherit" />
-                )}
+                {isPublic ? <Lock /> : <Globe />}
                 {isPublic ? "Gjør privat" : "Gjør offentlig"}
               </DropdownMenuItem>
               <DropdownMenuSeparator className="card-menu-separator" />
@@ -203,7 +199,7 @@ function FagPratCardImpl({ fagprat, variant }: FagPratCardProps) {
                   setDeleteOpen(true);
                 }}
               >
-                <Trash2 className="group-focus/dropdown-menu-item:!text-inherit" />
+                <Trash2 />
                 Slett
               </DropdownMenuItem>
             </DropdownMenuContent>
