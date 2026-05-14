@@ -11,7 +11,7 @@ import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { Stepper } from "@workspace/ui/components/stepper";
 import { useMutation } from "convex/react";
-import { Users, Mic, CheckSquare, ArrowRight, BarChart3 } from "lucide-react";
+import { Users, CheckSquare, ArrowRight, BarChart3 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -34,7 +34,6 @@ function LiveoktSetupPage() {
 
   const [groupsEnabled, setGroupsEnabled] = useState(true);
   const [groupCount, setGroupCount] = useState(DEFAULT_GROUP_COUNT);
-  const [transcriptionEnabled, setTranscriptionEnabled] = useState(false);
   const [selfEvalEnabled, setSelfEvalEnabled] = useState(true);
   const [launching, setLaunching] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
@@ -60,7 +59,6 @@ function LiveoktSetupPage() {
         fagpratId: fagprat._id,
         groupsEnabled,
         groupCount,
-        transcriptionEnabled,
         selfEvalEnabled,
       });
       setCreatedSessionId(sessionId);
@@ -105,22 +103,6 @@ function LiveoktSetupPage() {
                 max={MAX_GROUP_COUNT}
                 onChange={setGroupCount}
               />
-            </OptionCard>
-
-            <OptionCard
-              icon={<Mic className="size-5" />}
-              title="Transkribering"
-              description="Ta opp og transkriber elevdiskusjoner automatisk"
-              enabled={transcriptionEnabled}
-              onToggle={() => setTranscriptionEnabled(!transcriptionEnabled)}
-            >
-              <div className="flex items-start gap-3 rounded-xl bg-amber-50 p-3">
-                <Mic className="mt-0.5 size-4 shrink-0 text-amber-600" />
-                <p className="text-xs text-amber-800">
-                  Opptak krever tillatelse fra elevene. Sørg for at alle er informert før du
-                  aktiverer denne funksjonen.
-                </p>
-              </div>
             </OptionCard>
 
             <OptionCard

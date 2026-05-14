@@ -25,10 +25,6 @@ export function LiveoktSetupSkeleton() {
               </div>
             </div>
 
-            <div className="rounded-2xl border-[1.5px] border-l-4 border-border border-l-border bg-card">
-              <OptionCardHeader />
-            </div>
-
             <div className="rounded-2xl border-[1.5px] border-l-4 border-primary/30 border-l-primary bg-primary/[0.02]">
               <OptionCardHeader />
             </div>

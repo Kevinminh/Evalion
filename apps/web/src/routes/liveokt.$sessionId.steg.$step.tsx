@@ -23,7 +23,6 @@ import { useStep4Countdown } from "@/hooks/use-step4-countdown";
 import { DestructiveButton } from "@workspace/ui/components/destructive-button";
 import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
 import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
-import { RecordingButton } from "@/components/liveokt/recording-button";
 import { SessionEndedScreen } from "@/components/liveokt/session-ended-screen";
 import { StatementPicker } from "@/components/liveokt/statement-picker";
 import { useStep1 } from "@/components/liveokt/step-1-vote-in-progress";
@@ -130,7 +129,6 @@ function LiveStepPage() {
 function TeacherSessionLayout() {
   const {
     fagprat,
-    session,
     step,
     panelOpen,
     setPanelOpen,
@@ -179,7 +177,6 @@ function TeacherSessionLayout() {
           ) : undefined
         }
       >
-        {session.transcriptionEnabled && <RecordingButton />}
         <DestructiveButton onClick={endSession}>Avslutt økt</DestructiveButton>
       </SessionTopBar>
 
