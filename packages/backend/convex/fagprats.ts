@@ -18,7 +18,12 @@ export const list = query({
 export const getById = query({
   args: { id: v.id("fagprats") },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
+    const fagprat = await ctx.db.get(args.id);
+    if (!fagprat) return null;
+    if (fagprat.visibility === "public") return fagprat;
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || fagprat.authorId !== identity.subject) return null;
+    return fagprat;
   },
 });
 
@@ -326,13 +331,5 @@ export const generateUploadUrl = mutation({
   handler: async (ctx) => {
     await requireAuth(ctx);
     return await ctx.storage.generateUploadUrl();
-  },
-});
-
-export const deleteFile = mutation({
-  args: { storageId: v.id("_storage") },
-  handler: async (ctx, args) => {
-    await requireAuth(ctx);
-    await ctx.storage.delete(args.storageId);
   },
 });

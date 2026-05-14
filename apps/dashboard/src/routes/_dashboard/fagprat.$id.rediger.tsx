@@ -17,7 +17,9 @@ import { toast } from "sonner";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { MetadataCard } from "@/components/metadata-card";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
+import { UnauthorizedState } from "@workspace/ui/components/states/unauthorized-state";
 import { StatementEditor } from "@/components/statement-editor";
+import { authClient } from "@/lib/auth-client";
 import { api, fagpratQueries } from "@/lib/convex";
 import type { FagPratId, FagPratType, Visibility } from "@/lib/types";
 
@@ -30,6 +32,7 @@ function EditFagPratPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const { data: fagprat, isPending, isError } = useQuery(fagpratQueries.getById(id as FagPratId));
+  const { data: session, isPending: sessionPending } = authClient.useSession();
   const updateFagPrat = useMutation(api.fagprats.update);
 
   const [title, setTitle] = useState("");
@@ -61,7 +64,9 @@ function EditFagPratPage() {
     }
   }, [fagprat, id, setStatements]);
 
-  if (isPending) {
+  const isAuthor = !!(session?.user?.id && fagprat && fagprat.authorId === session.user.id);
+
+  if (isPending || sessionPending) {
     return <FagPratDetailSkeleton />;
   }
 
@@ -71,6 +76,10 @@ function EditFagPratPage() {
 
   if (!fagprat) {
     return <NotFoundState />;
+  }
+
+  if (!isAuthor) {
+    return <UnauthorizedState />;
   }
 
   const handleSave = async () => {
