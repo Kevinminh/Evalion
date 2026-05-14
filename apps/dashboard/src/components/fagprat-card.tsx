@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import { api } from "@workspace/backend/convex/_generated/api";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -15,7 +16,6 @@ import { AuthorAvatar } from "@/components/author-avatar";
 import { DeleteFagPratDialog } from "@/components/delete-fagprat-dialog";
 import { ShareFagPratDialog } from "@/components/share-fagprat-dialog";
 import { TypeIcon } from "@/components/type-icon";
-import { api } from "@/lib/convex";
 import type { FagPratSummary } from "@/lib/types";
 
 interface FagPratCardProps {

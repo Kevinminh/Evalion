@@ -1,4 +1,4 @@
-import type { Fasit } from "@workspace/evalion/lib/types";
+import type { Fasit } from "@workspace/api/types";
 import { cn } from "@workspace/ui/lib/utils";
 
 interface VoteOptionsProps {
@@ -7,9 +7,9 @@ interface VoteOptionsProps {
   disabled?: boolean;
 }
 
-// Class strings declared inline (not imported from packages/evalion constants)
+// Class strings declared inline (not imported from packages/features constants)
 // so Tailwind sees the literal arbitrary-value shadow utilities and generates
-// the corresponding CSS rules. See memory: packages/evalion is not in @source.
+// the corresponding CSS rules. See memory: packages/features is not in @source.
 const VOTE_OPTIONS: { value: Fasit; label: string; classes: string }[] = [
   {
     value: "sant",
@@ -48,8 +48,8 @@ export function VoteOptions({ selected, onSelect, disabled }: VoteOptionsProps) 
               "flex-1 rounded-2xl py-3 text-[15px] font-bold text-white transition-all duration-150 ease-out",
               VOTE_BUTTON_3D_CLASSES,
               opt.classes,
-              isSelected && "outline-3 outline outline-white outline-offset-[-3px] scale-[1.04]",
-              isDimmed && "opacity-50 scale-[0.97]",
+              isSelected && "outline-3 outline outline-white outline-offset-[-3px]",
+              isDimmed && "opacity-[0.45]",
               disabled && "pointer-events-none opacity-70",
             )}
           >

@@ -1,13 +1,16 @@
-import { Professor } from "@workspace/evalion/components/live/professor";
+import { Professor } from "@workspace/features/components/live/professor";
+import { resolveStatementStudentHex } from "@workspace/features/lib/constants";
 import { RecordingDisclaimer } from "@workspace/ui/components/recording-disclaimer";
 import { StatementCard } from "@workspace/ui/components/statement-card";
-import { cn } from "@workspace/ui/lib/utils";
+import { StudentAvatar } from "@workspace/ui/components/student-avatar";
 
 import { useStudentGame } from "./student-game-context";
 
 export function Step2Discussion() {
-  const { statement, groupMembers, session } = useStudentGame();
+  const { statement, statementIndex, groupMembers, session } = useStudentGame();
   if (!statement) return null;
+
+  const statementColor = resolveStatementStudentHex(statement.color, statementIndex);
 
   return (
     <div className="flex w-full flex-col items-center gap-6">
@@ -22,14 +25,7 @@ export function Step2Discussion() {
                 key={m._id}
                 className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5 shadow-xs"
               >
-                <div
-                  className={cn(
-                    "flex size-6 items-center justify-center rounded-full text-xs font-bold text-white",
-                    m.avatarColor,
-                  )}
-                >
-                  {m.name?.[0]?.toUpperCase() ?? "?"}
-                </div>
+                <StudentAvatar name={m.name} avatarColor={m.avatarColor} size="xs" />
                 <span className="text-sm font-medium text-foreground">{m.name}</span>
               </div>
             ))}
@@ -37,9 +33,13 @@ export function Step2Discussion() {
         </div>
       )}
 
-      <StatementCard statement={statement} />
+      <StatementCard statement={statement} color={statementColor} />
 
       <h2 className="text-xl font-extrabold text-foreground">Snakk sammen!</h2>
+      <p className="-mt-3 max-w-[380px] text-center text-sm leading-relaxed text-muted-foreground">
+        Diskuter påstanden med læringspartneren din. Avslør hva du stemte, og forsøk å forklare
+        hvordan du tenker.
+      </p>
 
       <Professor
         size="sm"

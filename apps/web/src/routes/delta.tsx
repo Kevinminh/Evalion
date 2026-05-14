@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { liveSessionsQueries } from "@workspace/api/liveSessions";
+import { sessionStudentsMutations } from "@workspace/api/sessionStudents";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
-import { JoinSessionSkeleton } from "@workspace/evalion/components/skeletons/join-session-skeleton";
+import { JoinSessionSkeleton } from "@workspace/features/components/skeletons/join-session-skeleton";
 import { useMutation } from "convex/react";
 import { ArrowLeft, Loader2, UserPlus } from "lucide-react";
 import { useState } from "react";
-
-import { api, liveSessionQueries } from "@/lib/convex";
 
 export const Route = createFileRoute("/delta")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -19,8 +19,8 @@ export const Route = createFileRoute("/delta")({
 function DeltaPage() {
   const { code } = Route.useSearch();
   const navigate = useNavigate();
-  const { data: session, isPending } = useQuery(liveSessionQueries.getByJoinCode(code));
-  const addStudent = useMutation(api.liveSessions.addStudent);
+  const { data: session, isPending } = useQuery(liveSessionsQueries.byJoinCode(code));
+  const addStudent = useMutation(sessionStudentsMutations.add);
 
   const [name, setName] = useState("");
   const [joining, setJoining] = useState(false);

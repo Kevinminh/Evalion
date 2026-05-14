@@ -6,11 +6,7 @@ import { requireAuth } from "./helpers";
 const MAX_PASTANDER = 50;
 const MAX_TEXT_LENGTH = 1000;
 
-const fasitValidator = v.union(
-  v.literal("sant"),
-  v.literal("usant"),
-  v.literal("delvis"),
-);
+const fasitValidator = v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis"));
 
 const pastandValidator = v.object({
   clientId: v.string(),
@@ -19,10 +15,7 @@ const pastandValidator = v.object({
   forklaring: v.string(),
 });
 
-const forkunnskapValidator = v.union(
-  v.literal("intro"),
-  v.literal("oppsummering"),
-);
+const forkunnskapValidator = v.union(v.literal("intro"), v.literal("oppsummering"));
 
 function isEmptyPastand(p: {
   text: string;
@@ -157,19 +150,5 @@ export const setLastParams = mutation({
       lastForkunnskap: args.lastForkunnskap,
       updatedAt: Date.now(),
     });
-  },
-});
-
-export const clear = mutation({
-  args: {},
-  handler: async (ctx) => {
-    const identity = await requireAuth(ctx);
-    const existing = await ctx.db
-      .query("pastandDrafts")
-      .withIndex("by_user", (q) => q.eq("userId", identity.subject))
-      .unique();
-    if (existing) {
-      await ctx.db.delete(existing._id);
-    }
   },
 });

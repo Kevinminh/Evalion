@@ -1,7 +1,7 @@
-import { CountdownOverlay } from "@workspace/evalion/components/live/countdown-overlay";
-import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
-import { Professor } from "@workspace/evalion/components/live/professor";
-import { FASIT_TEXT } from "@workspace/evalion/lib/constants";
+import { CountdownOverlay } from "@workspace/features/components/live/countdown-overlay";
+import { FasitBadgeOverlay } from "@workspace/features/components/live/fasit-badge-overlay";
+import { Professor } from "@workspace/features/components/live/professor";
+import { FASIT_TEXT, resolveStatementStudentHex } from "@workspace/features/lib/constants";
 
 import { RecordingDisclaimer } from "@workspace/ui/components/recording-disclaimer";
 import { StatementCard } from "@workspace/ui/components/statement-card";
@@ -14,26 +14,35 @@ interface Step4RevealProps {
 }
 
 export function Step4Reveal({ showCountdown, countdownNumber, countdownDone }: Step4RevealProps) {
-  const { statement, session } = useStudentGame();
+  const { statement, statementIndex, session } = useStudentGame();
   if (!statement) return null;
+
+  const statementColor = resolveStatementStudentHex(statement.color, statementIndex);
 
   return (
     <>
       <CountdownOverlay visible={showCountdown} number={countdownNumber} />
       <div className="flex w-full flex-col items-center gap-6">
-        {countdownDone && <FasitBadge fasit={statement.fasit} animated size="lg" />}
-
-        <StatementCard statement={statement} />
+        <FasitBadgeOverlay fasit={statement.fasit} show={countdownDone} animated>
+          <StatementCard statement={statement} color={statementColor} />
+        </FasitBadgeOverlay>
 
         {countdownDone && (
-          <Professor
-            size="sm"
-            bounce
-            textSize="sm"
-            text={`Forklar til læringspartneren din hvorfor påstanden er ${
-              FASIT_TEXT[statement.fasit]
-            }. Bruk fagbegreper, sammenligninger og eksempler.`}
-          />
+          <div className="flex w-full flex-col items-center gap-4">
+            <h2 className="text-center text-2xl font-extrabold text-[var(--color-text-ink-strong)]">
+              Snakk sammen!
+            </h2>
+            <p className="max-w-[380px] text-center text-sm leading-relaxed text-[var(--color-text-ink-soft)]">
+              Forklar til læringspartneren din hvorfor påstanden er {FASIT_TEXT[statement.fasit]}.
+            </p>
+            <Professor
+              size="sm"
+              bordered
+              bounce
+              textSize="sm"
+              text="Bruk fagbegreper, sammenligninger og eksempler for å styrke forklaringen din."
+            />
+          </div>
         )}
 
         {countdownDone && session.transcriptionEnabled && <RecordingDisclaimer />}

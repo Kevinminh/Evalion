@@ -1,4 +1,4 @@
-import { STATEMENT_COLORS_HEX } from "@workspace/evalion/lib/constants";
+import { getStatementColorHex } from "@workspace/features/lib/constants";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 import { cn } from "@workspace/ui/lib/utils";
 import { Check } from "lucide-react";
@@ -32,7 +32,7 @@ export function StatementPicker() {
           const isSelected = selectedStatement === i;
           const isLast = i === count - 1;
           const isUsed = usedStatements.has(i);
-          const color = STATEMENT_COLORS_HEX[i % STATEMENT_COLORS_HEX.length]!;
+          const color = getStatementColorHex(i);
           return (
             <button
               key={i}

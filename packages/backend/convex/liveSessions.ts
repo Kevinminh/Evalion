@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 
-import { query, mutation } from "./_generated/server";
+import type { Doc } from "./_generated/dataModel";
+import { query, mutation, type QueryCtx } from "./_generated/server";
 import { requireAuth, requireSessionOwner, validateStatementIndex } from "./helpers";
 
 function generateJoinCode(): string {
@@ -54,48 +55,56 @@ const AVATAR_EMOJIS = [
 
 // ── Session queries ──
 
+async function listTeacherSessionsWhere(
+  ctx: QueryCtx,
+  predicate: (status: Doc<"liveSessions">["status"]) => boolean,
+) {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    return [];
+  }
+  const sessions = await ctx.db
+    .query("liveSessions")
+    .withIndex("by_teacher", (q) => q.eq("teacherId", identity.subject))
+    .order("desc")
+    .collect();
+
+  const filtered = sessions.filter((s) => predicate(s.status));
+
+  const uniqueFagpratIds = [...new Set(filtered.map((s) => s.fagpratId))];
+  const fagpratEntries = await Promise.all(
+    uniqueFagpratIds.map(async (id) => [id, await ctx.db.get(id)] as const),
+  );
+  const fagpratMap = new Map(fagpratEntries);
+
+  const allStudents = await Promise.all(
+    filtered.map((session) =>
+      ctx.db
+        .query("sessionStudents")
+        .withIndex("by_session", (q) => q.eq("sessionId", session._id))
+        .collect(),
+    ),
+  );
+  const studentCountMap = new Map<string, number>();
+  for (let i = 0; i < filtered.length; i++) {
+    studentCountMap.set(filtered[i]!._id, allStudents[i]!.length);
+  }
+
+  return filtered.map((session) => ({
+    ...session,
+    fagpratTitle: fagpratMap.get(session.fagpratId)?.title ?? "Slettet FagPrat",
+    studentCount: studentCountMap.get(session._id) ?? 0,
+  }));
+}
+
 export const listByTeacher = query({
   args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      return [];
-    }
-    const sessions = await ctx.db
-      .query("liveSessions")
-      .withIndex("by_teacher", (q) => q.eq("teacherId", identity.subject))
-      .order("desc")
-      .collect();
+  handler: (ctx) => listTeacherSessionsWhere(ctx, (status) => status === "ended"),
+});
 
-    const ended = sessions.filter((s) => s.status === "ended");
-
-    // Deduplicate fagprat lookups to avoid redundant queries
-    const uniqueFagpratIds = [...new Set(ended.map((s) => s.fagpratId))];
-    const fagpratEntries = await Promise.all(
-      uniqueFagpratIds.map(async (id) => [id, await ctx.db.get(id)] as const),
-    );
-    const fagpratMap = new Map(fagpratEntries);
-
-    // Batch-fetch all students for ended sessions and count by session
-    const allStudents = await Promise.all(
-      ended.map((session) =>
-        ctx.db
-          .query("sessionStudents")
-          .withIndex("by_session", (q) => q.eq("sessionId", session._id))
-          .collect(),
-      ),
-    );
-    const studentCountMap = new Map<string, number>();
-    for (let i = 0; i < ended.length; i++) {
-      studentCountMap.set(ended[i]!._id, allStudents[i]!.length);
-    }
-
-    return ended.map((session) => ({
-      ...session,
-      fagpratTitle: fagpratMap.get(session.fagpratId)?.title ?? "Slettet FagPrat",
-      studentCount: studentCountMap.get(session._id) ?? 0,
-    }));
-  },
+export const listCurrentByTeacher = query({
+  args: {},
+  handler: (ctx) => listTeacherSessionsWhere(ctx, (status) => status !== "ended"),
 });
 
 export const getById = query({
@@ -220,6 +229,39 @@ export const end = mutation({
     if (!session || session.teacherId !== identity.subject) {
       throw new Error("Not authorized");
     }
+
+    const students = await ctx.db
+      .query("sessionStudents")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.id))
+      .collect();
+    const dummyIds = new Set(students.filter((s) => s.isDummy).map((s) => s._id));
+
+    if (dummyIds.size > 0) {
+      const [votes, ratings, begrunnelser] = await Promise.all([
+        ctx.db
+          .query("sessionVotes")
+          .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
+          .collect(),
+        ctx.db
+          .query("sessionRatings")
+          .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
+          .collect(),
+        ctx.db
+          .query("sessionBegrunnelser")
+          .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
+          .collect(),
+      ]);
+
+      await Promise.all([
+        ...students.filter((s) => s.isDummy).map((s) => ctx.db.delete(s._id)),
+        ...votes
+          .filter((vote) => dummyIds.has(vote.studentId))
+          .map((vote) => ctx.db.delete(vote._id)),
+        ...ratings.filter((r) => dummyIds.has(r.studentId)).map((r) => ctx.db.delete(r._id)),
+        ...begrunnelser.filter((b) => dummyIds.has(b.studentId)).map((b) => ctx.db.delete(b._id)),
+      ]);
+    }
+
     await ctx.db.patch(args.id, { status: "ended" });
     return args.id;
   },
@@ -790,6 +832,25 @@ export const getBegrunnelser = query({
   },
 });
 
+export const getMyBegrunnelser = query({
+  args: {
+    sessionId: v.id("liveSessions"),
+    studentId: v.id("sessionStudents"),
+    statementIndex: v.number(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("sessionBegrunnelser")
+      .withIndex("by_session_statement_student_round", (q) =>
+        q
+          .eq("sessionId", args.sessionId)
+          .eq("statementIndex", args.statementIndex)
+          .eq("studentId", args.studentId),
+      )
+      .collect();
+  },
+});
+
 export const highlightBegrunnelse = mutation({
   args: {
     id: v.id("sessionBegrunnelser"),
@@ -801,19 +862,6 @@ export const highlightBegrunnelse = mutation({
 
     await requireSessionOwner(ctx, begrunnelse.sessionId);
 
-    // Clear any other highlighted begrunnelse for the same statement
-    if (args.highlighted) {
-      const others = await ctx.db
-        .query("sessionBegrunnelser")
-        .withIndex("by_session_statement", (q) =>
-          q.eq("sessionId", begrunnelse.sessionId).eq("statementIndex", begrunnelse.statementIndex),
-        )
-        .filter((q) => q.eq(q.field("highlighted"), true))
-        .collect();
-      for (const other of others) {
-        await ctx.db.patch(other._id, { highlighted: false });
-      }
-    }
     await ctx.db.patch(args.id, { highlighted: args.highlighted });
   },
 });

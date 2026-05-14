@@ -1,44 +1,40 @@
 import { useState } from "react";
-import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
-import { toast } from "sonner";
+import { FasitBadgeOverlay } from "@workspace/features/components/live/fasit-badge-overlay";
+import { resolveStatementStudentHex } from "@workspace/features/lib/constants";
 
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { RatingScale } from "@workspace/ui/components/rating-scale";
 import { useStudentGame } from "./student-game-context";
 import { SubmitButton } from "@workspace/ui/components/submit-button";
 import { WaitingScreen } from "./waiting-screen";
+import { useSubmitWithWaiting } from "@/hooks/use-submit-with-waiting";
 
 export function Step6Rating() {
-  const { statement, submitRating } = useStudentGame();
+  const { statement, statementIndex, submitRating } = useStudentGame();
   const [selected, setSelected] = useState<number | null>(null);
-  const [sent, setSent] = useState(false);
+  const { sent, showWaiting, handleSubmit } = useSubmitWithWaiting(
+    (rating: number) => submitRating(rating),
+    { errorMessage: "Vurderingen ble ikke sendt. Prøv igjen." },
+  );
 
   if (!statement) return null;
-  if (sent) {
-    return <WaitingScreen />;
+  if (showWaiting) {
+    return <WaitingScreen title="Takk for svaret ditt!" />;
   }
 
-  const handleSubmit = async () => {
-    if (selected === null) return;
-    setSent(true);
-    try {
-      await submitRating(selected);
-    } catch {
-      setSent(false);
-      toast.error("Vurderingen ble ikke sendt. Prøv igjen.");
-    }
-  };
+  const statementColor = resolveStatementStudentHex(statement.color, statementIndex);
 
   return (
     <div className="flex w-full flex-col items-center gap-5">
-      <FasitBadge fasit={statement.fasit} />
-      <StatementCard statement={statement} />
+      <FasitBadgeOverlay fasit={statement.fasit}>
+        <StatementCard statement={statement} color={statementColor} />
+      </FasitBadgeOverlay>
 
-      <div className="w-full max-w-md space-y-3">
-        <p className="text-center text-sm font-bold text-foreground">
+      <div className="w-full max-w-md space-y-4">
+        <p className="text-center text-2xl font-extrabold text-[var(--color-text-ink-strong)]">
           Hvor godt forstår du dette nå?
         </p>
-        <p className="text-center text-xs text-muted-foreground">
+        <p className="text-center text-sm leading-relaxed text-[var(--color-text-ink-soft)]">
           Vurder forståelsen din fra 1 til 5
         </p>
 
@@ -54,7 +50,11 @@ export function Step6Rating() {
         </div>
       </div>
 
-      <SubmitButton sent={sent} disabled={selected === null} onClick={handleSubmit} />
+      <SubmitButton
+        sent={sent}
+        disabled={selected === null}
+        onClick={() => selected !== null && handleSubmit(selected)}
+      />
     </div>
   );
 }

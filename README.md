@@ -47,7 +47,7 @@ pnpm --filter web dev
 | Package             | Name                 | Purpose                                                                                       |
 | ------------------- | -------------------- | --------------------------------------------------------------------------------------------- |
 | `packages/backend`  | `@workspace/backend` | Convex backend — schema, queries, mutations, actions, HTTP, Better Auth integration          |
-| `packages/evalion`  | `@workspace/evalion` | Cross-app feature code: shared auth/live-session UI, hooks, and lib helpers (depends on backend + ui) |
+| `packages/features`  | `@workspace/features` | Cross-app feature code: shared auth/live-session UI, hooks, and lib helpers (depends on backend + ui) |
 | `packages/ui`       | `@workspace/ui`      | Pure UI primitives (shadcn/ui + Base UI + Tailwind CSS 4)                                    |
 | `packages/config`   | `@evalion/config`    | Shared TypeScript base configuration                                                          |
 

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { api } from "@workspace/backend/convex/_generated/api";
-import { FagPratCardSkeleton } from "@workspace/evalion/components/skeletons/fagprat-card-skeleton";
+import { FagPratCardSkeleton } from "@workspace/features/components/skeletons/fagprat-card-skeleton";
 import { usePaginatedQuery } from "convex/react";
 import { useRef, useState } from "react";
 

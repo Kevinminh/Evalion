@@ -1,6 +1,6 @@
-// Class strings declared inline (not imported from packages/evalion constants)
+// Class strings declared inline (not imported from packages/features constants)
 // so Tailwind sees the literal color utilities and generates the corresponding
-// CSS rules. See memory: packages/evalion is not in @source.
+// CSS rules. See memory: packages/features is not in @source.
 const LEVEL_COLORS: Record<number, { border: string; text: string }> = {
   1: { border: "border-red-500", text: "text-red-500" },
   2: { border: "border-orange-500", text: "text-orange-500" },

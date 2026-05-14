@@ -1,11 +1,13 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Button } from "@workspace/ui/components/button";
+import { fagpratsQueries } from "@workspace/api/fagprats";
+import { api } from "@workspace/backend/convex/_generated/api";
 import {
   toStatementPayload,
   toStatementsWithId,
   useStatements,
-} from "@workspace/evalion/hooks/use-statements";
-import { useQueryClient } from "@tanstack/react-query";
+} from "@workspace/features/hooks/use-statements";
+import { Button } from "@workspace/ui/components/button";
 import { useMutation } from "convex/react";
 import { Plus } from "lucide-react";
 import { Reorder } from "motion/react";
@@ -19,7 +21,6 @@ import { ReddiModal } from "@/components/reddi-modal";
 import { ReddiPanel } from "@/components/reddi/reddi-panel";
 import { StatementEditor } from "@/components/statement-editor";
 import { VisibilityToggle } from "@/components/visibility-toggle";
-import { api, fagpratQueries } from "@/lib/convex";
 import { LABEL_CLASS, SUBJECT_OPTIONS, LEVEL_OPTIONS } from "@/lib/constants";
 import type { Fasit, FagPratType, Visibility } from "@/lib/types";
 
@@ -83,7 +84,7 @@ function LagFagPratPage() {
         statements: toStatementPayload(statements),
         visibility,
       });
-      queryClient.setQueryData(fagpratQueries.getById(fagprat._id).queryKey, fagprat);
+      queryClient.setQueryData(fagpratsQueries.byId(fagprat._id).queryKey, fagprat);
       navigate({ to: "/fagprat/$id", params: { id: fagprat._id } });
     } catch {
       toast.error("Kunne ikke lagre FagPraten. Prøv igjen.");

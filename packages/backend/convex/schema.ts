@@ -79,6 +79,7 @@ export default defineSchema({
     avatarColor: v.string(),
     avatarEmoji: v.optional(v.string()),
     groupIndex: v.optional(v.number()),
+    isDummy: v.optional(v.boolean()),
   }).index("by_session", ["sessionId"]),
 
   sessionVotes: defineTable({
@@ -147,6 +148,13 @@ export default defineSchema({
   aiPrompts: defineTable({
     key: v.string(),
     content: v.string(),
+    updatedAt: v.number(),
+    updatedBy: v.optional(v.string()),
+  }).index("by_key", ["key"]),
+
+  featureFlags: defineTable({
+    key: v.string(),
+    enabled: v.boolean(),
     updatedAt: v.number(),
     updatedBy: v.optional(v.string()),
   }).index("by_key", ["key"]),

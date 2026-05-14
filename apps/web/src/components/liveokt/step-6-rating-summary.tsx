@@ -1,19 +1,23 @@
-import { BackButton } from "@workspace/evalion/components/live/back-button";
-import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
-import { Professor } from "@workspace/evalion/components/live/professor";
-import { TeacherStepLayout } from "@workspace/evalion/components/live/teacher-step-layout";
-import { resolveStatementHex } from "@workspace/evalion/lib/constants";
-import type { Fasit } from "@workspace/evalion/lib/types";
+import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
+import { BackButton } from "@workspace/features/components/live/back-button";
+import { BreakdownRow } from "@workspace/features/components/live/breakdown-row";
+import { FasitBadgeOverlay } from "@workspace/features/components/live/fasit-badge-overlay";
+import { Professor } from "@workspace/features/components/live/professor";
+import { TeacherStepLayout } from "@workspace/features/components/live/teacher-step-layout";
+import { resolveStatementHex } from "@workspace/features/lib/constants";
+import { formatDecimal1, percentage } from "@workspace/features/lib/format";
+import type { Fasit } from "@workspace/api/types";
+import { PanelCard } from "@workspace/ui/components/panel-card";
+import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
+import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { cn } from "@workspace/ui/lib/utils";
 import { ArrowRight, BarChart3 } from "lucide-react";
 import { useState } from "react";
 
-import { DestructiveButton } from "@workspace/ui/components/destructive-button";
-import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
 import { cssVars } from "@/lib/css-vars";
 import type { TeacherStep } from "@/types/teacher-step";
-import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
+
 import { useTeacherSession } from "./teacher-session-context";
 
 const CIRCLE_STYLE: { border: string; text: string }[] = [
@@ -68,7 +72,7 @@ function DualDistColumn({ title, votes, correctKey }: DualDistColumnProps) {
       <div className="flex items-end justify-center gap-2 px-0 py-1">
         {order.map((key) => {
           const count = counts[key];
-          const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+          const pct = percentage(count, total);
           const fillHeight = total > 0 ? (count / maxCount) * 100 : 0;
           const isCorrect = key === correctKey;
           const fillBg = isCorrect ? CORRECT_FILL[key] : "var(--color-vote-empty-fill)";
@@ -134,27 +138,33 @@ export function useStep6(): TeacherStep {
     usedStatements,
     markStatementUsed,
     goToStep,
-    endSession,
     ratingDistribution,
     avgRating,
     r1Votes,
     r2Votes,
   } = useTeacherSession();
   const [confDetailOpen, setConfDetailOpen] = useState(false);
+  const fasit = statement?.fasit;
+  const r2WithConf = r2Votes.filter((v) => typeof v.confidence === "number");
+  const r2Correct = fasit ? r2WithConf.filter((v) => v.vote === fasit) : [];
+  const r2Wrong = fasit ? r2WithConf.filter((v) => v.vote !== fasit) : [];
+  const r2AvgConfCorrect = r2Correct.length
+    ? r2Correct.reduce((s, v) => s + (v.confidence ?? 0), 0) / r2Correct.length
+    : undefined;
+  const r2AvgConfWrong = r2Wrong.length
+    ? r2Wrong.reduce((s, v) => s + (v.confidence ?? 0), 0) / r2Wrong.length
+    : undefined;
 
   const statementColor = resolveStatementHex(statement?.color, selectedIdx);
 
   const main = (
     <TeacherStepLayout
-      top={
-        <div className="flex w-full items-center justify-between">
-          <BackButton onClick={() => goToStep(0)} />
-          {statement && <FasitBadge fasit={statement.fasit} size="lg" />}
-        </div>
-      }
+      top={<BackButton onClick={() => goToStep(0)} pulse />}
       statement={
         statement && (
-          <StatementCard statement={statement} size="lg" color={statementColor} gradient />
+          <FasitBadgeOverlay fasit={statement.fasit}>
+            <StatementCard statement={statement} size="lg" color={statementColor} gradient />
+          </FasitBadgeOverlay>
         )
       }
       professor={
@@ -173,17 +183,15 @@ export function useStep6(): TeacherStep {
 
   const panel = (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-text-ink-soft)]">
-        Resultat
-      </p>
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-2xl bg-white p-3 shadow-[0_4px_6px_rgba(0,0,0,0.07),0_2px_4px_rgba(0,0,0,0.04)]">
+      <PanelSectionLabel>Resultat</PanelSectionLabel>
+      <PanelCard>
         {/* conf-summary-row */}
         <div className="flex flex-wrap items-center gap-2 px-3 py-2">
           <span className="text-xs font-semibold text-[var(--color-text-ink-faint)]">
             Gjennomsnittlig forståelse:
           </span>
           <span className="font-mono text-[22px] font-extrabold leading-none tabular-nums text-[var(--color-turkis-500)]">
-            {avgRating !== undefined ? avgRating.toFixed(1).replace(".", ",") : "–"}
+            {formatDecimal1(avgRating)}
           </span>
           <button
             type="button"
@@ -222,6 +230,10 @@ export function useStep6(): TeacherStep {
                 );
               })}
             </div>
+            <div className="mt-2.5 flex justify-center gap-6 border-t border-[var(--color-rating-bar-track)] pt-2.5">
+              <BreakdownRow label="Riktig svar:" value={r2AvgConfCorrect} layout="inline" />
+              <BreakdownRow label="Feil svar:" value={r2AvgConfWrong} layout="inline" />
+            </div>
           </div>
         )}
 
@@ -241,7 +253,7 @@ export function useStep6(): TeacherStep {
             Venter på elevenes vurderinger…
           </p>
         )}
-      </div>
+      </PanelCard>
     </div>
   );
 
@@ -249,25 +261,18 @@ export function useStep6(): TeacherStep {
     fagprat.statements.length - usedStatements.size - (usedStatements.has(selectedIdx) ? 0 : 1);
   const hasMoreStatements = unusedCount > 0;
 
-  const panelFooter = (
-    <div className="flex gap-2">
-      {hasMoreStatements && (
-        <PrimaryActionButton
-          className="flex-1"
-          onClick={() => {
-            markStatementUsed(selectedIdx);
-            goToStep(0);
-          }}
-        >
-          Neste påstand
-          <ArrowRight className="size-4" />
-        </PrimaryActionButton>
-      )}
-      <DestructiveButton className="flex-1" onClick={endSession}>
-        Avslutt
-      </DestructiveButton>
-    </div>
-  );
+  const panelFooter = hasMoreStatements ? (
+    <PrimaryActionButton
+      className="w-full"
+      onClick={() => {
+        markStatementUsed(selectedIdx);
+        goToStep(0);
+      }}
+    >
+      Neste påstand
+      <ArrowRight className="size-4" />
+    </PrimaryActionButton>
+  ) : null;
 
   return { main, panel, panelFooter };
 }

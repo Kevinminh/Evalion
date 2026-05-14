@@ -1,19 +1,12 @@
-import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from "recharts";
-
 import {
   type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@workspace/ui/components/chart";
+import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from "recharts";
 
-const COLORS = [
-  "var(--usant)",
-  "var(--delvis)",
-  "var(--chart-4)",
-  "var(--chart-2)",
-  "var(--sant)",
-];
+const COLORS = ["var(--usant)", "var(--delvis)", "var(--chart-4)", "var(--chart-2)", "var(--sant)"];
 
 const chartConfig = {
   count: {

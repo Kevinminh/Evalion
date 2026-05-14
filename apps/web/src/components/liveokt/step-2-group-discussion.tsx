@@ -1,12 +1,17 @@
-import { BackButton } from "@workspace/evalion/components/live/back-button";
-import { BegrunnelseCard } from "@workspace/evalion/components/live/begrunnelse-card";
-import { DistributionChart } from "@workspace/evalion/components/live/distribution-chart";
-import { PanelTabs } from "@workspace/evalion/components/live/panel-tabs";
-import { Professor } from "@workspace/evalion/components/live/professor";
-import { TeacherStepLayout } from "@workspace/evalion/components/live/teacher-step-layout";
-import { resolveStatementHex } from "@workspace/evalion/lib/constants";
+import { BackButton } from "@workspace/features/components/live/back-button";
+import { BreakdownRow } from "@workspace/features/components/live/breakdown-row";
+import { DistributionChart } from "@workspace/features/components/live/distribution-chart";
+import { FremhevetCarousel } from "@workspace/features/components/live/fremhevet-carousel";
+import { PanelTabs } from "@workspace/features/components/live/panel-tabs";
+import { Professor } from "@workspace/features/components/live/professor";
+import { TeacherStepLayout } from "@workspace/features/components/live/teacher-step-layout";
+import { resolveStatementHex } from "@workspace/features/lib/constants";
+import { formatDecimal1 } from "@workspace/features/lib/format";
+import { PanelCard } from "@workspace/ui/components/panel-card";
+import { PanelSectionLabel } from "@workspace/ui/components/panel-section-label";
 import { StatementCard } from "@workspace/ui/components/statement-card";
-import { Smartphone } from "lucide-react";
+import { BarChart3 } from "lucide-react";
+import { useState } from "react";
 
 import type { TeacherStep } from "@/types/teacher-step";
 
@@ -18,14 +23,17 @@ export function useStep2(): TeacherStep {
     panelTab,
     setPanelTab,
     begrunnelser,
-    students,
     voteBars,
     totalVotes,
     activeRoundVotes,
+    avgConfidenceR1,
+    avgConfidenceR1ByVote,
     selectedIdx,
     goToStep,
+    highlightBegrunnelse,
   } = useTeacherSession();
   const begrunnelseTab = panelTab === "default" || panelTab === "begrunnelser";
+  const [showAvgBreakdown, setShowAvgBreakdown] = useState(false);
 
   const statementColor = resolveStatementHex(statement?.color, selectedIdx);
 
@@ -53,24 +61,9 @@ export function useStep2(): TeacherStep {
     />
   );
 
-  const highlighted = begrunnelser?.find((b) => b.highlighted) ?? null;
-  const highlightedStudent = highlighted
-    ? students.find((s) => s._id === highlighted.studentId)
-    : undefined;
-  const highlightedVote = highlighted
-    ? activeRoundVotes.find((v) => v.studentId === highlighted.studentId)?.vote
-    : undefined;
-
-  const withConfidence = activeRoundVotes.filter((v) => typeof v.confidence === "number");
-  const avgConfidence = withConfidence.length
-    ? withConfidence.reduce((sum, v) => sum + (v.confidence ?? 0), 0) / withConfidence.length
-    : null;
-
   const panel = (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      <p className="shrink-0 px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-text-ink-soft)]">
-        Elevsvar – Første stemmerunde
-      </p>
+      <PanelSectionLabel>Elevsvar – Første stemmerunde</PanelSectionLabel>
       <PanelTabs
         tabs={[
           { key: "begrunnelser", label: "Begrunnelser" },
@@ -79,51 +72,58 @@ export function useStep2(): TeacherStep {
         activeTab={begrunnelseTab ? "begrunnelser" : "stemmefordeling"}
         onTabChange={setPanelTab}
       >
-        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto rounded-2xl bg-white p-3 shadow-[0_4px_6px_rgba(0,0,0,0.07),0_2px_4px_rgba(0,0,0,0.04)]">
-          {begrunnelseTab ? (
-            highlighted ? (
-              <div className="flex flex-col gap-2">
-                <p className="px-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--color-highlight-strip-text)]">
-                  Fremhevet
-                </p>
-                <BegrunnelseCard
-                  text={highlighted.text}
-                  studentName={highlightedStudent?.name}
-                  vote={highlightedVote}
-                  highlighted
-                />
-              </div>
-            ) : (
-              <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-6 text-center">
-                <Smartphone className="size-9 text-[var(--color-vote-empty-fill)]" strokeWidth={1.5} />
-                <p className="max-w-[240px] text-sm leading-relaxed text-[var(--color-text-ink-faint)]">
-                  Trykk på begrunnelser i live-statistikken på din eksterne enhet for å fremheve
-                  dem her.
-                </p>
-              </div>
-            )
-          ) : (
-            <div className="flex h-full flex-col gap-2">
+        {begrunnelseTab ? (
+          <PanelCard gap="2">
+            <FremhevetCarousel
+              begrunnelser={begrunnelser}
+              votes={activeRoundVotes}
+              round={1}
+              onDismiss={(b) => void highlightBegrunnelse(b)}
+            />
+          </PanelCard>
+        ) : (
+          <PanelCard>
+            <div className="relative flex items-center justify-between gap-2">
+              <span className="text-sm font-semibold text-[var(--color-text-ink-soft)]">
+                Gjennomsnittlig sikkerhet:
+              </span>
               <div className="flex items-center gap-2">
-                <span className="flex-1 text-sm font-semibold text-[var(--color-text-ink-soft)]">
-                  Gjennomsnittlig sikkerhet:
-                </span>
                 <span className="font-mono text-xl font-extrabold leading-none tabular-nums text-[var(--color-turkis-500)]">
-                  {avgConfidence !== null ? avgConfidence.toFixed(1).replace(".", ",") : "–"}
+                  {formatDecimal1(avgConfidenceR1)}
                 </span>
+                <button
+                  type="button"
+                  aria-label="Vis sikkerhet fordelt på kategori"
+                  aria-pressed={showAvgBreakdown}
+                  onClick={() => setShowAvgBreakdown((s) => !s)}
+                  className={
+                    "flex size-8 items-center justify-center rounded-xl border-[1.5px] border-[var(--color-divider-soft)] text-[var(--color-text-ink-faint)] transition-colors " +
+                    (showAvgBreakdown
+                      ? "bg-[var(--color-divider-soft)] text-[var(--color-text-ink-soft)]"
+                      : "bg-white hover:bg-[var(--color-divider-soft)]")
+                  }
+                >
+                  <BarChart3 className="size-4" strokeWidth={2} />
+                </button>
               </div>
-              <div className="h-px bg-[var(--color-divider-soft)]" />
-              <div className="flex-1 min-h-0 py-2">
-                <DistributionChart
-                  key={`s${selectedIdx}-discussion`}
-                  bars={voteBars}
-                  total={totalVotes}
-                  correctKey={statement?.fasit}
-                />
-              </div>
+              {showAvgBreakdown && (
+                <div className="absolute top-full right-0 z-10 mt-2 flex min-w-[160px] flex-col gap-1.5 rounded-xl border-[1.5px] border-[var(--color-divider-soft)] bg-white p-3 shadow-[var(--shadow-card-soft)]">
+                  <BreakdownRow label="Sant:" value={avgConfidenceR1ByVote.sant} />
+                  <BreakdownRow label="Delvis sant:" value={avgConfidenceR1ByVote.delvis} />
+                  <BreakdownRow label="Usant:" value={avgConfidenceR1ByVote.usant} />
+                </div>
+              )}
             </div>
-          )}
-        </div>
+            <div className="h-px bg-[var(--color-divider-soft)]" />
+            <div className="flex-1 min-h-0 py-2">
+              <DistributionChart
+                key={`s${selectedIdx}-discussion`}
+                bars={voteBars}
+                total={totalVotes}
+              />
+            </div>
+          </PanelCard>
+        )}
       </PanelTabs>
     </div>
   );

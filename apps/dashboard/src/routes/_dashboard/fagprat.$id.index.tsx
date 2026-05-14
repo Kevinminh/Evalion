@@ -1,5 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { FagPratDetailSkeleton } from "@workspace/features/components/skeletons/fagprat-detail-skeleton";
+import { authClient } from "@workspace/features/lib/auth-client";
+import { Button } from "@workspace/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -7,21 +10,19 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@workspace/ui/components/dropdown-menu";
+import { ErrorState } from "@workspace/ui/components/states/error-state";
+import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { useMutation } from "convex/react";
-import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, Users, Pencil, MoreVertical, Copy, Trash2, FolderPlus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { FagPratDetailSkeleton } from "@workspace/evalion/components/skeletons/fagprat-detail-skeleton";
-import { ErrorState } from "@workspace/ui/components/states/error-state";
-import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
+import { fagpratsMutations, fagpratsQueries } from "@workspace/api/fagprats";
+
 import { AuthorAvatar } from "@/components/author-avatar";
 import { DeleteFagPratDialog } from "@/components/delete-fagprat-dialog";
 import { StatementTable } from "@/components/statement-table";
 import { TypeIcon } from "@/components/type-icon";
-import { authClient } from "@/lib/auth-client";
-import { api, fagpratQueries } from "@/lib/convex";
 import type { FagPratId } from "@/lib/types";
 
 export const Route = createFileRoute("/_dashboard/fagprat/$id/")({
@@ -31,10 +32,10 @@ export const Route = createFileRoute("/_dashboard/fagprat/$id/")({
 function FagPratPreviewPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const { data: fagprat, isPending, isError } = useQuery(fagpratQueries.getById(id as FagPratId));
+  const { data: fagprat, isPending, isError } = useQuery(fagpratsQueries.byId(id as FagPratId));
   const { data: session } = authClient.useSession();
-  const duplicateFagPrat = useMutation(api.fagprats.duplicate);
-  const removeFagPrat = useMutation(api.fagprats.remove);
+  const duplicateFagPrat = useMutation(fagpratsMutations.duplicate);
+  const removeFagPrat = useMutation(fagpratsMutations.remove);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   if (isPending) {

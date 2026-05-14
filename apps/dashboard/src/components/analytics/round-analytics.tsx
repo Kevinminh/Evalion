@@ -1,4 +1,5 @@
 import type { Id } from "@workspace/backend/convex/_generated/dataModel";
+import { Popover, PopoverContent, PopoverTrigger } from "@workspace/ui/components/popover";
 import { cn } from "@workspace/ui/lib/utils";
 import { BarChart3 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -6,9 +7,14 @@ import { useMemo, useState } from "react";
 import type { Fasit } from "@/lib/types";
 
 import { ColumnChart } from "./column-chart";
-import { ConfidenceCircles } from "./confidence-circles";
 import { MatrixHint, StudentMatrix } from "./student-matrix";
-import type { RoundDistribution, ConfidenceData, StudentData } from "./types";
+import {
+  getStatementGradient,
+  type RoundDistribution,
+  type ConfidenceData,
+  type StatementColorName,
+  type StudentData,
+} from "./types";
 
 interface RoundAnalyticsProps {
   round: 1 | 2;
@@ -18,6 +24,7 @@ interface RoundAnalyticsProps {
   prevDistribution?: RoundDistribution;
   fasit: Fasit;
   statementText: string;
+  statementColor?: StatementColorName;
   totalStudents: number;
   sessionActive: boolean;
   students: StudentData[];
@@ -32,12 +39,13 @@ export function RoundAnalytics({
   prevDistribution,
   fasit,
   statementText,
+  statementColor,
   totalStudents,
   sessionActive,
   students,
   onToggleHighlight,
 }: RoundAnalyticsProps) {
-  const [showConfDetail, setShowConfDetail] = useState(false);
+  const gradient = getStatementGradient(statementColor);
   const [matrixSelected, setMatrixSelected] = useState<number | null>(null);
 
   const voteItems = [
@@ -95,8 +103,14 @@ export function RoundAnalytics({
   return (
     <div className="flex flex-col gap-3.5">
       <div className="overflow-hidden rounded-[16px] border border-neutral-200 bg-white">
-        <div className="mx-3.5 mt-3.5 rounded-[12px] bg-gradient-to-br from-purple-50 to-purple-100 p-2.5 text-center">
-          <p className="text-xs font-semibold italic leading-relaxed text-purple-800">
+        <div
+          className="mx-3.5 mt-3.5 rounded-[12px] p-2.5 text-center"
+          style={{ background: gradient.background }}
+        >
+          <p
+            className="text-xs font-semibold italic leading-relaxed"
+            style={{ color: gradient.text }}
+          >
             «{statementText}»
           </p>
         </div>
@@ -118,15 +132,8 @@ export function RoundAnalytics({
           )}
         </div>
 
-        <div className="px-3.5 pt-0 pb-1">
-          <div className="text-[10px] font-semibold text-muted-foreground">Stemmefordeling</div>
-        </div>
-        <div className="px-2 pb-2">
-          <ColumnChart items={voteItems} />
-        </div>
-
-        <div className="flex items-center justify-between border-t border-neutral-100 px-3.5 py-2.5">
-          <div className="flex items-center gap-1.5 flex-wrap">
+        <div className="flex items-center justify-between px-3.5 py-2.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-[11px] font-semibold text-muted-foreground">
               Gjennomsnittlig sikkerhet:
             </span>
@@ -159,45 +166,40 @@ export function RoundAnalytics({
               </span>
             )}
           </div>
-          <button
-            onClick={() => setShowConfDetail(!showConfDetail)}
-            className={`flex size-8 items-center justify-center rounded-[10px] border-[1.5px] transition-all ${
-              showConfDetail
-                ? "border-primary/30 bg-primary/5"
-                : "border-neutral-200 bg-white hover:bg-neutral-100"
-            }`}
-          >
-            <BarChart3
-              className={`size-4 ${showConfDetail ? "text-primary" : "text-muted-foreground"}`}
-            />
-          </button>
-        </div>
-
-        {showConfDetail && (
-          <div className="border-t border-neutral-100 px-3.5 py-2.5">
-            <ConfidenceCircles distribution={confidence.confidenceDistribution} />
-            <div className="mt-2.5 flex flex-wrap justify-center gap-6 border-t border-neutral-100 pt-2.5">
-              <div className="flex items-center gap-2.5 text-xs font-semibold">
+          <Popover>
+            <PopoverTrigger
+              aria-label="Vis fordelt på kategori"
+              className="flex size-8 items-center justify-center rounded-[10px] border-[1.5px] border-neutral-200 bg-white text-muted-foreground transition-all hover:bg-neutral-100 data-[popup-open]:border-primary/30 data-[popup-open]:bg-primary/5 data-[popup-open]:text-primary"
+            >
+              <BarChart3 className="size-4" />
+            </PopoverTrigger>
+            <PopoverContent side="bottom" align="end" sideOffset={8} className="w-44 gap-1.5">
+              <div className="flex items-center justify-between text-sm font-semibold">
                 <span className="text-muted-foreground">Sant:</span>
                 <span className="font-mono font-bold">
                   {confidence.confidenceByVote.sant.toFixed(1)}
                 </span>
               </div>
-              <div className="flex items-center gap-2.5 text-xs font-semibold">
+              <div className="flex items-center justify-between text-sm font-semibold">
                 <span className="text-muted-foreground">Delvis sant:</span>
                 <span className="font-mono font-bold">
                   {confidence.confidenceByVote.delvis.toFixed(1)}
                 </span>
               </div>
-              <div className="flex items-center gap-2.5 text-xs font-semibold">
+              <div className="flex items-center justify-between text-sm font-semibold">
                 <span className="text-muted-foreground">Usant:</span>
                 <span className="font-mono font-bold">
                   {confidence.confidenceByVote.usant.toFixed(1)}
                 </span>
               </div>
-            </div>
-          </div>
-        )}
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        <div className="border-t border-neutral-100 px-3.5 pb-3.5">
+          <p className="pt-1.5 text-[10px] font-semibold text-muted-foreground">Stemmefordeling</p>
+          <ColumnChart items={voteItems} />
+        </div>
       </div>
 
       {round === 2 && (
@@ -208,8 +210,8 @@ export function RoundAnalytics({
             </span>
           </div>
           <div className="px-3.5 pb-3.5">
-            <div className="flex flex-col items-center gap-1 rounded-[14px] bg-primary/5 px-4 py-3">
-              <span className="font-mono text-2xl font-extrabold leading-none text-primary tabular-nums">
+            <div className="flex items-center justify-center gap-2.5 rounded-[14px] bg-primary/15 px-3.5 py-2.5">
+              <span className="font-mono text-[20px] font-extrabold leading-none text-secondary-foreground tabular-nums">
                 {changedCount}/{totalStudents}
               </span>
               <span className="text-[11px] font-semibold text-muted-foreground">
@@ -238,7 +240,7 @@ export function RoundAnalytics({
         />
       )}
 
-      {matrixSelected === null && <MatrixHint />}
+      <MatrixHint />
     </div>
   );
 }
@@ -315,29 +317,29 @@ function buildR2MatrixCells(students: StudentData[]) {
     {
       label: "Endret til riktig",
       count: endretTilRiktig.length,
-      colorClass: "bg-sant/15",
-      textClass: "text-sant",
+      colorClass: "bg-[#E8F5E9]",
+      textClass: "text-[#2E7D32]",
       students: mapStudents(endretTilRiktig),
     },
     {
       label: "Endret fra riktig til feil",
       count: endretFraRiktig.length,
-      colorClass: "bg-usant/15",
-      textClass: "text-usant",
+      colorClass: "bg-[#FFEBEE]",
+      textClass: "text-[#C62828]",
       students: mapStudents(endretFraRiktig),
     },
     {
       label: "Endret, fortsatt feil",
       count: endretFortsattFeil.length,
-      colorClass: "bg-orange-100",
-      textClass: "text-orange-800",
+      colorClass: "bg-[#FFF3E0]",
+      textClass: "text-[#B35C00]",
       students: mapStudents(endretFortsattFeil),
     },
     {
       label: "Uendret",
       count: uendret.length,
-      colorClass: "bg-yellow-100",
-      textClass: "text-yellow-800",
+      colorClass: "bg-[#FFFDE7]",
+      textClass: "text-[#8D6E00]",
       students: mapStudents(uendret),
     },
   ];

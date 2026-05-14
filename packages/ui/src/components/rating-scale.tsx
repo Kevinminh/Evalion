@@ -33,7 +33,7 @@ export function RatingScale({
   className,
 }: RatingScaleProps) {
   return (
-    <div className={cn("flex gap-2", className)}>
+    <div className={cn("flex gap-3", className)}>
       {SCALE_VALUES.map((n) => {
         const isSelected = selected === n;
         const selectedClass =

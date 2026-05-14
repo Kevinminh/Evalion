@@ -1,26 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Button } from "@workspace/ui/components/button";
-import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
-import { FagPratDetailSkeleton } from "@workspace/evalion/components/skeletons/fagprat-detail-skeleton";
+import { fagpratsMutations, fagpratsQueries } from "@workspace/api/fagprats";
+import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
+import { FagPratDetailSkeleton } from "@workspace/features/components/skeletons/fagprat-detail-skeleton";
 import {
   toStatementPayload,
   toStatementsWithId,
   useStatements,
-} from "@workspace/evalion/hooks/use-statements";
+} from "@workspace/features/hooks/use-statements";
+import { authClient } from "@workspace/features/lib/auth-client";
+import { Button } from "@workspace/ui/components/button";
+import { ErrorState } from "@workspace/ui/components/states/error-state";
+import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
+import { UnauthorizedState } from "@workspace/ui/components/states/unauthorized-state";
 import { useMutation } from "convex/react";
 import { Plus } from "lucide-react";
 import { Reorder } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { MetadataCard } from "@/components/metadata-card";
-import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
-import { UnauthorizedState } from "@workspace/ui/components/states/unauthorized-state";
 import { StatementEditor } from "@/components/statement-editor";
-import { authClient } from "@/lib/auth-client";
-import { api, fagpratQueries } from "@/lib/convex";
 import type { FagPratId, FagPratType, Visibility } from "@/lib/types";
 
 export const Route = createFileRoute("/_dashboard/fagprat/$id/rediger")({
@@ -31,9 +31,9 @@ export const Route = createFileRoute("/_dashboard/fagprat/$id/rediger")({
 function EditFagPratPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const { data: fagprat, isPending, isError } = useQuery(fagpratQueries.getById(id as FagPratId));
+  const { data: fagprat, isPending, isError } = useQuery(fagpratsQueries.byId(id as FagPratId));
   const { data: session, isPending: sessionPending } = authClient.useSession();
-  const updateFagPrat = useMutation(api.fagprats.update);
+  const updateFagPrat = useMutation(fagpratsMutations.update);
 
   const [title, setTitle] = useState("");
   const [fag, setFag] = useState("");

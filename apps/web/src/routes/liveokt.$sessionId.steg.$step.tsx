@@ -1,15 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
-import { LiveStepSkeleton } from "@workspace/evalion/components/skeletons/live-step-skeleton";
-import { SessionTopBar } from "@workspace/evalion/components/live/session-top-bar";
-import { StepNav } from "@workspace/evalion/components/live/step-nav";
-import { TeacherPanel } from "@workspace/evalion/components/live/teacher-panel";
-import { TopBarTimer } from "@workspace/evalion/components/live/top-bar-timer";
-import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
+import { LiveStepSkeleton } from "@workspace/features/components/skeletons/live-step-skeleton";
+import { SessionTopBar } from "@workspace/features/components/live/session-top-bar";
+import { StepNav } from "@workspace/features/components/live/step-nav";
+import { TeacherPanel } from "@workspace/features/components/live/teacher-panel";
+import { TopBarTimer } from "@workspace/features/components/live/top-bar-timer";
+import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
 import { ArrowRight } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
-import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
+import { fagpratsQueries } from "@workspace/api/fagprats";
+import { liveSessionsQueries } from "@workspace/api/liveSessions";
+import { sessionBegrunnelserQueries } from "@workspace/api/sessionBegrunnelser";
+import { sessionStudentsQueries } from "@workspace/api/sessionStudents";
+import { sessionVotesQueries } from "@workspace/api/sessionVotes";
+
 import { cssVars } from "@/lib/css-vars";
 import { DASHBOARD_URL } from "@/lib/env";
 import { parseSessionId } from "@/lib/route-params";
@@ -19,6 +24,7 @@ import { DestructiveButton } from "@workspace/ui/components/destructive-button";
 import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
 import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
 import { RecordingButton } from "@/components/liveokt/recording-button";
+import { SessionEndedScreen } from "@/components/liveokt/session-ended-screen";
 import { StatementPicker } from "@/components/liveokt/statement-picker";
 import { useStep1 } from "@/components/liveokt/step-1-vote-in-progress";
 import { useStep2 } from "@/components/liveokt/step-2-group-discussion";
@@ -50,26 +56,26 @@ function LiveStepPage() {
   const typedSessionId = parseSessionId(sessionId);
 
   const { data: session, isPending: sessionLoading } = useQuery(
-    liveSessionQueries.getById(typedSessionId),
+    liveSessionsQueries.byId(typedSessionId),
   );
   const { data: fagprat, isPending: fagpratLoading } = useQuery(
-    fagpratQueries.getById(session?.fagpratId ?? "skip"),
+    fagpratsQueries.byId(session?.fagpratId ?? "skip"),
   );
-  const { data: students } = useQuery(liveSessionQueries.listStudents(typedSessionId));
+  const { data: students } = useQuery(sessionStudentsQueries.listBySession(typedSessionId));
 
   const selectedIdx = session?.currentStatementIndex ?? 0;
 
   const { data: votes } = useQuery({
-    ...liveSessionQueries.getVotes(typedSessionId, selectedIdx),
+    ...sessionVotesQueries.bySessionStatement(typedSessionId, selectedIdx),
     enabled: !!fagprat,
   });
   const { data: analytics } = useQuery({
-    ...liveSessionQueries.getVoteAnalytics(typedSessionId, selectedIdx),
+    ...sessionVotesQueries.analytics(typedSessionId, selectedIdx),
     enabled: !!fagprat && step >= 4,
   });
   const { data: begrunnelser } = useQuery({
-    ...liveSessionQueries.getBegrunnelser(typedSessionId, selectedIdx),
-    enabled: !!fagprat && [2, 5].includes(step),
+    ...sessionBegrunnelserQueries.bySessionStatement(typedSessionId, selectedIdx),
+    enabled: !!fagprat && [2, 4, 5].includes(step),
   });
 
   if (sessionLoading || fagpratLoading) {
@@ -82,6 +88,10 @@ function LiveStepPage() {
         <p className="text-muted-foreground">FagPrat ikke funnet.</p>
       </EmptyStateMessage>
     );
+  }
+
+  if (session.status === "ended") {
+    return <SessionEndedScreen />;
   }
 
   if (step > 0 && !fagprat.statements[selectedIdx]) {
@@ -149,6 +159,11 @@ function TeacherSessionLayout() {
     timer.startedAt !== undefined && timer.pausedAt === undefined;
   const showTopbarTimer = timerIsRunning && !panelOpen;
 
+  const stepIntent = useMemo(
+    () => ({ open: step === 1 || step === 3, key: step }),
+    [step],
+  );
+
   return (
     <div className="flex h-svh flex-col overflow-hidden bg-[var(--color-bg-primary)]">
       <SessionTopBar
@@ -177,8 +192,15 @@ function TeacherSessionLayout() {
         </main>
         {teacherStep && (
           <TeacherPanel
-            defaultOpen={step !== 5}
-            attentionWhenClosed={timerIsRunning}
+            // Panel auto-flips on every step transition: open on 1 & 3, closed
+            // on 2, 4, 5, 6. Driven by `forceState` keyed on `step`. The toggle
+            // pulses on "closed" steps and while the timer is running.
+            defaultOpen={step === 1 || step === 3}
+            attentionWhenClosed={
+              step === 2 || step === 4 || step === 5 || step === 6 || timerIsRunning
+            }
+            forceCollapse={timerIsRunning && (step === 1 || step === 3)}
+            forceState={stepIntent}
             footer={
               teacherStep.panelFooter === null ? null : (
                 <PanelFooter footer={teacherStep.panelFooter} />

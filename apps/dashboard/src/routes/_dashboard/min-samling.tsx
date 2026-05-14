@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { fagpratsQueries } from "@workspace/api/fagprats";
+import { FagPratCardSkeleton } from "@workspace/features/components/skeletons/fagprat-card-skeleton";
+import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { CustomDropdown } from "@/components/custom-dropdown";
-import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { FagPratCard } from "@/components/fagprat-card";
-import { FagPratCardSkeleton } from "@workspace/evalion/components/skeletons/fagprat-card-skeleton";
 import { LEVEL_OPTIONS, SKELETON_COUNT } from "@/lib/constants";
-import { fagpratQueries } from "@/lib/convex";
 import { useDebouncedValue } from "@/lib/use-debounced-value";
 
 const SORT_OPTIONS = [
@@ -74,7 +74,7 @@ function MinSamlingPage() {
     [navigate],
   );
 
-  const { data: allFagPrats, isPending, isError } = useQuery(fagpratQueries.listByAuthor());
+  const { data: allFagPrats, isPending, isError } = useQuery(fagpratsQueries.listByAuthor());
 
   // Backend returns docs ordered by updatedAt desc (via `by_author_updatedAt` index),
   // so "sist-endret" needs no client-side sort.
@@ -83,9 +83,7 @@ function MinSamlingPage() {
     if (!searchQuery) return allFagPrats;
     const query = searchQuery.toLowerCase();
     return allFagPrats.filter(
-      (fp) =>
-        fp.title.toLowerCase().includes(query) ||
-        fp.subject.toLowerCase().includes(query),
+      (fp) => fp.title.toLowerCase().includes(query) || fp.subject.toLowerCase().includes(query),
     );
   }, [allFagPrats, searchQuery]);
 

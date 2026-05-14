@@ -1,4 +1,4 @@
-import type { StatementWithId } from "@workspace/evalion/hooks/use-statements";
+import type { StatementWithId } from "@workspace/features/hooks/use-statements";
 import { cn } from "@workspace/ui/lib/utils";
 import { ChevronDown, GripVertical, Trash2 } from "lucide-react";
 import { Reorder, useDragControls } from "motion/react";

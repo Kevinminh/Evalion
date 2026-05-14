@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { authClient } from "@workspace/features/lib/auth-client";
 import { ProfileContactCard } from "@workspace/ui/components/profile-contact-card";
 import { ProfileDangerZoneCard } from "@workspace/ui/components/profile-danger-zone-card";
 import {
@@ -11,7 +12,6 @@ import {
 } from "@workspace/ui/components/profile-legal-card";
 import { useState } from "react";
 
-import { authClient } from "@/lib/auth-client";
 import { CONTACT_EMAIL, OM_EVALION_URL, PERSONVERN_URL } from "@/lib/external-links";
 
 export const Route = createFileRoute("/_dashboard/profile")({

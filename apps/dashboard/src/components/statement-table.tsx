@@ -1,6 +1,4 @@
-import type { Fasit } from "@workspace/evalion/lib/types";
-
-import type { FagPratStatement } from "@/lib/types";
+import type { FagPratStatement, Fasit } from "@/lib/types";
 
 const FASIT_CONFIG: Record<Fasit, { label: string; className: string }> = {
   sant: { label: "Sant", className: "bg-sant-bg text-sant" },

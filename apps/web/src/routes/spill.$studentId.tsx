@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Professor } from "@workspace/evalion/components/live/professor";
-import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
-import { StudentGameSkeleton } from "@workspace/evalion/components/skeletons/student-game-skeleton";
+import { Professor } from "@workspace/features/components/live/professor";
+import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
+import { StudentGameSkeleton } from "@workspace/features/components/skeletons/student-game-skeleton";
 import { ConfirmDialog } from "@workspace/ui/components/confirm-dialog";
 import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
 import { StudentAvatar } from "@workspace/ui/components/student-avatar";
@@ -11,11 +11,15 @@ import { cn } from "@workspace/ui/lib/utils";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { fagpratsQueries } from "@workspace/api/fagprats";
+import { liveSessionsQueries } from "@workspace/api/liveSessions";
+import { sessionStudentsQueries } from "@workspace/api/sessionStudents";
+import { sessionVotesQueries } from "@workspace/api/sessionVotes";
+
 import { StudentGameProvider, useStudentGame } from "@/components/spill/student-game-context";
 import { StudentStepRenderer } from "@/components/spill/student-step-renderer";
 import { StudentTimerBadge } from "@/components/spill/student-timer-badge";
 import { StudentTopbar } from "@/components/spill/student-topbar";
-import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
 import { parseStudentId } from "@/lib/route-params";
 import { phaseStepNumber } from "@/types/student-phase";
 
@@ -33,15 +37,15 @@ function StudentGamePage() {
   const typedStudentId = parseStudentId(studentId);
 
   const { data: student, isPending: studentLoading } = useQuery(
-    liveSessionQueries.getStudent(typedStudentId),
+    sessionStudentsQueries.byId(typedStudentId),
   );
-  const { data: session } = useQuery(liveSessionQueries.getById(student?.sessionId ?? "skip"));
-  const { data: fagprat } = useQuery(fagpratQueries.getById(session?.fagpratId ?? "skip"));
+  const { data: session } = useQuery(liveSessionsQueries.byId(student?.sessionId ?? "skip"));
+  const { data: fagprat } = useQuery(fagpratsQueries.byId(session?.fagpratId ?? "skip"));
   const { data: students } = useQuery(
-    liveSessionQueries.listStudents(student?.sessionId ?? "skip"),
+    sessionStudentsQueries.listBySession(student?.sessionId ?? "skip"),
   );
   const { data: votes } = useQuery(
-    liveSessionQueries.getVotes(
+    sessionVotesQueries.bySessionStatement(
       student?.sessionId && fagprat ? student.sessionId : "skip",
       session?.currentStatementIndex ?? 0,
     ),
@@ -112,12 +116,13 @@ function StudentGameLayout({ onLeave }: { onLeave: () => void }) {
         stepLabel={session.status === "lobby" ? "Lobby" : undefined}
         onLeave={() => setShowLeaveConfirm(true)}
         rightSlot={<StudentTimerBadge />}
+        hideStepBadge={!!session.timerStartedAt}
       />
 
       <div
         className={cn(
           "flex w-full flex-col items-center pt-8",
-          useWideLayout ? "max-w-3xl" : "max-w-md",
+          useWideLayout ? "max-w-3xl" : "max-w-md md:max-w-lg lg:max-w-2xl",
         )}
       >
         <StudentGameContent onLeave={onLeave} />

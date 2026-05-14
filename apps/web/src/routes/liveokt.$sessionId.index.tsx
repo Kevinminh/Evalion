@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { SessionTopBar } from "@workspace/evalion/components/live/session-top-bar";
-import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
-import { TeacherLobbySkeleton } from "@workspace/evalion/components/skeletons/teacher-lobby-skeleton";
+import { SessionTopBar } from "@workspace/features/components/live/session-top-bar";
+import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
+import { TeacherLobbySkeleton } from "@workspace/features/components/skeletons/teacher-lobby-skeleton";
 import { DestructiveButton } from "@workspace/ui/components/destructive-button";
 import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
 import { PrimaryActionButton } from "@workspace/ui/components/primary-action-button";
@@ -11,9 +11,13 @@ import { WaitingDots } from "@workspace/ui/components/waiting-dots";
 import { Users } from "lucide-react";
 
 import { JoinCard } from "@/components/liveokt/lobby/join-card";
+import { SessionEndedScreen } from "@/components/liveokt/session-ended-screen";
 import { StudentGrid } from "@/components/liveokt/lobby/student-grid";
 import { useLobbyActions } from "@/hooks/liveokt/use-lobby-actions";
-import { fagpratQueries, liveSessionQueries } from "@/lib/convex";
+import { fagpratsQueries } from "@workspace/api/fagprats";
+import { liveSessionsQueries } from "@workspace/api/liveSessions";
+import { sessionStudentsQueries } from "@workspace/api/sessionStudents";
+
 import { DASHBOARD_URL } from "@/lib/env";
 import { parseSessionId } from "@/lib/route-params";
 
@@ -33,19 +37,19 @@ function TeacherLobbyPage() {
     data: session,
     isLoading: sessionLoading,
     error: sessionError,
-  } = useQuery(liveSessionQueries.getById(typedSessionId));
+  } = useQuery(liveSessionsQueries.byId(typedSessionId));
 
   const {
     data: fagprat,
     isLoading: fagpratLoading,
     error: fagpratError,
-  } = useQuery(fagpratQueries.getById(session?.fagpratId ?? "skip"));
+  } = useQuery(fagpratsQueries.byId(session?.fagpratId ?? "skip"));
 
   const {
     data: students,
     isLoading: studentsLoading,
     error: studentsError,
-  } = useQuery(liveSessionQueries.listStudents(typedSessionId));
+  } = useQuery(sessionStudentsQueries.listBySession(typedSessionId));
 
   const lobby = useLobbyActions({
     sessionId: typedSessionId,
@@ -66,6 +70,10 @@ function TeacherLobbyPage() {
         <p className="text-muted-foreground">Økt ikke funnet.</p>
       </EmptyStateMessage>
     );
+  }
+
+  if (session.status === "ended") {
+    return <SessionEndedScreen />;
   }
 
   const studentList = students ?? [];

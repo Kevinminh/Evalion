@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { FagPratDetailSkeleton } from "@workspace/evalion/components/skeletons/fagprat-detail-skeleton";
+import { fagpratsQueries } from "@workspace/api/fagprats";
+import { FagPratDetailSkeleton } from "@workspace/features/components/skeletons/fagprat-detail-skeleton";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 
@@ -8,7 +9,6 @@ import "@workspace/ui/styles/pdf-print.css";
 import { ArrowLeft, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useState } from "react";
 
-import { fagpratQueries } from "@/lib/convex";
 import type { FagPrat, FagPratId, FagPratStatement, Fasit } from "@/lib/types";
 
 const CARDS_PER_FIRST_PAGE = 3;
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_dashboard/fagprat/$id/pdf")({
 function FagPratPdfPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const { data: fagprat, isPending, isError } = useQuery(fagpratQueries.getById(id as FagPratId));
+  const { data: fagprat, isPending, isError } = useQuery(fagpratsQueries.byId(id as FagPratId));
 
   const [title, setTitle] = useState("");
   const [seeded, setSeeded] = useState(false);

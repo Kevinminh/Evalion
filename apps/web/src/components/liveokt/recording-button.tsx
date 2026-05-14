@@ -1,4 +1,4 @@
-import { RecordButton } from "@workspace/evalion/components/live/record-button";
+import { RecordButton } from "@workspace/features/components/live/record-button";
 
 import { useTeacherSession } from "./teacher-session-context";
 

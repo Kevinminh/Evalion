@@ -1,7 +1,9 @@
 "use client";
 
 import { AlertDialog as AlertDialogPrimitive } from "@base-ui/react/alert-dialog";
+import { buttonVariants } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
+import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 
 function AlertDialog({ ...props }: AlertDialogPrimitive.Root.Props) {
@@ -83,27 +85,31 @@ function AlertDialogDescription({ className, ...props }: AlertDialogPrimitive.De
   );
 }
 
-function AlertDialogAction({ className, ...props }: React.ComponentProps<"button">) {
+function AlertDialogAction({
+  className,
+  variant = "default",
+  size = "default",
+  ...props
+}: React.ComponentProps<"button"> & VariantProps<typeof buttonVariants>) {
   return (
     <button
       data-slot="alert-dialog-action"
-      className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-xl bg-destructive px-4 py-2.5 text-sm font-bold text-white transition-all hover:bg-destructive/90",
-        className,
-      )}
+      className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />
   );
 }
 
-function AlertDialogCancel({ className, ...props }: AlertDialogPrimitive.Close.Props) {
+function AlertDialogCancel({
+  className,
+  variant = "outline",
+  size = "default",
+  ...props
+}: AlertDialogPrimitive.Close.Props & VariantProps<typeof buttonVariants>) {
   return (
     <AlertDialogPrimitive.Close
       data-slot="alert-dialog-cancel"
-      className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-xl border-2 border-border px-4 py-2.5 text-sm font-bold text-foreground transition-all hover:bg-muted",
-        className,
-      )}
+      className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />
   );

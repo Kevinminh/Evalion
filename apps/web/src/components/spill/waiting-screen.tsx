@@ -1,18 +1,21 @@
-import { Professor } from "@workspace/evalion/components/live/professor";
+import { Professor } from "@workspace/features/components/live/professor";
 import { WaitingDots } from "@workspace/ui/components/waiting-dots";
-import { CheckCircle2 } from "lucide-react";
 
-export function WaitingScreen() {
+interface WaitingScreenProps {
+  title?: string;
+  waitingText?: string;
+}
+
+export function WaitingScreen({
+  title,
+  waitingText = "Venter på resten av klassen",
+}: WaitingScreenProps = {}) {
   return (
-    <div className="flex flex-col items-center gap-6 py-8">
-      <span className="inline-flex animate-fasit-pulse items-center gap-2 rounded-full bg-sant/15 px-4 py-1.5 text-sm font-bold uppercase tracking-wider text-sant">
-        <CheckCircle2 className="size-4" />
-        Stemmen registrert
-      </span>
-      <h2 className="text-xl font-extrabold text-foreground">Takk for svaret ditt!</h2>
+    <div className="flex flex-col items-center gap-4 py-8">
+      {title && <h2 className="text-lg font-extrabold text-primary">{title}</h2>}
       <Professor size="xl" bounce bordered />
-      <div className="flex items-center text-muted-foreground">
-        Venter på resten av klassen
+      <div className="flex items-center text-sm font-semibold text-muted-foreground">
+        {waitingText}
         <WaitingDots />
       </div>
     </div>

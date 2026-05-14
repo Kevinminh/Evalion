@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { LogoutCard } from "@workspace/evalion/components/auth/logout-card";
-
-import { authClient } from "@/lib/auth-client";
+import { LogoutCard } from "@workspace/features/components/auth/logout-card";
+import { authClient } from "@workspace/features/lib/auth-client";
 
 export const Route = createFileRoute("/logout")({ component: LogoutPage });
 

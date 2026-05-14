@@ -10,6 +10,9 @@ interface StudentTopbarProps {
   onLeave?: () => void;
   /** Slot rendered between the nickname pill and the step badge. */
   rightSlot?: ReactNode;
+  /** When the timer badge is showing, the mockup hides the step badge so only
+   * one chip occupies the slot. Caller sets this from session.timerStartedAt. */
+  hideStepBadge?: boolean;
 }
 
 export function StudentTopbar({
@@ -20,11 +23,12 @@ export function StudentTopbar({
   stepLabel,
   onLeave,
   rightSlot,
+  hideStepBadge,
 }: StudentTopbarProps) {
   return (
     <div className="fixed top-0 right-0 left-0 z-40 flex h-14 items-center justify-between border-b border-neutral-200 bg-white px-4">
       <div className="flex items-center gap-3 min-w-0">
-        <img src="/co-lab-logo.png" alt="CO-LAB" className="h-7 shrink-0 object-contain" />
+        <img src="/fagprat-logo.png" alt="FagPrat" className="h-7 shrink-0 object-contain" />
         {fagpratTitle && (
           <>
             <div className="h-5 w-px shrink-0 bg-neutral-300" />
@@ -37,9 +41,14 @@ export function StudentTopbar({
           {studentName}
         </span>
         {rightSlot}
-        {currentStep !== undefined && (
+        {currentStep !== undefined && !hideStepBadge && (
           <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-semibold text-muted-foreground sm:text-xs">
-            {stepLabel ?? `Steg ${currentStep} av ${totalSteps}`}
+            {stepLabel ?? (
+              <>
+                <span className="hidden sm:inline">{`Steg ${currentStep} av ${totalSteps}`}</span>
+                <span className="sm:hidden">{`${currentStep}/${totalSteps}`}</span>
+              </>
+            )}
           </span>
         )}
         {onLeave && (

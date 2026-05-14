@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import { EndringerCard } from "@workspace/evalion/components/live/endringer-card";
-import { FasitBadge } from "@workspace/evalion/components/live/fasit-badge";
+import { EndringerCard } from "@workspace/features/components/live/endringer-card";
+import { FasitBadge } from "@workspace/features/components/live/fasit-badge";
 import { Skeleton } from "@workspace/ui/components/skeleton";
+
+import { sessionVotesQueries } from "@workspace/api/sessionVotes";
+import type { Id } from "@workspace/api/types";
 
 import { AnalyticsRatingChart } from "@/components/analytics/rating-chart-analytics";
 import { VoteChart } from "@/components/analytics/vote-chart";
-import { liveSessionQueries } from "@/lib/convex";
 import type { Fasit } from "@/lib/types";
-import type { Id } from "@/lib/convex";
 
 interface StatementAnalyticsProps {
   sessionId: Id<"liveSessions">;
@@ -23,7 +24,7 @@ export function StatementAnalytics({
   fasit,
 }: StatementAnalyticsProps) {
   const { data: analytics, isPending } = useQuery(
-    liveSessionQueries.getVoteAnalytics(sessionId, statementIndex),
+    sessionVotesQueries.analytics(sessionId, statementIndex),
   );
 
   if (isPending || !analytics) {
@@ -67,6 +68,10 @@ export function StatementAnalytics({
             totalVotes={analytics.totalR2}
             changedToCorrect={analytics.wrongToRight}
             changedToIncorrect={analytics.rightToWrong}
+            totalChanged={analytics.students.reduce(
+              (sum, s) => (s.round1 && s.round2 && s.round1.vote !== s.round2.vote ? sum + 1 : sum),
+              0,
+            )}
           />
         </div>
         {analytics.ratingDistribution.some((d) => d.count > 0) && (

@@ -7,7 +7,7 @@ import { anyApi, type FunctionReference } from "convex/server";
 
 import { components } from "./_generated/api";
 import type { DataModel } from "./_generated/dataModel";
-import { query, type MutationCtx } from "./_generated/server";
+import { type MutationCtx } from "./_generated/server";
 import authConfig from "./auth.config";
 import schema from "./betterAuth/schema";
 
@@ -141,11 +141,3 @@ export const options = createAuthOptions({} as GenericCtx<DataModel>);
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
   return betterAuth(createAuthOptions(ctx));
 };
-
-export const getCurrentUser = query({
-  args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    return identity;
-  },
-});

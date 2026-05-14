@@ -1,9 +1,8 @@
+import { liveSessionsMutations } from "@workspace/api/liveSessions";
+import type { Id } from "@workspace/api/types";
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { useCallback, useMemo } from "react";
-
-import { api } from "@/lib/convex";
-import type { Id } from "@/lib/convex";
 
 export interface TimerControls {
   duration: number | undefined;
@@ -19,9 +18,9 @@ export function useTimerControls(
   sessionId: Id<"liveSessions">,
   session: Doc<"liveSessions"> | null | undefined,
 ): TimerControls {
-  const startTimerMutation = useMutation(api.liveSessions.startTimer);
-  const pauseTimerMutation = useMutation(api.liveSessions.pauseTimer);
-  const stopTimerMutation = useMutation(api.liveSessions.stopTimer);
+  const startTimerMutation = useMutation(liveSessionsMutations.startTimer);
+  const pauseTimerMutation = useMutation(liveSessionsMutations.pauseTimer);
+  const stopTimerMutation = useMutation(liveSessionsMutations.stopTimer);
 
   const onStart = useCallback(
     (d: number) => {

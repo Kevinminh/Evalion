@@ -1,9 +1,10 @@
 import { useNavigate } from "@tanstack/react-router";
+import { liveSessionsMutations } from "@workspace/api/liveSessions";
+import { sessionStudentsMutations } from "@workspace/api/sessionStudents";
+import type { Id } from "@workspace/api/types";
 import { useMutation } from "convex/react";
 import { toast } from "sonner";
 
-import { api } from "@/lib/convex";
-import type { Id } from "@/lib/convex";
 import { DASHBOARD_URL } from "@/lib/env";
 
 interface LobbyActionsArgs {
@@ -13,11 +14,11 @@ interface LobbyActionsArgs {
 
 export function useLobbyActions({ sessionId, groupCount }: LobbyActionsArgs) {
   const navigate = useNavigate();
-  const removeStudentMutation = useMutation(api.liveSessions.removeStudent);
-  const createGroupsMutation = useMutation(api.liveSessions.createGroups);
-  const clearGroupsMutation = useMutation(api.liveSessions.clearGroups);
-  const updateStepMutation = useMutation(api.liveSessions.updateStep);
-  const endSessionMutation = useMutation(api.liveSessions.end);
+  const removeStudentMutation = useMutation(sessionStudentsMutations.remove);
+  const createGroupsMutation = useMutation(sessionStudentsMutations.createGroups);
+  const clearGroupsMutation = useMutation(sessionStudentsMutations.clearGroups);
+  const updateStepMutation = useMutation(liveSessionsMutations.updateStep);
+  const endSessionMutation = useMutation(liveSessionsMutations.end);
 
   const start = async () => {
     try {

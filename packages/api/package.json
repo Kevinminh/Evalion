@@ -1,0 +1,37 @@
+{
+  "name": "@workspace/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./liveSessions": "./src/liveSessions.ts",
+    "./sessionStudents": "./src/sessionStudents.ts",
+    "./sessionVotes": "./src/sessionVotes.ts",
+    "./sessionRatings": "./src/sessionRatings.ts",
+    "./sessionBegrunnelser": "./src/sessionBegrunnelser.ts",
+    "./fagprats": "./src/fagprats.ts",
+    "./users": "./src/users.ts",
+    "./pastandDrafts": "./src/pastandDrafts.ts",
+    "./aiPrompts": "./src/aiPrompts.ts",
+    "./emailSubscribers": "./src/emailSubscribers.ts",
+    "./featureFlags": "./src/featureFlags.ts",
+    "./reddi": "./src/reddi.ts",
+    "./dev": "./src/dev.ts",
+    "./types": "./src/types.ts",
+    "./convex-id": "./src/convex-id.ts"
+  },
+  "scripts": {
+    "lint": "oxlint --type-aware --type-check",
+    "format": "oxfmt",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@workspace/backend": "workspace:*",
+    "@convex-dev/react-query": "catalog:",
+    "convex": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}

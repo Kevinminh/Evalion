@@ -49,7 +49,10 @@ export function ConceptTags({ concepts, onChange, editable = true }: ConceptTags
         ))}
         {editable && !showInput && (
           <button
-            onClick={() => { setInputValue(""); setShowInput(true); }}
+            onClick={() => {
+              setInputValue("");
+              setShowInput(true);
+            }}
             className="inline-flex items-center gap-1.5 rounded-full border-2 border-dashed border-primary/30 px-3 py-1 text-sm font-medium text-primary/60 transition-colors hover:border-primary/50 hover:text-primary"
           >
             <Plus className="size-3.5" />

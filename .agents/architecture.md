@@ -17,7 +17,8 @@ All three apps speak to the same Convex deployment and share a single Better Aut
 ```
 packages/
 ├── backend/        @workspace/backend   Convex schema, functions, HTTP, auth
-├── evalion/        @workspace/evalion   Cross-app feature code (depends on backend + ui)
+├── api/            @workspace/api       Typed call-site wrappers over Convex + data-access types
+├── features/       @workspace/features  Cross-app UI/hooks/auth helpers (depends on api + backend + ui)
 ├── ui/             @workspace/ui        Pure UI primitives (no backend deps)
 └── config/         @evalion/config      Shared base tsconfig
 ```
@@ -27,18 +28,22 @@ packages/
 ```
                          ┌─ touches Convex/auth or shared by 2+ apps?
                          │
-new component ──┬──── yes ┴──→  packages/evalion
+new component ──┬──── yes ┴──→  packages/features
                 │
                 ├──── no, pure presentational primitive ──→  packages/ui
                 │
                 └──── app-specific, single-app feature ──→  apps/<app>/src
+
+a query / mutation call site ──────────────────────────→  packages/api/src/<module>
+a data-access type (Doc<…>, Id<…>, Fasit, etc.)  ──────→  packages/api/src/types
 ```
 
 Rules of thumb:
 
 - **`packages/ui` must not import from `@workspace/backend`** — it stays a dumb presentation layer so it can be consumed without pulling Convex into the bundle.
-- **`packages/evalion` is the right home** for things like the live-session teacher panel, the auth login/register forms, the workspace shell, and route-level skeletons that two or more apps render.
-- **`apps/<app>` owns its own routes, providers, and one-off UI**. Don't promote a component to `@workspace/evalion` until a second app actually needs it.
+- **`packages/api` is the only place** that imports from `@workspace/backend/convex/_generated/*`. Apps and features call queries through `xQueries` / `xMutations` / `xFetch` exports here, not via the raw `api` object. See [`.agents/backend.md`](backend.md) for the wrapper convention.
+- **`packages/features` is the right home** for things like the live-session teacher panel, the auth login/register forms, the workspace shell, and route-level skeletons that two or more apps render.
+- **`apps/<app>` owns its own routes, providers, and one-off UI**. Don't promote a component to `@workspace/features` until a second app actually needs it.
 
 ## Routing layout
 
@@ -115,8 +120,10 @@ app/
 │  apps/web   │      │ apps/landing│      │apps/dashboard│
 └──────┬──────┘      └──────┬──────┘      └──────┬──────┘
        │                    │                    │
-       │  @workspace/evalion (shared UI + lib)   │
+       │  @workspace/features (shared UI + lib)   │
        └────────────────────┼────────────────────┘
+                            │
+                  @workspace/api (typed call wrappers + data types)
                             │
                   @workspace/backend (Convex)
                             │

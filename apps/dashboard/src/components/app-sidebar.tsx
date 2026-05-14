@@ -1,4 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
 import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { usersQueries } from "@workspace/api/users";
+import { authClient } from "@workspace/features/lib/auth-client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,9 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
-import { HelpCircle, LogOut, Settings } from "lucide-react";
-
-import { authClient } from "@/lib/auth-client";
+import { HelpCircle, LogOut, Settings, ShieldCheck } from "lucide-react";
 
 const navItems = [
   { label: "Utforsk", path: "/" as const, icon: "🔍" },
@@ -29,6 +30,8 @@ export function AppSidebar() {
   const matchRoute = useMatchRoute();
   const navigate = useNavigate();
   const { data: session } = authClient.useSession();
+  const { data: me } = useQuery(usersQueries.me());
+  const isAdmin = me?.role === "admin";
 
   const isActive = (path: string) => {
     if (path === "/") return !!matchRoute({ to: "/", fuzzy: false });
@@ -67,6 +70,17 @@ export function AppSidebar() {
             <span className="sidebar-item-label">{item.label}</span>
           </Link>
         ))}
+        {isAdmin && (
+          <Link
+            to="/admin"
+            className={`sidebar-item${isActive("/admin") ? " active" : ""}`}
+          >
+            <span className="sidebar-item-icon">
+              <ShieldCheck className="size-4" />
+            </span>
+            <span className="sidebar-item-label">Admin</span>
+          </Link>
+        )}
       </div>
 
       <div className="sidebar-spacer" />

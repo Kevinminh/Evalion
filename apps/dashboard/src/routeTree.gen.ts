@@ -19,6 +19,7 @@ import { Route as DashboardProfileRouteImport } from './routes/_dashboard/profil
 import { Route as DashboardMinSamlingRouteImport } from './routes/_dashboard/min-samling'
 import { Route as DashboardLagFagpratRouteImport } from './routes/_dashboard/lag-fagprat'
 import { Route as DashboardHistorikkRouteImport } from './routes/_dashboard/historikk'
+import { Route as DashboardAdminRouteImport } from './routes/_dashboard/admin'
 import { Route as AuthedPrivateRouteImport } from './routes/_authed/private'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthedLiveoktIdRouteImport } from './routes/_authed/liveokt.$id'
@@ -75,6 +76,11 @@ const DashboardHistorikkRoute = DashboardHistorikkRouteImport.update({
   path: '/historikk',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardAdminRoute = DashboardAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const AuthedPrivateRoute = AuthedPrivateRouteImport.update({
   id: '/private',
   path: '/private',
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/logout': typeof LogoutRoute
   '/register': typeof RegisterRoute
   '/private': typeof AuthedPrivateRoute
+  '/admin': typeof DashboardAdminRoute
   '/historikk': typeof DashboardHistorikkRoute
   '/lag-fagprat': typeof DashboardLagFagpratRoute
   '/min-samling': typeof DashboardMinSamlingRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/logout': typeof LogoutRoute
   '/register': typeof RegisterRoute
   '/private': typeof AuthedPrivateRoute
+  '/admin': typeof DashboardAdminRoute
   '/historikk': typeof DashboardHistorikkRoute
   '/lag-fagprat': typeof DashboardLagFagpratRoute
   '/min-samling': typeof DashboardMinSamlingRoute
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/logout': typeof LogoutRoute
   '/register': typeof RegisterRoute
   '/_authed/private': typeof AuthedPrivateRoute
+  '/_dashboard/admin': typeof DashboardAdminRoute
   '/_dashboard/historikk': typeof DashboardHistorikkRoute
   '/_dashboard/lag-fagprat': typeof DashboardLagFagpratRoute
   '/_dashboard/min-samling': typeof DashboardMinSamlingRoute
@@ -174,6 +183,7 @@ export interface FileRouteTypes {
     | '/logout'
     | '/register'
     | '/private'
+    | '/admin'
     | '/historikk'
     | '/lag-fagprat'
     | '/min-samling'
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/logout'
     | '/register'
     | '/private'
+    | '/admin'
     | '/historikk'
     | '/lag-fagprat'
     | '/min-samling'
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/logout'
     | '/register'
     | '/_authed/private'
+    | '/_dashboard/admin'
     | '/_dashboard/historikk'
     | '/_dashboard/lag-fagprat'
     | '/_dashboard/min-samling'
@@ -303,6 +315,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardHistorikkRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/admin': {
+      id: '/_dashboard/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof DashboardAdminRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_authed/private': {
       id: '/_authed/private'
       path: '/private'
@@ -371,6 +390,7 @@ const AuthedRouteWithChildren =
   AuthedRoute._addFileChildren(AuthedRouteChildren)
 
 interface DashboardRouteChildren {
+  DashboardAdminRoute: typeof DashboardAdminRoute
   DashboardHistorikkRoute: typeof DashboardHistorikkRoute
   DashboardLagFagpratRoute: typeof DashboardLagFagpratRoute
   DashboardMinSamlingRoute: typeof DashboardMinSamlingRoute
@@ -382,6 +402,7 @@ interface DashboardRouteChildren {
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardAdminRoute: DashboardAdminRoute,
   DashboardHistorikkRoute: DashboardHistorikkRoute,
   DashboardLagFagpratRoute: DashboardLagFagpratRoute,
   DashboardMinSamlingRoute: DashboardMinSamlingRoute,

@@ -1,7 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import { api } from "@workspace/backend/convex/_generated/api";
-import { RouteErrorBoundary } from "@workspace/evalion/components/route-error-boundary";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { liveSessionsQueries } from "@workspace/api/liveSessions";
+import { sessionBegrunnelserMutations } from "@workspace/api/sessionBegrunnelser";
+import { sessionVotesQueries } from "@workspace/api/sessionVotes";
+import type { Id } from "@workspace/api/types";
+import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
+import { Button } from "@workspace/ui/components/button";
+import { EmptyStateMessage } from "@workspace/ui/components/empty-state-message";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
@@ -9,8 +14,8 @@ import { useMutation } from "convex/react";
 
 import { ResultatTab } from "@/components/analytics/resultat-tab";
 import { RoundAnalytics } from "@/components/analytics/round-analytics";
-import { liveSessionQueries } from "@/lib/convex";
-import type { Id } from "@/lib/convex";
+import type { StatementColorName } from "@/components/analytics/types";
+import { WaitingState } from "@/components/analytics/waiting-state";
 
 export const Route = createFileRoute("/_authed/analytics/$id")({
   component: AnalyticsPage,
@@ -42,7 +47,7 @@ function AnalyticsPage() {
     data: session,
     isPending: sessionPending,
     isError: sessionError,
-  } = useQuery(liveSessionQueries.getSessionWithFagprat(sessionId));
+  } = useQuery(liveSessionsQueries.sessionWithFagprat(sessionId));
 
   // The analytics view passively follows the live session — no manual
   // statement selector or round/resultat tabs. The current påstand and
@@ -51,20 +56,23 @@ function AnalyticsPage() {
   const activeTab: TabId = STEP_TO_TAB[session?.currentStep ?? 1] ?? "runde1";
 
   const { data: analytics } = useQuery(
-    liveSessionQueries.getVoteAnalytics(sessionId, selectedStatement),
+    sessionVotesQueries.analytics(sessionId, selectedStatement),
   );
 
-  const highlightBegrunnelse = useMutation(api.liveSessions.highlightBegrunnelse);
+  const highlightBegrunnelse = useMutation(sessionBegrunnelserMutations.highlight);
 
   if (sessionPending) return <AnalyticsSkeleton />;
   if (sessionError) return <ErrorState className="flex min-h-svh items-center justify-center" />;
   if (!session) return <NotFoundState className="flex min-h-svh items-center justify-center" />;
+  if (session.status === "ended") return <SessionEndedScreen />;
 
   const statementText = session.statements[selectedStatement]?.text ?? "";
   const fasit = session.statements[selectedStatement]?.fasit ?? "sant";
+  const statementColor = session.statements[selectedStatement]?.color;
   const totalStudents = session.studentCount;
   const sessionActive = session.status === "active";
   const totalStatements = session.statements.length;
+  const showR1Comparison = (session.currentStep ?? 0) >= 4;
 
   return (
     <div className="flex min-h-svh flex-col bg-neutral-100">
@@ -72,7 +80,7 @@ function AnalyticsPage() {
       <div className="sticky top-0 z-40 border-b border-neutral-200 bg-white px-4 pb-2.5 pt-3">
         <div className="mx-auto flex max-w-lg items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-1.5">
-            <img src="/co-lab-logo.png" alt="CO-LAB" className="h-5 object-contain" />
+            <img src="/fagprat-logo.png" alt="FagPrat" className="h-5 object-contain" />
             <div className="h-3.5 w-px bg-neutral-300" />
             <span className="text-xs font-bold text-foreground">Live-statistikk</span>
           </div>
@@ -96,6 +104,8 @@ function AnalyticsPage() {
             <Skeleton className="h-64 rounded-[16px]" />
             <Skeleton className="h-48 rounded-[16px]" />
           </div>
+        ) : activeTab === "runde1" && analytics.round1.total === 0 && sessionActive ? (
+          <WaitingState />
         ) : (
           <>
             {activeTab === "runde1" && (
@@ -105,6 +115,7 @@ function AnalyticsPage() {
                 confidence={analytics.confidence1}
                 fasit={fasit}
                 statementText={statementText}
+                statementColor={statementColor as StatementColorName | undefined}
                 totalStudents={totalStudents}
                 sessionActive={sessionActive}
                 students={analytics.students}
@@ -117,10 +128,11 @@ function AnalyticsPage() {
                 round={2}
                 distribution={analytics.round2}
                 confidence={analytics.confidence2}
-                prevConfidence={analytics.confidence1}
-                prevDistribution={analytics.round1}
+                prevConfidence={showR1Comparison ? analytics.confidence1 : undefined}
+                prevDistribution={showR1Comparison ? analytics.round1 : undefined}
                 fasit={fasit}
                 statementText={statementText}
+                statementColor={statementColor as StatementColorName | undefined}
                 totalStudents={totalStudents}
                 sessionActive={sessionActive}
                 students={analytics.students}
@@ -133,6 +145,7 @@ function AnalyticsPage() {
                 round2={analytics.round2}
                 fasit={fasit}
                 statementText={statementText}
+                statementColor={statementColor as StatementColorName | undefined}
                 avgRating={analytics.avgRating}
                 ratingDistribution={analytics.ratingDistribution}
                 students={analytics.students}
@@ -142,6 +155,18 @@ function AnalyticsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+function SessionEndedScreen() {
+  return (
+    <EmptyStateMessage>
+      <h1 className="font-heading text-2xl font-medium">Økten er avsluttet</h1>
+      <p className="text-muted-foreground">Stemmene er talt opp og aktiviteten er ferdig.</p>
+      <Button render={<Link to="/min-samling" />} size="sm" className="mt-2">
+        Gå til Min samling
+      </Button>
+    </EmptyStateMessage>
   );
 }
 

@@ -1,16 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { liveSessionsMutations, liveSessionsQueries } from "@workspace/api/liveSessions";
+import type { Id } from "@workspace/api/types";
+import { SessionCardSkeleton } from "@workspace/features/components/skeletons/session-card-skeleton";
+import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { useMutation } from "convex/react";
 import { Users, Calendar, BarChart3, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { SessionCardSkeleton } from "@workspace/evalion/components/skeletons/session-card-skeleton";
 import { DeleteFagPratDialog } from "@/components/delete-fagprat-dialog";
-import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { SKELETON_COUNT } from "@/lib/constants";
-import { api, liveSessionQueries } from "@/lib/convex";
-import type { Id } from "@/lib/convex";
 import { formatDate } from "@/lib/format-date";
 
 export const Route = createFileRoute("/_dashboard/historikk")({
@@ -19,8 +19,8 @@ export const Route = createFileRoute("/_dashboard/historikk")({
 
 function HistorikkPage() {
   const navigate = useNavigate();
-  const { data: sessions, isPending, isError } = useQuery(liveSessionQueries.listByTeacher());
-  const removeSession = useMutation(api.liveSessions.remove);
+  const { data: sessions, isPending, isError } = useQuery(liveSessionsQueries.listByTeacher());
+  const removeSession = useMutation(liveSessionsMutations.remove);
 
   const [deleteSession, setDeleteSession] = useState<{
     id: Id<"liveSessions">;
@@ -85,18 +85,14 @@ function HistorikkPage() {
 
               <div className="mt-auto flex items-center gap-2 border-t border-border/50 pt-3">
                 <button
-                  onClick={() =>
-                    navigate({ to: "/analytics/$id", params: { id: session._id } })
-                  }
+                  onClick={() => navigate({ to: "/analytics/$id", params: { id: session._id } })}
                   className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-primary/30 bg-card px-3 py-2 text-sm font-bold text-primary transition-all hover:border-primary/60 hover:bg-primary/5"
                 >
                   <BarChart3 className="size-4" />
                   Se statistikk
                 </button>
                 <button
-                  onClick={() =>
-                    setDeleteSession({ id: session._id, title: session.fagpratTitle })
-                  }
+                  onClick={() => setDeleteSession({ id: session._id, title: session.fagpratTitle })}
                   className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl border-2 border-border text-muted-foreground transition-all hover:border-destructive/50 hover:bg-destructive/5 hover:text-destructive"
                 >
                   <Trash2 className="size-4" />

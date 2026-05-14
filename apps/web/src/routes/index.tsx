@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-router";
-import { UserAvatar } from "@workspace/evalion/components/auth/user-menu";
+import { UserAvatar } from "@workspace/features/components/auth/user-menu";
+import { authClient } from "@workspace/features/lib/auth-client";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Play, LogOut, User, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { authClient } from "@/lib/auth-client";
-import { liveSessionQueries } from "@/lib/convex";
+import { liveSessionsQueries } from "@workspace/api/liveSessions";
+
 import { DASHBOARD_URL } from "@/lib/env";
 
 export const Route = createFileRoute("/")({ component: App });
@@ -24,7 +25,7 @@ function App() {
   // Live query for the entered code — only enabled when user submits
   const [submittedCode, setSubmittedCode] = useState("");
   const { data: foundSession, isFetching } = useQuery({
-    ...liveSessionQueries.getByJoinCode(submittedCode),
+    ...liveSessionsQueries.byJoinCode(submittedCode),
     enabled: submittedCode.length === 6,
   });
 
