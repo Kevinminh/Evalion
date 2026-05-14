@@ -22,6 +22,8 @@ import { ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { PLAY_URL } from "@/lib/env";
+
 export const Route = createFileRoute("/_dashboard/admin")({
   component: AdminPage,
 });
@@ -161,10 +163,7 @@ function CurrentLiveSessionsSection() {
                 </CardDescription>
                 <CardAction>
                   <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      render={<Link to="/liveokt/$id" params={{ id: session._id }} />}
-                    >
+                    <Button size="sm" render={<a href={`${PLAY_URL}/liveokt/${session._id}`} />}>
                       Fortsett
                     </Button>
                     <Button
