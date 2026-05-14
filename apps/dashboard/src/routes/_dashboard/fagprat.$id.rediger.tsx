@@ -122,7 +122,7 @@ function EditFagPratPage() {
       {/* Statements */}
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-extrabold text-foreground">Påstander</h2>
-        <Button variant="outline" size="sm" onClick={addStatement}>
+        <Button variant="outline" className="bg-white" size="sm" onClick={addStatement}>
           <Plus className="size-4" />
           Legg til påstand
         </Button>
@@ -149,6 +149,13 @@ function EditFagPratPage() {
           />
         ))}
       </Reorder.Group>
+      <div className="mt-6 flex items-center justify-between gap-3">
+        <Button variant="outline" className="bg-white" size="sm" onClick={addStatement}>
+          <Plus className="size-4" />
+          Legg til påstand
+        </Button>
+        <Button onClick={handleSave}>Lagre</Button>
+      </div>
     </div>
   );
 }

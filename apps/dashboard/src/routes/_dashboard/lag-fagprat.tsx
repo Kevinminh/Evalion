@@ -109,8 +109,8 @@ function LagFagPratPage() {
     return (
       <div className="max-w-[900px]">
         {/* Page header (non-sticky per design) */}
-        <div className="mb-8 flex items-start justify-between gap-4">
-          <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">Fullfør FagPraten</h1>
+        <div className="sticky top-0 z-20 -mx-4 mb-8 flex items-center justify-between border-b bg-background px-4 py-4 sm:-mx-6 md:-mx-10 md:px-10">
+          <h1 className="text-lg font-extrabold text-foreground sm:text-xl">Fullfør FagPraten</h1>
           <div className="flex shrink-0 items-center gap-3">
             <Button variant="outline" onClick={() => setStep(1)} disabled={saving}>
               Tilbake
@@ -152,7 +152,7 @@ function LagFagPratPage() {
     <div className="max-w-[900px]">
       {/* Sticky header */}
       <div className="sticky top-0 z-20 -mx-4 mb-8 flex items-center justify-between border-b bg-background px-4 py-4 sm:-mx-6 md:-mx-10 md:px-10">
-        <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">Lag en FagPrat</h1>
+        <h1 className="text-lg font-extrabold text-foreground sm:text-xl">Lag en FagPrat</h1>
         <div className="flex items-center gap-3">
           <Button variant="outline" onClick={() => navigate({ to: "/" })}>
             Avbryt
@@ -211,7 +211,7 @@ function LagFagPratPage() {
                 </div>
               )}
             </div>
-            <Button variant="outline" size="sm" onClick={addStatement}>
+            <Button variant="outline" className="bg-white" size="sm" onClick={addStatement}>
               <Plus className="size-4" />
               Legg til påstand
             </Button>
@@ -247,6 +247,15 @@ function LagFagPratPage() {
             ))}
           </Reorder.Group>
         )}
+        <div className="mt-6 flex items-center justify-between gap-3">
+          <Button variant="outline" className="bg-white" size="sm" onClick={addStatement}>
+            <Plus className="size-4" />
+            Legg til påstand
+          </Button>
+          <Button disabled={!canProceed} onClick={handleNext}>
+            Neste
+          </Button>
+        </div>
       </div>
     </div>
   );
