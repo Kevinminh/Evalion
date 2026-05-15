@@ -10,7 +10,7 @@ import { ConfirmDialog } from "@workspace/ui/components/confirm-dialog";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { useMutation } from "convex/react";
-import { CheckSquare, ArrowRight } from "lucide-react";
+import { CheckSquare, ChevronsRightIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -102,9 +102,9 @@ function LiveoktSetupPage() {
             onToggle={() => setSelfEvalEnabled(!selfEvalEnabled)}
           />
 
-          <Button variant="teal" className="w-full" onClick={handleLaunch} disabled={launching}>
-            {launching ? "Oppretter..." : "Neste — opprett lobby"}
-            <ArrowRight className="size-4" />
+          <Button variant="teal" size={"pill-lg"} className="w-full" onClick={handleLaunch} disabled={launching}>
+            {launching ? "Oppretter..." : "Opprett lobby"}
+            <ChevronsRightIcon className="size-4" />
           </Button>
         </div>
       </div>
