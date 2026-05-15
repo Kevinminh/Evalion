@@ -9,15 +9,15 @@ import { Button } from "@workspace/ui/components/button";
 import { ConfirmDialog } from "@workspace/ui/components/confirm-dialog";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
-import { Stepper } from "@workspace/ui/components/stepper";
 import { useMutation } from "convex/react";
-import { Users, CheckSquare, ArrowRight, BarChart3 } from "lucide-react";
+import { CheckSquare, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { GroupingSelector } from "@/components/live/grouping-selector";
 import { LaunchModal } from "@/components/live/launch-modal";
 import { OptionCard } from "@/components/live/option-card";
-import { DEFAULT_GROUP_COUNT, MIN_GROUP_COUNT, MAX_GROUP_COUNT } from "@/lib/constants";
+import { DEFAULT_GROUP_COUNT } from "@/lib/constants";
 import { PLAY_URL } from "@/lib/env";
 import type { FagPratId } from "@/lib/types";
 
@@ -32,7 +32,7 @@ function LiveoktSetupPage() {
   const { data: fagprat, isPending, isError } = useQuery(fagpratsQueries.byId(id as FagPratId));
   const createSession = useMutation(liveSessionsMutations.create);
 
-  const [groupsEnabled, setGroupsEnabled] = useState(true);
+  const [groupsEnabled, setGroupsEnabled] = useState(false);
   const [groupCount, setGroupCount] = useState(DEFAULT_GROUP_COUNT);
   const [selfEvalEnabled, setSelfEvalEnabled] = useState(true);
   const [launching, setLaunching] = useState(false);
@@ -81,60 +81,31 @@ function LiveoktSetupPage() {
     <div className="min-h-svh bg-background">
       <SessionTopBar title={fagprat.title} onExit={() => setCancelOpen(true)} />
 
-      <div className="mx-auto max-w-[1100px] px-4 pt-20 pb-12 sm:px-8 sm:pt-24">
+      <div className="mx-auto max-w-[720px] px-4 pt-20 pb-12 sm:px-8 sm:pt-24">
         <h1 className="mb-6 text-2xl font-extrabold text-foreground sm:mb-8 sm:text-3xl">
           Oppsett for liveøkt
         </h1>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px] lg:gap-8">
-          {/* Left: Options */}
-          <div className="space-y-4">
-            <OptionCard
-              icon={<Users className="size-5" />}
-              title="Grupper"
-              description="Del elevene inn i grupper for diskusjonsrunden"
-              enabled={groupsEnabled}
-              onToggle={() => setGroupsEnabled(!groupsEnabled)}
-            >
-              <Stepper
-                label="Antall grupper"
-                value={groupCount}
-                min={MIN_GROUP_COUNT}
-                max={MAX_GROUP_COUNT}
-                onChange={setGroupCount}
-              />
-            </OptionCard>
+        <div className="space-y-4">
+          <GroupingSelector
+            groupsEnabled={groupsEnabled}
+            onGroupsEnabledChange={setGroupsEnabled}
+            groupCount={groupCount}
+            onGroupCountChange={setGroupCount}
+          />
 
-            <OptionCard
-              icon={<CheckSquare className="size-5" />}
-              title="Egenvurdering"
-              description="La elevene vurdere sin egen forståelse etter hver påstand"
-              enabled={selfEvalEnabled}
-              onToggle={() => setSelfEvalEnabled(!selfEvalEnabled)}
-            />
-          </div>
+          <OptionCard
+            icon={<CheckSquare className="size-5" />}
+            title="Egenvurdering"
+            description="La elevene vurdere sin egen forståelse etter hver påstand"
+            enabled={selfEvalEnabled}
+            onToggle={() => setSelfEvalEnabled(!selfEvalEnabled)}
+          />
 
-          {/* Right: Summary panel */}
-          <div className="lg:sticky lg:top-24">
-            <div className="rounded-2xl border-[1.5px] border-border bg-card p-6">
-              {/* Analytics info */}
-              <div className="mb-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Lærer-analytics
-              </div>
-              <div className="mb-4 flex items-center gap-3 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-4">
-                <BarChart3 className="size-8 shrink-0 text-primary/40" />
-                <p className="text-xs text-muted-foreground">
-                  QR-kode for sanntidsanalyse vises etter at lobbyen er opprettet
-                </p>
-              </div>
-
-              {/* Launch button */}
-              <Button variant="teal" className="w-full" onClick={handleLaunch} disabled={launching}>
-                {launching ? "Oppretter..." : "Neste — opprett lobby"}
-                <ArrowRight className="size-4" />
-              </Button>
-            </div>
-          </div>
+          <Button variant="teal" className="w-full" onClick={handleLaunch} disabled={launching}>
+            {launching ? "Oppretter..." : "Neste — opprett lobby"}
+            <ArrowRight className="size-4" />
+          </Button>
         </div>
       </div>
 
