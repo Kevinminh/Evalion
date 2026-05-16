@@ -1,16 +1,15 @@
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import type { StatementWithId } from "@workspace/features/hooks/use-statements";
 import { cn } from "@workspace/ui/lib/utils";
-import { GripVertical, Trash2, Sparkles, ImageIcon } from "lucide-react";
+import { ChevronDown, GripVertical, Trash2 } from "lucide-react";
+import { Reorder, useDragControls } from "motion/react";
+import { useRef, useState } from "react";
 
-import { ComingSoonButton } from "@/components/coming-soon-button";
-import { LABEL_CLASS, TEXTAREA_CLASS } from "@/lib/constants";
 import { FASIT_OPTIONS } from "@/lib/fasit-config";
-import { getStatementColor } from "@/lib/statement-colors";
+import { useClickOutside } from "@/lib/use-click-outside";
 import type { Fasit } from "@/lib/types";
 
 interface StatementEditorProps {
-  id: number | string;
+  value: StatementWithId;
   index: number;
   text: string;
   fasit: Fasit;
@@ -22,126 +21,164 @@ interface StatementEditorProps {
   onDelete: () => void;
 }
 
+const ACTION_BTN_CLASS =
+  "flex size-8 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-border bg-card text-muted-foreground transition-all hover:border-primary/40 hover:bg-primary/5 hover:text-primary";
+
+const FASIT_TRIGGER_CLASS: Record<Fasit, string> = {
+  sant: "bg-sant-bg text-sant border-sant",
+  usant: "bg-usant-bg text-usant border-usant",
+  delvis: "bg-delvis-bg text-delvis border-delvis",
+};
+
+function FasitDropdown({ value, onChange }: { value: Fasit; onChange: (v: Fasit) => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useClickOutside(ref, () => setOpen(false), open);
+
+  const selected = FASIT_OPTIONS.find((o) => o.value === value) ?? FASIT_OPTIONS[0];
+
+  return (
+    <div ref={ref} className="relative w-40">
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen((o) => !o);
+        }}
+        className={cn(
+          "flex w-full items-center justify-between gap-2 rounded-lg border-[1.5px] px-4 py-3 text-sm font-bold uppercase outline-none transition-colors",
+          FASIT_TRIGGER_CLASS[selected.value],
+        )}
+      >
+        <span className="truncate">{selected.label}</span>
+        <ChevronDown className="size-4 shrink-0 opacity-70" />
+      </button>
+      {open && (
+        <div
+          role="listbox"
+          className="absolute top-full left-0 right-0 z-30 mt-2 rounded-xl border-[1.5px] border-border bg-popover p-2 shadow-lg"
+        >
+          {FASIT_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              role="option"
+              aria-selected={opt.value === value}
+              onClick={() => {
+                onChange(opt.value);
+                setOpen(false);
+              }}
+              className={cn(
+                "block w-full rounded-lg px-3 py-2 text-left text-sm font-bold uppercase transition-colors",
+                opt.value === value
+                  ? FASIT_TRIGGER_CLASS[opt.value]
+                  : "text-foreground hover:bg-muted/60",
+              )}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function StatementEditor({
-  id,
+  value,
   index,
   text,
   fasit,
   explanation,
-  colorIndex,
   onTextChange,
   onFasitChange,
   onExplanationChange,
   onDelete,
 }: StatementEditorProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id,
-  });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  const color = colorIndex !== undefined ? getStatementColor(colorIndex) : null;
+  const dragControls = useDragControls();
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={cn(
-        "rounded-2xl border-[1.5px] border-border bg-card",
-        isDragging && "z-10 opacity-80 shadow-lg",
-      )}
+    <Reorder.Item
+      as="div"
+      value={value}
+      dragListener={false}
+      dragControls={dragControls}
+      transition={{ type: "spring", stiffness: 600, damping: 40 }}
+      whileDrag={{
+        scale: 1.02,
+        boxShadow: "0 12px 28px rgba(0, 0, 0, 0.12)",
+        zIndex: 10,
+      }}
+      style={{ position: "relative" }}
+      className="rounded-2xl border-[1.5px] border-border bg-card px-6 py-5 transition-colors hover:border-primary/30 hover:shadow-sm"
     >
-      {/* Top bar */}
-      <div className="flex items-center justify-between border-b border-border/50 px-4 py-2.5">
-        <div className="flex items-center gap-2">
-          <div
+      {/* Top bar: number + actions */}
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex size-8 items-center justify-center rounded-full bg-primary text-xs font-extrabold text-primary-foreground">
+          {index + 1}
+        </div>
+        <div className="flex gap-1">
+          <button
+            type="button"
+            onClick={onDelete}
+            aria-label="Slett påstand"
             className={cn(
-              "flex size-7 items-center justify-center rounded-full text-xs font-extrabold",
-              color ? `${color.bg} ${color.text}` : "bg-primary text-white",
+              ACTION_BTN_CLASS,
+              "hover:border-destructive/40 hover:bg-destructive/5 hover:text-destructive",
             )}
           >
-            {index + 1}
-          </div>
+            <Trash2 className="size-4" />
+          </button>
           <button
+            type="button"
             aria-label="Dra for å sortere"
-            className="cursor-grab touch-none text-muted-foreground/50 hover:text-muted-foreground active:cursor-grabbing"
-            {...attributes}
-            {...listeners}
+            onPointerDown={(e) => dragControls.start(e)}
+            className={cn(ACTION_BTN_CLASS, "cursor-grab touch-none select-none active:cursor-grabbing")}
           >
             <GripVertical className="size-4" />
           </button>
-          <ComingSoonButton icon={<Sparkles className="size-4" />} ariaLabel="Generer med AI" />
         </div>
-        <button
-          onClick={onDelete}
-          aria-label="Slett påstand"
-          className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-        >
-          <Trash2 className="size-4" />
-        </button>
       </div>
 
-      <div className="space-y-4 p-5">
-        {/* Påstand */}
-        <div>
-          <label className={`mb-1.5 block ${LABEL_CLASS}`}>Påstand</label>
-          <div className="flex gap-2">
-            <textarea
-              value={text}
-              onChange={(e) => onTextChange(e.target.value)}
-              placeholder="Skriv en påstand..."
-              className={`min-h-16 ${TEXTAREA_CLASS}`}
-            />
-            <ComingSoonButton
-              icon={<ImageIcon className="size-4" />}
-              ariaLabel="Legg til bilde for påstand"
-              className="flex size-10 shrink-0 items-center justify-center self-start rounded-lg border-2 border-dashed border-muted-foreground/30"
-            />
-          </div>
-        </div>
+      {/* Påstand input row */}
+      <div className="mb-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+        Påstand
+      </div>
+      <div className="flex items-stretch gap-3">
+        <input
+          type="text"
+          value={text}
+          onChange={(e) => onTextChange(e.target.value)}
+          placeholder="Skriv en påstand..."
+          className="flex-1 rounded-lg border-[1.5px] border-border bg-muted/40 px-4 py-3 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-primary focus:bg-card focus:ring-3 focus:ring-primary/20"
+        />
+      </div>
 
-        {/* Fasit */}
-        <div>
-          <label className={`mb-1.5 block ${LABEL_CLASS}`}>Fasit</label>
-          <div className="flex gap-2">
-            {FASIT_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                onClick={() => onFasitChange(option.value)}
-                className={cn(
-                  "rounded-lg border-2 px-4 py-2 text-sm font-bold transition-all",
-                  fasit === option.value
-                    ? `${option.bg} ${option.text} ${option.border}`
-                    : "border-border text-muted-foreground hover:border-muted-foreground/50",
-                )}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
+      {/* Bottom: Fasit + Forklaring */}
+      <div className="mt-4 flex items-stretch gap-6">
+        <div className="flex shrink-0 flex-col gap-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            Fasit
+          </span>
+          <FasitDropdown value={fasit} onChange={onFasitChange} />
         </div>
-
-        {/* Forklaring */}
-        <div>
-          <label className={`mb-1.5 block ${LABEL_CLASS}`}>Forklaring</label>
-          <div className="flex gap-2">
-            <textarea
+        <div className="flex flex-1 flex-col gap-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            Forklaring
+          </span>
+          <div className="flex h-full items-stretch gap-3">
+            <input
+              type="text"
               value={explanation}
               onChange={(e) => onExplanationChange(e.target.value)}
               placeholder="Forklar hvorfor svaret er riktig..."
-              className={`min-h-16 ${TEXTAREA_CLASS}`}
-            />
-            <ComingSoonButton
-              icon={<ImageIcon className="size-4" />}
-              ariaLabel="Legg til bilde for forklaring"
-              className="flex size-10 shrink-0 items-center justify-center self-start rounded-lg border-2 border-dashed border-muted-foreground/30"
+              className="flex-1 rounded-lg border-[1.5px] border-border bg-muted/40 px-4 py-3 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-primary focus:bg-card focus:ring-3 focus:ring-primary/20"
             />
           </div>
         </div>
       </div>
-    </div>
+    </Reorder.Item>
   );
 }

@@ -34,11 +34,20 @@ export default defineSchema({
     updatedAt: v.optional(v.number()),
   })
     .index("by_author", ["authorId"])
+    .index("by_author_updatedAt", ["authorId", "updatedAt"])
     .index("by_visibility", ["visibility"])
     .index("by_visibility_subject", ["visibility", "subject"])
     .index("by_visibility_level", ["visibility", "level"])
     .index("by_visibility_subject_level", ["visibility", "subject", "level"])
-    .index("by_subject", ["subject"])
+    .index("by_visibility_usageCount", ["visibility", "usageCount"])
+    .index("by_visibility_subject_usageCount", ["visibility", "subject", "usageCount"])
+    .index("by_visibility_level_usageCount", ["visibility", "level", "usageCount"])
+    .index("by_visibility_subject_level_usageCount", [
+      "visibility",
+      "subject",
+      "level",
+      "usageCount",
+    ])
     .searchIndex("search_fagprats", {
       searchField: "title",
       filterFields: ["subject", "level", "type", "visibility"],
@@ -61,7 +70,8 @@ export default defineSchema({
     timerRemainingAtPause: v.optional(v.number()),
   })
     .index("by_joinCode", ["joinCode"])
-    .index("by_teacher", ["teacherId"]),
+    .index("by_teacher", ["teacherId"])
+    .index("by_fagprat", ["fagpratId"]),
 
   sessionStudents: defineTable({
     sessionId: v.id("liveSessions"),

@@ -151,7 +151,6 @@ export const create = mutation({
     fagpratId: v.id("fagprats"),
     groupsEnabled: v.boolean(),
     groupCount: v.number(),
-    transcriptionEnabled: v.boolean(),
     selfEvalEnabled: v.boolean(),
   },
   handler: async (ctx, args) => {
@@ -190,6 +189,7 @@ export const create = mutation({
       joinCode,
       status: "lobby",
       currentStep: 0,
+      transcriptionEnabled: false,
     });
   },
 });

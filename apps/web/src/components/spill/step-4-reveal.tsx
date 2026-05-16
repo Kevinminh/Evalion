@@ -3,7 +3,6 @@ import { FasitBadgeOverlay } from "@workspace/features/components/live/fasit-bad
 import { Professor } from "@workspace/features/components/live/professor";
 import { FASIT_TEXT, resolveStatementStudentHex } from "@workspace/features/lib/constants";
 
-import { RecordingDisclaimer } from "@workspace/ui/components/recording-disclaimer";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { useStudentGame } from "./student-game-context";
 
@@ -14,7 +13,7 @@ interface Step4RevealProps {
 }
 
 export function Step4Reveal({ showCountdown, countdownNumber, countdownDone }: Step4RevealProps) {
-  const { statement, statementIndex, session } = useStudentGame();
+  const { statement, statementIndex } = useStudentGame();
   if (!statement) return null;
 
   const statementColor = resolveStatementStudentHex(statement.color, statementIndex);
@@ -44,8 +43,6 @@ export function Step4Reveal({ showCountdown, countdownNumber, countdownDone }: S
             />
           </div>
         )}
-
-        {countdownDone && session.transcriptionEnabled && <RecordingDisclaimer />}
       </div>
     </>
   );

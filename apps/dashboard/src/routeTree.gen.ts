@@ -15,10 +15,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
-import { Route as DashboardVelgPastanderRouteImport } from './routes/_dashboard/velg-pastander'
 import { Route as DashboardProfileRouteImport } from './routes/_dashboard/profile'
 import { Route as DashboardMinSamlingRouteImport } from './routes/_dashboard/min-samling'
-import { Route as DashboardLagreFagpratRouteImport } from './routes/_dashboard/lagre-fagprat'
 import { Route as DashboardLagFagpratRouteImport } from './routes/_dashboard/lag-fagprat'
 import { Route as DashboardHistorikkRouteImport } from './routes/_dashboard/historikk'
 import { Route as DashboardAdminRouteImport } from './routes/_dashboard/admin'
@@ -28,6 +26,7 @@ import { Route as AuthedLiveoktIdRouteImport } from './routes/_authed/liveokt.$i
 import { Route as AuthedAnalyticsIdRouteImport } from './routes/_authed/analytics.$id'
 import { Route as DashboardFagpratIdIndexRouteImport } from './routes/_dashboard/fagprat.$id.index'
 import { Route as DashboardFagpratIdRedigerRouteImport } from './routes/_dashboard/fagprat.$id.rediger'
+import { Route as DashboardFagpratIdPdfRouteImport } from './routes/_dashboard/fagprat.$id.pdf'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -57,11 +56,6 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardVelgPastanderRoute = DashboardVelgPastanderRouteImport.update({
-  id: '/velg-pastander',
-  path: '/velg-pastander',
-  getParentRoute: () => DashboardRoute,
-} as any)
 const DashboardProfileRoute = DashboardProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -70,11 +64,6 @@ const DashboardProfileRoute = DashboardProfileRouteImport.update({
 const DashboardMinSamlingRoute = DashboardMinSamlingRouteImport.update({
   id: '/min-samling',
   path: '/min-samling',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardLagreFagpratRoute = DashboardLagreFagpratRouteImport.update({
-  id: '/lagre-fagprat',
-  path: '/lagre-fagprat',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardLagFagpratRoute = DashboardLagFagpratRouteImport.update({
@@ -123,6 +112,11 @@ const DashboardFagpratIdRedigerRoute =
     path: '/fagprat/$id/rediger',
     getParentRoute: () => DashboardRoute,
   } as any)
+const DashboardFagpratIdPdfRoute = DashboardFagpratIdPdfRouteImport.update({
+  id: '/fagprat/$id/pdf',
+  path: '/fagprat/$id/pdf',
+  getParentRoute: () => DashboardRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof DashboardIndexRoute
@@ -133,13 +127,12 @@ export interface FileRoutesByFullPath {
   '/admin': typeof DashboardAdminRoute
   '/historikk': typeof DashboardHistorikkRoute
   '/lag-fagprat': typeof DashboardLagFagpratRoute
-  '/lagre-fagprat': typeof DashboardLagreFagpratRoute
   '/min-samling': typeof DashboardMinSamlingRoute
   '/profile': typeof DashboardProfileRoute
-  '/velg-pastander': typeof DashboardVelgPastanderRoute
   '/analytics/$id': typeof AuthedAnalyticsIdRoute
   '/liveokt/$id': typeof AuthedLiveoktIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/fagprat/$id/pdf': typeof DashboardFagpratIdPdfRoute
   '/fagprat/$id/rediger': typeof DashboardFagpratIdRedigerRoute
   '/fagprat/$id/': typeof DashboardFagpratIdIndexRoute
 }
@@ -152,13 +145,12 @@ export interface FileRoutesByTo {
   '/admin': typeof DashboardAdminRoute
   '/historikk': typeof DashboardHistorikkRoute
   '/lag-fagprat': typeof DashboardLagFagpratRoute
-  '/lagre-fagprat': typeof DashboardLagreFagpratRoute
   '/min-samling': typeof DashboardMinSamlingRoute
   '/profile': typeof DashboardProfileRoute
-  '/velg-pastander': typeof DashboardVelgPastanderRoute
   '/analytics/$id': typeof AuthedAnalyticsIdRoute
   '/liveokt/$id': typeof AuthedLiveoktIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/fagprat/$id/pdf': typeof DashboardFagpratIdPdfRoute
   '/fagprat/$id/rediger': typeof DashboardFagpratIdRedigerRoute
   '/fagprat/$id': typeof DashboardFagpratIdIndexRoute
 }
@@ -173,14 +165,13 @@ export interface FileRoutesById {
   '/_dashboard/admin': typeof DashboardAdminRoute
   '/_dashboard/historikk': typeof DashboardHistorikkRoute
   '/_dashboard/lag-fagprat': typeof DashboardLagFagpratRoute
-  '/_dashboard/lagre-fagprat': typeof DashboardLagreFagpratRoute
   '/_dashboard/min-samling': typeof DashboardMinSamlingRoute
   '/_dashboard/profile': typeof DashboardProfileRoute
-  '/_dashboard/velg-pastander': typeof DashboardVelgPastanderRoute
   '/_dashboard/': typeof DashboardIndexRoute
   '/_authed/analytics/$id': typeof AuthedAnalyticsIdRoute
   '/_authed/liveokt/$id': typeof AuthedLiveoktIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_dashboard/fagprat/$id/pdf': typeof DashboardFagpratIdPdfRoute
   '/_dashboard/fagprat/$id/rediger': typeof DashboardFagpratIdRedigerRoute
   '/_dashboard/fagprat/$id/': typeof DashboardFagpratIdIndexRoute
 }
@@ -195,13 +186,12 @@ export interface FileRouteTypes {
     | '/admin'
     | '/historikk'
     | '/lag-fagprat'
-    | '/lagre-fagprat'
     | '/min-samling'
     | '/profile'
-    | '/velg-pastander'
     | '/analytics/$id'
     | '/liveokt/$id'
     | '/api/auth/$'
+    | '/fagprat/$id/pdf'
     | '/fagprat/$id/rediger'
     | '/fagprat/$id/'
   fileRoutesByTo: FileRoutesByTo
@@ -214,13 +204,12 @@ export interface FileRouteTypes {
     | '/admin'
     | '/historikk'
     | '/lag-fagprat'
-    | '/lagre-fagprat'
     | '/min-samling'
     | '/profile'
-    | '/velg-pastander'
     | '/analytics/$id'
     | '/liveokt/$id'
     | '/api/auth/$'
+    | '/fagprat/$id/pdf'
     | '/fagprat/$id/rediger'
     | '/fagprat/$id'
   id:
@@ -234,14 +223,13 @@ export interface FileRouteTypes {
     | '/_dashboard/admin'
     | '/_dashboard/historikk'
     | '/_dashboard/lag-fagprat'
-    | '/_dashboard/lagre-fagprat'
     | '/_dashboard/min-samling'
     | '/_dashboard/profile'
-    | '/_dashboard/velg-pastander'
     | '/_dashboard/'
     | '/_authed/analytics/$id'
     | '/_authed/liveokt/$id'
     | '/api/auth/$'
+    | '/_dashboard/fagprat/$id/pdf'
     | '/_dashboard/fagprat/$id/rediger'
     | '/_dashboard/fagprat/$id/'
   fileRoutesById: FileRoutesById
@@ -299,13 +287,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/velg-pastander': {
-      id: '/_dashboard/velg-pastander'
-      path: '/velg-pastander'
-      fullPath: '/velg-pastander'
-      preLoaderRoute: typeof DashboardVelgPastanderRouteImport
-      parentRoute: typeof DashboardRoute
-    }
     '/_dashboard/profile': {
       id: '/_dashboard/profile'
       path: '/profile'
@@ -318,13 +299,6 @@ declare module '@tanstack/react-router' {
       path: '/min-samling'
       fullPath: '/min-samling'
       preLoaderRoute: typeof DashboardMinSamlingRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/lagre-fagprat': {
-      id: '/_dashboard/lagre-fagprat'
-      path: '/lagre-fagprat'
-      fullPath: '/lagre-fagprat'
-      preLoaderRoute: typeof DashboardLagreFagpratRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/lag-fagprat': {
@@ -390,6 +364,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardFagpratIdRedigerRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/fagprat/$id/pdf': {
+      id: '/_dashboard/fagprat/$id/pdf'
+      path: '/fagprat/$id/pdf'
+      fullPath: '/fagprat/$id/pdf'
+      preLoaderRoute: typeof DashboardFagpratIdPdfRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
 
@@ -412,11 +393,10 @@ interface DashboardRouteChildren {
   DashboardAdminRoute: typeof DashboardAdminRoute
   DashboardHistorikkRoute: typeof DashboardHistorikkRoute
   DashboardLagFagpratRoute: typeof DashboardLagFagpratRoute
-  DashboardLagreFagpratRoute: typeof DashboardLagreFagpratRoute
   DashboardMinSamlingRoute: typeof DashboardMinSamlingRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
-  DashboardVelgPastanderRoute: typeof DashboardVelgPastanderRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardFagpratIdPdfRoute: typeof DashboardFagpratIdPdfRoute
   DashboardFagpratIdRedigerRoute: typeof DashboardFagpratIdRedigerRoute
   DashboardFagpratIdIndexRoute: typeof DashboardFagpratIdIndexRoute
 }
@@ -425,11 +405,10 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAdminRoute: DashboardAdminRoute,
   DashboardHistorikkRoute: DashboardHistorikkRoute,
   DashboardLagFagpratRoute: DashboardLagFagpratRoute,
-  DashboardLagreFagpratRoute: DashboardLagreFagpratRoute,
   DashboardMinSamlingRoute: DashboardMinSamlingRoute,
   DashboardProfileRoute: DashboardProfileRoute,
-  DashboardVelgPastanderRoute: DashboardVelgPastanderRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardFagpratIdPdfRoute: DashboardFagpratIdPdfRoute,
   DashboardFagpratIdRedigerRoute: DashboardFagpratIdRedigerRoute,
   DashboardFagpratIdIndexRoute: DashboardFagpratIdIndexRoute,
 }

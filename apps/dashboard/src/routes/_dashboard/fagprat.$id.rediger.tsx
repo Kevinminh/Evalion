@@ -1,7 +1,6 @@
-import { DndContext, closestCenter } from "@dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { fagpratsMutations, fagpratsQueries } from "@workspace/api/fagprats";
 import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
 import { FagPratDetailSkeleton } from "@workspace/features/components/skeletons/fagprat-detail-skeleton";
 import {
@@ -9,15 +8,16 @@ import {
   toStatementsWithId,
   useStatements,
 } from "@workspace/features/hooks/use-statements";
+import { authClient } from "@workspace/features/lib/auth-client";
 import { Button } from "@workspace/ui/components/button";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
+import { UnauthorizedState } from "@workspace/ui/components/states/unauthorized-state";
 import { useMutation } from "convex/react";
 import { Plus } from "lucide-react";
+import { Reorder } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-
-import { fagpratsMutations, fagpratsQueries } from "@workspace/api/fagprats";
 
 import { MetadataCard } from "@/components/metadata-card";
 import { StatementEditor } from "@/components/statement-editor";
@@ -32,6 +32,7 @@ function EditFagPratPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const { data: fagprat, isPending, isError } = useQuery(fagpratsQueries.byId(id as FagPratId));
+  const { data: session, isPending: sessionPending } = authClient.useSession();
   const updateFagPrat = useMutation(fagpratsMutations.update);
 
   const [title, setTitle] = useState("");
@@ -46,7 +47,6 @@ function EditFagPratPage() {
     addStatement,
     updateStatement,
     removeStatement,
-    handleDragEnd,
   } = useStatements();
 
   // Sync local state only on first load or when navigating to a different fagprat
@@ -64,7 +64,9 @@ function EditFagPratPage() {
     }
   }, [fagprat, id, setStatements]);
 
-  if (isPending) {
+  const isAuthor = !!(session?.user?.id && fagprat && fagprat.authorId === session.user.id);
+
+  if (isPending || sessionPending) {
     return <FagPratDetailSkeleton />;
   }
 
@@ -74,6 +76,10 @@ function EditFagPratPage() {
 
   if (!fagprat) {
     return <NotFoundState />;
+  }
+
+  if (!isAuthor) {
+    return <UnauthorizedState />;
   }
 
   const handleSave = async () => {
@@ -125,31 +131,40 @@ function EditFagPratPage() {
       {/* Statements */}
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-extrabold text-foreground">Påstander</h2>
-        <Button variant="outline" size="sm" onClick={addStatement}>
+        <Button variant="outline" className="bg-white" size="sm" onClick={addStatement}>
           <Plus className="size-4" />
           Legg til påstand
         </Button>
       </div>
-      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={statements.map((s) => s.id)} strategy={verticalListSortingStrategy}>
-          <div className="space-y-4">
-            {statements.map((stmt, i) => (
-              <StatementEditor
-                key={stmt.id}
-                id={stmt.id}
-                index={i}
-                text={stmt.text}
-                fasit={stmt.fasit}
-                explanation={stmt.explanation}
-                onTextChange={(v) => updateStatement(i, "text", v)}
-                onFasitChange={(v) => updateStatement(i, "fasit", v)}
-                onExplanationChange={(v) => updateStatement(i, "explanation", v)}
-                onDelete={() => removeStatement(i)}
-              />
-            ))}
-          </div>
-        </SortableContext>
-      </DndContext>
+      <Reorder.Group
+        as="div"
+        axis="y"
+        values={statements}
+        onReorder={setStatements}
+        className="space-y-4"
+      >
+        {statements.map((stmt, i) => (
+          <StatementEditor
+            key={stmt.id}
+            value={stmt}
+            index={i}
+            text={stmt.text}
+            fasit={stmt.fasit}
+            explanation={stmt.explanation}
+            onTextChange={(v) => updateStatement(i, "text", v)}
+            onFasitChange={(v) => updateStatement(i, "fasit", v)}
+            onExplanationChange={(v) => updateStatement(i, "explanation", v)}
+            onDelete={() => removeStatement(i)}
+          />
+        ))}
+      </Reorder.Group>
+      <div className="mt-6 flex items-center justify-between gap-3">
+        <Button variant="outline" className="bg-white" size="sm" onClick={addStatement}>
+          <Plus className="size-4" />
+          Legg til påstand
+        </Button>
+        <Button onClick={handleSave}>Lagre</Button>
+      </div>
     </div>
   );
 }

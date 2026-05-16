@@ -1,8 +1,10 @@
 import { Button } from "@workspace/ui/components/button";
-import { Globe, Lock, Pencil } from "lucide-react";
-import { useState } from "react";
+import { cn } from "@workspace/ui/lib/utils";
+import { Globe, Lock, Pencil, Sprout, Target } from "lucide-react";
+import { useId, useState } from "react";
 
 import { ConceptTags } from "@/components/concept-tags";
+import { CustomDropdown } from "@/components/custom-dropdown";
 import { ForkunnskapSelector } from "@/components/forkunnskap-selector";
 import { VisibilityToggle } from "@/components/visibility-toggle";
 import { LABEL_CLASS, LEVEL_OPTIONS, SUBJECT_OPTIONS } from "@/lib/constants";
@@ -23,11 +25,6 @@ interface MetadataCardProps {
   onVisibilityChange: (value: Visibility) => void;
 }
 
-/**
- * Metadata panel for the FagPrat edit page. Toggles between a compact
- * read view (title + subject/level badges + edit button) and an expanded
- * edit form.
- */
 export function MetadataCard({
   title,
   onTitleChange,
@@ -43,15 +40,21 @@ export function MetadataCard({
   onVisibilityChange,
 }: MetadataCardProps) {
   const [editing, setEditing] = useState(false);
+  const titleId = useId();
 
   return (
-    <div className="relative mb-8 max-w-[600px] rounded-2xl border-[1.5px] border-border bg-card p-4 sm:p-6">
+    <div
+      className={cn(
+        "relative mb-8 rounded-2xl border-[1.5px] border-border bg-card p-4 sm:p-6",
+        !editing && "max-w-[600px]",
+      )}
+    >
       {!editing ? (
-        /* Read mode */
         <>
           <button
             onClick={() => setEditing(true)}
-            className="absolute right-4 top-4 rounded-lg border-2 border-primary/30 p-2 text-primary transition-all hover:border-primary/60 hover:bg-primary/5"
+            aria-label="Rediger metadata"
+            className="absolute right-4 top-4 rounded-full border-2 border-primary/30 p-2 text-primary transition-all hover:border-primary/60 hover:bg-primary/5"
           >
             <Pencil className="size-4" />
           </button>
@@ -62,6 +65,22 @@ export function MetadataCard({
             <span className="inline-block rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
               {level}
             </span>
+            {type === "intro" && (
+              <span
+                className="inline-flex size-7 items-center justify-center rounded-full border border-turkis-200 bg-turkis-50 text-turkis-500"
+                title="Introduksjon"
+              >
+                <Sprout className="size-3.5" />
+              </span>
+            )}
+            {type === "oppsummering" && (
+              <span
+                className="inline-flex size-7 items-center justify-center rounded-full border border-amber-200 bg-amber-50 text-amber-600"
+                title="Oppsummering"
+              >
+                <Target className="size-3.5" />
+              </span>
+            )}
           </div>
           <h3 className="mb-1 flex items-center gap-2 text-lg font-extrabold text-foreground">
             {title}
@@ -76,60 +95,50 @@ export function MetadataCard({
           </div>
         </>
       ) : (
-        /* Edit mode */
         <>
-          <div className="mb-4">
-            <label className={`mb-1.5 block ${LABEL_CLASS}`}>Tittel</label>
+          <div className="mb-5">
+            <label htmlFor={titleId} className={`mb-2 block ${LABEL_CLASS}`}>
+              Tittel på din FagPrat
+            </label>
             <input
+              id={titleId}
               type="text"
               value={title}
               onChange={(e) => onTitleChange(e.target.value)}
-              className="w-full rounded-xl border-2 border-input bg-background px-4 py-2.5 text-base font-bold outline-none focus:border-primary focus:ring-3 focus:ring-primary/20"
+              className="w-full rounded-xl border-[1.5px] border-border bg-muted/30 px-4 py-3 text-lg font-extrabold text-foreground outline-none transition-colors focus:border-primary focus:bg-card focus:ring-3 focus:ring-primary/20 sm:text-xl"
             />
           </div>
-          <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className={`mb-1.5 block ${LABEL_CLASS} text-foreground`}>Fag</label>
-              <select
-                value={subject}
-                onChange={(e) => onSubjectChange(e.target.value)}
-                className="w-full appearance-none rounded-xl border-2 border-input bg-card px-4 py-2.5 text-sm font-medium outline-none focus:border-primary focus:ring-3 focus:ring-primary/20"
-              >
-                {SUBJECT_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className={`mb-1.5 block ${LABEL_CLASS} text-foreground`}>Trinn</label>
-              <select
-                value={level}
-                onChange={(e) => onLevelChange(e.target.value)}
-                className="w-full appearance-none rounded-xl border-2 border-input bg-card px-4 py-2.5 text-sm font-medium outline-none focus:border-primary focus:ring-3 focus:ring-primary/20"
-              >
-                {LEVEL_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div className="mb-5">
+            <VisibilityToggle value={visibility} onChange={onVisibilityChange} showDescription />
           </div>
-          <div className="mb-4">
+          <div className="mb-5 grid grid-cols-1 items-end gap-4 sm:grid-cols-2">
+            <CustomDropdown
+              label="Fag"
+              value={subject}
+              onChange={onSubjectChange}
+              placeholder="Velg fag"
+              options={SUBJECT_OPTIONS}
+            />
+            <CustomDropdown
+              label="Trinn"
+              value={level}
+              onChange={onLevelChange}
+              placeholder="Velg trinn"
+              options={LEVEL_OPTIONS}
+            />
+          </div>
+          <div className="mb-5">
+            <ForkunnskapSelector value={type} onChange={onTypeChange} />
+          </div>
+          <div className="mb-2">
             <ConceptTags concepts={concepts} onChange={onConceptsChange} />
           </div>
-          <ForkunnskapSelector value={type} onChange={onTypeChange} />
-          <div className="mt-4">
-            <VisibilityToggle value={visibility} onChange={onVisibilityChange} />
-          </div>
-          <div className="mt-4 flex justify-end gap-2">
+          <div className="mt-6 flex justify-end gap-2 border-t border-border pt-4">
             <Button variant="ghost" size="sm" onClick={() => setEditing(false)}>
               Avbryt
             </Button>
             <Button size="sm" onClick={() => setEditing(false)}>
-              Ferdig
+              Oppdater
             </Button>
           </div>
         </>

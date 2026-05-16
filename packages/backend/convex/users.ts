@@ -4,7 +4,7 @@ import { authComponent } from "./auth";
 export const getMe = query({
   args: {},
   handler: async (ctx) => {
-    const user = await authComponent.getAuthUser(ctx);
+    const user = await authComponent.safeGetAuthUser(ctx);
     if (!user) return null;
     return {
       email: user.email,

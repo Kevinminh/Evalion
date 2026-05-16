@@ -1,13 +1,12 @@
 import { Professor } from "@workspace/features/components/live/professor";
 import { resolveStatementStudentHex } from "@workspace/features/lib/constants";
-import { RecordingDisclaimer } from "@workspace/ui/components/recording-disclaimer";
 import { StatementCard } from "@workspace/ui/components/statement-card";
 import { StudentAvatar } from "@workspace/ui/components/student-avatar";
 
 import { useStudentGame } from "./student-game-context";
 
 export function Step2Discussion() {
-  const { statement, statementIndex, groupMembers, session } = useStudentGame();
+  const { statement, statementIndex, groupMembers } = useStudentGame();
   if (!statement) return null;
 
   const statementColor = resolveStatementStudentHex(statement.color, statementIndex);
@@ -47,8 +46,6 @@ export function Step2Discussion() {
         textSize="sm"
         text="Enige? Lag en god begrunnelse sammen! Uenige? Prøv å overbevise hverandre!"
       />
-
-      {session.transcriptionEnabled && <RecordingDisclaimer />}
     </div>
   );
 }

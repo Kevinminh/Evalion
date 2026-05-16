@@ -5,6 +5,22 @@ export type { Doc, Id };
 // ── Document types ──────────────────────────────────────────────────────────
 export type FagPrat = Doc<"fagprats">;
 export type FagPratId = Id<"fagprats">;
+
+// Lightweight projection used for list views (e.g. min-samling cards).
+// Mirrors what fagprats.listByAuthor returns.
+export interface FagPratSummary {
+  _id: FagPratId;
+  _creationTime: number;
+  title: string;
+  subject: string;
+  level: string;
+  type: FagPratType;
+  visibility: Visibility;
+  usageCount: number;
+  authorName: string;
+  updatedAt: number | undefined;
+  statementsCount: number;
+}
 export type LiveSession = Doc<"liveSessions">;
 export type SessionStudent = Doc<"sessionStudents">;
 
@@ -29,13 +45,4 @@ export interface FagPratStatement {
   explanation: string;
   color?: StatementColorName;
   begrunnelse?: string;
-}
-
-export interface FagPratDraft {
-  title: string;
-  concepts: string[];
-  subject: string;
-  level: string;
-  type: FagPratType;
-  statements: FagPratStatement[];
 }

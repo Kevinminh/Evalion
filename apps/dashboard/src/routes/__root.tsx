@@ -16,6 +16,8 @@ import { Toaster } from "@workspace/ui/components/sonner";
 
 import appCss from "@workspace/ui/globals.css?url";
 
+import dashboardCss from "@/styles/dashboard.css?url";
+
 const getAuth = createServerFn({ method: "GET" }).handler(async () => {
   return await getToken();
 });
@@ -30,7 +32,10 @@ export const Route = createRootRouteWithContext<{
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Dashboard" },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "stylesheet", href: dashboardCss },
+    ],
   }),
   beforeLoad: async (ctx) => {
     const token = await getAuth();
@@ -68,7 +73,7 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="nb">
+    <html lang="nb" data-app="dashboard">
       <head>
         <HeadContent />
       </head>

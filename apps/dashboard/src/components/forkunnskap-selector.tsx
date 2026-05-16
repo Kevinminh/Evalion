@@ -14,67 +14,65 @@ export function ForkunnskapSelector({ value, onChange }: ForkunnskapSelectorProp
       <div className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground">
         Forkunnskaper
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="flex gap-4">
         <button
           onClick={() => onChange("intro")}
           className={cn(
-            "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all",
+            "flex flex-1 items-center gap-3 rounded-2xl border-[2.5px] bg-card px-5 py-3 text-left shadow-3d-sm transition-all hover:-translate-y-0.5",
             value === "intro"
-              ? "border-teal-400 bg-teal-50 shadow-[0_0_12px_rgba(43,188,179,0.2)]"
-              : "border-border hover:border-teal-200 hover:bg-teal-50/50",
+              ? "border-turkis-400 bg-turkis-50/80 shadow-[0_3px_0_var(--color-turkis-200)]"
+              : "border-neutral-300 hover:border-turkis-400 hover:bg-turkis-50/50",
           )}
         >
-          <div
+          <Sprout
             className={cn(
-              "flex size-10 items-center justify-center rounded-full",
-              value === "intro" ? "bg-teal-100 text-teal-600" : "bg-muted text-muted-foreground",
+              "size-[22px] shrink-0 transition-colors",
+              value === "intro" ? "text-turkis-500" : "text-muted-foreground",
             )}
-          >
-            <Sprout className="size-5" />
+          />
+          <div className="flex flex-col">
+            <span
+              className={cn(
+                "text-base font-bold transition-colors",
+                value === "intro" ? "text-turkis-600" : "text-foreground",
+              )}
+            >
+              Introduksjon
+            </span>
+            <span className="text-xs text-muted-foreground">
+              Lite eller ingen forkunnskaper
+            </span>
           </div>
-          <span
-            className={cn(
-              "text-sm font-bold",
-              value === "intro" ? "text-teal-700" : "text-foreground",
-            )}
-          >
-            Introduksjon
-          </span>
-          <span className="text-xs text-muted-foreground text-center">
-            Elevene har ikke lært om emnet ennå
-          </span>
         </button>
 
         <button
           onClick={() => onChange("oppsummering")}
           className={cn(
-            "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all",
+            "flex flex-1 items-center gap-3 rounded-2xl border-[2.5px] bg-card px-5 py-3 text-left shadow-3d-sm transition-all hover:-translate-y-0.5",
             value === "oppsummering"
-              ? "border-amber-400 bg-amber-50 shadow-[0_0_12px_rgba(217,119,6,0.2)]"
-              : "border-border hover:border-amber-200 hover:bg-amber-50/50",
+              ? "border-amber-500 bg-amber-50 shadow-[0_3px_0_#FDE68A]"
+              : "border-neutral-300 hover:border-amber-500 hover:bg-amber-50/60",
           )}
         >
-          <div
+          <Target
             className={cn(
-              "flex size-10 items-center justify-center rounded-full",
-              value === "oppsummering"
-                ? "bg-amber-100 text-amber-600"
-                : "bg-muted text-muted-foreground",
+              "size-[22px] shrink-0 transition-colors",
+              value === "oppsummering" ? "text-amber-600" : "text-muted-foreground",
             )}
-          >
-            <Target className="size-5" />
+          />
+          <div className="flex flex-col">
+            <span
+              className={cn(
+                "text-base font-bold transition-colors",
+                value === "oppsummering" ? "text-amber-700" : "text-foreground",
+              )}
+            >
+              Oppsummering
+            </span>
+            <span className="text-xs text-muted-foreground">
+              Noen eller gode forkunnskaper
+            </span>
           </div>
-          <span
-            className={cn(
-              "text-sm font-bold",
-              value === "oppsummering" ? "text-amber-700" : "text-foreground",
-            )}
-          >
-            Oppsummering
-          </span>
-          <span className="text-xs text-muted-foreground text-center">
-            Elevene har allerede lært om emnet
-          </span>
         </button>
       </div>
     </div>

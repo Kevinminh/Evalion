@@ -16,7 +16,6 @@ import { useTimerControls } from "@/hooks/use-timer-controls";
 
 import { usePanelState } from "@/hooks/liveokt/use-panel-state";
 import { useRatingStats, type RatingStats } from "@/hooks/liveokt/use-rating-stats";
-import { useRecording, type RecordingState } from "@/hooks/liveokt/use-recording";
 import { useSessionMutations, type SessionMutations } from "@/hooks/liveokt/use-session-mutations";
 import { useVoteAnalysis, type VoteAnalysis } from "@/hooks/liveokt/use-vote-analysis";
 
@@ -25,7 +24,6 @@ type Statement = Doc<"fagprats">["statements"][number];
 export interface TeacherSessionValue
   extends VoteAnalysis,
     RatingStats,
-    RecordingState,
     SessionMutations {
   sessionId: Id<"liveSessions">;
   step: number;
@@ -101,7 +99,6 @@ export function TeacherSessionProvider({
 
   const voteAnalysis = useVoteAnalysis({ votes, analytics, step });
   const ratingStats = useRatingStats(analytics);
-  const recording = useRecording();
   const panelState = usePanelState(step, selectedIdx);
   const timer = useTimerControls(sessionId, session);
 
@@ -130,7 +127,6 @@ export function TeacherSessionProvider({
       timer,
       ...voteAnalysis,
       ...ratingStats,
-      ...recording,
       ...panelState,
       ...mutations,
     }),
@@ -147,7 +143,6 @@ export function TeacherSessionProvider({
       timer,
       voteAnalysis,
       ratingStats,
-      recording,
       panelState,
       mutations,
     ],
