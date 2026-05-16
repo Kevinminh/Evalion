@@ -163,7 +163,12 @@ function CurrentLiveSessionsSection() {
                 </CardDescription>
                 <CardAction>
                   <div className="flex items-center gap-2">
-                    <Button size="sm" render={<a href={`${PLAY_URL}/liveokt/${session._id}`} />}>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        window.location.href = `${PLAY_URL}/liveokt/${session._id}`;
+                      }}
+                    >
                       Fortsett
                     </Button>
                     <Button
