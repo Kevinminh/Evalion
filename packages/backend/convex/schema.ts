@@ -20,6 +20,11 @@ export const statementValidator = v.object({
 });
 
 export default defineSchema({
+  // ── FagPrats (question sets) ──
+  // A FagPrat is a teacher-authored deck of statements (text + fasit +
+  // explanation). Created and managed from the dashboard; consumed by the live
+  // game; also shown in the public demo on landing. Source-of-truth content
+  // that exists independently of any live session.
   fagprats: defineTable({
     title: v.string(),
     subject: v.string(),
@@ -53,6 +58,13 @@ export default defineSchema({
       filterFields: ["subject", "level", "type", "visibility"],
     }),
 
+  // ── Live game session ──
+  // One classroom run of a FagPrat. The teacher launches a session from the
+  // dashboard; students join via a 6-char joinCode on the web app and play
+  // through the 6 steps. `liveSessions` holds the session-level state;
+  // `sessionStudents` / `sessionVotes` / `sessionRatings` /
+  // `sessionJustifications` are per-student records scoped by `sessionId`.
+  // All four child tables are cascade-deleted when the session is removed.
   liveSessions: defineTable({
     fagpratId: v.id("fagprats"),
     teacherId: v.string(),
@@ -107,7 +119,7 @@ export default defineSchema({
     .index("by_session_statement", ["sessionId", "statementIndex"])
     .index("by_session_statement_student", ["sessionId", "statementIndex", "studentId"]),
 
-    sessionJustifications: defineTable({
+  sessionJustifications: defineTable({
     sessionId: v.id("liveSessions"),
     studentId: v.id("sessionStudents"),
     statementIndex: v.number(),
@@ -124,11 +136,11 @@ export default defineSchema({
     ])
     .index("by_session_student", ["sessionId", "studentId"]),
 
-  emailSubscribers: defineTable({
-    email: v.string(),
-    source: v.optional(v.string()),
-  }).index("by_email", ["email"]),
-
+  // ── Påstandsgenerator (standalone landing-only tool) ──
+  // Used by the `/lag-pastander` and `/velg-pastander` routes on the landing
+  // app. Lets a teacher generate a quick batch of påstander via AI and export
+  // them as PDF, without going through the full FagPrat flow. One draft per
+  // user (auto-saved). Completely independent of `liveSessions` and `fagprats`.
   statementDrafts: defineTable({
     userId: v.string(),
     statements: v.array(
@@ -145,6 +157,17 @@ export default defineSchema({
     updatedAt: v.number(),
   }).index("by_user", ["userId"]),
 
+  // ── Marketing / waitlist ──
+  // Captures from the landing site's newsletter / waitlist form.
+  emailSubscribers: defineTable({
+    email: v.string(),
+    source: v.optional(v.string()),
+  }).index("by_email", ["email"]),
+
+  // ── Admin / infrastructure ──
+  // Editable system prompts for the AI generator (admins can override the
+  // default prompt baked into `reddi.ts`), and feature flags controlled from
+  // the admin UI.
   aiPrompts: defineTable({
     key: v.string(),
     content: v.string(),
