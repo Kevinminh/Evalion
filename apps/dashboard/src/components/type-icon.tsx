@@ -21,7 +21,7 @@ export function TypeIcon({ type }: { type: FagPratType }) {
     );
   }
   return (
-    <span className="fp-card-forkunnskap oppsummering">
+    <span className="fp-card-forkunnskap summary">
       <svg
         viewBox="0 0 24 24"
         fill="none"

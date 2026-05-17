@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { sessionBegrunnelserQueries } from "@workspace/api/sessionBegrunnelser";
+import { sessionJustificationsQueries } from "@workspace/api/sessionJustifications";
 import type { Fasit } from "@workspace/api/types";
 import {
   LEVEL_CIRCLE_COLORS,
@@ -69,7 +69,7 @@ export function MineSvarPanel() {
   // Subscribe to begrunnelser only while the panel is open — keeps the
   // long-running Convex WebSocket cost off all the other students' steps.
   const { data: begrunnelser } = useQuery(
-    sessionBegrunnelserQueries.mine(
+    sessionJustificationsQueries.mine(
       open ? session._id : "skip",
       student._id,
       statementIndex,

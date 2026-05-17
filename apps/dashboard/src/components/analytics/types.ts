@@ -16,8 +16,8 @@ export interface ConfidenceData {
 
 import type { Id } from "@workspace/backend/convex/_generated/dataModel";
 
-export interface BegrunnelseRef {
-  _id: Id<"sessionBegrunnelser">;
+export interface JustificationRef {
+  _id: Id<"sessionJustifications">;
   text: string;
   highlighted: boolean;
 }
@@ -28,7 +28,7 @@ export interface StudentData {
   avatarColor: string;
   round1: { vote: string; confidence: number | null; correct: boolean } | null;
   round2: { vote: string; confidence: number | null; correct: boolean } | null;
-  begrunnelseR1: BegrunnelseRef | null;
+  justificationR1: JustificationRef | null;
   rating: number | null;
 }
 

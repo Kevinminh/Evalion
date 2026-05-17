@@ -60,7 +60,7 @@ export const create = mutation({
     title: v.string(),
     subject: v.string(),
     level: v.string(),
-    type: v.union(v.literal("intro"), v.literal("oppsummering")),
+    type: v.union(v.literal("intro"), v.literal("summary")),
     concepts: v.array(v.string()),
     statements: v.array(statementValidator),
     visibility: v.union(v.literal("public"), v.literal("private")),
@@ -96,7 +96,7 @@ export const update = mutation({
     title: v.optional(v.string()),
     subject: v.optional(v.string()),
     level: v.optional(v.string()),
-    type: v.optional(v.union(v.literal("intro"), v.literal("oppsummering"))),
+    type: v.optional(v.union(v.literal("intro"), v.literal("summary"))),
     concepts: v.optional(v.array(v.string())),
     statements: v.optional(v.array(statementValidator)),
     visibility: v.optional(v.union(v.literal("public"), v.literal("private"))),
@@ -187,12 +187,12 @@ export const remove = mutation({
       for (const rating of ratings) {
         await ctx.db.delete(rating._id);
       }
-      const begrunnelser = await ctx.db
-        .query("sessionBegrunnelser")
+      const justifications = await ctx.db
+        .query("sessionJustifications")
         .withIndex("by_session_statement", (q) => q.eq("sessionId", session._id))
         .collect();
-      for (const b of begrunnelser) {
-        await ctx.db.delete(b._id);
+      for (const j of justifications) {
+        await ctx.db.delete(j._id);
       }
       await ctx.db.delete(session._id);
     }
@@ -248,7 +248,7 @@ export const search = query({
     searchText: v.optional(v.string()),
     subject: v.optional(v.string()),
     level: v.optional(v.string()),
-    type: v.optional(v.union(v.literal("intro"), v.literal("oppsummering"))),
+    type: v.optional(v.union(v.literal("intro"), v.literal("summary"))),
     sortBy: v.optional(v.union(v.literal("relevant"), v.literal("recent"))),
   },
   handler: async (ctx, args) => {

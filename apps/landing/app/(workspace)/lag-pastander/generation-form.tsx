@@ -26,7 +26,7 @@ const MODELS_BY_PROVIDER: Record<Provider, readonly string[]> = {
   anthropic: ["claude-sonnet-4-6", "claude-opus-4-7", "claude-haiku-4-5"],
 };
 
-type Forkunnskap = "intro" | "oppsummering";
+type Forkunnskap = "intro" | "summary";
 
 const fieldLabel = "mb-[3px] block text-[12px] font-bold text-ink";
 
@@ -40,7 +40,7 @@ export function GenerationForm({
   initialForkunnskap?: Forkunnskap;
 }) {
   const router = useRouter();
-  const setLastParams = useMutation(api.pastandDrafts.setLastParams);
+  const setLastParams = useMutation(api.statementDrafts.setLastParams);
   const updateReddiPrompt = useMutation(api.aiPrompts.updateReddiSystemPrompt);
   const { data: session } = authClient.useSession();
   const isAdmin = (session?.user as { role?: string } | undefined)?.role === "admin";
@@ -94,9 +94,9 @@ export function GenerationForm({
 
     setSubmitting(true);
     void setLastParams({
-      lastFag: fag,
-      lastTrinn: trinn,
-      lastForkunnskap: forkunnskap,
+      lastSubject: fag,
+      lastLevel: trinn,
+      lastType: forkunnskap,
     }).catch(() => {
       // Non-critical; URL params are the source of truth.
     });
@@ -324,11 +324,11 @@ export function GenerationForm({
             onClick={() => setForkunnskap("intro")}
           />
           <ForkunnskapButton
-            kind="oppsummering"
+            kind="summary"
             title="Oppsummering"
             desc="Gode forkunnskaper"
-            selected={forkunnskap === "oppsummering"}
-            onClick={() => setForkunnskap("oppsummering")}
+            selected={forkunnskap === "summary"}
+            onClick={() => setForkunnskap("summary")}
           />
         </div>
       </div>
@@ -379,7 +379,7 @@ function ForkunnskapButton({
   selected,
   onClick,
 }: {
-  kind: "intro" | "oppsummering";
+  kind: "intro" | "summary";
   title: string;
   desc: string;
   selected: boolean;

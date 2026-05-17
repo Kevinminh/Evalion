@@ -44,12 +44,12 @@ async function deleteUserOwnedData(ctx: MutationCtx, userId: string) {
       await ctx.db.delete(rating._id);
     }
 
-    const begrunnelser = await ctx.db
-      .query("sessionBegrunnelser")
+    const justifications = await ctx.db
+      .query("sessionJustifications")
       .withIndex("by_session_statement", (q) => q.eq("sessionId", sessionId))
       .collect();
-    for (const b of begrunnelser) {
-      await ctx.db.delete(b._id);
+    for (const j of justifications) {
+      await ctx.db.delete(j._id);
     }
 
     await ctx.db.delete(sessionId);
@@ -64,7 +64,7 @@ async function deleteUserOwnedData(ctx: MutationCtx, userId: string) {
   }
 
   const drafts = await ctx.db
-    .query("pastandDrafts")
+    .query("statementDrafts")
     .withIndex("by_user", (q) => q.eq("userId", userId))
     .collect();
   for (const draft of drafts) {

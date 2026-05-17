@@ -24,7 +24,7 @@ export default defineSchema({
     title: v.string(),
     subject: v.string(),
     level: v.string(),
-    type: v.union(v.literal("intro"), v.literal("oppsummering")),
+    type: v.union(v.literal("intro"), v.literal("summary")),
     concepts: v.array(v.string()),
     statements: v.array(statementValidator),
     visibility: v.union(v.literal("public"), v.literal("private")),
@@ -107,7 +107,7 @@ export default defineSchema({
     .index("by_session_statement", ["sessionId", "statementIndex"])
     .index("by_session_statement_student", ["sessionId", "statementIndex", "studentId"]),
 
-  sessionBegrunnelser: defineTable({
+    sessionJustifications: defineTable({
     sessionId: v.id("liveSessions"),
     studentId: v.id("sessionStudents"),
     statementIndex: v.number(),
@@ -129,19 +129,19 @@ export default defineSchema({
     source: v.optional(v.string()),
   }).index("by_email", ["email"]),
 
-  pastandDrafts: defineTable({
+  statementDrafts: defineTable({
     userId: v.string(),
-    pastander: v.array(
+    statements: v.array(
       v.object({
         clientId: v.string(),
         text: v.string(),
         fasit: v.optional(v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis"))),
-        forklaring: v.string(),
+        explanation: v.string(),
       }),
     ),
-    lastFag: v.optional(v.string()),
-    lastTrinn: v.optional(v.string()),
-    lastForkunnskap: v.optional(v.union(v.literal("intro"), v.literal("oppsummering"))),
+    lastSubject: v.optional(v.string()),
+    lastLevel: v.optional(v.string()),
+    lastType: v.optional(v.union(v.literal("intro"), v.literal("summary"))),
     updatedAt: v.number(),
   }).index("by_user", ["userId"]),
 

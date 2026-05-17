@@ -28,7 +28,7 @@ interface RoundAnalyticsProps {
   totalStudents: number;
   sessionActive: boolean;
   students: StudentData[];
-  onToggleHighlight?: (id: Id<"sessionBegrunnelser">, next: boolean) => void;
+  onToggleHighlight?: (id: Id<"sessionJustifications">, next: boolean) => void;
 }
 
 export function RoundAnalytics({
@@ -266,7 +266,7 @@ function buildR1MatrixCells(students: StudentData[]) {
       name: s.name,
       vote: s.round1!.vote as "sant" | "usant" | "delvis",
       confidence: s.round1!.confidence,
-      begrunnelse: s.begrunnelseR1,
+      justification: s.justificationR1,
     }));
 
   // Order matters: R1Matrix expects [riktigHoy, feilHoy, riktigLav, feilLav]
@@ -309,7 +309,7 @@ function buildR2MatrixCells(students: StudentData[]) {
       name: s.name,
       vote: s.round1!.vote as "sant" | "usant" | "delvis",
       confidence: s.round2!.confidence,
-      begrunnelse: null,
+      justification: null,
       vote2: s.round2!.vote as "sant" | "usant" | "delvis",
     }));
 

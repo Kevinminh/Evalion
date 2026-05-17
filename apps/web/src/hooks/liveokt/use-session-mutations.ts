@@ -1,5 +1,5 @@
 import { liveSessionsMutations } from "@workspace/api/liveSessions";
-import { sessionBegrunnelserMutations } from "@workspace/api/sessionBegrunnelser";
+import { sessionJustificationsMutations } from "@workspace/api/sessionJustifications";
 import type { Id } from "@workspace/api/types";
 import type { Doc } from "@workspace/backend/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
@@ -18,7 +18,7 @@ interface UseSessionMutationsArgs {
 export interface SessionMutations {
   goToStep: (n: number, statementIndexOverride?: number) => Promise<void>;
   endSession: () => Promise<void>;
-  highlightBegrunnelse: (b: Doc<"sessionBegrunnelser">) => Promise<unknown>;
+  highlightJustification: (b: Doc<"sessionJustifications">) => Promise<unknown>;
   markStatementUsed: (n: number) => void;
   usedStatements: Set<number>;
   completedSteps: number[];
@@ -34,7 +34,7 @@ export function useSessionMutations({
 }: UseSessionMutationsArgs): SessionMutations {
   const updateStepMutation = useMutation(liveSessionsMutations.updateStep);
   const endSessionMutation = useMutation(liveSessionsMutations.end);
-  const highlightBegrunnelseMutation = useMutation(sessionBegrunnelserMutations.highlight);
+  const highlightJustificationMutation = useMutation(sessionJustificationsMutations.highlight);
 
   const [usedStatements, setUsedStatements] = useState<Set<number>>(new Set());
 
@@ -69,10 +69,10 @@ export function useSessionMutations({
     }
   }, [sessionId, endSessionMutation, onSessionEnded]);
 
-  const highlightBegrunnelse = useCallback(
-    (b: Doc<"sessionBegrunnelser">) =>
-      highlightBegrunnelseMutation({ id: b._id, highlighted: !b.highlighted }),
-    [highlightBegrunnelseMutation],
+  const highlightJustification = useCallback(
+    (b: Doc<"sessionJustifications">) =>
+      highlightJustificationMutation({ id: b._id, highlighted: !b.highlighted }),
+    [highlightJustificationMutation],
   );
 
   const markStatementUsed = useCallback(
@@ -83,7 +83,7 @@ export function useSessionMutations({
   return {
     goToStep,
     endSession,
-    highlightBegrunnelse,
+    highlightJustification,
     markStatementUsed,
     usedStatements,
     completedSteps,

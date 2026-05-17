@@ -68,7 +68,7 @@ const DUMMY_NAMES = [
 
 const VOTE_OPTIONS = ["sant", "usant", "delvis"] as const;
 
-const DUMMY_BEGRUNNELSER = [
+const DUMMY_JUSTIFICATIONS = [
   "Jeg tror dette stemmer fordi vi lærte om det i forrige uke.",
   "Jeg er ikke helt sikker, men jeg tipper at det er riktig.",
   "Læreren sa noe lignende i timen, så jeg tror det er sant.",
@@ -146,7 +146,7 @@ export const castDummyVotes = mutation({
       throw new Error("Round must be 1 or 2");
     }
 
-    const [students, existingVotes, existingBegrunnelser] = await Promise.all([
+    const [students, existingVotes, existingJustifications] = await Promise.all([
       ctx.db
         .query("sessionStudents")
         .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
@@ -158,7 +158,7 @@ export const castDummyVotes = mutation({
         )
         .collect(),
       ctx.db
-        .query("sessionBegrunnelser")
+        .query("sessionJustifications")
         .withIndex("by_session_statement", (q) =>
           q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
         )
@@ -168,12 +168,12 @@ export const castDummyVotes = mutation({
     const votedStudentIds = new Set(
       existingVotes.filter((v) => v.round === args.round).map((v) => v.studentId),
     );
-    const begrunnelseStudentIds = new Set(
-      existingBegrunnelser.filter((b) => b.round === args.round).map((b) => b.studentId),
+    const justificationStudentIds = new Set(
+      existingJustifications.filter((j) => j.round === args.round).map((j) => j.studentId),
     );
 
     const voteInserts: Promise<unknown>[] = [];
-    const begrunnelseInserts: Promise<unknown>[] = [];
+    const justificationInserts: Promise<unknown>[] = [];
     let inserted = 0;
     for (const student of dummies) {
       if (votedStudentIds.has(student._id)) continue;
@@ -191,10 +191,11 @@ export const castDummyVotes = mutation({
       );
       inserted++;
 
-      if (!begrunnelseStudentIds.has(student._id)) {
-        const text = DUMMY_BEGRUNNELSER[Math.floor(Math.random() * DUMMY_BEGRUNNELSER.length)]!;
-        begrunnelseInserts.push(
-          ctx.db.insert("sessionBegrunnelser", {
+      if (!justificationStudentIds.has(student._id)) {
+        const text =
+          DUMMY_JUSTIFICATIONS[Math.floor(Math.random() * DUMMY_JUSTIFICATIONS.length)]!;
+        justificationInserts.push(
+          ctx.db.insert("sessionJustifications", {
             sessionId: args.sessionId,
             studentId: student._id,
             statementIndex: args.statementIndex,
@@ -204,7 +205,7 @@ export const castDummyVotes = mutation({
         );
       }
     }
-    await Promise.all([...voteInserts, ...begrunnelseInserts]);
+    await Promise.all([...voteInserts, ...justificationInserts]);
 
     return { dummyCount: dummies.length, inserted };
   },

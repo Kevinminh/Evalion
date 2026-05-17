@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { liveSessionsQueries } from "@workspace/api/liveSessions";
-import { sessionBegrunnelserMutations } from "@workspace/api/sessionBegrunnelser";
+import { sessionJustificationsMutations } from "@workspace/api/sessionJustifications";
 import { sessionVotesQueries } from "@workspace/api/sessionVotes";
 import type { Id } from "@workspace/api/types";
 import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
@@ -59,7 +59,7 @@ function AnalyticsPage() {
     sessionVotesQueries.analytics(sessionId, selectedStatement),
   );
 
-  const highlightBegrunnelse = useMutation(sessionBegrunnelserMutations.highlight);
+  const highlightJustification = useMutation(sessionJustificationsMutations.highlight);
 
   if (sessionPending) return <AnalyticsSkeleton />;
   if (sessionError) return <ErrorState className="flex min-h-svh items-center justify-center" />;
@@ -119,7 +119,7 @@ function AnalyticsPage() {
                 totalStudents={totalStudents}
                 sessionActive={sessionActive}
                 students={analytics.students}
-                onToggleHighlight={(id, next) => highlightBegrunnelse({ id, highlighted: next })}
+                onToggleHighlight={(id, next) => highlightJustification({ id, highlighted: next })}
               />
             )}
 

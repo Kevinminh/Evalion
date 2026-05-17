@@ -332,7 +332,7 @@ function buildUserPrompt(args: {
   topic: string;
   subject: string;
   level: string;
-  type: "intro" | "oppsummering";
+  type: "intro" | "summary";
 }): string {
   const typeDescription =
     args.type === "intro"
@@ -495,7 +495,7 @@ export const generateStatements = action({
     topic: v.string(),
     subject: v.string(),
     level: v.string(),
-    type: v.union(v.literal("intro"), v.literal("oppsummering")),
+    type: v.union(v.literal("intro"), v.literal("summary")),
     model: v.optional(modelValidator),
   },
   handler: async (

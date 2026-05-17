@@ -30,7 +30,7 @@ export interface TeacherSessionValue
   session: Doc<"liveSessions">;
   fagprat: Doc<"fagprats">;
   students: Doc<"sessionStudents">[];
-  begrunnelser: Doc<"sessionBegrunnelser">[] | undefined;
+  begrunnelser: Doc<"sessionJustifications">[] | undefined;
 
   selectedIdx: number;
   statement: Statement | undefined;
@@ -74,7 +74,7 @@ interface TeacherSessionProviderProps {
         ratingDistribution: { score: number; count: number }[];
       }
     | undefined;
-  begrunnelser: Doc<"sessionBegrunnelser">[] | undefined;
+  begrunnelser: Doc<"sessionJustifications">[] | undefined;
   navigateToStep: (n: number) => Promise<void>;
   onSessionEnded: () => void;
   children: ReactNode;

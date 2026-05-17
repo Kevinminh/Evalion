@@ -3,37 +3,37 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { requireAuth } from "./helpers";
 
-const MAX_PASTANDER = 50;
+const MAX_STATEMENTS = 50;
 const MAX_TEXT_LENGTH = 1000;
 
 const fasitValidator = v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis"));
 
-const pastandValidator = v.object({
+const statementValidator = v.object({
   clientId: v.string(),
   text: v.string(),
   fasit: v.optional(fasitValidator),
-  forklaring: v.string(),
+  explanation: v.string(),
 });
 
-const forkunnskapValidator = v.union(v.literal("intro"), v.literal("oppsummering"));
+const typeValidator = v.union(v.literal("intro"), v.literal("summary"));
 
-function isEmptyPastand(p: {
+function isEmptyStatement(p: {
   text: string;
-  forklaring: string;
+  explanation: string;
   fasit?: "sant" | "usant" | "delvis";
 }) {
-  return p.text.trim() === "" && p.forklaring.trim() === "" && p.fasit === undefined;
+  return p.text.trim() === "" && p.explanation.trim() === "" && p.fasit === undefined;
 }
 
-function validatePastander(pastander: { text: string; forklaring: string }[]) {
-  if (pastander.length > MAX_PASTANDER) {
-    throw new Error(`For mange påstander (maks ${MAX_PASTANDER}).`);
+function validateStatements(statements: { text: string; explanation: string }[]) {
+  if (statements.length > MAX_STATEMENTS) {
+    throw new Error(`For mange påstander (maks ${MAX_STATEMENTS}).`);
   }
-  for (const p of pastander) {
+  for (const p of statements) {
     if (p.text.length > MAX_TEXT_LENGTH) {
       throw new Error("Påstand-tekst er for lang.");
     }
-    if (p.forklaring.length > MAX_TEXT_LENGTH) {
+    if (p.explanation.length > MAX_TEXT_LENGTH) {
       throw new Error("Forklaring er for lang.");
     }
   }
@@ -45,31 +45,31 @@ export const get = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
     return await ctx.db
-      .query("pastandDrafts")
+      .query("statementDrafts")
       .withIndex("by_user", (q) => q.eq("userId", identity.subject))
       .unique();
   },
 });
 
-export const setPastander = mutation({
-  args: { pastander: v.array(pastandValidator) },
+export const setStatements = mutation({
+  args: { statements: v.array(statementValidator) },
   handler: async (ctx, args) => {
     const identity = await requireAuth(ctx);
-    validatePastander(args.pastander);
+    validateStatements(args.statements);
     const existing = await ctx.db
-      .query("pastandDrafts")
+      .query("statementDrafts")
       .withIndex("by_user", (q) => q.eq("userId", identity.subject))
       .unique();
     if (existing) {
       await ctx.db.patch(existing._id, {
-        pastander: args.pastander,
+        statements: args.statements,
         updatedAt: Date.now(),
       });
       return existing._id;
     }
-    return await ctx.db.insert("pastandDrafts", {
+    return await ctx.db.insert("statementDrafts", {
       userId: identity.subject,
-      pastander: args.pastander,
+      statements: args.statements,
       updatedAt: Date.now(),
     });
   },
@@ -81,7 +81,7 @@ export const appendStatements = mutation({
       v.object({
         text: v.string(),
         fasit: fasitValidator,
-        forklaring: v.string(),
+        explanation: v.string(),
       }),
     ),
   },
@@ -93,29 +93,29 @@ export const appendStatements = mutation({
       clientId: `${now}-${i}-${Math.random().toString(36).slice(2, 8)}`,
       text: s.text,
       fasit: s.fasit,
-      forklaring: s.forklaring,
+      explanation: s.explanation,
     }));
 
     const existing = await ctx.db
-      .query("pastandDrafts")
+      .query("statementDrafts")
       .withIndex("by_user", (q) => q.eq("userId", identity.subject))
       .unique();
 
     if (existing) {
-      const kept = existing.pastander.filter((p) => !isEmptyPastand(p));
+      const kept = existing.statements.filter((p) => !isEmptyStatement(p));
       const merged = [...kept, ...additions];
-      validatePastander(merged);
+      validateStatements(merged);
       await ctx.db.patch(existing._id, {
-        pastander: merged,
+        statements: merged,
         updatedAt: now,
       });
       return existing._id;
     }
 
-    validatePastander(additions);
-    return await ctx.db.insert("pastandDrafts", {
+    validateStatements(additions);
+    return await ctx.db.insert("statementDrafts", {
       userId: identity.subject,
-      pastander: additions,
+      statements: additions,
       updatedAt: now,
     });
   },
@@ -123,31 +123,31 @@ export const appendStatements = mutation({
 
 export const setLastParams = mutation({
   args: {
-    lastFag: v.optional(v.string()),
-    lastTrinn: v.optional(v.string()),
-    lastForkunnskap: v.optional(forkunnskapValidator),
+    lastSubject: v.optional(v.string()),
+    lastLevel: v.optional(v.string()),
+    lastType: v.optional(typeValidator),
   },
   handler: async (ctx, args) => {
     const identity = await requireAuth(ctx);
     const existing = await ctx.db
-      .query("pastandDrafts")
+      .query("statementDrafts")
       .withIndex("by_user", (q) => q.eq("userId", identity.subject))
       .unique();
     if (existing) {
       await ctx.db.patch(existing._id, {
-        lastFag: args.lastFag,
-        lastTrinn: args.lastTrinn,
-        lastForkunnskap: args.lastForkunnskap,
+        lastSubject: args.lastSubject,
+        lastLevel: args.lastLevel,
+        lastType: args.lastType,
         updatedAt: Date.now(),
       });
       return existing._id;
     }
-    return await ctx.db.insert("pastandDrafts", {
+    return await ctx.db.insert("statementDrafts", {
       userId: identity.subject,
-      pastander: [],
-      lastFag: args.lastFag,
-      lastTrinn: args.lastTrinn,
-      lastForkunnskap: args.lastForkunnskap,
+      statements: [],
+      lastSubject: args.lastSubject,
+      lastLevel: args.lastLevel,
+      lastType: args.lastType,
       updatedAt: Date.now(),
     });
   },

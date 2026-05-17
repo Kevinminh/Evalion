@@ -22,7 +22,7 @@ const FASIT_LABEL: Record<Fasit, string> = {
 
 const FORKUNNSKAP_LABEL: Record<FagPrat["type"], string> = {
   intro: "Introduksjon",
-  oppsummering: "Oppsummering",
+  summary: "Oppsummering",
 };
 
 export const Route = createFileRoute("/_dashboard/fagprat/$id/pdf")({

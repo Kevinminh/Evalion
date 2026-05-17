@@ -38,15 +38,15 @@ function newClientId() {
 }
 
 function emptyCard(): Card {
-  return { clientId: newClientId(), text: "", forklaring: "" };
+  return { clientId: newClientId(), text: "", explanation: "" };
 }
 
 export function MinePastanderList({
   draft,
 }: {
-  draft: Doc<"pastandDrafts"> | null | undefined;
+  draft: Doc<"statementDrafts"> | null | undefined;
 }) {
-  const setPastander = useMutation(api.pastandDrafts.setPastander);
+  const setStatements = useMutation(api.statementDrafts.setStatements);
 
   const [cards, setCards] = useState<Card[] | null>(null);
   const skipNextSyncRef = useRef(false);
@@ -60,11 +60,11 @@ export function MinePastanderList({
     if (draft === undefined) return;
     if (!seededRef.current) {
       seededRef.current = true;
-      const serverCards: Card[] = (draft?.pastander ?? []).map((p) => ({
+      const serverCards: Card[] = (draft?.statements ?? []).map((p) => ({
         clientId: p.clientId,
         text: p.text,
         fasit: p.fasit,
-        forklaring: p.forklaring,
+        explanation: p.explanation,
       }));
       knownClientIdsRef.current = new Set(serverCards.map((c) => c.clientId));
       skipNextSyncRef.current = true;
@@ -73,7 +73,7 @@ export function MinePastanderList({
     }
     // Subsequent server updates — append any new clientIds we don't know about.
     if (!draft) return;
-    const newOnes = draft.pastander.filter(
+    const newOnes = draft.statements.filter(
       (p) => !knownClientIdsRef.current.has(p.clientId),
     );
     if (newOnes.length === 0) return;
@@ -85,7 +85,7 @@ export function MinePastanderList({
         clientId: p.clientId,
         text: p.text,
         fasit: p.fasit,
-        forklaring: p.forklaring,
+        explanation: p.explanation,
       })),
     ]);
   }, [draft]);
@@ -98,12 +98,12 @@ export function MinePastanderList({
       return;
     }
     const timeout = setTimeout(() => {
-      void setPastander({ pastander: cards }).catch((err) => {
+      void setStatements({ statements: cards }).catch((err) => {
         console.error("Kunne ikke lagre påstander:", err);
       });
     }, SYNC_DEBOUNCE_MS);
     return () => clearTimeout(timeout);
-  }, [cards, setPastander]);
+  }, [cards, setStatements]);
 
   function updateCard(clientId: string, patch: Partial<Card>) {
     setCards((prev) =>

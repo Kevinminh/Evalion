@@ -45,7 +45,7 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
     avgConfidenceR2ByVote,
     goToStep,
     begrunnelser,
-    highlightBegrunnelse,
+    highlightJustification,
   } = useTeacherSession();
   const endringerTab = panelTab === "default" || panelTab === "endringer";
   const fremhevetTab = panelTab === "fremhevet";
@@ -120,7 +120,7 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
               begrunnelser={begrunnelser}
               votes={r1Votes}
               round={1}
-              onDismiss={(b) => void highlightBegrunnelse(b)}
+              onDismiss={(b) => void highlightJustification(b)}
             />
           </PanelCard>
         ) : endringerTab ? (

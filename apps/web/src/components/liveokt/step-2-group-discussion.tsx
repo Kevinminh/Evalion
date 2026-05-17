@@ -30,7 +30,7 @@ export function useStep2(): TeacherStep {
     avgConfidenceR1ByVote,
     selectedIdx,
     goToStep,
-    highlightBegrunnelse,
+    highlightJustification,
   } = useTeacherSession();
   const begrunnelseTab = panelTab === "default" || panelTab === "begrunnelser";
   const [showAvgBreakdown, setShowAvgBreakdown] = useState(false);
@@ -78,7 +78,7 @@ export function useStep2(): TeacherStep {
               begrunnelser={begrunnelser}
               votes={activeRoundVotes}
               round={1}
-              onDismiss={(b) => void highlightBegrunnelse(b)}
+              onDismiss={(b) => void highlightJustification(b)}
             />
           </PanelCard>
         ) : (

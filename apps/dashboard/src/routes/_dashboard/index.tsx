@@ -34,7 +34,7 @@ function UtforskPage() {
       : forkunnskapIntro
         ? ("intro" as const)
         : forkunnskapOppsummering
-          ? ("oppsummering" as const)
+          ? ("summary" as const)
           : undefined;
 
   const showNone = !forkunnskapIntro && !forkunnskapOppsummering;
@@ -149,7 +149,7 @@ function UtforskPage() {
                     checked={forkunnskapOppsummering}
                     onChange={() => setForkunnskapOppsummering(!forkunnskapOppsummering)}
                   />
-                  <TypeIcon type="oppsummering" />
+                  <TypeIcon type="summary" />
                   Oppsummering
                 </label>
               </div>

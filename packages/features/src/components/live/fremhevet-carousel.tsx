@@ -8,10 +8,10 @@ import { BegrunnelseNav } from "./begrunnelse-nav";
 const PAGE_SIZE = 3;
 
 interface FremhevetCarouselProps {
-  begrunnelser: Doc<"sessionBegrunnelser">[] | undefined;
+  begrunnelser: Doc<"sessionJustifications">[] | undefined;
   votes: Doc<"sessionVotes">[];
   round: number;
-  onDismiss: (begrunnelse: Doc<"sessionBegrunnelser">) => void;
+  onDismiss: (begrunnelse: Doc<"sessionJustifications">) => void;
 }
 
 export function FremhevetCarousel({

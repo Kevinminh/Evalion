@@ -237,7 +237,7 @@ export const end = mutation({
     const dummyIds = new Set(students.filter((s) => s.isDummy).map((s) => s._id));
 
     if (dummyIds.size > 0) {
-      const [votes, ratings, begrunnelser] = await Promise.all([
+      const [votes, ratings, justifications] = await Promise.all([
         ctx.db
           .query("sessionVotes")
           .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
@@ -247,7 +247,7 @@ export const end = mutation({
           .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
           .collect(),
         ctx.db
-          .query("sessionBegrunnelser")
+          .query("sessionJustifications")
           .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
           .collect(),
       ]);
@@ -258,7 +258,9 @@ export const end = mutation({
           .filter((vote) => dummyIds.has(vote.studentId))
           .map((vote) => ctx.db.delete(vote._id)),
         ...ratings.filter((r) => dummyIds.has(r.studentId)).map((r) => ctx.db.delete(r._id)),
-        ...begrunnelser.filter((b) => dummyIds.has(b.studentId)).map((b) => ctx.db.delete(b._id)),
+        ...justifications
+          .filter((j) => dummyIds.has(j.studentId))
+          .map((j) => ctx.db.delete(j._id)),
       ]);
     }
 
@@ -275,7 +277,7 @@ export const remove = mutation({
       throw new Error("Only ended sessions can be deleted");
     }
 
-    const [students, votes, ratings, begrunnelser] = await Promise.all([
+    const [students, votes, ratings, justifications] = await Promise.all([
       ctx.db
         .query("sessionStudents")
         .withIndex("by_session", (q) => q.eq("sessionId", args.id))
@@ -289,7 +291,7 @@ export const remove = mutation({
         .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
         .collect(),
       ctx.db
-        .query("sessionBegrunnelser")
+        .query("sessionJustifications")
         .withIndex("by_session_statement", (q) => q.eq("sessionId", args.id))
         .collect(),
     ]);
@@ -298,7 +300,7 @@ export const remove = mutation({
       ...students.map((s) => ctx.db.delete(s._id)),
       ...votes.map((v) => ctx.db.delete(v._id)),
       ...ratings.map((r) => ctx.db.delete(r._id)),
-      ...begrunnelser.map((b) => ctx.db.delete(b._id)),
+      ...justifications.map((j) => ctx.db.delete(j._id)),
     ]);
 
     await ctx.db.delete(args.id);
@@ -680,16 +682,16 @@ export const getVoteAnalytics = query({
       .query("sessionStudents")
       .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
       .collect();
-    const begrunnelser = await ctx.db
-      .query("sessionBegrunnelser")
+    const justifications = await ctx.db
+      .query("sessionJustifications")
       .withIndex("by_session_statement", (q) =>
         q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
       )
       .collect();
-    const begrunnelseByStudent = new Map(
-      begrunnelser.map((b) => [
-        `${b.studentId}:${b.round}`,
-        { _id: b._id, text: b.text, highlighted: b.highlighted ?? false },
+    const justificationByStudent = new Map(
+      justifications.map((j) => [
+        `${j.studentId}:${j.round}`,
+        { _id: j._id, text: j.text, highlighted: j.highlighted ?? false },
       ]),
     );
 
@@ -706,7 +708,7 @@ export const getVoteAnalytics = query({
         round2: r2
           ? { vote: r2.vote, confidence: r2.confidence ?? null, correct: r2.vote === fasit }
           : null,
-        begrunnelseR1: begrunnelseByStudent.get(`${s._id}:1`) ?? null,
+        justificationR1: justificationByStudent.get(`${s._id}:1`) ?? null,
       };
     });
 
@@ -769,9 +771,9 @@ export const getRatings = query({
   },
 });
 
-// ── Begrunnelser ──
+// ── Justifications ──
 
-export const submitBegrunnelse = mutation({
+export const submitJustification = mutation({
   args: {
     sessionId: v.id("liveSessions"),
     studentId: v.id("sessionStudents"),
@@ -781,19 +783,18 @@ export const submitBegrunnelse = mutation({
   },
   handler: async (ctx, args) => {
     const trimmed = args.text.trim();
-    if (!trimmed) throw new Error("Begrunnelse cannot be empty");
-    if (trimmed.length > 2000) throw new Error("Begrunnelse is too long (max 2000 characters)");
+    if (!trimmed) throw new Error("Begrunnelse kan ikke være tom");
+    if (trimmed.length > 2000) throw new Error("Begrunnelse er for lang (maks 2000 tegn)");
 
     await validateStatementIndex(ctx, args.sessionId, args.statementIndex);
 
-    // Verify student belongs to this session
     const student = await ctx.db.get(args.studentId);
     if (!student || student.sessionId !== args.sessionId) {
       throw new Error("Student not found in this session");
     }
 
     const existing = await ctx.db
-      .query("sessionBegrunnelser")
+      .query("sessionJustifications")
       .withIndex("by_session_statement_student_round", (q) =>
         q
           .eq("sessionId", args.sessionId)
@@ -807,7 +808,7 @@ export const submitBegrunnelse = mutation({
       await ctx.db.patch(existing._id, { text: trimmed });
       return existing._id;
     }
-    return await ctx.db.insert("sessionBegrunnelser", {
+    return await ctx.db.insert("sessionJustifications", {
       sessionId: args.sessionId,
       studentId: args.studentId,
       statementIndex: args.statementIndex,
@@ -817,14 +818,14 @@ export const submitBegrunnelse = mutation({
   },
 });
 
-export const getBegrunnelser = query({
+export const getJustifications = query({
   args: {
     sessionId: v.id("liveSessions"),
     statementIndex: v.number(),
   },
   handler: async (ctx, args) => {
     return await ctx.db
-      .query("sessionBegrunnelser")
+      .query("sessionJustifications")
       .withIndex("by_session_statement", (q) =>
         q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
       )
@@ -832,7 +833,7 @@ export const getBegrunnelser = query({
   },
 });
 
-export const getMyBegrunnelser = query({
+export const getMyJustifications = query({
   args: {
     sessionId: v.id("liveSessions"),
     studentId: v.id("sessionStudents"),
@@ -840,7 +841,7 @@ export const getMyBegrunnelser = query({
   },
   handler: async (ctx, args) => {
     return await ctx.db
-      .query("sessionBegrunnelser")
+      .query("sessionJustifications")
       .withIndex("by_session_statement_student_round", (q) =>
         q
           .eq("sessionId", args.sessionId)
@@ -851,16 +852,16 @@ export const getMyBegrunnelser = query({
   },
 });
 
-export const highlightBegrunnelse = mutation({
+export const highlightJustification = mutation({
   args: {
-    id: v.id("sessionBegrunnelser"),
+    id: v.id("sessionJustifications"),
     highlighted: v.boolean(),
   },
   handler: async (ctx, args) => {
-    const begrunnelse = await ctx.db.get(args.id);
-    if (!begrunnelse) throw new Error("Begrunnelse not found");
+    const justification = await ctx.db.get(args.id);
+    if (!justification) throw new Error("Begrunnelse ikke funnet");
 
-    await requireSessionOwner(ctx, begrunnelse.sessionId);
+    await requireSessionOwner(ctx, justification.sessionId);
 
     await ctx.db.patch(args.id, { highlighted: args.highlighted });
   },
