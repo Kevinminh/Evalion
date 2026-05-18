@@ -42,9 +42,19 @@ export function Step2Discussion() {
 
       <Professor
         size="sm"
+        bordered
         bounce
         textSize="sm"
-        text="Enige? Lag en god begrunnelse sammen! Uenige? Prøv å overbevise hverandre!"
+        text={
+          <span className="block text-left">
+            <span className="block">
+              <span className="font-bold">Enige?</span> Lag en god begrunnelse sammen!
+            </span>
+            <span className="block">
+              <span className="font-bold">Uenige?</span> Prøv å overbevise hverandre!
+            </span>
+          </span>
+        }
       />
     </div>
   );

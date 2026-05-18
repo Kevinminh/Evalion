@@ -12,6 +12,7 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { useMutation } from "convex/react";
+import { useCallback, useLayoutEffect, useRef } from "react";
 
 import { LobbyState } from "@/components/analytics/lobby-state";
 import { ResultatTab } from "@/components/analytics/resultat-tab";
@@ -54,7 +55,10 @@ function AnalyticsPage() {
   // statement selector or round/resultat tabs. The current påstand and
   // current step are read straight off the session document.
   const selectedStatement = session?.currentStatementIndex ?? 0;
-  const activeTab: TabId = STEP_TO_TAB[session?.currentStep ?? 1] ?? "runde1";
+  const currentStep = session?.currentStep ?? 0;
+  // Step 0 is the teacher's statement picker — no påstand has been chosen yet.
+  const isStatementOverview = currentStep === 0;
+  const activeTab: TabId = STEP_TO_TAB[currentStep] ?? "runde1";
 
   const { data: analytics } = useQuery(
     sessionVotesQueries.analytics(sessionId, selectedStatement),
@@ -63,6 +67,48 @@ function AnalyticsPage() {
   const { data: students } = useQuery(sessionStudentsQueries.listBySession(sessionId));
 
   const highlightJustification = useMutation(sessionJustificationsMutations.highlight);
+
+  // Toggling a highlight reflows the page: the HighlightedReorderPanel above
+  // the matrix / "Alle elever" list grows or shrinks. On mobile, that pushes
+  // the row the user just tapped out from under their finger. We compensate
+  // by adjusting window scroll by the same amount the page just resized,
+  // gated on a pending flag so we only react to height changes caused by a
+  // toggle (and not, e.g., a teacher advancing the step).
+  const pendingHighlightReflow = useRef(false);
+
+  useLayoutEffect(() => {
+    let lastHeight = document.body.getBoundingClientRect().height;
+    const ro = new ResizeObserver(() => {
+      const h = document.body.getBoundingClientRect().height;
+      const delta = h - lastHeight;
+      lastHeight = h;
+      if (delta === 0 || !pendingHighlightReflow.current) return;
+      // Skip compensation when the user is at the top — the panel itself is
+      // in view and a natural reflow looks better than a scroll jump.
+      if (window.scrollY <= 50) {
+        pendingHighlightReflow.current = false;
+        return;
+      }
+      pendingHighlightReflow.current = false;
+      window.scrollBy({ top: delta, behavior: "instant" });
+    });
+    ro.observe(document.body);
+    return () => ro.disconnect();
+  }, []);
+
+  const handleToggleHighlight = useCallback(
+    (justificationId: Id<"sessionJustifications">, next: boolean) => {
+      pendingHighlightReflow.current = true;
+      // Safety net: clear the flag if the mutation never produces a reflow
+      // (e.g., no-op toggle, network error) so a later unrelated layout
+      // change doesn't get compensated.
+      window.setTimeout(() => {
+        pendingHighlightReflow.current = false;
+      }, 1500);
+      void highlightJustification({ id: justificationId, highlighted: next });
+    },
+    [highlightJustification],
+  );
 
   if (sessionPending) return <AnalyticsSkeleton />;
   if (sessionError) return <ErrorState className="flex min-h-svh items-center justify-center" />;
@@ -77,7 +123,7 @@ function AnalyticsPage() {
   const statementColor = session.statements[selectedStatement]?.color;
   const totalStudents = session.studentCount;
   const totalStatements = session.statements.length;
-  const showR1Comparison = (session.currentStep ?? 0) >= 4;
+  const showR1Comparison = currentStep >= 4;
 
   return (
     <div className="flex min-h-svh flex-col bg-neutral-100">
@@ -89,16 +135,18 @@ function AnalyticsPage() {
             <div className="h-3.5 w-px bg-neutral-300" />
             <span className="text-xs font-bold text-foreground">Live-statistikk</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            {totalStatements > 1 && (
-              <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
-                Påstand {selectedStatement + 1} av {totalStatements}
+          {!isStatementOverview && (
+            <div className="flex items-center gap-1.5">
+              {totalStatements > 1 && (
+                <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+                  Påstand {selectedStatement + 1} av {totalStatements}
+                </span>
+              )}
+              <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary">
+                {BADGE_LABELS[activeTab]}
               </span>
-            )}
-            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary">
-              {BADGE_LABELS[activeTab]}
-            </span>
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -109,10 +157,18 @@ function AnalyticsPage() {
             <Skeleton className="h-64 rounded-[16px]" />
             <Skeleton className="h-48 rounded-[16px]" />
           </div>
-        ) : activeTab === "runde1" &&
-          analytics.round1.total === 0 &&
-          !session.timerStartedAt ? (
-          <WaitingState />
+        ) : (activeTab === "runde1" &&
+            analytics.round1.total === 0 &&
+            !session.timerStartedAt) ||
+          (activeTab === "runde2" &&
+            analytics.round2.total === 0 &&
+            !session.timerStartedAt &&
+            currentStep === 3) ? (
+          <WaitingState
+            text={
+              isStatementOverview ? "Venter på at læreren skal velge en påstand…" : undefined
+            }
+          />
         ) : (
           <>
             {activeTab === "runde1" && (
@@ -126,14 +182,14 @@ function AnalyticsPage() {
                 statementColor={statementColor}
                 statementIndex={selectedStatement}
                 totalStudents={totalStudents}
-                currentStep={session.currentStep ?? 0}
+                currentStep={currentStep}
                 timerDuration={session.timerDuration}
                 timerStartedAt={session.timerStartedAt}
                 timerPausedAt={session.timerPausedAt}
                 timerRemainingAtPause={session.timerRemainingAtPause}
                 hasVotes={analytics.round1.total > 0}
                 students={analytics.students}
-                onToggleHighlight={(id, next) => highlightJustification({ id, highlighted: next })}
+                onToggleHighlight={handleToggleHighlight}
               />
             )}
 
@@ -150,14 +206,14 @@ function AnalyticsPage() {
                 statementColor={statementColor}
                 statementIndex={selectedStatement}
                 totalStudents={totalStudents}
-                currentStep={session.currentStep ?? 0}
+                currentStep={currentStep}
                 timerDuration={session.timerDuration}
                 timerStartedAt={session.timerStartedAt}
                 timerPausedAt={session.timerPausedAt}
                 timerRemainingAtPause={session.timerRemainingAtPause}
                 hasVotes={analytics.round2.total > 0}
                 students={analytics.students}
-                onToggleHighlight={(id, next) => highlightJustification({ id, highlighted: next })}
+                onToggleHighlight={handleToggleHighlight}
               />
             )}
 
@@ -173,7 +229,7 @@ function AnalyticsPage() {
                 avgRating={analytics.avgRating}
                 ratingDistribution={analytics.ratingDistribution}
                 students={analytics.students}
-                onToggleHighlight={(id, next) => highlightJustification({ id, highlighted: next })}
+                onToggleHighlight={handleToggleHighlight}
               />
             )}
           </>

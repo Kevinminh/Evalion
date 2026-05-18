@@ -471,6 +471,22 @@ export const castVote = mutation({
       throw new Error("Student not found in this session");
     }
 
+    // The round is only "open" when the teacher is on the matching voting step
+    // (round 1 → step 1, round 2 → step 3) AND has actually started the timer.
+    // updateStep clears timer fields on every transition, so timerStartedAt is
+    // the durable signal that the round was opened on this step. Without this,
+    // clients could submit votes the moment the dashboard switched steps but
+    // before the teacher pressed "start", leaking into analytics prematurely.
+    const session = await ctx.db.get(args.sessionId);
+    if (!session) throw new Error("Session not found");
+    const expectedStep = args.round === 1 ? 1 : args.round === 2 ? 3 : undefined;
+    if (expectedStep === undefined) {
+      throw new Error("Invalid round");
+    }
+    if (session.currentStep !== expectedStep || session.timerStartedAt === undefined) {
+      throw new Error("Voting is not open");
+    }
+
     // Prevent duplicate votes for same student/statement/round
     const existing = await ctx.db
       .query("sessionVotes")
