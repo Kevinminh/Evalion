@@ -134,7 +134,10 @@ export function RoundAnalytics({
       <HighlightedReorderPanel
         sessionId={sessionId}
         statementIndex={statementIndex}
-        round={round}
+        // In round 2 the teacher can highlight begrunnelser from both rounds
+        // straight from the matrix (R1 begrunnelser are now visible there for
+        // steg 3/4), so surface both rounds' highlights in the reorder panel.
+        round={round === 1 ? 1 : undefined}
       />
       <div className="overflow-hidden rounded-[16px] border border-neutral-200 bg-white">
         <div
@@ -395,12 +398,11 @@ function buildR2MatrixCells(students: StudentData[]) {
     arr.map((s) => ({
       name: s.name,
       vote: s.round1!.vote as "sant" | "usant" | "delvis",
-      confidence: s.round2!.confidence,
-      // Only R2 begrunnelser are highlightable in the R2 tab — the teacher's
-      // intent in this view is to surface what students wrote during the
-      // re-vote, and falling back to R1 would let R1 highlights leak in.
-      justification: s.justificationR2,
+      confidence: s.round1!.confidence,
+      justification: s.justificationR1,
       vote2: s.round2!.vote as "sant" | "usant" | "delvis",
+      confidence2: s.round2!.confidence,
+      justification2: s.justificationR2,
     }));
 
   return [
