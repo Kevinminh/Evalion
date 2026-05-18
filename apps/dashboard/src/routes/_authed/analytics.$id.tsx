@@ -109,9 +109,13 @@ function AnalyticsPage() {
             <Skeleton className="h-64 rounded-[16px]" />
             <Skeleton className="h-48 rounded-[16px]" />
           </div>
-        ) : activeTab === "runde1" &&
-          analytics.round1.total === 0 &&
-          !session.timerStartedAt ? (
+        ) : (activeTab === "runde1" &&
+            analytics.round1.total === 0 &&
+            !session.timerStartedAt) ||
+          (activeTab === "runde2" &&
+            analytics.round2.total === 0 &&
+            !session.timerStartedAt &&
+            (session.currentStep ?? 0) === 3) ? (
           <WaitingState />
         ) : (
           <>
