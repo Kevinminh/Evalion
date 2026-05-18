@@ -79,4 +79,3 @@ import { Button } from "@workspace/ui/components/button";
 ## Dependency Management
 
 Dependency versions are centralized in `pnpm-workspace.yaml` using the `catalog:` protocol. Add or update versions there, then reference them as `"package": "catalog:"` in individual `package.json` files.
-
