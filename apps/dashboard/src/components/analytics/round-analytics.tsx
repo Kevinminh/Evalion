@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { Fasit } from "@/lib/types";
 
 import { ColumnChart } from "./column-chart";
+import { HighlightedReorderPanel } from "./highlighted-reorder-panel";
 import { MatrixHint, StudentMatrix } from "./student-matrix";
 import {
   getStatementGradient,
@@ -18,6 +19,7 @@ import {
 
 interface RoundAnalyticsProps {
   round: 1 | 2;
+  sessionId: Id<"liveSessions">;
   distribution: RoundDistribution;
   confidence: ConfidenceData;
   prevConfidence?: ConfidenceData;
@@ -43,6 +45,7 @@ interface RoundAnalyticsProps {
 
 export function RoundAnalytics({
   round,
+  sessionId,
   distribution,
   confidence,
   prevConfidence,
@@ -128,6 +131,11 @@ export function RoundAnalytics({
 
   return (
     <div className="flex flex-col gap-3.5">
+      <HighlightedReorderPanel
+        sessionId={sessionId}
+        statementIndex={statementIndex}
+        round={round}
+      />
       <div className="overflow-hidden rounded-[16px] border border-neutral-200 bg-white">
         <div
           className="mx-3.5 mt-3.5 rounded-[12px] p-2.5 text-center"
@@ -184,7 +192,7 @@ export function RoundAnalytics({
                   {prevConfidence.avgConfidence.toFixed(1)}
                 </span>
                 <span className="text-xs text-muted-foreground">→</span>
-                <span className="font-mono text-lg font-extrabold text-secondary-foreground">
+                <span className="font-mono text-lg font-extrabold text-foreground">
                   {confidence.avgConfidence.toFixed(1)}
                 </span>
                 {confidence.avgConfidence !== prevConfidence.avgConfidence && (
@@ -202,7 +210,7 @@ export function RoundAnalytics({
                 )}
               </div>
             ) : (
-              <span className="font-mono text-lg font-extrabold text-secondary-foreground">
+              <span className="font-mono text-lg font-extrabold text-foreground">
                 {confidence.avgConfidence.toFixed(1)}
               </span>
             )}
@@ -247,7 +255,7 @@ export function RoundAnalytics({
           </div>
           <div className="px-3.5 pb-3.5">
             <div className="flex items-center justify-center gap-2.5 rounded-[14px] bg-primary/15 px-3.5 py-2.5">
-              <span className="font-mono text-[20px] font-extrabold leading-none text-secondary-foreground tabular-nums">
+              <span className="font-mono text-[20px] font-extrabold leading-none text-foreground tabular-nums">
                 {changedCount}/{totalStudents}
               </span>
               <span className="text-[11px] font-semibold text-muted-foreground">
@@ -273,6 +281,7 @@ export function RoundAnalytics({
           layout="r2"
           selectedIdx={matrixSelected}
           onSelect={setMatrixSelected}
+          onToggleHighlight={onToggleHighlight}
         />
       )}
 
@@ -387,7 +396,10 @@ function buildR2MatrixCells(students: StudentData[]) {
       name: s.name,
       vote: s.round1!.vote as "sant" | "usant" | "delvis",
       confidence: s.round2!.confidence,
-      justification: null,
+      // Only R2 begrunnelser are highlightable in the R2 tab — the teacher's
+      // intent in this view is to surface what students wrote during the
+      // re-vote, and falling back to R1 would let R1 highlights leak in.
+      justification: s.justificationR2,
       vote2: s.round2!.vote as "sant" | "usant" | "delvis",
     }));
 

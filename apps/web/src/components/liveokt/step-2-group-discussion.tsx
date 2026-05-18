@@ -22,16 +22,18 @@ export function useStep2(): TeacherStep {
     statement,
     panelTab,
     setPanelTab,
-    begrunnelser,
+    activeRoundBegrunnelser,
     voteBars,
     totalVotes,
-    activeRoundVotes,
+    r1Votes,
+    r2Votes,
     avgConfidenceR1,
     avgConfidenceR1ByVote,
     selectedIdx,
     goToStep,
     highlightJustification,
   } = useTeacherSession();
+  const allVotes = [...r1Votes, ...r2Votes];
   const begrunnelseTab = panelTab === "default" || panelTab === "begrunnelser";
   const [showAvgBreakdown, setShowAvgBreakdown] = useState(false);
 
@@ -75,9 +77,8 @@ export function useStep2(): TeacherStep {
         {begrunnelseTab ? (
           <PanelCard gap="2">
             <FremhevetCarousel
-              begrunnelser={begrunnelser}
-              votes={activeRoundVotes}
-              round={1}
+              begrunnelser={activeRoundBegrunnelser}
+              votes={allVotes}
               onDismiss={(b) => void highlightJustification(b)}
             />
           </PanelCard>

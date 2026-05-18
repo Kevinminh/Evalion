@@ -709,6 +709,7 @@ export const getVoteAnalytics = query({
           ? { vote: r2.vote, confidence: r2.confidence ?? null, correct: r2.vote === fasit }
           : null,
         justificationR1: justificationByStudent.get(`${s._id}:1`) ?? null,
+        justificationR2: justificationByStudent.get(`${s._id}:2`) ?? null,
       };
     });
 
@@ -863,7 +864,50 @@ export const highlightJustification = mutation({
 
     await requireSessionOwner(ctx, justification.sessionId);
 
-    await ctx.db.patch(args.id, { highlighted: args.highlighted });
+    if (args.highlighted) {
+      // New highlights land at the end of the carousel. Order is per
+      // session+statement, so other statements aren't affected.
+      const siblings = await ctx.db
+        .query("sessionJustifications")
+        .withIndex("by_session_statement", (q) =>
+          q
+            .eq("sessionId", justification.sessionId)
+            .eq("statementIndex", justification.statementIndex),
+        )
+        .collect();
+      const maxOrder = siblings.reduce(
+        (max, s) => (s.highlighted && s.highlightOrder !== undefined ? Math.max(max, s.highlightOrder) : max),
+        -1,
+      );
+      await ctx.db.patch(args.id, { highlighted: true, highlightOrder: maxOrder + 1 });
+    } else {
+      await ctx.db.patch(args.id, { highlighted: false, highlightOrder: undefined });
+    }
+  },
+});
+
+export const reorderHighlights = mutation({
+  args: {
+    sessionId: v.id("liveSessions"),
+    statementIndex: v.number(),
+    orderedIds: v.array(v.id("sessionJustifications")),
+  },
+  handler: async (ctx, args) => {
+    await requireSessionOwner(ctx, args.sessionId);
+
+    const siblings = await ctx.db
+      .query("sessionJustifications")
+      .withIndex("by_session_statement", (q) =>
+        q.eq("sessionId", args.sessionId).eq("statementIndex", args.statementIndex),
+      )
+      .collect();
+    const validIds = new Set(siblings.filter((s) => s.highlighted).map((s) => s._id));
+
+    await Promise.all(
+      args.orderedIds
+        .filter((id) => validIds.has(id))
+        .map((id, index) => ctx.db.patch(id, { highlightOrder: index })),
+    );
   },
 });
 

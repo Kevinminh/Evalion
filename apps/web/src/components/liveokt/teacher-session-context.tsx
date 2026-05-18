@@ -14,6 +14,7 @@ import type { Id } from "@workspace/api/types";
 import type { TimerControls } from "@/hooks/use-timer-controls";
 import { useTimerControls } from "@/hooks/use-timer-controls";
 
+import { useActiveRoundBegrunnelser } from "@/hooks/liveokt/use-active-round-begrunnelser";
 import { usePanelState } from "@/hooks/liveokt/use-panel-state";
 import { useRatingStats, type RatingStats } from "@/hooks/liveokt/use-rating-stats";
 import { useSessionMutations, type SessionMutations } from "@/hooks/liveokt/use-session-mutations";
@@ -31,6 +32,10 @@ export interface TeacherSessionValue
   fagprat: Doc<"fagprats">;
   students: Doc<"sessionStudents">[];
   begrunnelser: Doc<"sessionJustifications">[] | undefined;
+  /** Begrunnelser filtered to the round in focus on the current step (R1 in
+   * steps 1–2, R2 in steps 3+). Consumers that render the FremhevetCarousel
+   * use this; step-5 keeps reading raw `begrunnelser`. */
+  activeRoundBegrunnelser: Doc<"sessionJustifications">[] | undefined;
 
   selectedIdx: number;
   statement: Statement | undefined;
@@ -101,6 +106,7 @@ export function TeacherSessionProvider({
   const ratingStats = useRatingStats(analytics);
   const panelState = usePanelState(step, selectedIdx);
   const timer = useTimerControls(sessionId, session);
+  const activeRoundBegrunnelser = useActiveRoundBegrunnelser(begrunnelser, step);
 
   const onResetStatement = useCallback(() => setSelectedStatement(null), []);
   const mutations = useSessionMutations({
@@ -120,6 +126,7 @@ export function TeacherSessionProvider({
       fagprat,
       students,
       begrunnelser,
+      activeRoundBegrunnelser,
       selectedIdx,
       statement,
       selectedStatement,
@@ -137,6 +144,7 @@ export function TeacherSessionProvider({
       fagprat,
       students,
       begrunnelser,
+      activeRoundBegrunnelser,
       selectedIdx,
       statement,
       selectedStatement,

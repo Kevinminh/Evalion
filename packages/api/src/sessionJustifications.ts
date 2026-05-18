@@ -25,4 +25,5 @@ export const sessionJustificationsQueries = {
 export const sessionJustificationsMutations = {
   submit: api.liveSessions.submitJustification,
   highlight: api.liveSessions.highlightJustification,
+  reorder: api.liveSessions.reorderHighlights,
 } as const;

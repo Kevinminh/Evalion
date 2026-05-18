@@ -126,6 +126,11 @@ export default defineSchema({
     round: v.number(),
     text: v.string(),
     highlighted: v.optional(v.boolean()),
+    // Teacher-controlled order in the step-4 Fremhevet carousel. Only set when
+    // `highlighted` is true; cleared when un-highlighting. Lower number =
+    // earlier in the carousel. Items without a value sink to the end so old
+    // pre-schema highlights remain visible but droppable.
+    highlightOrder: v.optional(v.number()),
   })
     .index("by_session_statement", ["sessionId", "statementIndex"])
     .index("by_session_statement_student_round", [

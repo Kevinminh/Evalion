@@ -29,6 +29,7 @@ export interface StudentData {
   round1: { vote: string; confidence: number | null; correct: boolean } | null;
   round2: { vote: string; confidence: number | null; correct: boolean } | null;
   justificationR1: JustificationRef | null;
+  justificationR2: JustificationRef | null;
   rating: number | null;
 }
 

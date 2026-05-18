@@ -118,6 +118,7 @@ function AnalyticsPage() {
             {activeTab === "runde1" && (
               <RoundAnalytics
                 round={1}
+                sessionId={sessionId}
                 distribution={analytics.round1}
                 confidence={analytics.confidence1}
                 fasit={fasit}
@@ -139,6 +140,7 @@ function AnalyticsPage() {
             {activeTab === "runde2" && (
               <RoundAnalytics
                 round={2}
+                sessionId={sessionId}
                 distribution={analytics.round2}
                 confidence={analytics.confidence2}
                 prevConfidence={showR1Comparison ? analytics.confidence1 : undefined}
@@ -155,6 +157,7 @@ function AnalyticsPage() {
                 timerRemainingAtPause={session.timerRemainingAtPause}
                 hasVotes={analytics.round2.total > 0}
                 students={analytics.students}
+                onToggleHighlight={(id, next) => highlightJustification({ id, highlighted: next })}
               />
             )}
 
@@ -166,9 +169,11 @@ function AnalyticsPage() {
                 statementText={statementText}
                 statementColor={statementColor}
                 statementIndex={selectedStatement}
+                sessionId={sessionId}
                 avgRating={analytics.avgRating}
                 ratingDistribution={analytics.ratingDistribution}
                 students={analytics.students}
+                onToggleHighlight={(id, next) => highlightJustification({ id, highlighted: next })}
               />
             )}
           </>
