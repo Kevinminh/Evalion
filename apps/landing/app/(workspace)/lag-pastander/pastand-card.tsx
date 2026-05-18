@@ -10,7 +10,7 @@ export type Card = {
   clientId: string;
   text: string;
   fasit?: Fasit;
-  forklaring: string;
+  explanation: string;
 };
 
 const FASIT_OPTIONS: { value: Fasit; label: string }[] = [
@@ -55,14 +55,14 @@ export function PastandCard({
   const [reorderOpen, setReorderOpen] = useState(false);
   const reorderRef = useRef<HTMLDivElement | null>(null);
   const textRef = useRef<HTMLTextAreaElement | null>(null);
-  const forklaringRef = useRef<HTMLTextAreaElement | null>(null);
+  const explanationRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     autoGrow(textRef.current);
   }, [card.text]);
   useEffect(() => {
-    autoGrow(forklaringRef.current);
-  }, [card.forklaring]);
+    autoGrow(explanationRef.current);
+  }, [card.explanation]);
 
   useEffect(() => {
     if (!reorderOpen) return;
@@ -207,12 +207,12 @@ export function PastandCard({
       <div>
         <label className="mb-[3px] block text-[12px] font-bold text-ink">Forklaring</label>
         <textarea
-          ref={forklaringRef}
+          ref={explanationRef}
           className={fieldTextarea}
           rows={1}
           placeholder="Forklar hvorfor svaret er riktig…"
-          value={card.forklaring}
-          onChange={(e) => onChange({ forklaring: e.target.value })}
+          value={card.explanation}
+          onChange={(e) => onChange({ explanation: e.target.value })}
         />
       </div>
     </article>

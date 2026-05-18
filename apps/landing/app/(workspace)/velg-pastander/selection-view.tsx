@@ -31,7 +31,7 @@ type GenerationParams = {
   topic: string;
   subject: string;
   level: string;
-  type: "intro" | "oppsummering";
+  type: "intro" | "summary";
   model?: Model;
 };
 
@@ -41,7 +41,7 @@ function readParams(searchParams: URLSearchParams): GenerationParams | null {
   const tema = searchParams.get("tema")?.trim();
   const type = searchParams.get("type");
   if (!fag || !trinn || !tema) return null;
-  if (type !== "intro" && type !== "oppsummering") return null;
+  if (type !== "intro" && type !== "summary") return null;
   const rawModel = searchParams.get("model");
   const model =
     rawModel && (ALLOWED_MODELS as readonly string[]).includes(rawModel)
@@ -60,7 +60,7 @@ export function SelectionView() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const generate = useAction(api.reddi.generateStatements);
-  const append = useMutation(api.pastandDrafts.appendStatements);
+  const append = useMutation(api.statementDrafts.appendStatements);
 
   const [statements, setStatements] = useState<GeneratedStatement[] | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -113,7 +113,7 @@ export function SelectionView() {
     try {
       const chosen = statements
         .filter((s) => selected.has(s.id))
-        .map((s) => ({ text: s.text, fasit: s.fasit, forklaring: s.explanation }));
+        .map((s) => ({ text: s.text, fasit: s.fasit, explanation: s.explanation }));
       await append({ statements: chosen });
       router.push("/lag-pastander");
     } catch (err) {

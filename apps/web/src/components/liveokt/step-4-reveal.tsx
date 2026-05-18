@@ -44,9 +44,10 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
     avgConfidenceR2,
     avgConfidenceR2ByVote,
     goToStep,
-    begrunnelser,
-    highlightBegrunnelse,
+    activeRoundBegrunnelser,
+    highlightJustification,
   } = useTeacherSession();
+  const allVotes = [...r1Votes, ...r2Votes];
   const endringerTab = panelTab === "default" || panelTab === "endringer";
   const fremhevetTab = panelTab === "fremhevet";
   const [showAvgBreakdown, setShowAvgBreakdown] = useState(false);
@@ -117,10 +118,9 @@ export function useStep4({ showCountdown, countdownNumber, countdownDone }: Step
         {fremhevetTab ? (
           <PanelCard gap="2">
             <FremhevetCarousel
-              begrunnelser={begrunnelser}
-              votes={r1Votes}
-              round={1}
-              onDismiss={(b) => void highlightBegrunnelse(b)}
+              begrunnelser={activeRoundBegrunnelser}
+              votes={allVotes}
+              onDismiss={(b) => void highlightJustification(b)}
             />
           </PanelCard>
         ) : endringerTab ? (

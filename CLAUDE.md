@@ -85,13 +85,13 @@ See [`.agents/backend.md`](.agents/backend.md) for the full breakdown of functio
 
 ### Database tables
 
-- **`fagprats`** — Question sets. Title, subject, level, type (`intro` | `oppsummering`), concepts, statements (text + fasit + explanation + optional color/image/begrunnelse), visibility, usage count, author. Indexed by author/visibility/subject/level with a `search_fagprats` search index.
+- **`fagprats`** — Question sets. Title, subject, level, type (`intro` | `summary`), concepts, statements (text + fasit + explanation + optional color/image/begrunnelse), visibility, usage count, author. Indexed by author/visibility/subject/level with a `search_fagprats` search index.
 - **`liveSessions`** — Active/ended game sessions. Join code, status (`lobby` | `active` | `ended`), current step, current statement index, group toggle/count, transcription toggle, self-evaluation toggle, timer state (duration/startedAt/pausedAt/remainingAtPause).
 - **`sessionStudents`** — Students enrolled in a session (name, avatar color, optional avatar emoji, group index).
 - **`sessionVotes`** — Vote records per student per statement per round (sant/usant/delvis + optional confidence).
 - **`sessionRatings`** — Student self-evaluation ratings (1–5 scale) per statement.
-- **`sessionBegrunnelser`** — Free-text justifications per student per statement per round; teachers can highlight individual entries.
-- **`pastandDrafts`** — Per-user drafts from the standalone Påstandsgenerator on the landing app, including last-used fag/trinn/forkunnskap.
+- **`sessionJustifications`** — Free-text justifications per student per statement per round; teachers can highlight individual entries.
+- **`statementDrafts`** — Per-user drafts from the standalone Påstandsgenerator on the landing app, including last-used subject/level/type.
 - **`aiPrompts`** — Editable system prompts keyed by name, used by the AI generator (`reddi.ts`).
 - **`emailSubscribers`** — Newsletter / waitlist email captures from the landing site.
 
@@ -145,5 +145,8 @@ Dashboard additionally uses:
 
 - **Code identifiers** (variables, functions, types, props, file names) are in **English**.
 - **UI strings** (labels, messages, button text, toasts) are in **Norwegian**.
-- **Domain terms** — `fagprat`, `fasit`, `begrunnelse`, `liveokt`, `sant`/`usant`/`delvis`, `trinn`, `påstand`, `forkunnskap` — are **canonical Norwegian vocabulary** and stay in Norwegian even inside code. They have no good English equivalent and translating them loses meaning.
+- **Canonical Norwegian domain terms** — `fagprat`, `fasit`, `begrunnelse`, `liveokt`, `påstand`, `sant`/`usant`/`delvis` — stay in Norwegian where they encode pedagogy without a clean English equivalent. They appear as table names (`fagprats`), enum literals (`"sant"`/`"usant"`/`"delvis"`), and specific field names (`fasit`, `begrunnelse`) on domain entities.
+- **Field names use English even on Norwegian-named tables.** A table can be `fagprats` while its fields are `subject`, `level`, `statements`, `explanation`. Domain-term fields (`fasit`, `begrunnelse`) are the exception.
+- **Schema enum literals use English** for non-canonical values: `type: "intro" | "summary"` (not `"oppsummering"`), `visibility: "public" | "private"`, `status: "lobby" | "active" | "ended"`. Norwegian display labels are added at the UI mapping layer (e.g. `{ summary: "Oppsummering" }`).
+- **`trinn` and `forkunnskap`** remain UI vocabulary (route slugs, labels, user-facing copy). Their schema-side equivalents are `level` and `type` respectively.
 - **Routes** use the Norwegian verb for the action (`/lag-fagprat`, `/velg-pastander`, `/min-samling`, `/lag-pastander`, `/historikk`). This is intentional and matches the URL structure exposed to teachers.

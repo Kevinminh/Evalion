@@ -46,10 +46,10 @@ export function ForkunnskapSelector({ value, onChange }: ForkunnskapSelectorProp
         </button>
 
         <button
-          onClick={() => onChange("oppsummering")}
+          onClick={() => onChange("summary")}
           className={cn(
             "flex flex-1 items-center gap-3 rounded-2xl border-[2.5px] bg-card px-5 py-3 text-left shadow-3d-sm transition-all hover:-translate-y-0.5",
-            value === "oppsummering"
+            value === "summary"
               ? "border-amber-500 bg-amber-50 shadow-[0_3px_0_#FDE68A]"
               : "border-neutral-300 hover:border-amber-500 hover:bg-amber-50/60",
           )}
@@ -57,14 +57,14 @@ export function ForkunnskapSelector({ value, onChange }: ForkunnskapSelectorProp
           <Target
             className={cn(
               "size-[22px] shrink-0 transition-colors",
-              value === "oppsummering" ? "text-amber-600" : "text-muted-foreground",
+              value === "summary" ? "text-amber-600" : "text-muted-foreground",
             )}
           />
           <div className="flex flex-col">
             <span
               className={cn(
                 "text-base font-bold transition-colors",
-                value === "oppsummering" ? "text-amber-700" : "text-foreground",
+                value === "summary" ? "text-amber-700" : "text-foreground",
               )}
             >
               Oppsummering

@@ -20,11 +20,16 @@ export const statementValidator = v.object({
 });
 
 export default defineSchema({
+  // ── FagPrats (question sets) ──
+  // A FagPrat is a teacher-authored deck of statements (text + fasit +
+  // explanation). Created and managed from the dashboard; consumed by the live
+  // game; also shown in the public demo on landing. Source-of-truth content
+  // that exists independently of any live session.
   fagprats: defineTable({
     title: v.string(),
     subject: v.string(),
     level: v.string(),
-    type: v.union(v.literal("intro"), v.literal("oppsummering")),
+    type: v.union(v.literal("intro"), v.literal("summary")),
     concepts: v.array(v.string()),
     statements: v.array(statementValidator),
     visibility: v.union(v.literal("public"), v.literal("private")),
@@ -53,6 +58,13 @@ export default defineSchema({
       filterFields: ["subject", "level", "type", "visibility"],
     }),
 
+  // ── Live game session ──
+  // One classroom run of a FagPrat. The teacher launches a session from the
+  // dashboard; students join via a 6-char joinCode on the web app and play
+  // through the 6 steps. `liveSessions` holds the session-level state;
+  // `sessionStudents` / `sessionVotes` / `sessionRatings` /
+  // `sessionJustifications` are per-student records scoped by `sessionId`.
+  // All four child tables are cascade-deleted when the session is removed.
   liveSessions: defineTable({
     fagpratId: v.id("fagprats"),
     teacherId: v.string(),
@@ -107,13 +119,18 @@ export default defineSchema({
     .index("by_session_statement", ["sessionId", "statementIndex"])
     .index("by_session_statement_student", ["sessionId", "statementIndex", "studentId"]),
 
-  sessionBegrunnelser: defineTable({
+  sessionJustifications: defineTable({
     sessionId: v.id("liveSessions"),
     studentId: v.id("sessionStudents"),
     statementIndex: v.number(),
     round: v.number(),
     text: v.string(),
     highlighted: v.optional(v.boolean()),
+    // Teacher-controlled order in the step-4 Fremhevet carousel. Only set when
+    // `highlighted` is true; cleared when un-highlighting. Lower number =
+    // earlier in the carousel. Items without a value sink to the end so old
+    // pre-schema highlights remain visible but droppable.
+    highlightOrder: v.optional(v.number()),
   })
     .index("by_session_statement", ["sessionId", "statementIndex"])
     .index("by_session_statement_student_round", [
@@ -124,27 +141,38 @@ export default defineSchema({
     ])
     .index("by_session_student", ["sessionId", "studentId"]),
 
+  // ── Påstandsgenerator (standalone landing-only tool) ──
+  // Used by the `/lag-pastander` and `/velg-pastander` routes on the landing
+  // app. Lets a teacher generate a quick batch of påstander via AI and export
+  // them as PDF, without going through the full FagPrat flow. One draft per
+  // user (auto-saved). Completely independent of `liveSessions` and `fagprats`.
+  statementDrafts: defineTable({
+    userId: v.string(),
+    statements: v.array(
+      v.object({
+        clientId: v.string(),
+        text: v.string(),
+        fasit: v.optional(v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis"))),
+        explanation: v.string(),
+      }),
+    ),
+    lastSubject: v.optional(v.string()),
+    lastLevel: v.optional(v.string()),
+    lastType: v.optional(v.union(v.literal("intro"), v.literal("summary"))),
+    updatedAt: v.number(),
+  }).index("by_user", ["userId"]),
+
+  // ── Marketing / waitlist ──
+  // Captures from the landing site's newsletter / waitlist form.
   emailSubscribers: defineTable({
     email: v.string(),
     source: v.optional(v.string()),
   }).index("by_email", ["email"]),
 
-  pastandDrafts: defineTable({
-    userId: v.string(),
-    pastander: v.array(
-      v.object({
-        clientId: v.string(),
-        text: v.string(),
-        fasit: v.optional(v.union(v.literal("sant"), v.literal("usant"), v.literal("delvis"))),
-        forklaring: v.string(),
-      }),
-    ),
-    lastFag: v.optional(v.string()),
-    lastTrinn: v.optional(v.string()),
-    lastForkunnskap: v.optional(v.union(v.literal("intro"), v.literal("oppsummering"))),
-    updatedAt: v.number(),
-  }).index("by_user", ["userId"]),
-
+  // ── Admin / infrastructure ──
+  // Editable system prompts for the AI generator (admins can override the
+  // default prompt baked into `reddi.ts`), and feature flags controlled from
+  // the admin UI.
   aiPrompts: defineTable({
     key: v.string(),
     content: v.string(),

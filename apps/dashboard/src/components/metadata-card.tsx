@@ -73,7 +73,7 @@ export function MetadataCard({
                 <Sprout className="size-3.5" />
               </span>
             )}
-            {type === "oppsummering" && (
+            {type === "summary" && (
               <span
                 className="inline-flex size-7 items-center justify-center rounded-full border border-amber-200 bg-amber-50 text-amber-600"
                 title="Oppsummering"

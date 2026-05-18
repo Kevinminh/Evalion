@@ -22,11 +22,11 @@ import { TRINN_OPTIONS, normalizeTrinn } from "./trinn-options";
 const PASTANDER_PER_FIRST_PAGE = 3;
 const PASTANDER_PER_OTHER_PAGE = 4;
 
-type Forkunnskap = "intro" | "oppsummering";
+type Forkunnskap = "intro" | "summary";
 
 const FORKUNNSKAP_LABEL: Record<Forkunnskap, string> = {
   intro: "Introduksjon",
-  oppsummering: "Oppsummering",
+  summary: "Oppsummering",
 };
 
 const FASIT_LABEL: Record<Fasit, string> = {
@@ -64,7 +64,7 @@ const topbarBtn =
 
 export function PdfExport() {
   const router = useRouter();
-  const draft = useQuery(api.pastandDrafts.get);
+  const draft = useQuery(api.statementDrafts.get);
 
   const [title, setTitle] = useState("");
   const [fag, setFag] = useState("");
@@ -77,9 +77,9 @@ export function PdfExport() {
     if (seededRef.current) return;
     if (draft === undefined) return;
     seededRef.current = true;
-    setFag(draft?.lastFag ?? "");
-    setTrinn(normalizeTrinn(draft?.lastTrinn ?? ""));
-    setForkunnskap(draft?.lastForkunnskap ?? "");
+    setFag(draft?.lastSubject ?? "");
+    setTrinn(normalizeTrinn(draft?.lastLevel ?? ""));
+    setForkunnskap(draft?.lastType ?? "");
   }, [draft]);
 
   useEffect(() => {
@@ -90,7 +90,7 @@ export function PdfExport() {
     return () => document.removeEventListener("keydown", onKey);
   }, [router]);
 
-  const pastander = draft?.pastander ?? [];
+  const pastander = draft?.statements ?? [];
   const validPastander = pastander.filter(
     (p) =>
       p.text.trim().length > 0 &&
@@ -204,8 +204,8 @@ export function PdfExport() {
                 Introduksjon
               </ForkunnskapChoice>
               <ForkunnskapChoice
-                selected={forkunnskap === "oppsummering"}
-                onClick={() => setForkunnskap("oppsummering")}
+                selected={forkunnskap === "summary"}
+                onClick={() => setForkunnskap("summary")}
               >
                 Oppsummering
               </ForkunnskapChoice>
@@ -356,7 +356,9 @@ function PdfPagesPreview({
                   <span className="pdf-card-num">{(pageOffsets[pageIdx] ?? 0) + cardIdx + 1}</span>
                   <div className={`pdf-fasit-box ${fasit}`}>{FASIT_LABEL[fasit]}</div>
                   <p className="pdf-pastand-text">{p.text}</p>
-                  {p.forklaring.trim() && <p className="pdf-forklaring-text">{p.forklaring}</p>}
+                  {p.explanation.trim() && (
+                    <p className="pdf-forklaring-text">{p.explanation}</p>
+                  )}
                 </article>
               );
             })}

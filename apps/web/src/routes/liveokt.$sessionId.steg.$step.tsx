@@ -11,7 +11,7 @@ import { useEffect, useMemo, useRef } from "react";
 
 import { fagpratsQueries } from "@workspace/api/fagprats";
 import { liveSessionsQueries } from "@workspace/api/liveSessions";
-import { sessionBegrunnelserQueries } from "@workspace/api/sessionBegrunnelser";
+import { sessionJustificationsQueries } from "@workspace/api/sessionJustifications";
 import { sessionStudentsQueries } from "@workspace/api/sessionStudents";
 import { sessionVotesQueries } from "@workspace/api/sessionVotes";
 
@@ -73,7 +73,7 @@ function LiveStepPage() {
     enabled: !!fagprat && step >= 4,
   });
   const { data: begrunnelser } = useQuery({
-    ...sessionBegrunnelserQueries.bySessionStatement(typedSessionId, selectedIdx),
+    ...sessionJustificationsQueries.bySessionStatement(typedSessionId, selectedIdx),
     enabled: !!fagprat && [2, 4, 5].includes(step),
   });
 

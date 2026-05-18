@@ -652,7 +652,7 @@
   border-color: var(--color-secondary-200);
   color: var(--color-secondary-500);
 }
-.fp-card-forkunnskap.oppsummering {
+.fp-card-forkunnskap.summary {
   background: #fffbeb;
   border-color: #fde68a;
   color: #d97706;

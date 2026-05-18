@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { liveSessionsQueries } from "@workspace/api/liveSessions";
-import { sessionBegrunnelserMutations } from "@workspace/api/sessionBegrunnelser";
+import { sessionJustificationsMutations } from "@workspace/api/sessionJustifications";
+import { sessionStudentsQueries } from "@workspace/api/sessionStudents";
 import { sessionVotesQueries } from "@workspace/api/sessionVotes";
 import type { Id } from "@workspace/api/types";
 import { RouteErrorBoundary } from "@workspace/features/components/route-error-boundary";
@@ -12,9 +13,9 @@ import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { useMutation } from "convex/react";
 
+import { LobbyState } from "@/components/analytics/lobby-state";
 import { ResultatTab } from "@/components/analytics/resultat-tab";
 import { RoundAnalytics } from "@/components/analytics/round-analytics";
-import type { StatementColorName } from "@/components/analytics/types";
 import { WaitingState } from "@/components/analytics/waiting-state";
 
 export const Route = createFileRoute("/_authed/analytics/$id")({
@@ -34,7 +35,7 @@ const STEP_TO_TAB: Record<number, TabId> = {
   1: "runde1",
   2: "runde1",
   3: "runde2",
-  4: "resultat",
+  4: "runde2",
   5: "resultat",
   6: "resultat",
 };
@@ -59,18 +60,22 @@ function AnalyticsPage() {
     sessionVotesQueries.analytics(sessionId, selectedStatement),
   );
 
-  const highlightBegrunnelse = useMutation(sessionBegrunnelserMutations.highlight);
+  const { data: students } = useQuery(sessionStudentsQueries.listBySession(sessionId));
+
+  const highlightJustification = useMutation(sessionJustificationsMutations.highlight);
 
   if (sessionPending) return <AnalyticsSkeleton />;
   if (sessionError) return <ErrorState className="flex min-h-svh items-center justify-center" />;
   if (!session) return <NotFoundState className="flex min-h-svh items-center justify-center" />;
   if (session.status === "ended") return <SessionEndedScreen />;
+  if (session.status === "lobby") {
+    return <LobbyShell joinCode={session.joinCode} students={students ?? []} />;
+  }
 
   const statementText = session.statements[selectedStatement]?.text ?? "";
   const fasit = session.statements[selectedStatement]?.fasit ?? "sant";
   const statementColor = session.statements[selectedStatement]?.color;
   const totalStudents = session.studentCount;
-  const sessionActive = session.status === "active";
   const totalStatements = session.statements.length;
   const showR1Comparison = (session.currentStep ?? 0) >= 4;
 
@@ -104,38 +109,55 @@ function AnalyticsPage() {
             <Skeleton className="h-64 rounded-[16px]" />
             <Skeleton className="h-48 rounded-[16px]" />
           </div>
-        ) : activeTab === "runde1" && analytics.round1.total === 0 && sessionActive ? (
+        ) : activeTab === "runde1" &&
+          analytics.round1.total === 0 &&
+          !session.timerStartedAt ? (
           <WaitingState />
         ) : (
           <>
             {activeTab === "runde1" && (
               <RoundAnalytics
                 round={1}
+                sessionId={sessionId}
                 distribution={analytics.round1}
                 confidence={analytics.confidence1}
                 fasit={fasit}
                 statementText={statementText}
-                statementColor={statementColor as StatementColorName | undefined}
+                statementColor={statementColor}
+                statementIndex={selectedStatement}
                 totalStudents={totalStudents}
-                sessionActive={sessionActive}
+                currentStep={session.currentStep ?? 0}
+                timerDuration={session.timerDuration}
+                timerStartedAt={session.timerStartedAt}
+                timerPausedAt={session.timerPausedAt}
+                timerRemainingAtPause={session.timerRemainingAtPause}
+                hasVotes={analytics.round1.total > 0}
                 students={analytics.students}
-                onToggleHighlight={(id, next) => highlightBegrunnelse({ id, highlighted: next })}
+                onToggleHighlight={(id, next) => highlightJustification({ id, highlighted: next })}
               />
             )}
 
             {activeTab === "runde2" && (
               <RoundAnalytics
                 round={2}
+                sessionId={sessionId}
                 distribution={analytics.round2}
                 confidence={analytics.confidence2}
                 prevConfidence={showR1Comparison ? analytics.confidence1 : undefined}
                 prevDistribution={showR1Comparison ? analytics.round1 : undefined}
                 fasit={fasit}
                 statementText={statementText}
-                statementColor={statementColor as StatementColorName | undefined}
+                statementColor={statementColor}
+                statementIndex={selectedStatement}
                 totalStudents={totalStudents}
-                sessionActive={sessionActive}
+                currentStep={session.currentStep ?? 0}
+                timerDuration={session.timerDuration}
+                timerStartedAt={session.timerStartedAt}
+                timerPausedAt={session.timerPausedAt}
+                timerRemainingAtPause={session.timerRemainingAtPause}
+                hasVotes={analytics.round2.total > 0}
                 students={analytics.students}
+                onToggleHighlight={(id, next) => highlightJustification({ id, highlighted: next })}
               />
             )}
 
@@ -145,14 +167,46 @@ function AnalyticsPage() {
                 round2={analytics.round2}
                 fasit={fasit}
                 statementText={statementText}
-                statementColor={statementColor as StatementColorName | undefined}
+                statementColor={statementColor}
+                statementIndex={selectedStatement}
+                sessionId={sessionId}
                 avgRating={analytics.avgRating}
                 ratingDistribution={analytics.ratingDistribution}
                 students={analytics.students}
+                onToggleHighlight={(id, next) => highlightJustification({ id, highlighted: next })}
               />
             )}
           </>
         )}
+      </div>
+    </div>
+  );
+}
+
+function LobbyShell({
+  joinCode,
+  students,
+}: {
+  joinCode: string;
+  students: Parameters<typeof LobbyState>[0]["students"];
+}) {
+  return (
+    <div className="flex min-h-svh flex-col bg-neutral-100">
+      <div className="sticky top-0 z-40 border-b border-neutral-200 bg-white px-4 pb-2.5 pt-3">
+        <div className="mx-auto flex max-w-lg items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-1.5">
+            <img src="/fagprat-logo.png" alt="FagPrat" className="h-5 object-contain" />
+            <div className="h-3.5 w-px bg-neutral-300" />
+            <span className="text-xs font-bold text-foreground">Live-statistikk</span>
+          </div>
+          <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+            Lobby
+          </span>
+        </div>
+      </div>
+
+      <div className="mx-auto w-full max-w-lg flex-1 px-4 pt-4 pb-8">
+        <LobbyState joinCode={joinCode} students={students} />
       </div>
     </div>
   );

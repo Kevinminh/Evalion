@@ -1,4 +1,4 @@
-import { sessionBegrunnelserMutations } from "@workspace/api/sessionBegrunnelser";
+import { sessionJustificationsMutations } from "@workspace/api/sessionJustifications";
 import { sessionRatingsMutations } from "@workspace/api/sessionRatings";
 import { sessionStudentsMutations } from "@workspace/api/sessionStudents";
 import { sessionVotesMutations } from "@workspace/api/sessionVotes";
@@ -23,7 +23,7 @@ export interface StudentGameValue {
   groupMembers: Doc<"sessionStudents">[];
 
   castVote: (args: { vote: Fasit; confidence: number }) => Promise<unknown>;
-  submitBegrunnelse: (args: { text: string }) => Promise<unknown>;
+  submitJustification: (args: { text: string }) => Promise<unknown>;
   submitRating: (rating: number) => Promise<unknown>;
   removeStudent: () => Promise<unknown>;
 }
@@ -57,7 +57,7 @@ export function StudentGameProvider({
 }: StudentGameProviderProps) {
   const castVoteMutation = useMutation(sessionVotesMutations.cast);
   const submitRatingMutation = useMutation(sessionRatingsMutations.submit);
-  const submitBegrunnelseMutation = useMutation(sessionBegrunnelserMutations.submit);
+  const submitJustificationMutation = useMutation(sessionJustificationsMutations.submit);
   const removeStudentMutation = useMutation(sessionStudentsMutations.remove);
 
   const value = useMemo<StudentGameValue>(() => {
@@ -102,12 +102,12 @@ export function StudentGameProvider({
           confidence,
         });
       },
-      submitBegrunnelse: ({ text }) => {
+      submitJustification: ({ text }) => {
         const r = phaseRound(phase);
         if (r === 0) {
           return Promise.reject(new Error("Cannot submit begrunnelse outside of a vote phase"));
         }
-        return submitBegrunnelseMutation({
+        return submitJustificationMutation({
           sessionId,
           studentId,
           statementIndex,
@@ -126,7 +126,7 @@ export function StudentGameProvider({
     students,
     votes,
     castVoteMutation,
-    submitBegrunnelseMutation,
+    submitJustificationMutation,
     submitRatingMutation,
     removeStudentMutation,
   ]);

@@ -26,7 +26,7 @@ export type SessionStudent = Doc<"sessionStudents">;
 
 // ── Domain unions ───────────────────────────────────────────────────────────
 export type Fasit = "sant" | "usant" | "delvis";
-export type FagPratType = "intro" | "oppsummering";
+export type FagPratType = "intro" | "summary";
 export type Visibility = "public" | "private";
 export type StatementColorName = "yellow" | "blue" | "orange" | "purple" | "red";
 

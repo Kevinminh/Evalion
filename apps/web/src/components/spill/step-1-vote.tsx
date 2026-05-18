@@ -13,7 +13,7 @@ import { VoteOptions } from "./vote-options";
 import { WaitingScreen } from "./waiting-screen";
 
 export function Step1Vote() {
-  const { statement, hasVoted, session, student, statementIndex, castVote, submitBegrunnelse } =
+  const { statement, hasVoted, session, student, statementIndex, castVote, submitJustification } =
     useStudentGame();
   const {
     text: begrunnelseText,
@@ -29,11 +29,11 @@ export function Step1Vote() {
       const trimmed = begrunnelseText.trim();
       await Promise.all([
         castVote({ vote, confidence }),
-        trimmed ? submitBegrunnelse({ text: trimmed }) : Promise.resolve(),
+        trimmed ? submitJustification({ text: trimmed }) : Promise.resolve(),
       ]);
       if (trimmed) clearBegrunnelseDraft();
     },
-    [begrunnelseText, castVote, submitBegrunnelse, clearBegrunnelseDraft],
+    [begrunnelseText, castVote, submitJustification, clearBegrunnelseDraft],
   );
 
   const { sent, showWaiting, handleSubmit } = useSubmitWithWaiting(submitVoteAndBegrunnelse, {

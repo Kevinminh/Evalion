@@ -8,20 +8,26 @@ import { BegrunnelseNav } from "./begrunnelse-nav";
 const PAGE_SIZE = 3;
 
 interface FremhevetCarouselProps {
-  begrunnelser: Doc<"sessionBegrunnelser">[] | undefined;
+  begrunnelser: Doc<"sessionJustifications">[] | undefined;
+  /** All votes for the current statement (both rounds). The carousel looks up
+   * the per-row vote from the matching round so the displayed stance always
+   * matches the round in which the begrunnelse was written (R1 begrunnelse →
+   * R1 vote, R2 begrunnelse → R2 vote). */
   votes: Doc<"sessionVotes">[];
-  round: number;
-  onDismiss: (begrunnelse: Doc<"sessionBegrunnelser">) => void;
+  onDismiss: (begrunnelse: Doc<"sessionJustifications">) => void;
 }
 
-export function FremhevetCarousel({
-  begrunnelser,
-  votes,
-  round,
-  onDismiss,
-}: FremhevetCarouselProps) {
-  const voteByStudent = new Map(votes.map((v) => [v.studentId, v.vote]));
-  const items = (begrunnelser ?? []).filter((b) => b.highlighted && b.round === round);
+export function FremhevetCarousel({ begrunnelser, votes, onDismiss }: FremhevetCarouselProps) {
+  const voteByStudentRound = new Map(votes.map((v) => [`${v.studentId}:${v.round}`, v.vote]));
+  const items = (begrunnelser ?? [])
+    .filter((b) => b.highlighted)
+    .sort((a, b) => {
+      // Teacher-controlled order. `undefined` sinks to end so any rows
+      // highlighted before the schema change remain visible.
+      const ao = a.highlightOrder ?? Number.MAX_SAFE_INTEGER;
+      const bo = b.highlightOrder ?? Number.MAX_SAFE_INTEGER;
+      return ao - bo;
+    });
 
   const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
   const [page, setPage] = useState(0);
@@ -67,7 +73,7 @@ export function FremhevetCarousel({
           <BegrunnelseCard
             key={b._id}
             text={b.text}
-            vote={voteByStudent.get(b.studentId)}
+            vote={voteByStudentRound.get(`${b.studentId}:${b.round}`)}
             highlighted
             onDismiss={() => onDismiss(b)}
           />

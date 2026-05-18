@@ -5,10 +5,10 @@ import type { Id } from "@workspace/backend/convex/_generated/dataModel";
 
 import { SKIP, type Skip } from "./types";
 
-export const sessionBegrunnelserQueries = {
+export const sessionJustificationsQueries = {
   bySessionStatement: (sessionId: Id<"liveSessions"> | Skip, statementIndex: number) =>
     convexQuery(
-      api.liveSessions.getBegrunnelser,
+      api.liveSessions.getJustifications,
       sessionId === SKIP ? SKIP : { sessionId, statementIndex },
     ),
   mine: (
@@ -17,12 +17,13 @@ export const sessionBegrunnelserQueries = {
     statementIndex: number,
   ) =>
     convexQuery(
-      api.liveSessions.getMyBegrunnelser,
+      api.liveSessions.getMyJustifications,
       sessionId === SKIP ? SKIP : { sessionId, studentId, statementIndex },
     ),
 };
 
-export const sessionBegrunnelserMutations = {
-  submit: api.liveSessions.submitBegrunnelse,
-  highlight: api.liveSessions.highlightBegrunnelse,
+export const sessionJustificationsMutations = {
+  submit: api.liveSessions.submitJustification,
+  highlight: api.liveSessions.highlightJustification,
+  reorder: api.liveSessions.reorderHighlights,
 } as const;

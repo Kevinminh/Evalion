@@ -7,7 +7,7 @@ import {
 import type { Fasit } from "@workspace/api/types";
 import { cn } from "@workspace/ui/lib/utils";
 
-import type { BegrunnelseRef } from "./types";
+import type { JustificationRef } from "./types";
 
 interface MatrixCell {
   label: string;
@@ -18,7 +18,7 @@ interface MatrixCell {
     name: string;
     vote: "sant" | "usant" | "delvis";
     confidence: number | null;
-    begrunnelse?: BegrunnelseRef | null;
+    justification?: JustificationRef | null;
     vote2?: "sant" | "usant" | "delvis";
   }>;
 }
@@ -29,7 +29,7 @@ interface StudentMatrixProps {
   layout?: "r1" | "r2";
   selectedIdx: number | null;
   onSelect: (idx: number | null) => void;
-  onToggleHighlight?: (id: Id<"sessionBegrunnelser">, next: boolean) => void;
+  onToggleHighlight?: (id: Id<"sessionJustifications">, next: boolean) => void;
 }
 
 export function StudentMatrix({
@@ -65,11 +65,11 @@ export function StudentMatrix({
             </div>
             <div className="-mx-3.5 flex max-h-96 flex-col overflow-y-auto">
               {selected.students.map((s, j) => {
-                const canHighlight = !!s.begrunnelse && !!onToggleHighlight;
-                const highlighted = s.begrunnelse?.highlighted ?? false;
+                const canHighlight = !!s.justification && !!onToggleHighlight;
+                const highlighted = s.justification?.highlighted ?? false;
                 const handleClick = () => {
-                  if (s.begrunnelse && onToggleHighlight) {
-                    onToggleHighlight(s.begrunnelse._id, !s.begrunnelse.highlighted);
+                  if (s.justification && onToggleHighlight) {
+                    onToggleHighlight(s.justification._id, !s.justification.highlighted);
                   }
                 };
                 return (
@@ -88,9 +88,9 @@ export function StudentMatrix({
                   >
                     <div className="min-w-0 flex-1">
                       <div className="text-[13px] font-bold text-foreground">{s.name}</div>
-                      {s.begrunnelse?.text ? (
+                      {s.justification?.text ? (
                         <div className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">
-                          {s.begrunnelse.text}
+                          {s.justification.text}
                         </div>
                       ) : (
                         <div className="mt-0.5 text-[11px] italic leading-relaxed text-muted-foreground/70">

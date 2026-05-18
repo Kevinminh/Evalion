@@ -48,7 +48,7 @@ const SEED_DATA = [
     title: "Brøk, prosent og desimaltall",
     subject: "Matematikk",
     level: "10. trinn",
-    type: "oppsummering" as const,
+    type: "summary" as const,
     concepts: ["Brøk", "Prosent", "Desimaltall", "Omregning"],
     statements: [
       {
@@ -83,7 +83,7 @@ const SEED_DATA = [
     title: "Cellebiologi og arv",
     subject: "Naturfag",
     level: "10. trinn",
-    type: "oppsummering" as const,
+    type: "summary" as const,
     concepts: ["Cellen", "DNA", "Gener", "Celledeling", "Arv"],
     statements: [
       {
@@ -241,7 +241,7 @@ const SEED_DATA = [
     title: "British vs. American English",
     subject: "Engelsk",
     level: "VG2",
-    type: "oppsummering" as const,
+    type: "summary" as const,
     concepts: ["Spelling", "Vocabulary", "Pronunciation", "Grammar", "Culture"],
     statements: [
       {
