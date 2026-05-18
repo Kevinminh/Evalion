@@ -54,7 +54,10 @@ function AnalyticsPage() {
   // statement selector or round/resultat tabs. The current påstand and
   // current step are read straight off the session document.
   const selectedStatement = session?.currentStatementIndex ?? 0;
-  const activeTab: TabId = STEP_TO_TAB[session?.currentStep ?? 1] ?? "runde1";
+  const currentStep = session?.currentStep ?? 0;
+  // Step 0 is the teacher's statement picker — no påstand has been chosen yet.
+  const isStatementOverview = currentStep === 0;
+  const activeTab: TabId = STEP_TO_TAB[currentStep] ?? "runde1";
 
   const { data: analytics } = useQuery(
     sessionVotesQueries.analytics(sessionId, selectedStatement),
@@ -77,7 +80,7 @@ function AnalyticsPage() {
   const statementColor = session.statements[selectedStatement]?.color;
   const totalStudents = session.studentCount;
   const totalStatements = session.statements.length;
-  const showR1Comparison = (session.currentStep ?? 0) >= 4;
+  const showR1Comparison = currentStep >= 4;
 
   return (
     <div className="flex min-h-svh flex-col bg-neutral-100">
@@ -89,16 +92,18 @@ function AnalyticsPage() {
             <div className="h-3.5 w-px bg-neutral-300" />
             <span className="text-xs font-bold text-foreground">Live-statistikk</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            {totalStatements > 1 && (
-              <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
-                Påstand {selectedStatement + 1} av {totalStatements}
+          {!isStatementOverview && (
+            <div className="flex items-center gap-1.5">
+              {totalStatements > 1 && (
+                <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+                  Påstand {selectedStatement + 1} av {totalStatements}
+                </span>
+              )}
+              <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary">
+                {BADGE_LABELS[activeTab]}
               </span>
-            )}
-            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary">
-              {BADGE_LABELS[activeTab]}
-            </span>
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -115,8 +120,12 @@ function AnalyticsPage() {
           (activeTab === "runde2" &&
             analytics.round2.total === 0 &&
             !session.timerStartedAt &&
-            (session.currentStep ?? 0) === 3) ? (
-          <WaitingState />
+            currentStep === 3) ? (
+          <WaitingState
+            text={
+              isStatementOverview ? "Venter på at læreren skal velge en påstand…" : undefined
+            }
+          />
         ) : (
           <>
             {activeTab === "runde1" && (
@@ -130,7 +139,7 @@ function AnalyticsPage() {
                 statementColor={statementColor}
                 statementIndex={selectedStatement}
                 totalStudents={totalStudents}
-                currentStep={session.currentStep ?? 0}
+                currentStep={currentStep}
                 timerDuration={session.timerDuration}
                 timerStartedAt={session.timerStartedAt}
                 timerPausedAt={session.timerPausedAt}
@@ -154,7 +163,7 @@ function AnalyticsPage() {
                 statementColor={statementColor}
                 statementIndex={selectedStatement}
                 totalStudents={totalStudents}
-                currentStep={session.currentStep ?? 0}
+                currentStep={currentStep}
                 timerDuration={session.timerDuration}
                 timerStartedAt={session.timerStartedAt}
                 timerPausedAt={session.timerPausedAt}
