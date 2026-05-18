@@ -11,19 +11,15 @@ import type { Fasit } from "@/lib/types";
 
 import { ColumnChart } from "./column-chart";
 import { ConfidenceCircles } from "./confidence-circles";
-import {
-  getStatementGradient,
-  type RoundDistribution,
-  type StatementColorName,
-  type StudentData,
-} from "./types";
+import { getStatementGradient, type RoundDistribution, type StudentData } from "./types";
 
 interface ResultatTabProps {
   round1: RoundDistribution;
   round2: RoundDistribution;
   fasit: Fasit;
   statementText: string;
-  statementColor?: StatementColorName;
+  statementColor: string | undefined;
+  statementIndex: number;
   avgRating: number;
   ratingDistribution: Array<{ score: number; count: number }>;
   students: StudentData[];
@@ -35,12 +31,13 @@ export function ResultatTab({
   fasit,
   statementText,
   statementColor,
+  statementIndex,
   avgRating,
   ratingDistribution,
   students,
 }: ResultatTabProps) {
   const [showRatingDetail, setShowRatingDetail] = useState(false);
-  const gradient = getStatementGradient(statementColor);
+  const gradient = getStatementGradient(statementColor, statementIndex);
 
   const makeItems = (dist: RoundDistribution) => [
     { label: "Sant", count: dist.sant, pct: dist.santPct, isCorrect: fasit === "sant" },
@@ -156,7 +153,7 @@ export function ResultatTab({
                     >
                       {VOTE_LABELS[s.round1.vote as Fasit]}
                     </span>
-                    {s.round2 && (
+                    {s.round2 && s.round2.vote !== s.round1.vote && (
                       <>
                         <span className="text-[10px] text-muted-foreground">→</span>
                         <span

@@ -1,8 +1,9 @@
 import type { Id } from "@workspace/backend/convex/_generated/dataModel";
+import { computeRemainingSeconds } from "@workspace/features/lib/timer";
 import { Popover, PopoverContent, PopoverTrigger } from "@workspace/ui/components/popover";
 import { cn } from "@workspace/ui/lib/utils";
-import { BarChart3 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { BarChart3, Pause } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { Fasit } from "@/lib/types";
 
@@ -12,7 +13,6 @@ import {
   getStatementGradient,
   type RoundDistribution,
   type ConfidenceData,
-  type StatementColorName,
   type StudentData,
 } from "./types";
 
@@ -24,9 +24,19 @@ interface RoundAnalyticsProps {
   prevDistribution?: RoundDistribution;
   fasit: Fasit;
   statementText: string;
-  statementColor?: StatementColorName;
+  statementColor: string | undefined;
+  statementIndex: number;
   totalStudents: number;
-  sessionActive: boolean;
+  currentStep: number;
+  timerDuration: number | undefined;
+  timerStartedAt: number | undefined;
+  timerPausedAt: number | undefined;
+  timerRemainingAtPause: number | undefined;
+  /** True if any vote has been recorded for this round/statement. Votes survive
+   * step navigation, so this is the durable signal that the round was already
+   * opened — used to distinguish "ended" from a stale "not_started" after the
+   * teacher navigates away and back. */
+  hasVotes: boolean;
   students: StudentData[];
   onToggleHighlight?: (id: Id<"sessionJustifications">, next: boolean) => void;
 }
@@ -40,13 +50,29 @@ export function RoundAnalytics({
   fasit,
   statementText,
   statementColor,
+  statementIndex,
   totalStudents,
-  sessionActive,
+  currentStep,
+  timerDuration,
+  timerStartedAt,
+  timerPausedAt,
+  timerRemainingAtPause,
+  hasVotes,
   students,
   onToggleHighlight,
 }: RoundAnalyticsProps) {
-  const gradient = getStatementGradient(statementColor);
+  const gradient = getStatementGradient(statementColor, statementIndex);
   const [matrixSelected, setMatrixSelected] = useState<number | null>(null);
+  const votingStep = round === 1 ? 1 : 3;
+  const voteState = useVoteBadgeState(
+    votingStep,
+    currentStep,
+    timerDuration,
+    timerStartedAt,
+    timerPausedAt,
+    timerRemainingAtPause,
+    hasVotes,
+  );
 
   const voteItems = [
     {
@@ -120,16 +146,31 @@ export function RoundAnalytics({
             <strong className="font-extrabold text-foreground">{distribution.total}</strong> av{" "}
             {totalStudents} elever har stemt
           </span>
-          {sessionActive && round === 1 ? (
+          {voteState === "running" ? (
             <div className="flex items-center gap-1.5 rounded-full bg-sant px-3 py-1 text-[9px] font-extrabold uppercase tracking-wider text-white">
               <span className="size-1.5 animate-pulse rounded-full bg-white" />
               Avstemning pågår
             </div>
+          ) : voteState === "paused" ? (
+            <div className="flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-[9px] font-extrabold uppercase tracking-wider text-orange-700">
+              <Pause className="size-2.5" strokeWidth={3} fill="currentColor" />
+              Pause
+            </div>
+          ) : voteState === "not_started" ? (
+            <div className="rounded-full bg-neutral-200 px-3 py-1 text-[9px] font-extrabold uppercase tracking-wider text-neutral-600">
+              Ikke startet
+            </div>
           ) : (
             <div className="rounded-full bg-neutral-500 px-3 py-1 text-[9px] font-extrabold uppercase tracking-wider text-white">
-              Runde {round} fullført
+              Runde {round} avsluttet
             </div>
           )}
+        </div>
+
+
+        <div className="border-t border-neutral-100 px-3.5 pb-3.5">
+          <p className="pt-1.5 text-[10px] font-semibold text-muted-foreground">Stemmefordeling</p>
+          <ColumnChart items={voteItems} />
         </div>
 
         <div className="flex items-center justify-between px-3.5 py-2.5">
@@ -195,11 +236,6 @@ export function RoundAnalytics({
             </PopoverContent>
           </Popover>
         </div>
-
-        <div className="border-t border-neutral-100 px-3.5 pb-3.5">
-          <p className="pt-1.5 text-[10px] font-semibold text-muted-foreground">Stemmefordeling</p>
-          <ColumnChart items={voteItems} />
-        </div>
       </div>
 
       {round === 2 && (
@@ -243,6 +279,48 @@ export function RoundAnalytics({
       <MatrixHint />
     </div>
   );
+}
+
+type VoteBadgeState = "not_started" | "running" | "paused" | "ended";
+
+/** Derives the round badge state from currentStep + timer fields + vote count.
+ * No backend "round state" enum exists; this hook is the single source of truth.
+ *  - If the teacher has moved past the voting step → "ended".
+ *  - If the timer was never started on this step:
+ *      • votes exist for this round/statement → "ended" (round was already run,
+ *        teacher navigated away and back — timer fields were wiped by
+ *        updateStep but the votes persist as proof).
+ *      • no votes → "not_started".
+ *  - If the timer is paused → "paused".
+ *  - If the timer is running with time left → "running" (ticks each second).
+ *  - Otherwise (countdown hit zero) → "ended". */
+function useVoteBadgeState(
+  votingStep: number,
+  currentStep: number,
+  duration: number | undefined,
+  startedAt: number | undefined,
+  pausedAt: number | undefined,
+  remainingAtPause: number | undefined,
+  hasVotes: boolean,
+): VoteBadgeState {
+  const [remaining, setRemaining] = useState(() =>
+    computeRemainingSeconds(duration, startedAt, pausedAt, remainingAtPause),
+  );
+
+  useEffect(() => {
+    setRemaining(computeRemainingSeconds(duration, startedAt, pausedAt, remainingAtPause));
+    if (!startedAt || pausedAt) return;
+    const id = setInterval(() => {
+      setRemaining(computeRemainingSeconds(duration, startedAt, pausedAt, remainingAtPause));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [duration, startedAt, pausedAt, remainingAtPause]);
+
+  if (currentStep !== votingStep) return "ended";
+  if (startedAt === undefined) return hasVotes ? "ended" : "not_started";
+  if (pausedAt !== undefined) return "paused";
+  if (remaining > 0) return "running";
+  return "ended";
 }
 
 function buildR1MatrixCells(students: StudentData[]) {

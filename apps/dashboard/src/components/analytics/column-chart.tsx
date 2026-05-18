@@ -72,7 +72,7 @@ export function ColumnChart({ items, compact = false }: ColumnChartProps) {
             >
               <div
                 className={cn(
-                  "absolute bottom-0 flex w-full items-center justify-center rounded-b-[8px] transition-all duration-400",
+                  "absolute bottom-0 flex w-full items-center justify-center rounded-[8px] transition-all duration-400",
                   fillClass,
                 )}
                 style={{ height: `${height}%`, minHeight: 2 }}
