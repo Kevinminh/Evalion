@@ -12,6 +12,7 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 import { ErrorState } from "@workspace/ui/components/states/error-state";
 import { NotFoundState } from "@workspace/ui/components/states/not-found-state";
 import { useMutation } from "convex/react";
+import { useCallback, useLayoutEffect, useRef } from "react";
 
 import { LobbyState } from "@/components/analytics/lobby-state";
 import { ResultatTab } from "@/components/analytics/resultat-tab";
@@ -66,6 +67,48 @@ function AnalyticsPage() {
   const { data: students } = useQuery(sessionStudentsQueries.listBySession(sessionId));
 
   const highlightJustification = useMutation(sessionJustificationsMutations.highlight);
+
+  // Toggling a highlight reflows the page: the HighlightedReorderPanel above
+  // the matrix / "Alle elever" list grows or shrinks. On mobile, that pushes
+  // the row the user just tapped out from under their finger. We compensate
+  // by adjusting window scroll by the same amount the page just resized,
+  // gated on a pending flag so we only react to height changes caused by a
+  // toggle (and not, e.g., a teacher advancing the step).
+  const pendingHighlightReflow = useRef(false);
+
+  useLayoutEffect(() => {
+    let lastHeight = document.body.getBoundingClientRect().height;
+    const ro = new ResizeObserver(() => {
+      const h = document.body.getBoundingClientRect().height;
+      const delta = h - lastHeight;
+      lastHeight = h;
+      if (delta === 0 || !pendingHighlightReflow.current) return;
+      // Skip compensation when the user is at the top — the panel itself is
+      // in view and a natural reflow looks better than a scroll jump.
+      if (window.scrollY <= 50) {
+        pendingHighlightReflow.current = false;
+        return;
+      }
+      pendingHighlightReflow.current = false;
+      window.scrollBy({ top: delta, behavior: "instant" });
+    });
+    ro.observe(document.body);
+    return () => ro.disconnect();
+  }, []);
+
+  const handleToggleHighlight = useCallback(
+    (justificationId: Id<"sessionJustifications">, next: boolean) => {
+      pendingHighlightReflow.current = true;
+      // Safety net: clear the flag if the mutation never produces a reflow
+      // (e.g., no-op toggle, network error) so a later unrelated layout
+      // change doesn't get compensated.
+      window.setTimeout(() => {
+        pendingHighlightReflow.current = false;
+      }, 1500);
+      void highlightJustification({ id: justificationId, highlighted: next });
+    },
+    [highlightJustification],
+  );
 
   if (sessionPending) return <AnalyticsSkeleton />;
   if (sessionError) return <ErrorState className="flex min-h-svh items-center justify-center" />;
@@ -146,7 +189,7 @@ function AnalyticsPage() {
                 timerRemainingAtPause={session.timerRemainingAtPause}
                 hasVotes={analytics.round1.total > 0}
                 students={analytics.students}
-                onToggleHighlight={(id, next) => highlightJustification({ id, highlighted: next })}
+                onToggleHighlight={handleToggleHighlight}
               />
             )}
 
@@ -170,7 +213,7 @@ function AnalyticsPage() {
                 timerRemainingAtPause={session.timerRemainingAtPause}
                 hasVotes={analytics.round2.total > 0}
                 students={analytics.students}
-                onToggleHighlight={(id, next) => highlightJustification({ id, highlighted: next })}
+                onToggleHighlight={handleToggleHighlight}
               />
             )}
 
@@ -186,7 +229,7 @@ function AnalyticsPage() {
                 avgRating={analytics.avgRating}
                 ratingDistribution={analytics.ratingDistribution}
                 students={analytics.students}
-                onToggleHighlight={(id, next) => highlightJustification({ id, highlighted: next })}
+                onToggleHighlight={handleToggleHighlight}
               />
             )}
           </>
